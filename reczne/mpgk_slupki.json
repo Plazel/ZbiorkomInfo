@@ -1,0 +1,1165 @@
+{
+"km114": {
+"-": {
+"code": "1",
+"tok": [
+"GONDOLA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ"
+]
+}
+},
+"km115": {
+"a": {
+"code": "2a",
+"tok": [
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ"
+]
+}
+},
+"km116": {
+"a": {
+"code": "3a",
+"tok": [
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ"
+]
+},
+"b": {
+"code": "3b",
+"tok": [
+"GONDOLA"
+]
+}
+},
+"km118": {
+"-": {
+"code": "5",
+"tok": []
+}
+},
+"km149": {
+"a": {
+"code": "80a",
+"tok": [
+"GONDOLA"
+]
+}
+},
+"km117": {
+"a": {
+"code": "6a",
+"tok": [
+"CZYRNA",
+"MOCHNACZKA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "6b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km120": {
+"b": {
+"code": "7b",
+"tok": [
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km119": {
+"a": {
+"code": "8a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "8b",
+"tok": [
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km69": {
+"a": {
+"code": "9a",
+"tok": [
+"BEREST",
+"CZYRNA",
+"MOCHNACZKA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "9b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km70": {
+"a": {
+"code": "10a",
+"tok": [
+"BEREST",
+"CZYRNA",
+"MOCHNACZKA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "10b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km71": {
+"a": {
+"code": "11a",
+"tok": [
+"CZYRNA",
+"MOCHNACZKA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "11b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km72": {
+"a": {
+"code": "12a",
+"tok": [
+"CZYRNA",
+"MOCHNACZKA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "12b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km130": {
+"a": {
+"code": "71a",
+"tok": [
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km73": {
+"a": {
+"code": "13a",
+"tok": [
+"CZYRNA",
+"MOCHNACZKA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "13b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km74": {
+"a": {
+"code": "14a",
+"tok": [
+"MOCHNACZKA",
+"MUSZYNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "14b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km75": {
+"a": {
+"code": "15a",
+"tok": [
+"MOCHNACZKA",
+"MUSZYNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ"
+]
+},
+"b": {
+"code": "15b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km76": {
+"a": {
+"code": "16a",
+"tok": [
+"MOCHNACZKA",
+"MUSZYNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ"
+]
+},
+"b": {
+"code": "16b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km109": {
+"a": {
+"code": "17a",
+"tok": [
+"SŁOTWIŃSKA"
+]
+},
+"b": {
+"code": "17b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km111": {
+"-": {
+"code": "18",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km110": {
+"b": {
+"code": "18b",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km95": {
+"a": {
+"code": "20a",
+"tok": [
+"GONDOLA",
+"MUSZYNKA",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km129": {
+"a": {
+"code": "21a",
+"tok": [
+"GONDOLA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "21b",
+"tok": []
+}
+},
+"km128": {
+"a": {
+"code": "22a",
+"tok": [
+"GONDOLA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "22b",
+"tok": []
+}
+},
+"km121": {
+"a": {
+"code": "23a",
+"tok": [
+"GONDOLA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "23b",
+"tok": [
+"GONDOLA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km122": {
+"b": {
+"code": "24b",
+"tok": [
+"GONDOLA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km123": {
+"b": {
+"code": "25b",
+"tok": [
+"GONDOLA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km124": {
+"-": {
+"code": "26",
+"tok": [
+"GONDOLA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km68": {
+"a": {
+"code": "27a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "27b",
+"tok": [
+"ZAWODZIE"
+]
+}
+},
+"km67": {
+"a": {
+"code": "28a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+},
+"b": {
+"code": "28b",
+"tok": [
+"ZAWODZIE"
+]
+}
+},
+"km125": {
+"b": {
+"code": "31b",
+"tok": [
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km127": {
+"b": {
+"code": "32b",
+"tok": [
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km135": {
+"a": {
+"code": "33a",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km97": {
+"a": {
+"code": "34a",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km99": {
+"a": {
+"code": "35a",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+},
+"b": {
+"code": "35b",
+"tok": []
+}
+},
+"km89": {
+"-": {
+"code": "37",
+"tok": []
+}
+},
+"km100": {
+"a": {
+"code": "38a",
+"tok": [
+"CZYRNA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "38b",
+"tok": []
+}
+},
+"km101": {
+"a": {
+"code": "39a",
+"tok": []
+},
+"b": {
+"code": "39b",
+"tok": []
+}
+},
+"km102": {
+"a": {
+"code": "40a",
+"tok": [
+"CZYRNA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "40b",
+"tok": []
+}
+},
+"km103": {
+"a": {
+"code": "41a",
+"tok": [
+"CZYRNA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "41b",
+"tok": []
+}
+},
+"km104": {
+"a": {
+"code": "42a",
+"tok": [
+"CZYRNA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "42b",
+"tok": []
+}
+},
+"km105": {
+"a": {
+"code": "43a",
+"tok": [
+"CZYRNA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "43b",
+"tok": []
+}
+},
+"km106": {
+"-": {
+"code": "44",
+"tok": []
+}
+},
+"km132": {
+"a": {
+"code": "46a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "46b",
+"tok": [
+"GONDOLA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km133": {
+"a": {
+"code": "47a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "47b",
+"tok": [
+"GONDOLA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km84": {
+"a": {
+"code": "48a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "48b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km83": {
+"a": {
+"code": "49a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "49b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km148": {
+"a": {
+"code": "50a",
+"tok": [
+"CZYRNA",
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "50b",
+"tok": [
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km147": {
+"a": {
+"code": "51a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "51b",
+"tok": [
+"CZYRNA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km146": {
+"a": {
+"code": "52a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "52b",
+"tok": [
+"CZYRNA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km145": {
+"a": {
+"code": "53a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "53b",
+"tok": [
+"CZYRNA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km144": {
+"a": {
+"code": "54a",
+"tok": [
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "54b",
+"tok": [
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km140": {
+"a": {
+"code": "55a",
+"tok": [
+"POLANY"
+]
+},
+"b": {
+"code": "55b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km141": {
+"a": {
+"code": "56a",
+"tok": [
+"POLANY"
+]
+},
+"b": {
+"code": "56b",
+"tok": [
+"GONDOLA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km142": {
+"b": {
+"code": "57b",
+"tok": [
+"GONDOLA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km143": {
+"b": {
+"code": "58b",
+"tok": [
+"GONDOLA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km139": {
+"a": {
+"code": "59a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "59b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km138": {
+"a": {
+"code": "60a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "60b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km137": {
+"a": {
+"code": "61a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "61b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km136": {
+"a": {
+"code": "62a",
+"tok": [
+"PIORUNKA",
+"POLANY"
+]
+},
+"b": {
+"code": "62b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+}
+},
+"km78": {
+"a": {
+"code": "63a",
+"tok": [
+"MUSZYNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "63b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km77": {
+"a": {
+"code": "64a",
+"tok": [
+"MUSZYNKA",
+"POLANY",
+"TYLICZ"
+]
+},
+"b": {
+"code": "64b",
+"tok": [
+"GONDOLA",
+"SŁOTWIŃSKA",
+"ZAWODZIE"
+]
+}
+},
+"km81": {
+"a": {
+"code": "65a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "65b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km82": {
+"a": {
+"code": "66a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "66b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km134": {
+"-": {
+"code": "67",
+"tok": [
+"GONDOLA",
+"ZAWODZIE"
+]
+}
+},
+"km126": {
+"a": {
+"code": "68a",
+"tok": [
+"SŁOTWIŃSKA"
+]
+}
+},
+"km113": {
+"-": {
+"code": "69",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"SŁOTWIŃSKA",
+"TYLICZ",
+"ZAIKS"
+]
+}
+},
+"km131": {
+"a": {
+"code": "70a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "70b",
+"tok": [
+"GONDOLA",
+"TYLICZ",
+"ZAIKS",
+"ZAWODZIE"
+]
+}
+},
+"km88": {
+"a": {
+"code": "74a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "74b",
+"tok": [
+"CZYRNA",
+"MUSZYNKA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ"
+]
+}
+},
+"km87": {
+"a": {
+"code": "75a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "75b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km86": {
+"a": {
+"code": "76a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "76b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km85": {
+"a": {
+"code": "77a",
+"tok": [
+"CZYRNA",
+"GONDOLA",
+"PIORUNKA",
+"POLANY",
+"TYLICZ",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "77b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km80": {
+"a": {
+"code": "78a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "78b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+},
+"km79": {
+"a": {
+"code": "79a",
+"tok": [
+"GONDOLA",
+"PIORUNKA",
+"ZAWODZIE"
+]
+},
+"b": {
+"code": "79b",
+"tok": [
+"MUSZYNKA",
+"TYLICZ"
+]
+}
+}
+}

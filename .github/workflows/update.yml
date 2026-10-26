@@ -1,0 +1,47 @@
+name: Aktualizacja rozkładów
+
+on:
+  schedule:
+    - cron: '30 2 * * *'   # codziennie ok. 4:30 czasu polskiego
+  workflow_dispatch:        # ręczne uruchomienie z zakładki Actions
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Narzędzia LOOM do schematu oktylinearnego (z pamięci podręcznej)
+        id: loom
+        uses: actions/cache@v4
+        with:
+          path: loom-bin
+          key: loom-bin-v1
+      - name: Zbuduj LOOM (tylko za pierwszym razem)
+        if: steps.loom.outputs.cache-hit != 'true'
+        run: |
+          git clone --recurse-submodules --depth 1 https://github.com/ad-freiburg/loom.git /tmp/loom
+          # the tools do not need LOOM's own tests, which take most of the build time
+          for d in topo loom octi; do
+            sed -i "s|file(GLOB_RECURSE ${d}_SRC \*.cpp)|&\nlist(FILTER ${d}_SRC EXCLUDE REGEX \".*/tests/.*\")|" /tmp/loom/src/$d/CMakeLists.txt
+          done
+          cmake -S /tmp/loom -B /tmp/loom/build -DCMAKE_BUILD_TYPE=Release
+          make -C /tmp/loom/build -j4 topo loom octi
+          mkdir -p loom-bin && cp /tmp/loom/build/topo /tmp/loom/build/loom /tmp/loom/build/octi loom-bin/
+      - name: Pobierz otwarte dane i wygeneruj rozkłady
+        env:
+          LOOM_BIN: ${{ github.workspace }}/loom-bin
+        run: python3 build.py data
+      - name: Zapisz zmiany
+        run: |
+          git config user.name "rozklady-bot"
+          git config user.email "rozklady-bot@users.noreply.github.com"
+          git add data reczne/drogi_cache.json reczne/dopasowanie_cache.json
+          git diff --cached --quiet || git commit -m "Aktualizacja rozkładów $(date +%F)"
+          git push

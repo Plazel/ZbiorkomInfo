@@ -1,0 +1,228 @@
+{
+"Nowy Sącz MDA": [
+"nsr1",
+"Nowy Sącz MDA",
+[
+49.61717,
+20.69818
+],
+"osm"
+],
+"Nowy Sącz ul. Rejtana": "ns00361",
+"Nowy Sącz ul. Kilińskiego Stadion": "ns00331",
+"Nowy Sącz ul. Bulwar Narwiku-Most II": "ns01881",
+"Nowy Sącz ul. Tarnowska": "ns01351",
+"Nowy Sącz ul. Tarnowska Zabełcze": "ns01371",
+"Nowy Sącz ul. Tarnowska Galeria": "ns01381",
+"Wielopole": "ns50071",
+"Wielogłowy": "ns50081",
+"Dąbrowa": "ns50091",
+"Dąbrowa Szpital": "ns50101",
+"Dąbrowa Góry": [
+"nsr12",
+"Dąbrowa Góry",
+[
+49.69014,
+20.68041
+],
+"osm"
+],
+"Zbyszyce": [
+"nsr13",
+"Zbyszyce",
+[
+49.69395,
+20.67786
+],
+"osm"
+],
+"Wola Kurowska": [
+"nsr14",
+"Wola Kurowska",
+[
+49.70252,
+20.68509
+],
+"osm"
+],
+"Sienna II": [
+"nsr15",
+"Sienna II",
+[
+49.70685,
+20.68311
+],
+"osm"
+],
+"Sienna I": [
+"nsr16",
+"Sienna I",
+[
+49.71426,
+20.6939
+],
+"osm"
+],
+"Lipie Ośr. Wypoczynkowy": [
+"nsr17",
+"Lipie Ośrodek Wypoczynkowy",
+[
+49.72221,
+20.70606
+],
+"osm"
+],
+"Lipie": [
+"nsr18",
+"Lipie",
+[
+49.72669,
+20.71961
+],
+"osm"
+],
+"Lipie I": [
+"nsr19",
+"Lipie I",
+[
+49.73491,
+20.72538
+],
+"osm"
+],
+"Gródek n/Dunajcem Koszarka": [
+"nsr20",
+"Gródek nad Dunajcem Koszarka",
+[
+49.73878,
+20.72802
+],
+"osm"
+],
+"Gródek n/Dunajcem": [
+"nsr21",
+"Gródek nad Dunajcem",
+[
+49.74629,
+20.7318
+],
+"osm"
+],
+"Bartkowa Posadowa I": [
+"nsr22",
+"Bartkowa Posadowa I",
+[
+49.75088,
+20.73076
+],
+"est"
+],
+"Bartkowa Posadowa Ośrodek Wypoczynkow": [
+"nsr23",
+"Bartkowa Posadowa Ośrodek Wypoczynkowy",
+[
+49.75546,
+20.72971
+],
+"osm"
+],
+"Rożnów Wiesiółka": [
+"nsr24",
+"Rożnów Wiesiółka",
+[
+49.76122,
+20.70893
+],
+"est"
+],
+"Rożnów Skrzyżowanie": [
+"nsr25",
+"Rożnów Skrzyżowanie",
+[
+49.76698,
+20.68815
+],
+"osm"
+],
+"Rożnów Zapora": [
+"nsr26",
+"Rożnów Zapora",
+[
+49.76833,
+20.69036
+],
+"est"
+],
+"Rożnów Kościół": [
+"nsr27",
+"Rożnów Kościół",
+[
+49.76968,
+20.69256
+],
+"est"
+],
+"Rożnów Ośrodek Zdrowia": [
+"nsr28",
+"Rożnów Ośrodek Zdrowia",
+[
+49.77103,
+20.69477
+],
+"osm"
+],
+"Rożnów UPT": [
+"nsr29",
+"Rożnów UPT",
+[
+49.77692,
+20.70303
+],
+"osm"
+],
+"Roztoka Brzeziny": [
+"nsr30",
+"Roztoka Brzeziny",
+[
+49.78871,
+20.71277
+],
+"osm"
+],
+"Tropie Wiatrowice": [
+"nsr31",
+"Tropie Wiatrowice",
+[
+49.79023,
+20.70024
+],
+"est"
+],
+"Tropie UPT": [
+"nsr32",
+"Tropie UPT",
+[
+49.79175,
+20.68772
+],
+"osm"
+],
+"Tropie I": [
+"nsr33",
+"Tropie I",
+[
+49.79286,
+20.67595
+],
+"osm"
+],
+"Tropie II": [
+"nsr34",
+"Tropie II",
+[
+49.79613,
+20.65849
+],
+"osm"
+]
+}
