@@ -194,6 +194,8 @@ ROWS = [
  "Klikněte na linku v seznamu nebo ve schématu a zvýrazní se. Tažením posouváte, kolečkem myši nebo dvěma prsty přibližujete, dvěma prsty otáčíte."),
 ("Północ u góry", "North up", "Norden oben", "Sever hore", "Sever nahoře"),
 ("Gotowe", "Done", "Fertig", "Hotovo", "Hotovo"),
+("Trasy linii po kliknięciu przystanku", "Line routes when a stop is clicked", "Linienwege beim Klick auf eine Haltestelle", "Trasy liniek po kliknutí na zastávku", "Trasy linek po kliknutí na zastávku"),
+("pokazuje na mapie linie odjeżdżające z przystanku", "shows the lines leaving the stop on the map", "zeigt die abfahrenden Linien auf der Karte", "zobrazí na mape linky odchádzajúce zo zastávky", "zobrazí na mapě linky odjíždějící ze zastávky"),
 ("Moja lokalizacja", "My location", "Mein Standort", "Moja poloha", "Moje poloha"),
 ("Szczegóły przystanku →", "Stop details →", "Haltestellendetails →", "Podrobnosti zastávky →", "Podrobnosti zastávky →"),
 ("Brak odjazdów w najbliższym czasie.", "No departures soon.", "In nächster Zeit keine Abfahrten.", "V najbližšom čase žiadne odchody.", "V nejbližší době žádné odjezdy."),
