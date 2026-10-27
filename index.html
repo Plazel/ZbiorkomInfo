@@ -541,11 +541,11 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 }
 @media (max-width:460px){header.top .themebar .plus{width:30px;height:30px}#plusBtn{display:none}.logo span{font-size:1.02rem;letter-spacing:-.03em}header.top{gap:8px}header.top .themebar{gap:6px}#cityBtn{max-width:calc(100vw - 252px);padding:7px 9px}}
 .expWrap{position:relative;display:inline-flex}
-.expPanel{position:absolute;right:0;width:300px;top:calc(100% + 6px);z-index:30;background:var(--bg);border:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.14);padding:12px 14px;display:flex;flex-direction:column;gap:12px;width:max-content;max-width:min(330px,calc(100vw - 32px))}
+.expPanel{position:absolute;right:0;top:calc(100% + 6px);z-index:30;background:var(--bg);border:1px solid var(--line);box-shadow:0 6px 24px rgba(0,0,0,.14);padding:12px 14px;display:flex;flex-direction:column;gap:12px;width:max-content;max-width:min(420px,calc(100vw - 32px))}
 .expPanel[hidden]{display:none}
 .expPanel .sw-depot{align-items:flex-start;margin:0}
 .expPanel .sw-depot small{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
-.expDays{flex-wrap:wrap;gap:6px 14px}.expDays[hidden]{display:none}
+.expDays{flex-wrap:wrap;gap:6px 14px}.expDays label{white-space:nowrap}.expDays[hidden]{display:none}
 .expFmt{display:flex;gap:14px;align-items:center;padding:6px 2px 2px;font-size:.92rem}.expFmt span{color:var(--muted)}.expFmt label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
 .expBtns{display:flex;gap:8px}
 
@@ -658,16 +658,17 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .mapZoom button,.mapVar,.mapHint,.mapAttr,.glink,.draft,.notes p.click,.sw-depot .track,.sw-depot .track::after,.group .x,select,input,textarea,.wksel,.crumb,
 .expPanel,.ps .psr,.mins span.hl,.mins .nx,.mins span.sel,.sw,
 .jpPt,.jpDot,.jpIcon,.jpSwap,.jpGo,.jpOpt,.jpSum,.jpBadge,.jpPick,.jpZoom,.jpZoom button,.jpAc,.jpWhen select,.jpWhen input,.tdLines,.tdStat,.tdMsg,.tdIn,.tdF select,.tdF input,.bgItem,.bgSum,.gsList{border-radius:0!important}
-.expFmt input[type=checkbox],.expFmt input[type=radio]{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0;border:1.5px solid var(--fg);border-radius:0;background:var(--bg);display:inline-grid;place-items:center;cursor:pointer;flex:none}
-.expFmt input[type=checkbox]:checked{background:var(--fg)}
-.expFmt input[type=checkbox]:checked::after{content:"";width:4px;height:8px;border:solid var(--bg);border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+.expFmt input[type=radio]{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0;border:1.5px solid var(--fg);border-radius:0;background:var(--bg);display:inline-grid;place-items:center;cursor:pointer;flex:none}
 .expFmt input[type=radio]::before{content:"";width:8px;height:8px;background:var(--fg);transform:scale(0);transition:transform .12s}
 .expFmt input[type=radio]:checked::before{transform:scale(1)}
 .expFmt input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.mapNightL input[type=checkbox]{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0;border:1.5px solid var(--fg);border-radius:0;background:var(--bg);display:inline-grid;place-items:center;cursor:pointer;flex:none}
-.mapNightL input[type=checkbox]:checked{background:var(--fg)}
-.mapNightL input[type=checkbox]:checked::after{content:"";width:4px;height:8px;border:solid var(--bg);border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
-.mapNightL input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* every checkbox on the page (now and added later; switches excepted): square, in the text colour */
+input[type=checkbox]:not([role=switch]){appearance:none;-webkit-appearance:none;width:16px;height:16px;margin:0;border:1.5px solid currentColor;border-radius:0;background:transparent;display:inline-grid;place-items:center;cursor:pointer;flex:none;vertical-align:-3px;color:inherit}
+input[type=checkbox]:not([role=switch]):checked{background:currentColor}
+input[type=checkbox]:not([role=switch]):checked::after{content:"";width:4px;height:8px;border:solid var(--ck-tick,var(--bg));border-width:0 2px 2px 0;transform:translateY(-1px) rotate(45deg)}
+input[type=checkbox]:not([role=switch]):disabled{opacity:.45;cursor:default}
+input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.depBox{--ck-tick:var(--d-panel)}
 /* ---- side drawer (glasses): Takty, Rozkłady brygad ---- */
 #topLoc[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .bgNone{min-height:calc(100vh - var(--top-h) - 160px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:0}.bgNone h2{margin:0 0 2px}.bgWarn{color:#e0a100;margin-bottom:12px}.bgNone p{color:var(--muted);font-size:1.05rem;max-width:46ch;margin:0}
@@ -1985,7 +1986,7 @@ function hookPrint(make){const p=document.getElementById('prBtn'),q=document.get
   const hasX=!!(S0.cols.x&&S0.cols.x.length);xx.closest('label').hidden=!hasX;xx.checked=hasX&&store.get('ztm.expNoX',false);xx.onchange=()=>store.set('ztm.expNoX',xx.checked);
   // the days on the sheet (only the kinds of day the line has)
   const dbox=document.getElementById('expDays');const dk=['w','f','s','h'].filter(k=>S0.cols[k]&&S0.cols[k].length);
-  dbox.hidden=dk.length<2;dbox.innerHTML='<span>Dni</span>'+dk.map(k=>`<label><input type="checkbox" value="${k}" checked> ${esc(DAYNAMES[k])}</label>`).join('');
+  dbox.hidden=dk.length<2;dbox.innerHTML=dk.map(k=>`<label><input type="checkbox" value="${k}" checked> ${esc(DAYNAMES[k])}</label>`).join('');
   dbox.querySelectorAll('input').forEach(i=>i.onchange=()=>{if(!dbox.querySelector('input:checked'))i.checked=true});   // at least one day stays
   const fm=store.get('ztm.expFmt','a4');document.querySelectorAll('[name=expFmt]').forEach(i=>{i.checked=i.value===fm;i.onchange=()=>store.set('ztm.expFmt',i.value)});
   const mk=()=>{const S=make();S.fmt=(document.querySelector('[name=expFmt]:checked')||{}).value||'a4';S.short=long&&sh.checked;S.noNotes=hasNotes&&nt.checked;S.noLines=!!S.combo&&ln.checked;S.noRoute=rt.checked;S.noX=hasX&&xx.checked;
