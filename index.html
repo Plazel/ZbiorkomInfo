@@ -3043,16 +3043,27 @@ async function openStopPop(name,pole,e,gi){closeStopPop(true);
     if(live&&live.length){if(live[0].st!==undefined)a=[...live,...sch.filter(d=>!live.some(l=>l.r.n===d.r.n&&Math.abs(l.st-d.t)<=1))];
       else{const last=Math.max(...live.map(d=>d.sch!=null?d.sch:d.t));a=[...live,...sch.filter(d=>d.t>last+1&&!live.some(l=>l.r.n===d.r.n&&l.sch!=null&&Math.abs(l.sch-d.t)<=1.5))]}}
     a=a.filter(d=>d.t>=now-.5).sort((x,y)=>x.t-y.t).slice(0,4);
+    // a live departure without its run: the timetable run it stands for
+    a.forEach(d=>{if(d.ps)return;const m=sch.find(x=>x.r.n===d.r.n&&x.ps&&Math.abs(x.t-(d.sch!=null?d.sch:d.st!=null?d.st:d.t))<=1.5);if(m){d.di=m.di;d.ps=m.ps}});
     const wp=showPl&&a.some(d=>d.pole);
     bx.innerHTML=a.length?a.map(d=>{const s=depStyle(d.r);const m=Math.round(d.t-now);
       const tm=m<=0?'<1 min':m<30?m+' min':String(Math.floor(d.t/60)%24).padStart(2,'0')+':'+String(Math.round(d.t)%60).padStart(2,'0');
-      return `<div class="mr${wp?' wpl':''}" data-rid="${esc(d.r.id)}" role="button" tabindex="0" title="Pokaż trasę linii ${esc(d.r.n)}"><div class="mb ${s.shape}${sqCls(d.r)}" style="background:${s.bg};color:${s.fg}">${esc(d.r.n)}</div><div>${esc(d.head)}</div>${wp?`<div class="mpl" title="Peron">${d.pole?POLE+esc(d.pole):''}</div>`:''}<div class="mt${d.live?' live':''}">${tm}</div></div>`}).join(''):'<p>Brak odjazdów w najbliższym czasie.</p>';
-    bx.querySelectorAll('.mr[data-rid]').forEach(row=>{const go=()=>{const id=row.dataset.rid;if(!MAP.data.routes[id])return;closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([id]);applyHL()};
+      return `<div class="mr${wp?' wpl':''}" data-rid="${esc(d.r.id)}" data-i="${a.indexOf(d)}" role="button" tabindex="0" title="Pokaż trasę linii ${esc(d.r.n)}"><div class="mb ${s.shape}${sqCls(d.r)}" style="background:${s.bg};color:${s.fg}">${esc(d.r.n)}</div><div>${esc(d.head)}</div>${wp?`<div class="mpl" title="Peron">${d.pole?POLE+esc(d.pole):''}</div>`:''}<div class="mt${d.live?' live':''}">${tm}</div></div>`}).join(''):'<p>Brak odjazdów w najbliższym czasie.</p>';
+    bx.querySelectorAll('.mr[data-rid]').forEach(row=>{const go=()=>{const id=row.dataset.rid;if(!MAP.data.routes[id])return;const dep=a[+row.dataset.i];closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([id]);applyHL();
+        // the line in the variant of this run (its letter, or the main route)
+        const v=runVariant(id,dep);if(v!=null&&MAP.hl.size===1){MAP.variant=v;updateVarPanel();renderLabels()}};
       row.onclick=go;row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}}});
     trTree(bx)};
   const load=async()=>{let sch=[];for(const [k,sh] of depDayKeys())sch.push(...await depFor(st,k,sh));draw(sch,null);
     let live=null;try{live=await depLive(st)}catch(_){}if(live&&live.length)draw(sch,live)};
   load();MAP.popT=setInterval(load,30000)}
+// the map variant a run follows: the variant of its direction whose stops are the run's stops (by name), else the main route
+function runVariant(id,dep){const M=MAP.data.routes[id];if(!M||!M.vr||!dep||!dep.ps)return null;
+  const nm=x=>(IDX.stops[x]||[''])[0];const want=dep.ps.map(nm).join('|');
+  const es=M.vr.filter(e=>e.d===dep.di&&!(hideDepot&&e.dp));
+  let e=es.find(e=>e.s.map(nm).join('|')===want);
+  if(!e){const W=new Set(dep.ps.map(nm));let bs=-1;es.forEach(x=>{const S=x.s.map(nm);const sc=S.filter(n=>W.has(n)).length*2-S.length-W.size;if(sc>bs){bs=sc;e=x}})}
+  if(!e||e.m||e.l<0)return 'main';return e.l}
 // ---- the user's own position on the map (a blue dot with the accuracy circle), followed while it is on ----
 function toggleMe(){const b=document.getElementById('mapMeBtn');
   if(MAP.meW!=null){navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null;MAP.me=null;b.setAttribute('aria-pressed','false');drawMe();return}
@@ -3188,7 +3199,7 @@ async function depFor(st,dayKey,shift){
         const plan=d.plans&&d.tp&&d.tp[dk]!==undefined?d.plans[d.tp[dk]]:[];
         plan.forEach(([t0,pi])=>{const [pat,off]=d.prof[pi];const ps=d.pats[pat];
           for(let j=0;j<ps.length-1;j++)if(ps[j]===k){const key=pi+'|'+t0;if(seen.has(key))break;seen.add(key);
-            out.push({t:t0+off[j]+shift,r,head:sName(d.stops[ps[ps.length-1]][0]),pole,st:st.n,sch:true});break}})})})}));
+            out.push({t:t0+off[j]+shift,r,head:sName(d.stops[ps[ps.length-1]][0]),pole,st:st.n,sch:true,di:L.dirs.indexOf(d),ps:(d._ids||(d._ids={}))[pat]||(d._ids[pat]=ps.map(i=>d.stops[i][0]))});break}})})})}));
   return out}
 function depDayKeys(){const tt=todayType();const now=new Date();const wd=now.getDay();
   const tomorrow=wd===5?'s':wd===6?'h':'w';   // weekday after today (holidays aside)
@@ -3276,7 +3287,7 @@ async function depLiveGT(st){const area=RT_GTFS[st.c],feeds=RT_FEEDS[area];if(!f
         if(e.delay!=null)dl=e.delay;else continue}
       if(dl<-900)continue;
       const tS=t0+off[k],t=tS+dl/60;if(t<nowM-1||t>nowM+120)continue;
-      out.push({t,st:tS,r,head:sName(d.stops[ps[ps.length-1]][0]),pole:(IDX.stops[d.stops[ps[k]][0]]||[])[1]||'',live:true,delay:Math.round(dl),lastT:t})}}
+      out.push({t,st:tS,r,head:sName(d.stops[ps[ps.length-1]][0]),pole:(IDX.stops[d.stops[ps[k]][0]]||[])[1]||'',live:true,delay:Math.round(dl),lastT:t,di:L.dirs.indexOf(d),ps:ps.map(i=>d.stops[i][0])})}}
   if(!ok)return null;return out}
 async function depLive(st){
   if(RT_GTFS[st.c])return RT_LOCAL?depLiveRT(st):depLiveGT(st);
