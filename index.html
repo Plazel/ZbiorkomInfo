@@ -2715,7 +2715,7 @@ function buildStopSyms(){const D=MAP.data.routes;const poles=new Map();
     if(!g){g={name:p.name,ps:[]};L.push(g)}g.ps.push(p);byName.set(p.name,L)});
   // two poles with the same number (data of two operators) are one
   MAP.stopG=[...byName.values()].flat().map(g=>{const pm=new Map();g.ps.forEach(p=>{const k=p.pole||p.id;const o=pm.get(k);if(o){p.rs.forEach(r=>o.rs.add(r));o.n=(o.n||1)+1;o.xy=[(o.xy[0]+p.xy[0])/2,(o.xy[1]+p.xy[1])/2]}else pm.set(k,{...p,rs:new Set(p.rs)})});
-    const ps=[...pm.values()].sort((a,b)=>a.pole.localeCompare(b.pole,'pl',{numeric:true}));ps.forEach(p=>p.sy=symsOf([...p.rs]));
+    const ps=[...pm.values()].sort((a,b)=>a.pole.localeCompare(b.pole,'pl',{numeric:true}));ps.forEach(p=>{p.sy=symsOf([...p.rs]);p.rail=[...p.rs].every(r=>r.t==='rail')});
     const all=new Set();ps.forEach(p=>p.rs.forEach(r=>all.add(r)));
     return {name:g.name,ps,x:ps.reduce((a,p)=>a+p.xy[0],0)/ps.length,y:ps.reduce((a,p)=>a+p.xy[1],0)/ps.length,sy:symsOf([...all]),
       pri:all.size+[...all].filter(r=>r.t==='rail'||r.t==='tram').length*4}})}
@@ -2749,7 +2749,10 @@ function renderStopSyms(g,k,v){
   const vis=MAP.stopG.filter(G=>G.x>v.x-m&&G.x<v.x+v.w+m&&G.y>v.y-m&&G.y<v.y+v.h+m).sort((a,b)=>b.pri-a.pri);
   const out=[];const marks=[];
   vis.forEach(G=>{const gi=MAP.stopG.indexOf(G);
-    const units=poleLvl&&G.ps.length>1?G.ps.map(p=>({x:p.xy[0],y:p.xy[1],sy:p.sy,pole:p.pole})):[{x:G.x,y:G.y,sy:G.sy,pole:G.ps.length===1?G.ps[0].pole:''}];
+    // railway stations stay one sign without platform numbers, however close the zoom
+    const rp=G.ps.filter(p=>p.rail),op=G.ps.filter(p=>!p.rail);
+    const railU=rp.length?[{x:rp.reduce((a,p)=>a+p.xy[0],0)/rp.length,y:rp.reduce((a,p)=>a+p.xy[1],0)/rp.length,sy:symsOf(rp.flatMap(p=>[...p.rs])),pole:''}]:[];
+    const units=poleLvl&&op.length+railU.length>1?[...op.map(p=>({x:p.xy[0],y:p.xy[1],sy:p.sy,pole:p.pole})),...railU]:[{x:G.x,y:G.y,sy:G.sy,pole:G.ps.length===1&&!G.ps[0].rail?G.ps[0].pole:''}];
     let first=null;const placed=[];
     units.forEach(u=>{const [sx,sy]=scr(u.x,u.y);const hw=u.sy.length*10.5+1;const b=[sx-hw,sy-11,sx+hw,sy+11];
       if(!poleLvl&&hit(b))return;add(b);if(!first)first={sx,sy,hw,u};placed.push({sx,sy,hw,u});
