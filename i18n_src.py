@@ -200,6 +200,7 @@ ROWS = [
 ("Brak zgody na udostępnienie lokalizacji.", "Location access denied.", "Standortzugriff verweigert.", "Prístup k polohe zamietnutý.", "Přístup k poloze zamítnut."),
 ("Nie udało się ustalić lokalizacji.", "Could not determine the location.", "Standort konnte nicht ermittelt werden.", "Polohu sa nepodarilo zistiť.", "Polohu se nepodařilo zjistit."),
 ("Wybierz przystanek w ustawieniach tablicy.", "Choose a stop in the board settings.", "Wähle eine Haltestelle in den Tafeleinstellungen.", "Vyberte zastávku v nastaveniach tabule.", "Vyberte zastávku v nastavení tabule."),
+("Linie lokalne", "Local lines", "Lokallinien", "Miestne linky", "Místní linky"),
 ("Moja lokalizacja", "My location", "Mein Standort", "Moja poloha", "Moje poloha"),
 ("Szczegóły przystanku →", "Stop details →", "Haltestellendetails →", "Podrobnosti zastávky →", "Podrobnosti zastávky →"),
 ("Brak odjazdów w najbliższym czasie.", "No departures soon.", "In nächster Zeit keine Abfahrten.", "V najbližšom čase žiadne odchody.", "V nejbližší době žádné odjezdy."),
