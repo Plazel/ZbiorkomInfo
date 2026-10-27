@@ -193,6 +193,7 @@ ROWS = [
  "Kliknite na linku v zozname alebo na schéme a zvýrazní sa. Ťahaním posúvate, kolieskom myši alebo dvoma prstami približujete, dvoma prstami otáčate.",
  "Klikněte na linku v seznamu nebo ve schématu a zvýrazní se. Tažením posouváte, kolečkem myši nebo dvěma prsty přibližujete, dvěma prsty otáčíte."),
 ("Północ u góry", "North up", "Norden oben", "Sever hore", "Sever nahoře"),
+("Gotowe", "Done", "Fertig", "Hotovo", "Hotovo"),
 ("Mapa: ©", "Map: ©", "Karte: ©", "Mapa: ©", "Mapa: ©"),
 ("Tablica odjazdów", "Departure board", "Abfahrtstafel", "Tabuľa odchodov", "Tabule odjezdů"),
 ("ODJAZDY", "DEPARTURES", "ABFAHRTEN", "ODCHODY", "ODJEZDY"),
