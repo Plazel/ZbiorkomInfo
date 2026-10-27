@@ -3024,7 +3024,7 @@ const RT_URL='https://ckan2.multimediagdansk.pl/departures?stopId=';
 // served by serwer.py on this computer (uruchom_serwer.bat): its own pass-through to the ZTM API comes first
 const RT_LOCAL=/^https?:$/.test(location.protocol)&&/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 // RT_PROXY: the site's own pass-through (e.g. a Cloudflare Worker, see proxy/worker.js), tried first when set
-const RT_PROXY='';
+const RT_PROXY='https://divine-limit-0a3b.latka1500.workers.dev/';
 const RT_WAYS=[...(RT_LOCAL?[u=>'/rt?'+u.split('?')[1]]:[]),...(RT_PROXY?[u=>RT_PROXY+'?url='+encodeURIComponent(u)]:[]),u=>u,u=>'https://corsproxy.io/?url='+encodeURIComponent(u),u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)];
 let RT_WAY=null,RT_DEAD=0;
 async function rtFetch(id){const order=RT_WAY!==null?[RT_WAY,...RT_WAYS.keys()].filter((v,i,a)=>a.indexOf(v)===i):[...RT_WAYS.keys()];
