@@ -552,7 +552,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .depModal.light{--d-bg:#e9ecee;--d-bar:#fff;--d-head:#d5dade;--d-row:#fff;--d-row2:#f4f6f7;--d-sep:#d0d5d9;--d-fg:#14181b;--d-dim:#5c656c;--d-acc:#0a62c9;--d-panel:#fff;--d-line:#d5dade;--d-in:#f4f6f7}
 .depModal:fullscreen{left:0;top:0}
 .depPanels{display:grid;grid-template-columns:repeat(var(--np,1),minmax(0,1fr));gap:calc(var(--rowh)*.08);background:var(--d-sep);min-height:0}
-.dP{display:grid;grid-template-rows:auto auto 1fr;min-width:0;min-height:0;background:var(--d-bg);overflow:hidden}
+.dP{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto 1fr;min-width:0;min-height:0;background:var(--d-bg);overflow:hidden}
 .dTitle{background:var(--d-bar);display:flex;align-items:center;gap:16px;padding:calc(var(--rowh)*.06) calc(var(--rowh)*.18);min-height:calc(var(--rowh)*.5)}
 .dTitle{padding-right:calc(var(--rowh)*.14)}
 /* the clock on the stop's bar, over the platform column */
@@ -807,7 +807,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 body.ovl #app,body.ovl .plusPanel{visibility:hidden}
 body.ovl{overflow:hidden;overscroll-behavior:none}
 :root{--brand:#d71920}
-@media (max-width:760px){.dTitle{min-height:calc(var(--rowh)*.62);padding-top:6px;padding-bottom:6px}.dTitle b,.dTitle .dClock{font-size:max(18px,calc(var(--rowh)*.34))}.dHead{height:calc(var(--rowh)*.72)}.dHead .l,.dHead .c{font-size:max(17px,calc(var(--rowh)*.32))}}
+@media (max-width:760px){.dTitle{min-height:calc(var(--rowh)*.56)}.dTitle b,.dTitle .dClock{font-size:calc(var(--rowh)*.3)}.dHead{height:calc(var(--rowh)*.6)}.dHead .l,.dHead .c{font-size:calc(var(--rowh)*.28)}.depPanels{overflow-y:auto;align-content:start;grid-template-columns:minmax(0,1fr)!important;grid-auto-rows:max-content}.dPanel,.depPanels>*{min-height:0;height:auto}.dRows{overflow:visible}}
 
 .depRowF .depLocBtn{align-self:flex-end;width:40px;height:40px;flex:none;display:inline-grid;place-items:center;padding:0;box-sizing:border-box}
 
@@ -3047,7 +3047,8 @@ function depLayout(){const m=depEl();if(m.hidden)return;
   const np=depCfg.split?2:1;m.style.setProperty('--np',np);
   const pe=document.getElementById('depPanels');const h=pe.clientHeight,w=pe.clientWidth/np;
   // the title and header take about 1.6 rows: the rows share the rest
-  const rowh=Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));   // narrow screens: smaller type, so names still fit
+  // narrow screens: the rows as large as the width allows (the boards then scroll), so the type stays readable
+  const rowh=pe.clientWidth<760?Math.max(40,Math.min(64,pe.clientWidth/7)):Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));
   m.style.setProperty('--rowh',rowh+'px');m.style.setProperty('--nrows',depCfg.rows);
   m.style.setProperty('--c-badge',(rowh*1.15)+'px');m.style.setProperty('--c-code',depCfg.showCode&&DEP.poles?Math.max(rowh*.9,codeW(rowh))+'px':'0px')}
 // the platform column is as wide as its heading in the chosen language (e.g. "Nástupište")
@@ -3177,7 +3178,7 @@ function navMark(){const v=MAP.open?'map':(typeof DEP!=='undefined'&&DEP.open)?'
   const pb=null,tf=document.getElementById('topFull'),tl=document.getElementById('topLoc');if(tf)tf.hidden=v!=='dep'}
 document.getElementById('topFull').onclick=()=>document.getElementById('depFull').click();
 // the location button (departure board): all departures from the nearest stop; poles serving opposite directions get a board each.
-// The board shown this way is not saved: a second click (or changing the city) brings back the saved board
+// The board found this way is remembered like one chosen by hand
 document.getElementById('topLoc').onclick=async()=>{const b=document.getElementById('topLoc'),st=document.getElementById('depStat');
   if(DEP.loc){DEP.loc=false;b.setAttribute('aria-pressed','false');depLoad();depLoadData();return}
   if(!navigator.geolocation){st.textContent='Ta przeglądarka nie udostępnia lokalizacji.';return}
@@ -3204,6 +3205,7 @@ async function depNearest(la,lo){const st=document.getElementById('depStat');
   const ttl=g=>{const c={};g.forEach(p=>Object.entries(head[p]||{}).forEach(([h,n])=>c[h]=(c[h]||0)+n));const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,1).map(x=>x[0]);
     return best+(g.length?' '+g.join(', '):'')+(top.length?' → '+top.join(', '):'')};
   depCfg=Object.assign(depDefaults(),depCfg,{stops:[{n:best,c:city,poles:B.length?A:[]}],stops2:B.length?[{n:best,c:city,poles:B}]:[],split:B.length>0,title:B.length?ttl(A):'',title2:B.length?ttl(B):''});
+  store.set(depKey(),depCfg);   // the nearest stop's board is remembered too (the next visit opens with it)
   DEP.loc=true;document.getElementById('topLoc').setAttribute('aria-pressed','true');depCloseDlg();
   depLoadData();st.textContent='Najbliższy przystanek: '+best+' ('+Math.round(bd)+' m)'}
 function markCity(){document.getElementById('cityName').textContent=CITIES[city][0];document.getElementById('cityBtn').title='Miasto: '+CITIES[city][0];
