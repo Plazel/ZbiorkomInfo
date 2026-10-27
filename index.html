@@ -509,6 +509,9 @@ header.top .themebar{max-width:none;margin:0 0 0 auto;padding:0;flex-wrap:nowrap
 #cityBtn span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #cityBtn:hover,#cityBtn[aria-expanded="true"]{border-color:var(--fg)}
 .cityMenu{position:absolute;left:0;top:calc(100% + 6px);z-index:45;background:var(--bg);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.16);padding:8px;width:max-content;min-width:230px;max-width:calc(100vw - 32px)}
+/* short screens: the list of cities scrolls inside the menu (above the bottom menu on phones) */
+.cityMenu,.langMenu{max-height:calc(100vh - var(--top-h) - 20px);max-height:calc(100dvh - var(--top-h) - 20px);overflow-y:auto;overscroll-behavior:contain}
+@media (max-width:760px){.cityMenu,.langMenu{max-height:calc(100vh - var(--top-h) - 80px - env(safe-area-inset-bottom,0px));max-height:calc(100dvh - var(--top-h) - 80px - env(safe-area-inset-bottom,0px))}}
 .cmg{display:flex;flex-direction:column;padding:4px 0}
 .cmg+.cmg{border-top:1px solid var(--line)}
 .cmg span{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 10px 2px}
