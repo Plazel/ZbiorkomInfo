@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ZbiorkomInfo</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M3%206h15v3.6L8.2%2022.4H18V26H2.6v-3.6l9.8-12.8H3z%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2221.5%22%20y%3D%226%22%20width%3D%225%22%20height%3D%2220%22%20fill%3D%22%23d71920%22%2F%3E%3C%2Fsvg%3E">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#ffffff"><meta name="mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M3%206h15v3.6L8.2%2022.4H18V26H2.6v-3.6l9.8-12.8H3z%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2221.5%22%20y%3D%226%22%20width%3D%225%22%20height%3D%2220%22%20fill%3D%22%23d71920%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap">
 <style>
@@ -84,7 +84,8 @@ span.chip{cursor:inherit}
 .ac button:hover,.ac button.cur{background:var(--panel)}
 .ac button svg.ic{width:24px;height:24px;color:var(--fg);margin-right:4px;flex:none}
 .ac .shared{margin-left:auto;padding-left:10px;font-family:var(--font-body);font-weight:400;font-size:.78rem;color:var(--muted);white-space:nowrap}
-.wksel{appearance:none;-webkit-appearance:none;padding-right:30px;max-width:100%;font-family:inherit;line-height:1.5;box-sizing:border-box;
+.wkPick{position:relative;display:inline-block;max-width:100%}.wkPick .wkList{left:0;right:auto;min-width:100%;width:max-content;max-width:calc(100vw - 32px);max-height:none;scrollbar-width:none}.wkPick .wkList li{color:var(--fg)}.wkPick .wkList li.cur{font-weight:600}
+.wksel{appearance:none;text-align:left;-webkit-appearance:none;padding-right:30px;max-width:100%;font-family:inherit;line-height:1.5;box-sizing:border-box;
   height:calc(.88rem * 1.5 + 16px);padding-top:0;padding-bottom:0;
   background-image:linear-gradient(45deg,transparent 50%,var(--fg) 50%),linear-gradient(135deg,var(--fg) 50%,transparent 50%);
   background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat}
@@ -744,7 +745,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .jpSet input[type=radio]:checked{border-color:var(--fg)}.jpSet input[type=radio]:checked::before{transform:scale(1)}
 .jpSet input[type=radio]:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .jpSet .sw-depot{margin:0}
-@media (max-width:760px){.jpModal{left:0;bottom:60px;grid-template-columns:1fr;grid-template-rows:auto 42vh;overflow:auto}.jpSide{border-right:0;overflow:visible}.jpMap{order:-1}
+@media (max-width:760px){.jpModal{left:0;bottom:60px;grid-template-columns:1fr;grid-template-rows:34vh auto;overflow:auto}.jpSide{border-right:0;overflow:visible}.jpMap{order:-1}
  .toolsDr{left:0;bottom:60px}.tkList li{grid-template-columns:48px auto 1fr 56px}}
 
 /* ===== mobile version (phones): search behind a button, timetable before the stop list, full-screen map with a sheet of lines ===== */
@@ -777,7 +778,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
   .tt .side:not(.open)>table{display:none}
   /* settings: a sheet across the screen instead of a narrow drop-down */
   .setPanel{position:fixed;left:8px;right:8px;top:calc(var(--top-h) + 6px);width:auto;max-width:none;max-height:calc(100dvh - var(--top-h) - 90px);overflow:auto;padding:14px 16px;gap:18px}
-  .expPanel{max-width:calc(100vw - 32px)}
+  .expPanel{position:fixed;left:8px;right:8px;top:calc(var(--top-h) + 6px);width:auto;max-width:none;max-height:calc(100dvh - var(--top-h) - 90px);overflow:auto}
   /* map: header in one scrolling row, the map over the whole screen, the line list as a sheet from the bottom */
   .mapHead{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:8px 12px;scrollbar-width:none}
   .mapHead::-webkit-scrollbar{display:none}
@@ -796,10 +797,17 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
   .mapZoom button{width:44px;height:44px}
   .mapVar{left:8px;right:8px;top:8px;max-width:none}
   /* journey planner: a smaller map, the form right under it */
-  .jpModal{grid-template-rows:auto 34vh}
+  .jpModal{grid-template-rows:34vh auto}
+  /* the views over the whole screen end where the bottom bar begins (taller with the phone's gesture area) */
+  .mapModal,.depModal,.toolsDr,.jpModal{bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  .jpSide{padding-bottom:24px}
 }
+/* while the map, the departure board, the journey planner or a tool is open, the timetables underneath are not drawn
+   (a fast scroll on a phone could show them through) and the page itself does not scroll */
+body.ovl #app,body.ovl .plusPanel{visibility:hidden}
+body.ovl{overflow:hidden;overscroll-behavior:none}
 :root{--brand:#d71920}
-@media (max-width:760px){.dTitle{min-height:calc(var(--rowh)*.4)}.dTitle b,.dTitle .dClock{font-size:calc(var(--rowh)*.22)}.dHead{height:calc(var(--rowh)*.56)}.dHead .l,.dHead .c{font-size:calc(var(--rowh)*.26)}}
+@media (max-width:760px){.dTitle{min-height:calc(var(--rowh)*.62);padding-top:6px;padding-bottom:6px}.dTitle b,.dTitle .dClock{font-size:max(18px,calc(var(--rowh)*.34))}.dHead{height:calc(var(--rowh)*.72)}.dHead .l,.dHead .c{font-size:max(17px,calc(var(--rowh)*.32))}}
 
 .depRowF .depLocBtn{align-self:flex-end;width:40px;height:40px;flex:none;display:inline-grid;place-items:center;padding:0;box-sizing:border-box}
 
@@ -822,6 +830,8 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
 
 .infoBox{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border-left:4px solid var(--fg);padding:14px 16px;margin:4px 0 18px;max-width:none}
 .infoBox svg{flex:none;margin-top:1px}
+.infoBox.warn{background:#fff4c2;border-left-color:#e0b100;color:#3a2f00}.infoBox.warn p{color:#3a2f00}
+:root[data-theme=dark] .infoBox.warn{background:#4a3f12;color:#fff4c2}:root[data-theme=dark] .infoBox.warn p{color:#fff4c2}
 .infoBox b{display:block;font-size:.95rem;margin-bottom:3px}
 .infoBox p{margin:0;font-size:.88rem;line-height:1.45;color:var(--fg)}
 
@@ -974,7 +984,12 @@ const xdOf=Ls=>{for(const L of Ls){const d=L&&L.dates&&L.dates['x'+WEEK];if(d)re
 let hideX=false;   // read from the browser's storage with the other settings (store is defined further on)
 const DK=ds=>{if(hideX){const b0=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return b0}const b=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return ds.some(dd=>dd.tp&&dd.tp['x'+WEEK]!==undefined)?[...b.filter(k=>k==='w'||k==='f'),'x','s','h']:b};   // a special weekday sits between the weekdays and Saturdays
 const HOLIDAYS=['2026-11-01','2026-11-11','2026-12-25','2026-12-26','2027-01-01','2027-01-06'];
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+// settings are kept in the browser's storage and, for the small ones (city, the departure board's stops…), also in a cookie,
+// so they stay where the storage is cleared or not kept
+const ck={get(k){const m=document.cookie.split('; ').find(x=>x.startsWith(encodeURIComponent(k)+'='));return m?decodeURIComponent(m.slice(m.indexOf('=')+1)):null},
+  set(k,v){try{if(v.length<3500)document.cookie=encodeURIComponent(k)+'='+encodeURIComponent(v)+';max-age=31536000;path=/;SameSite=Lax'}catch(e){}}};
+const store={get(k,d){let v=null;try{v=localStorage.getItem(k)}catch(e){}if(v==null)try{v=ck.get(k)}catch(e){}try{return v!=null?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){const j=JSON.stringify(v);try{localStorage.setItem(k,j)}catch(e){}if(/^ztm\.(city|dep|lang|theme|tools|jp)/.test(k))ck.set(k,j)}};
 /* ---- interface language: pl (as written in the page), en, de, sk, cs. The page is written in Polish; for another language every
    text and tooltip shown is swapped for its translation (I18N, from i18n_src.py via build_i18n.py), also what is drawn later
    (a MutationObserver). Names of stops and lines stay as they are. ---- */
@@ -1080,6 +1095,8 @@ varSw.addEventListener('change',()=>{hideVar=varSw.checked;store.set('ztm.hideVa
   document.addEventListener('click',e=>{if(!sp.hidden&&!e.target.closest('.setWrap'))show(false)});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!sp.hidden){show(false);sb.focus()}})}
 setTheme(store.get('ztm.theme','light'));
+// installable as an app (on the published site; not inside claude.ai)
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.ai|claudeusercontent/.test(location.hostname))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 const CITIES={gda:['Gdańsk','w Gdańsku'],sop:['Sopot','w Sopocie'],gdy:['Gdynia','w Gdyni'],all:['Trójmiasto','w Trójmieście'],km:['Krynica-Zdrój i Muszyna','w Krynicy-Zdroju i Muszynie'],byd:['Bydgoszcz','w Bydgoszczy'],ns:['Nowy Sącz','w Nowym Sączu'],poz:['Poznań','w Poznaniu'],krk:['Kraków','w Krakowie'],waw:['Warszawa','w Warszawie'],wej:['Wejherowo','w Wejherowie'],ldz:['Łódź','w Łodzi'],fl:['Flensburg','we Flensburgu'],prg:['Praga','w Pradze']};
 let city=store.get('ztm.city','gda');if(!CITIES[city])city='gda';
 // Krynica-Zdrój with Muszyna and Bydgoszcz are separate areas: not part of "Trójmiasto"
@@ -1161,7 +1178,7 @@ function comboEx(){let g=null;try{const A=autoGroups();const all=[...(A.tr||[]),
   return g&&g.length>1?g.join('+'):'3+6+7'}
 function renderBoard(){
   document.title='ZbiorkomInfo – '+CITIES[city][0];setBrand();
-  app.innerHTML=`${city==='km'?`<div class="infoBox" role="note"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.5" r=".6" fill="currentColor"/></svg><div><b>Uwaga dotycząca linii komunikacji gminnej w Krynicy-Zdroju</b><p>W przypadku linii organizowanych przez Miejskie Przedsiębiorstwo Gospodarki Komunalnej w Krynicy-Zdroju zaleca się korzystanie z narzędzia linii łączonych oraz wyszukiwania połączeń. Ze względu na nieprzejrzysty sposób organizacji komunikacji gminnej korzystanie z pojedynczych rozkładów może być utrudnione lub niemożliwe. Numery linii podane są jedynie w celach organizacji połączeń na stronie i nie są stosowane przez MPGK.</p></div></div>`:''}<h1 class="boardH">Rozkłady jazdy ${esc(CITIES[city][1])}</h1>
+  app.innerHTML=`${city==='km'?`<div class="infoBox warn" role="note"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3L22 20H2z"/><path d="M12 10v5"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg><div><b>Uwaga!</b><p>Ze względu na brak dostępu do aktualnych i pozbawionych błędów merytorycznych rozkładów jazdy dla linii organizowanych przez Krynicę-Zdrój rozkłady linii od 10 do 18 należy traktować wyłącznie jako sugestię. Należy również mieć na uwadze, że numeracja tych linii funkcjonuje jedynie w obrębie niniejszej strony celem ułatwienia orientacji i nie jest stosowana przez przewoźnika.</p></div></div>`:''}<h1 class="boardH">Rozkłady jazdy ${esc(CITIES[city][1])}</h1>
   <div id="board"></div>
   <section class="section" id="combo"><div class="shead">${ICONS.combo}<div><h2>Linie łączone</h2></div></div>
   <div style="min-width:0"><div class="groups" id="groups"></div>
@@ -1373,12 +1390,17 @@ function showResult(n){
 let WEEK=0;
 const dm=s=>s.slice(6)+'.'+s.slice(4,6);
 function weekPicker(){const W=IDX.weeks||[];if(!W.length)return '';
-  return `<select id="weekSel" class="btn wksel" aria-label="Rozkład na tydzień" title="Rozkład na tydzień">${W.map((w,i)=>`<option value="${i}"${i===WEEK?' selected':''}>Rozkład na tydzień ${dm(w.from)} – ${dm(w.to)}.${w.to.slice(0,4)}${i===0?' (bieżący)':''}</option>`).join('')}</select>`}
+  const lab=(w,i)=>`Rozkład na tydzień ${dm(w.from)} – ${dm(w.to)}.${w.to.slice(0,4)}${i===0?' (bieżący)':''}`;
+  // the page's own list (not the browser's: on phones that one looks out of place)
+  return `<span class="wkPick"><button type="button" id="weekSel" class="btn wksel" aria-haspopup="listbox" aria-expanded="false" title="Rozkład na tydzień">${esc(lab(W[WEEK]||W[0],WEEK))}</button><ul class="lnAc wkList" role="listbox" hidden>${W.map((w,i)=>`<li role="option" data-wk="${i}"${i===WEEK?' aria-selected="true" class="cur"':''}><span>${esc(lab(w,i))}</span></li>`).join('')}</ul></span>`}
 // the week picker sits in the row of buttons next to "Zmień kierunek" / "Trasa linii"
 function withWeek(extra,r){const wp=weekPicker()+(r?`<button class="btn" type="button" data-showmap="${esc(r.id)}">Pokaż linię na mapie</button>`:'');if(!wp)return extra||'';
   if(extra&&extra.includes('<div class="tools">')){const i=extra.lastIndexOf('</div>');return extra.slice(0,i)+wp+extra.slice(i)}
   return (extra||'')+`<div class="tools">${wp}</div>`}
-document.addEventListener('change',e=>{if(e.target&&e.target.id==='weekSel'){WEEK=+e.target.value;route()}});
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#weekSel'),li=e.target.closest&&e.target.closest('.wkList li');const L=document.querySelector('.wkList');
+  if(b&&L){const o=L.hidden;L.hidden=!o;b.setAttribute('aria-expanded',String(o));return}
+  if(li){WEEK=+li.dataset.wk;route();return}
+  if(L&&!L.hidden){L.hidden=true;const bb=document.getElementById('weekSel');if(bb)bb.setAttribute('aria-expanded','false')}});
 function tripsOf(d,day){const k=day+WEEK;if(d.plans)return d.tp&&d.tp[k]!==undefined?d.plans[d.tp[k]]:[];return (d.trips&&d.trips[day])||[]}
 function weekDate(day){if(day==='x')return XD_CUR;const w=(IDX.weeks||[])[WEEK];return w?w[day]:(IDX.days||{})[day]}   // no date for f (school-free weekdays)
 // where the timetable comes from, for the note under it
@@ -2959,7 +2981,9 @@ function depDayKeys(){const tt=todayType();const now=new Date();const wd=now.get
 const RT_URL='https://ckan2.multimediagdansk.pl/departures?stopId=';
 // served by serwer.py on this computer (uruchom_serwer.bat): its own pass-through to the ZTM API comes first
 const RT_LOCAL=/^https?:$/.test(location.protocol)&&/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-const RT_WAYS=[...(RT_LOCAL?[u=>'/rt?'+u.split('?')[1]]:[]),u=>u,u=>'https://corsproxy.io/?url='+encodeURIComponent(u),u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)];
+// RT_PROXY: the site's own pass-through (e.g. a Cloudflare Worker, see proxy/worker.js), tried first when set
+const RT_PROXY='';
+const RT_WAYS=[...(RT_LOCAL?[u=>'/rt?'+u.split('?')[1]]:[]),...(RT_PROXY?[u=>RT_PROXY+'?url='+encodeURIComponent(u)]:[]),u=>u,u=>'https://corsproxy.io/?url='+encodeURIComponent(u),u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)];
 let RT_WAY=null,RT_DEAD=0;
 async function rtFetch(id){const order=RT_WAY!==null?[RT_WAY,...RT_WAYS.keys()].filter((v,i,a)=>a.indexOf(v)===i):[...RT_WAYS.keys()];
   for(const w of order){try{const ac=new AbortController();const to=setTimeout(()=>ac.abort(),6000);
@@ -2989,7 +3013,9 @@ async function depLive(st){
     ds.forEach(d=>{const t=Date.parse(d.estimatedTime||d.theoreticalTime);if(!isFinite(t))return;
       const n=String(d.routeShortName||d.routeId);
       const r=IDX.routes.find(x=>x.n===n&&areaOf(x)==='tri')||{id:'rt'+n,n,t:/^\d{1,2}$/.test(n)?'tram':/^N/.test(n)?'night':'bus',c:['gda']};
-      out.push({t:(t-base)/60000,r,head:d.headsign||'',pole,st:st.n,live:d.status==='REALTIME',delay:d.delayInSeconds,lastT:(t-base)/60000})})}));
+      const th=Date.parse(d.theoreticalTime);const live=d.status==='REALTIME'&&!!d.estimatedTime;
+      // the delay as the difference of the two times the API gives (its delayInSeconds is for the vehicle's last stop)
+      out.push({t:(t-base)/60000,sch:isFinite(th)?(th-base)/60000:null,r,head:d.headsign||'',pole,stn:st.n,live,delay:live&&isFinite(th)?Math.round((t-th)/1000):0,lastT:(t-base)/60000})})}));
   if(!ok){RT_DEAD=Date.now()+120000;return null}   // no way through: try again in two minutes
   return out}
 // first the timetable (shown at once), then the live departures where they can be had (they replace it when they come)
@@ -3005,7 +3031,9 @@ async function depLoadData(){const run=DEP.run=(DEP.run||0)+1;const sch=[[],[]];
       // GTFS-Realtime (only the runs under way): the timetable runs not in it stay
       if(live[0].st!==undefined)return [...live,...x.a.filter(d=>!live.some(l=>l.r.n===d.r.n&&Math.abs(l.st-d.t)<=1))];
       // ZTM Gdańsk: the live list reaches about an hour ahead: later departures come from the timetable
-      const last=Math.max(...live.map(d=>d.t));return [...live,...x.a.filter(d=>d.t>last+1)]}
+      // every timetable departure the live list stands for (same line, its scheduled time) goes, as do those after the list ends
+      const last=Math.max(...live.map(d=>d.sch!=null?d.sch:d.t));
+      return [...live,...x.a.filter(d=>d.t>last+1&&!live.some(l=>l.r.n===d.r.n&&l.sch!=null&&Math.abs(l.sch-d.t)<=1.5))]}
     DEP.src.push('sch');return x.a}).sort((a,b)=>a.t-b.t));
   depRender()}
 function depStyle(r){const o={};   // colours as in the timetables
@@ -3061,8 +3089,8 @@ function depRender(){const m=depEl();if(m.hidden)return;
   document.getElementById('depStat').textContent=cs.join(', ');
   const live=DEP.src.includes('live'),sch=DEP.src.includes('sch');
   // the note: live where it is; in cities with live data that could not be had here, how to get it; elsewhere: timetables
-  const cities_=[...depCfg.stops,...(depCfg.split?depCfg.stops2:[])].map(x=>x.c||city);const rtCity=cities_.some(c=>['gda','sop','gdy','all','poz','krk'].includes(c));
-  document.getElementById('depSrc').textContent=live&&!sch?'● na żywo; dalsze odjazdy wg rozkładu':live?'● na żywo; pozostałe odjazdy podawane wg rozkładów jazdy':rtCity?'Dane na żywo są dostępne po uruchomieniu strony programem uruchom_serwer.bat – teraz odjazdy wg rozkładu':'Odjazdy podawane wg rozkładów jazdy';
+  const cities_=[...depCfg.stops,...(depCfg.split?depCfg.stops2:[])].map(x=>x.c||city);const rtCity=cities_.some(c=>['gda','sop','gdy','all','poz','krk','waw','ldz','prg'].includes(c));
+  document.getElementById('depSrc').textContent=live&&!sch?'● na żywo; dalsze odjazdy wg rozkładu':live?'● na żywo; pozostałe odjazdy podawane wg rozkładów jazdy':rtCity?'Odjazdy w czasie rzeczywistym nie są dostępne w tej chwili':'Odjazdy podawane wg rozkładów jazdy';
   depLayout()}
 function depTickClock(){document.querySelectorAll('#depPanels .dClock').forEach(c=>c.innerHTML=depClockHTML())}
 async function openDep(){if(!IDX)return;if(MAP.open)closeMap();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool();depLoad();const m=depEl();m.hidden=false;DEP.open=true;navMark();
@@ -3144,6 +3172,7 @@ function depLinesTable(){const tb=document.getElementById('depLinesB');tb.replac
 
 /* ---------- header: the city list ---------- */
 function navMark(){const v=MAP.open?'map':(typeof DEP!=='undefined'&&DEP.open)?'dep':(typeof JP!=='undefined'&&JP.open)?'jp':(typeof TD!=='undefined'&&TD.view)?TD.view:'tt';document.querySelectorAll('[data-nav]').forEach(b=>{if(b.dataset.nav===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
+  document.body.classList.toggle('ovl',v!=='tt');
   // "+" (own combination) only with the timetables, full screen only with the departure board
   const pb=null,tf=document.getElementById('topFull'),tl=document.getElementById('topLoc');if(tf)tf.hidden=v!=='dep'}
 document.getElementById('topFull').onclick=()=>document.getElementById('depFull').click();
@@ -3334,7 +3363,7 @@ async function renderStopPage(name,pole){
   const showPl=poles.length>1&&!pole;   // platform column on the board when the stop has several and all are shown
   const show=(sch,live)=>{const now=todayType().min;let a=sch;
     if(live&&live.length){if(live[0].st!==undefined)a=[...live,...sch.filter(d=>!live.some(l=>l.r.n===d.r.n&&Math.abs(l.st-d.t)<=1))];
-      else{const last=Math.max(...live.map(d=>d.t));a=[...live,...sch.filter(d=>d.t>last+1)]}}
+      else{const last=Math.max(...live.map(d=>d.sch!=null?d.sch:d.t));a=[...live,...sch.filter(d=>d.t>last+1&&!live.some(l=>l.r.n===d.r.n&&l.sch!=null&&Math.abs(l.sch-d.t)<=1.5))]}}
     a=a.filter(d=>d.t>=now-.5&&pass(d)).sort((x,y)=>x.t-y.t).slice(0,8);const bx=document.getElementById('spBoard');if(!bx){clearInterval(SP_TIMER);return}
     bx.innerHTML=a.length?a.map(d=>{const s=depStyle(d.r);const m=Math.round(d.t-now);
       const tm=m<=0?'<1 min':m<30?m+' min':String(Math.floor(d.t/60)%24).padStart(2,'0')+':'+String(Math.round(d.t)%60).padStart(2,'0');
@@ -3554,7 +3583,7 @@ async function bgList(){const main=document.getElementById('bgMain');if(!main)re
   const today=BG.date===ymd(new Date());const live=today?await bgVehicles(src):null;const fleet=live&&BG.fleet?await BG.fleet:null;
   const head=document.createElement('p');head.className='hint';
   head.textContent=`${list.length} ${list.length===1?'brygada':list.length%10>=2&&list.length%10<=4&&(list.length%100<10||list.length%100>=20)?'brygady':'brygad'} · ${r.op}`+
-    (today?(live?' · pojazdy na trasie według danych na żywo':src==='poz'||src==='krk'?' · pojazdy na żywo widać po uruchomieniu strony przez serwer lokalny (uruchom_serwer.bat)':src==='ztm'?' · nie udało się pobrać pozycji pojazdów na żywo':''):'');
+    (today?(live?' · pojazdy na trasie według danych na żywo':src==='poz'||src==='krk'?' · pozycje pojazdów na żywo nie są dostępne w tej chwili':src==='ztm'?' · nie udało się pobrać pozycji pojazdów na żywo':''):'');
   const ul=document.createElement('ul');ul.className='bgList';
   list.forEach(b=>{const lab=bgLabel(src,b,P),T=b[2],id=b[0]+'|'+(b[3]||'');
     const it=document.createElement('li');it.className='bgItem';
