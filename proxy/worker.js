@@ -1,9 +1,10 @@
 // ZbiorkomInfo – pass-through for live departures (Cloudflare Worker, free plan).
-// The ZTM Gdańsk API sends no CORS header, so a page on another site (e.g. GitHub Pages) cannot read it directly.
-// This worker fetches it and adds the header. Only the listed hosts are passed through.
+// The ZTM Gdańsk API and the GTFS-Realtime feeds of Warszawa, Łódź, Poznań, Kraków and Praga send no CORS header,
+// so a page on another site (e.g. GitHub Pages) cannot read them directly. This worker fetches them and adds the header;
+// the feeds are passed through unchanged (the page reads them itself). Only the listed hosts are passed through.
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy;
 // then put the worker's address (https://….workers.dev) into RT_PROXY in index.html.
-const ALLOWED = ['ckan2.multimediagdansk.pl'];
+const ALLOWED = ['ckan2.multimediagdansk.pl', 'cdn.zbiorkom.live', 'www.ztm.poznan.pl', 'gtfs.ztp.krakow.pl', 'api.golemio.cz'];
 export default {
   async fetch(req) {
     const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };

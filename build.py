@@ -609,6 +609,55 @@ try:
 except StopIteration:
     print('Kolej Krynica-Zdrój – Kraków: brak stacji w danych')
 
+# ---------------- Kraków: SKA (Szybka Kolej Aglomeracyjna, Koleje Małopolskie), lines SKA1–SKA3 ----------------
+# whole runs; their stations get their own ids ('q…'), as members of the Kraków area (shown on its map as "S")
+SKA_IDS = []
+SKA_LINES = {'KML_SKA1': ('kSKA1', 'SKA1', '#00b1eb'), 'KML_SKA2': ('kSKA2', 'SKA2', '#e82f89'), 'KML_SKA3': ('kSKA3', 'SKA3', '#e8a400')}
+try:
+    sk_trips = {r['trip_id']: r for r in rd(P + '/trips.txt') if r['route_id'] in SKA_LINES}
+    skst = collections.defaultdict(list)
+    for r in rd(P + '/stop_times.txt'):
+        if r['trip_id'] in sk_trips:
+            skst[r['trip_id']].append((int(r['stop_sequence']), station(r['stop_id']), tmin(r['departure_time']), r['pickup_type'] or '0', r['drop_off_type'] or '0', plat.get(r['stop_id'], '')))
+    for v in skst.values(): v.sort()
+    for rid, (lid, num, col) in SKA_LINES.items():
+        rot = {t: (lid, r['service_id']) for t, r in sk_trips.items() if r['route_id'] == rid and t in skst}
+        if not rot: continue
+        chosen, dates = choose(feed_days(P, rot), 'Koleje Małopolskie')
+        if not dates.get(lid): continue
+        # direction 0: the way of the longest run
+        ref = max((skst[t] for t in chosen), key=len, default=[]); seq = [x[1] for x in ref]
+        def sk_dir(run):
+            common = [x[1] for x in run if x[1] in seq]
+            if len(common) >= 2: return '0' if seq.index(common[-1]) > seq.index(common[0]) else '1'
+            return '0' if float(rstops[run[-1][1]]['stop_lon']) > float(rstops[run[0][1]]['stop_lon']) else '1'
+        pc = collections.defaultdict(collections.Counter); runs = []
+        for tid, lst in chosen.items():
+            run = skst[tid]
+            if len(run) < 2: continue
+            d = sk_dir(run)
+            for x in run: pc[(d, x[1])][x[5]] += 1
+            for _, k in lst: runs.append((tid, k, d, run))
+        groups = collections.defaultdict(list)
+        for tid, k, d, run in runs:
+            rows2 = []
+            for x in run:
+                pl = pc[(d, x[1])].most_common(1)[0][0]
+                sid = 'q' + x[1] + 'p' + pl
+                if sid not in STOPS:
+                    r = rstops[x[1]]
+                    STOPS[sid] = [r['stop_name'], pl, round(float(r['stop_lat']), 5), round(float(r['stop_lon']), 5), 'krk', 'rail']
+                rows2.append((sid, x[2], x[3], x[4]))
+            shp = sk_trips[tid].get('shape_id')
+            if shp: SHAPE_OF.setdefault((lid, tuple(x[0] for x in rows2)), 'r' + shp + '|c')
+            groups[lid].append((k, False, d, rows2, (sname(run[0][1]), sname(run[-1][1]))))
+        n0 = len(ROUTES_OUT)
+        build_routes(dict(groups), {lid: {'id': lid, 'n': num, 't': 'rail', 'op': 'Koleje Małopolskie', 'dates': dates[lid]}})
+        for r in ROUTES_OUT[n0:]: r['c'] = ['krk']; r['f'] = True; r['k'] = col; r['cat'] = 'rail'; SKA_IDS.append(r['id'])
+        print('SKA Kraków', num + ':', len(groups[lid]), 'kursów')
+except Exception as e:
+    print('SKA Kraków: pominięto (%s)' % e)
+
 
 # ---------------- street courses for lines whose feed has no shapes ----------------
 KM_SHAPES, KM_KEY = {}, {}
@@ -982,6 +1031,7 @@ def city_kind(area, short, rtype):
     if area == 'ldz' and short.startswith('Z'): return 'repl'
     return 'bus'
 NEW_ROUTE_IDS = collections.defaultdict(list)
+NEW_ROUTE_IDS['krk'].extend(SKA_IDS)   # the SKA trains belong to the Kraków files (map, schema)
 for area, A in NEW_AREAS.items():
     try:
         rot, tmeta, rmeta, tkey = {}, {}, {}, {}
@@ -1469,7 +1519,9 @@ for f in sorted(os.listdir(OUT + '/r')):
         if len(e['g']) > 1: e['g'] = via_fix(d['id'], [e['g']])[0]
         vlist.append({'d': di, 'm': e['m'], 's': e['s'], 'n': e['n'], 'v': e['v'], 'l': e['l'], 'g': rnd([e['g']])[0] if len(e['g']) > 1 else []})
     vlist.sort(key=lambda e: (e['d'], -e['m'], -e['n']))
-    MAPD[d['id']] = {'lt': lt, 'g': rnd(geo), 'v': rnd(vgeo), 'd': dirs_st, 've': sorted(ve), 'vs': sorted(vstops - ve), 'sn': sn, 'vr': vlist}
+    # stops served only by runs to or from the depot (the page can hide those runs on the map too)
+    dp = sorted({x[0] for dd in d.get('dirs', []) for x in dd.get('stops', []) if isinstance(x, list) and len(x) > 4 and x[4]})
+    MAPD[d['id']] = {'lt': lt, 'g': rnd(geo), 'v': rnd(vgeo), 'd': dirs_st, 've': sorted(ve), 'vs': sorted(vstops - ve), 'sn': sn, 'vr': vlist, **({'dp': dp} if dp else {})}
 _new_of = {rid: a for a, ids in NEW_ROUTE_IDS.items() for rid in ids}
 json.dump({'routes': {k: v for k, v in MAPD.items() if k not in _new_of}}, open(OUT + '/map.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 for a in NEW_AREAS:   # the network map of each big city in a file of its own
@@ -1599,4 +1651,12 @@ if '--bez-brygad' not in sys.argv:
     import subprocess
     subprocess.run([sys.executable, os.path.join(HERE, 'brygady.py'), OUT])
 
+# trip index for the live departures the page reads itself (rtindex.py)
+try:
+    import rtindex
+    _names = collections.defaultdict(set)
+    for r in ROUTES_OUT:
+        for c in r.get('c') or []: _names[c].add(r['n'])
+    rtindex.build(SCR, OUT, _names)
+except Exception as e: print('Indeks kursów na żywo: pominięty (%s)' % e)
 shutil.rmtree(SCR, ignore_errors=True)
