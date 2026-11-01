@@ -757,7 +757,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .bgTrips tr.oth td{color:var(--muted)}
 /* ---- journey planner ---- */
 .guideModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);overflow:auto}
-.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;min-height:100%;box-sizing:border-box;padding:10px 12px;gap:8px}
+.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}
 .gdTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gdSrch,.gdSet{position:relative}.gdSp{flex:1}
 .gdLoc[aria-pressed=true]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
 .gdIco[aria-expanded=true]{background:var(--panel)}
@@ -777,9 +777,9 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gdPick small{color:var(--muted);margin-left:auto;white-space:nowrap}
 .gdSip{--sB:#232629;--sH:#000;--sF:#fff;--sM:#aeb4ba;--sR:#fff;--sL:#3a3f44;--sA:#ffd23f}
 :root:not([data-theme=dark]) .gdSip{--sB:#eef0f2;--sH:#fff;--sF:#14171a;--sM:#5c6670;--sR:#14171a;--sL:#d5d9de;--sA:#b25e00}
-.gdSip{flex:1;display:flex;flex-direction:column;background:var(--sB);color:var(--sF);border:1px solid var(--sL);font-family:Roboto,"Segoe UI",sans-serif;min-height:320px;--gs:clamp(16px,min(2.6vw,3.4vh),32px)}
+.gdSip{flex:1;display:flex;flex-direction:column;background:var(--sB);color:var(--sF);border:1px solid var(--sL);font-family:Roboto,"Segoe UI",sans-serif;min-height:0;overflow:hidden;--gs:clamp(16px,min(2.6vw,3.4vh),32px)}
 .gsBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 14px;background:var(--sH);color:var(--sM);font-size:calc(var(--gs)*.55)}.gsBar b{color:var(--sF);font-size:calc(var(--gs)*.8);font-variant-numeric:tabular-nums}
-.gsBody{flex:1;display:flex;flex-direction:column}.gsRow,.gsGap{display:grid;grid-template-columns:calc(var(--gs)*3.4) calc(var(--gs)*1.6) 1fr auto;align-items:stretch}
+.gsBody{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}.gsRow,.gsGap{display:grid;grid-template-columns:calc(var(--gs)*3.4) calc(var(--gs)*1.6) 1fr auto;align-items:stretch}
 .gsGap{flex:1;min-height:calc(var(--gs)*1.4)}.gsGap.solid{min-height:0}.gsGap.solid .rl::before{border-left-style:solid}.gsGap .rl{position:relative}.gsGap .rl::before{content:"";position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);border-left:calc(var(--gs)*.32) dotted var(--sR)}
 .gsRow .tc{align-self:center;padding:0 14px;font-size:calc(var(--gs)*.9);font-weight:700;font-variant-numeric:tabular-nums}.gsRow .tc{display:flex;align-items:center;gap:6px;white-space:nowrap}.gsRow .tc svg{width:.9em;height:.9em}
 .gsRow .tl{align-self:center;text-align:right;font-size:calc(var(--gs)*.85);padding-right:6px;font-variant-numeric:tabular-nums;;color:var(--sF)}
@@ -789,11 +789,14 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gsRow.term .rl i{box-shadow:inset 0 0 0 calc(var(--gs)*.14) var(--sB),inset 0 0 0 calc(var(--gs)*.5) var(--sR)}.gsRow.now .rl i{width:calc(var(--gs)*1.4);height:calc(var(--gs)*1.4);background:var(--sR);box-shadow:inset 0 0 0 calc(var(--gs)*.18) var(--sH)}
 .gsRow .nm{padding:calc(var(--gs)*.32) 14px calc(var(--gs)*.32) 4px;min-width:0}.gsRow .nm>span{display:block;font-size:var(--gs);line-height:1.15}
 .gsRow.now{background:var(--sH);border-top:2px solid var(--sL)}.gsRow.now .nm{padding-block:calc(var(--gs)*.45)}.gsRow.now .nm small{display:block;color:var(--sM);font-size:calc(var(--gs)*.6)}.gsRow.now .nm>span{font-weight:800;font-size:calc(var(--gs)*1.45);line-height:1.1}.gsRow.now .tl{font-weight:700}
-.gsFill{flex:1}.gsBody{justify-content:flex-end}
+.gsBody{justify-content:flex-start}.gsBody .gsGap{flex:none;min-height:calc(var(--gs)*1.2)}
+.gsDeps{flex:1;min-height:calc(var(--gs)*4.6);overflow:hidden;background:var(--sH);border-top:1px solid var(--sL);padding:4px 14px 6px}.gsDH{font-size:calc(var(--gs)*.55);color:var(--sM);padding:4px 0}
+.gsDep{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px;padding:4px 0;border-top:1px solid var(--sL);font-size:calc(var(--gs)*.7)}.gsDep .chip{transform:none}
+.gsDep .dh{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gsDep .dp{color:var(--sM);font-size:.85em;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}.gsDep .dp svg{width:1em;height:1em}.gsDep .dt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 
 .gsTr{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.gsTr .chip{transform:none;box-shadow:0 0 0 1px var(--sL)}
 .gsTopb{display:flex;align-items:center;gap:16px;padding:10px 14px;background:var(--sH);border-bottom:2px solid var(--sL)}.gsTopb .gtt{flex:1;min-width:0}.gsTopb .gtt small{display:flex;align-items:center;gap:6px;color:var(--sM);font-size:calc(var(--gs)*.6)}.gsTopb .gtt small svg{width:1em;height:1em}
-.gsTopb .gtt b{display:block;font-weight:800;font-size:calc(var(--gs)*1.25);line-height:1.15}.gsTopb .rt{display:flex;align-items:baseline;gap:12px;white-space:nowrap}.gsTopb .rt .gsClock{font-size:calc(var(--gs)*1.1);font-variant-numeric:tabular-nums}
+.gsTopb .gtt b{display:block;font-weight:800;font-size:calc(var(--gs)*1.25);line-height:1.15}.gsTopb .rt{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap}.gsTopb .rt .gsClock{font-size:calc(var(--gs)*1.1);font-variant-numeric:tabular-nums}
 .gsFoot{order:9;padding:6px 14px;font-size:calc(var(--gs)*.55);color:var(--sM);background:var(--sH);border-top:1px solid var(--sL)}.gdWrap:has(.gdSip:not([hidden])) .gdStat{display:none}.gsTopb .rt small{color:var(--sM);font-size:calc(var(--gs)*.6)}.gsTopb .rt small b{color:var(--sF)}
 .gsTopb .mb{min-width:calc(var(--gs)*2.3);height:calc(var(--gs)*2.3);display:grid;place-items:center;font:700 calc(var(--gs)*1.25) "Roboto Condensed",sans-serif;padding:0 8px}
 .gsTopb .mb.circle{border-radius:50%;width:calc(var(--gs)*2.3);padding:0}.gsTopb .mb.rect.sq{width:calc(var(--gs)*2.3);padding:0}
@@ -3246,7 +3249,11 @@ const gdNameLang=()=>GD_CITY_LANG[city]||'pl';
 function openGuide(){if(!IDX)return;if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool();
   document.getElementById('guideModal').hidden=false;GUIDE.open=true;navMark();
   document.getElementById('gdTest').hidden=!store.get('ztm.tools',false);gdVoiceBtn();
-  if(!GUIDE.watch&&navigator.geolocation)GUIDE.watch=navigator.geolocation.watchPosition(p=>{GUIDE.pos=[p.coords.latitude,p.coords.longitude];store.set('ztm.here',[GUIDE.pos[0],GUIDE.pos[1],Date.now()])},
+  // the position: the last one known (if recent) at once, then a quick rough fix (network), then the exact one (GPS)
+  const kept=store.get('ztm.here',null);if(!GUIDE.pos&&kept&&Date.now()-kept[2]<120000)GUIDE.pos=[kept[0],kept[1]];
+  const gotPos=(p,exact)=>{const first=!GUIDE.pos;if(!exact&&GUIDE.exact)return;GUIDE.exact=GUIDE.exact||exact;GUIDE.pos=[p.coords.latitude,p.coords.longitude];store.set('ztm.here',[GUIDE.pos[0],GUIDE.pos[1],Date.now()]);if(first&&!GUIDE.run)gdTick()};
+  if(!GUIDE.watch&&navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>gotPos(p,false),()=>{},{enableHighAccuracy:false,maximumAge:60000,timeout:8000});
+  if(!GUIDE.watch&&navigator.geolocation)GUIDE.watch=navigator.geolocation.watchPosition(p=>gotPos(p,true),
     e=>{if(!GUIDE.fake)document.getElementById('gdStat').textContent=trS(e.code===1?'Brak zgody na udostępnienie lokalizacji.':'Nie udało się ustalić lokalizacji.')},{enableHighAccuracy:true,maximumAge:3000,timeout:20000});
   clearInterval(GUIDE.tm);gdTick();GUIDE.tm=setInterval(gdTick,4000)}
 function closeGuide(){document.getElementById('guideModal').hidden=true;GUIDE.open=false;clearInterval(GUIDE.tm);
@@ -3298,10 +3305,10 @@ function gdKeepAwake(on){try{if(on){GD_KEEP.volume=1;const p_=GD_KEEP.play();if(
 function gdMute(){if(GUIDE.voice)document.getElementById('gdVoice').click()}
 async function gdNotify(text){const ms=navigator.mediaSession;
   if(ms&&GUIDE.voice&&GUIDE.run){try{ms.metadata=new MediaMetadata({title:(text||trS('Przewodnik – zapowiedzi włączone')),artist:trS('Linia')+' '+GUIDE.run.r.n+' → '+GUIDE.run.head,album:'ZbiorkomInfo',artwork:[{src:'icons/icon-192.png',sizes:'192x192',type:'image/png'}]})}catch(e){}}
-  if(!GUIDE.voice||!gdPhone()||!window.Notification||Notification.permission!=='granted'||!navigator.serviceWorker)return;
+  if(text||!GUIDE.voice||!gdPhone()||!window.Notification||Notification.permission!=='granted'||!navigator.serviceWorker)return;   // (shown once, never updated: no sound or vibration)
   try{const reg=await navigator.serviceWorker.getRegistration();if(!reg)return;
     await reg.showNotification(trS('Zapowiedzi przewodnika są włączone'),{tag:'zbiorkom-guide',renotify:false,silent:true,requireInteraction:true,
-      body:(GUIDE.run?trS('Linia')+' '+GUIDE.run.r.n+' → '+GUIDE.run.head+(text?'\n'+text:''):text)||'',icon:'icons/icon-192.png',
+      body:GUIDE.run?trS('Linia')+' '+GUIDE.run.r.n+' → '+GUIDE.run.head:'',icon:'icons/icon-192.png',
       actions:[{action:'mute',title:trS('Wycisz zapowiedzi')}],data:{url:location.href}})}catch(e){}}
 async function gdNotifyClose(){try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(!reg)return;(await reg.getNotifications({tag:'zbiorkom-guide'})).forEach(n=>n.close())}catch(e){}}
 if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',e=>{if(e.data==='gd-mute')gdMute();else if(e.data==='gd-open'&&!GUIDE.open)openGuide()});
@@ -3421,7 +3428,7 @@ function gdProgress(h,src){const R=GUIDE.run,st=document.getElementById('gdStat'
   R.src=bd>500?trS('Jesteś daleko od trasy tego kursu.'):trS(src==='veh'?(tri?'Położenie pojazdu na żywo (GPS pojazdu)':'Położenie pojazdu na żywo (GTFS-RT)'):src==='test'?'TEST: wskazane miejsce':src==='tt'?'Położenie według rozkładu jazdy':'Położenie według GPS telefonu');
   // as many stops between as fit on the screen
   const gm=document.getElementById('guideModal');sip.hidden=false;
-  for(let m=6;m>=1;m--){sip.innerHTML=gdSipHtml(R,P,cur,next,m);if(gm.scrollHeight<=gm.clientHeight+1)break}}
+  for(let m=6;m>=1;m--){sip.innerHTML=gdSipHtml(R,P,cur,next,m);const b=sip.querySelector('.gsBody');if(!b||b.scrollHeight<=b.clientHeight+1)break}}
 // the lines one can change to at a stop: those with a stop of that name within 400 m (not a stop of the same name in another
 // town of the area), other than the ride's own line; a night line only when it calls there about the time the ride does
 const GD_TR={};
@@ -3437,6 +3444,22 @@ function gdTransfers(sid,r,tAt){const E=gdTrLoad(sid);if(!E.ok)return '';const s
   const grp=x=>x.t==='tram'?0:x.t==='rail'?1:/^\d/.test(x.n)?3:2;
   return E.list.filter(({r:x,T})=>x.n!==r.n&&(x.t!=='night'||T.some(t=>t>=tAt-10&&t<=tAt+40))&&!seen.has(x.n)&&seen.add(x.n))
     .sort((a,b)=>grp(a.r)-grp(b.r)||a.r.n.localeCompare(b.r.n,'pl',{numeric:true})).slice(0,14).map(({r:x})=>chip(x,'small',true).outerHTML).join('')}
+// a small departure board under the next stop: the next departures of other lines from it and from the stops within 200 m of
+// it, after the ride gets there (a stop of another name: its name with the pole)
+const GD_BRD={};
+function gdBoardLoad(sid){const now=Date.now(),E=GD_BRD[sid];if(E&&now-E.t<60000)return E;
+  const S=IDX.stops[sid];const sids=new Set(),names=new Set();
+  for(const [k,X] of Object.entries(IDX.stops))if(Math.abs(X[2]-S[2])<.003&&distM(X[2],X[3],S[2],S[3])<=200){sids.add(k);names.add(X[0])}
+  const N=GD_BRD[sid]={t:now,list:E?E.list:null};
+  (async()=>{const out=[];for(const n of names)for(const [k,sh] of depDayKeys()){let L=[];try{L=await depFor({n,c:city,poles:[]},k,sh)}catch(e){}out.push(...L.filter(d=>sids.has(d.sid)))}
+    N.list=out.sort((a,b)=>a.t-b.t)})();
+  return N}
+function gdBoard(R,sid,tAt){const E=gdBoardLoad(sid);if(!E.list)return '';const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;
+  const here=IDX.stops[sid][0];const seen=new Set();
+  const L=E.list.filter(d=>d.r.n!==R.r.n&&d.t>=tAt+(d.st===here?0:2)&&d.t<=tAt+45&&!seen.has(d.r.n+'|'+d.head+'|'+d.t)&&seen.add(d.r.n+'|'+d.head+'|'+d.t)).slice(0,8);
+  if(!L.length)return '';
+  return `<div class="gsDeps"><div class="gsDH">${esc(trS('Przesiadki'))}</div>`+L.map(d=>{const m=Math.round(d.t-nowM);
+    return `<div class="gsDep">${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}</span><span class="dp">${d.st!==here?esc(d.st)+' ':''}${d.pole?POLE+esc(d.pole):''}</span><span class="dt">${m<1?'&lt; 1 min':m+' min'}</span></div>`}).join('')+'</div>'}
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
@@ -3450,9 +3473,9 @@ function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(las
   const clk='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.5 2.5"/></svg>';
   return `<div class="gsTopb"><span class="mb ${s0.shape}${sqCls(R.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
 <div class="gtt"><small>${esc(trS('Kierunek'))}</small><b>${esc(R.head)}</b>${hd<last?`<small class="ta">${clk}${fmtT(T[last]+lag)} · ${mins(last)}</small>`:''}</div>
-<div class="rt">${R.vlabel?`<small>${esc(trS('Pojazd'))} <b>${esc(R.vlabel)}</b></small>`:''}<b class="gsClock">${gdClock()}</b></div></div>
+<div class="rt"><b class="gsClock">${gdClock()}</b>${R.vlabel?`<small>${esc(trS('Pojazd'))} <b>${esc(R.vlabel)}</b></small>`:''}</div></div>
 <div class="gsFoot">${esc(R.src||'')}${GUIDE.voice&&GDV.by?' · '+esc(trS('Głos'))+': '+esc(GDV.by):''}</div>
-<div class="gsBody">${gap?`<div class="gsGap"><span></span><span class="rl"></span><span></span></div>`:'<div class="gsFill"></div>'}${rows.join('')}${now}</div>`}
+<div class="gsBody">${gap?`<div class="gsGap"><span></span><span class="rl"></span><span></span></div>`:''}${rows.join('')}${now}${gdBoard(R,R.ps[hd],T[hd]+lag)}</div>`}
 document.getElementById('a11ySw').onchange=e=>a11ySet(e.target.checked);
 a11ySet(store.get('ztm.a11y',false));
 document.getElementById('gdVoice').onclick=()=>{GUIDE.voice=!GUIDE.voice;if(GUIDE.voice){[GD_GONG,GD_AUD].forEach(a=>{try{a.muted=true;if(a===GD_AUD&&!a.src)a.src=GD_GONG.src;const p_=a.play();const un=()=>{a.pause();try{a.currentTime=0}catch(e){}a.muted=false};p_?p_.then(un,un):un()}catch(e){}});gdVoiceLoad(gdLang());if(gdNameLang()!==gdLang())gdVoiceLoad(gdNameLang());gdKeepAwake(true)}else gdKeepAwake(false);gdVoiceBtn();if(GUIDE.voice&&GUIDE.run){GUIDE.lastAnn='';gdTick()}};
@@ -3653,7 +3676,7 @@ async function depFor(st,dayKey,shift){
         const plan=d.plans&&d.tp&&d.tp[dk]!==undefined?d.plans[d.tp[dk]]:[];
         plan.forEach(([t0,pi])=>{const [pat,off]=d.prof[pi];const ps=d.pats[pat];
           for(let j=0;j<ps.length-1;j++)if(ps[j]===k){const key=pi+'|'+t0;if(seen.has(key))break;seen.add(key);
-            out.push({t:t0+off[j]+shift,r,head:sName(d.stops[ps[ps.length-1]][0]),pole,st:st.n,sch:true,di:L.dirs.indexOf(d),ps:(d._ids||(d._ids={}))[pat]||(d._ids[pat]=ps.map(i=>d.stops[i][0])),t0:t0+shift,off,k:j});break}})})})}));
+            out.push({t:t0+off[j]+shift,r,head:sName(d.stops[ps[ps.length-1]][0]),pole,st:st.n,sid:s[0],sch:true,di:L.dirs.indexOf(d),ps:(d._ids||(d._ids={}))[pat]||(d._ids[pat]=ps.map(i=>d.stops[i][0])),t0:t0+shift,off,k:j});break}})})})}));
   return out}
 function depDayKeys(){const tt=todayType();const now=new Date();const wd=now.getDay();
   const tomorrow=wd===5?'s':wd===6?'h':'w';   // weekday after today (holidays aside)
