@@ -32,6 +32,7 @@ li .n{flex:1;min-width:0}li .m{font-size:.75rem;color:var(--muted)}
 .pm{background:none;border:0}.pm span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid #2f63ad;font:700 11px Roboto,sans-serif;color:#2f63ad;box-shadow:0 1px 4px rgba(0,0,0,.4)}
 .pm.sel span{border-color:var(--brand);color:var(--brand);transform:scale(1.25)}.pm.done span{border-color:#1f9a3e;color:#1f9a3e}
 .toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--fg);color:#fff;padding:8px 14px;z-index:9999;font-size:.9rem}
+#eDirs .hint{margin:6px 0 0;font-size:.85em;color:#666}#eDirs .pp{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -65,12 +66,20 @@ const labels=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_
 const plain=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key='+CK,{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
 photo.addTo(map);labels.addTo(map);let isPhoto=true;
 document.getElementById('layer').onclick=()=>{if(isPhoto){map.removeLayer(photo);map.removeLayer(labels);plain.addTo(map)}else{map.removeLayer(plain);photo.addTo(map);labels.addTo(map)}isPhoto=!isPhoto};
+// the platform of a direction when a stop has two: the one on the right of the way the buses go (traffic keeps right),
+// judged from the stop before (most runs) and the stop after; the same rule as the import (import_krynica.py)
+function posOf(id){const n=STOPS.find(x=>x.all.includes(id));if(n)return poles(n)[0];const S=ISTOPS[id];return S?{lat:S[2],lon:S[3]}:null}
+function sideOf(s,PP,d){const xy=P=>[P.lon*Math.cos(P.lat*Math.PI/180),P.lat];const c=[(xy(PP[0])[0]+xy(PP[1])[0])/2,(xy(PP[0])[1]+xy(PP[1])[1])/2];
+  const nb=posOf(d.nid);if(!nb)return 0;const b=xy(nb);const votes=[0,0];const pr=Object.entries(d.prev||{});if(!pr.length)pr.push([null,1]);
+  pr.forEach(([k,w])=>{const pa=k&&posOf(k);const a=pa?xy(pa):c;const dx=b[0]-a[0],dy=b[1]-a[1];if(!dx&&!dy)return;
+    const sd=P=>{const q=xy(P);return dx*(q[1]-c[1])-dy*(q[0]-c[0])};votes[sd(PP[1])<sd(PP[0])?1:0]+=w});
+  return votes[1]>votes[0]?1:0}
 // at most two termini named for a direction, those most runs go to; the other lines only by number
 const nsort=(a,b)=>a.localeCompare(b,'pl',{numeric:true});
 function dirTxt(d){const H=Object.keys(d.heads).sort((a,b)=>(d.runs[b]||0)-(d.runs[a]||0)||d.heads[b].size-d.heads[a].size);const top=H.slice(0,2);
   const shown=new Set();top.forEach(h=>d.heads[h].forEach(n=>shown.add(n)));const rest=[...new Set(H.slice(2).flatMap(h=>[...d.heads[h]]))].filter(n=>!shown.has(n)).sort(nsort);
   return top.map(h=>`<b>${h}</b> (${[...d.heads[h]].sort(nsort).join(', ')})`).join(', ')+(rest.length?` <small>oraz ${rest.length>1?"linie":"linia"} ${rest.join(', ')}</small>`:'')}
-let STOPS=[],LINES={},SEL=null,DIRS={};const MK={};let ARROWS=[];
+let STOPS=[],LINES={},SEL=null,DIRS={},ISTOPS={};const MK={};let ARROWS=[];
 const DCOL=['#d71920','#1f6fd1','#1f9a3e','#8e24aa','#e8a400','#00838f'];
 const icon=(t,cls)=>L.divIcon({className:'pm '+(cls||''),html:'<span>'+t+'</span>',iconSize:[30,30],iconAnchor:[15,15]});
 const st=id=>S[id]||(S[id]={poles:[{p:'',lat:null,lon:null}],note:'',done:false});
@@ -92,9 +101,10 @@ function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);c
   document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>1;
   document.getElementById('eDone').checked=!!x.done;document.getElementById('eNote').value=x.note||'';
   // where the buses go from here: an arrow to the next stop for each direction, listed with its lines and terminus
-  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=[];Object.values(DIRS['@'+id]||{}).forEach(d=>{if(d.next===s.name)return;const m=D.find(x=>x.next===d.next);if(!m){D.push({...d,heads:Object.fromEntries(Object.entries(d.heads).map(([h,l])=>[h,new Set(l)])),runs:{...d.runs}});return}Object.entries(d.heads).forEach(([h,l])=>{l.forEach(n=>(m.heads[h]=m.heads[h]||new Set()).add(n));m.runs[h]=(m.runs[h]||0)+(d.runs[h]||0)})});const P0=poles(s)[0];
-  document.getElementById('eDirs').innerHTML=D.length?'<b>Odjazdy w kierunku:</b>'+D.map((d,i)=>`<div><i style="background:${DCOL[i%DCOL.length]}"></i><span>→ ${dirTxt(d)}</span></div>`).join(''):'<span>Przystanek końcowy (brak odjazdów dalej).</span>';
-  D.forEach((d,i)=>{const n=STOPS.find(x=>x.all.includes(d.nid));const to=n?poles(n)[0]:{lat:d.lat,lon:d.lon};const col=DCOL[i%DCOL.length];
+  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=[];Object.values(DIRS['@'+id]||{}).forEach(d=>{if(d.next===s.name)return;const m=D.find(x=>x.next===d.next);if(!m){D.push({...d,heads:Object.fromEntries(Object.entries(d.heads).map(([h,l])=>[h,new Set(l)])),runs:{...d.runs}});return}Object.entries(d.heads).forEach(([h,l])=>{l.forEach(n=>(m.heads[h]=m.heads[h]||new Set()).add(n));m.runs[h]=(m.runs[h]||0)+(d.runs[h]||0)});Object.entries(d.prev||{}).forEach(([k,c])=>{m.prev=m.prev||{};m.prev[k]=(m.prev[k]||0)+c})});
+  const PP=poles(s);if(PP.length>1)D.forEach(d=>d.pole=sideOf(s,PP,d));
+  document.getElementById('eDirs').innerHTML=D.length?'<b>Odjazdy w kierunku:</b>'+D.map((d,i)=>`<div><i style="background:${DCOL[i%DCOL.length]}"></i><span>→ ${dirTxt(d)}${d.pole!=null?` · <b class="pp">peron ${PP[d.pole].p}</b>`:''}</span></div>`).join('')+(PP.length>1?'<p class="hint">Peron każdego kierunku wynika z ruchu prawostronnego (strzałki wychodzą z tego peronu). Jeśli się nie zgadza, wpisz to w uwagach.</p>':''):'<span>Przystanek końcowy (brak odjazdów dalej).</span>';
+  D.forEach((d,i)=>{const n=STOPS.find(x=>x.all.includes(d.nid));const to=n?poles(n)[0]:{lat:d.lat,lon:d.lon};const col=DCOL[i%DCOL.length];const P0=PP[d.pole||0];
     const f=Math.min(1,0.0012/Math.max(1e-6,Math.hypot(to.lat-P0.lat,(to.lon-P0.lon)*.65)));const end=[P0.lat+(to.lat-P0.lat)*f,P0.lon+(to.lon-P0.lon)*f];
     ARROWS.push(L.polyline([[P0.lat,P0.lon],end],{color:col,weight:5,opacity:.9,interactive:false}).addTo(map));
     ARROWS.push(L.polyline([[P0.lat,P0.lon],[to.lat,to.lon]],{color:col,weight:2,opacity:.7,dashArray:'4 6',interactive:false}).addTo(map));
@@ -110,14 +120,15 @@ function exportData(){const out={made:new Date().toISOString(),stops:{}};STOPS.f
   out.stops[s.id]={name:s.name,ids:s.ids,poles:poles(s).map(P=>({p:P.p,lat:+P.lat.toFixed(6),lon:+P.lon.toFixed(6)})),note:x.note||'',done:!!x.done}});return JSON.stringify(out,null,1)}
 document.getElementById('exp').onclick=()=>{const b=new Blob([exportData()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='przystanki-krynica.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
 document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(exportData());toast('Skopiowano – wklej w rozmowie')}catch(e){toast('Nie udało się skopiować – użyj „Pobierz plik”')}};
-Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null),fetch('../data/rp/km_0.json').then(r=>r.json()).catch(()=>({}))]).then(([I,M,RP])=>{
+Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null),fetch('../data/rp/km_0.json').then(r=>r.json()).catch(()=>({}))]).then(([I,M,RP])=>{ISTOPS=I.stops;
   // the direction of a line is the terminus of its basic variant: the course most runs take (the longest when equal)
   Object.values(RP).forEach(R=>(R.dirs||[]).forEach(d=>{const ids=d.stops.map(x=>x[0]);const cnt={};
     (d.plans||[]).forEach(pl=>(pl||[]).forEach(x=>{const pr=(d.prof||[])[x[1]];if(pr)cnt[pr[0]]=(cnt[pr[0]]||0)+1}));
     let bp=0;(d.pats||[]).forEach((pt,i)=>{const c=cnt[i]||0,cb=cnt[bp]||0;if(c>cb||(c===cb&&pt.length>(d.pats[bp]||[]).length))bp=i});
     const runs=Object.values(cnt).reduce((a,b)=>a+b,0);const bpt=(d.pats||[])[bp];const tid=bpt?ids[bpt[bpt.length-1]]:ids[ids.length-1];const head=I.stops[tid]?I.stops[tid][0]:d.head;
     (d.pats||[]).forEach(pt=>{for(let j=0;j<pt.length-1;j++){const a=ids[pt[j]],b=ids[pt[j+1]];if(!a||!b||a===b)continue;const B=I.stops[b];if(!B)continue;
-      const o=(DIRS[a]=DIRS[a]||{});const e=o[b]||(o[b]={nid:b,next:B[0],lat:B[2],lon:B[3],lines:new Set(),heads:{},runs:{}});e.lines.add(R.n);(e.heads[head]=e.heads[head]||new Set()).add(R.n);e.runs[head]=(e.runs[head]||0)+runs}})}));
+      const o=(DIRS[a]=DIRS[a]||{});const e=o[b]||(o[b]={nid:b,next:B[0],lat:B[2],lon:B[3],lines:new Set(),heads:{},runs:{}});e.lines.add(R.n);(e.heads[head]=e.heads[head]||new Set()).add(R.n);e.runs[head]=(e.runs[head]||0)+runs;
+      const pv=j>0?ids[pt[j-1]]:null;if(pv&&pv!==a){e.prev=e.prev||{};e.prev[pv]=(e.prev[pv]||0)+1}}})}));
   // one entry per stop: the ids of one name close together (data from several sources, and the platforms the timetables
   // derive per direction, e.g. 9a/9b) are one stop here; its second platform is added by hand where it really is one
   const base=k=>k.replace(/_[ab]$/,'');const B={};
