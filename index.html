@@ -3583,7 +3583,11 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   let pos=gps;if(!pos){let j=T.findIndex(t=>t>nowM);if(j<0)j=T.length;
     if(j===0)pos=[P[0][2],P[0][3]];else if(j>=T.length)pos=[P[T.length-1][2],P[T.length-1][3]];
     else{const f=Math.max(0,Math.min(1,(nowM-T[j-1])/Math.max(.1,T[j]-T[j-1])));pos=[P[j-1][2]+(P[j][2]-P[j-1][2])*f,P[j-1][3]+(P[j][3]-P[j-1][3])*f]}}
-  RUN.pos={xy:proj(pos[0],pos[1]),gps:!!gps,dl};
+  const xy=proj(pos[0],pos[1]);let ang=null,bd=1e18;
+  for(let j=1;j<P.length;j++){if(!P[j-1]||!P[j])continue;const A=proj(P[j-1][2],P[j-1][3]),B=proj(P[j][2],P[j][3]);const dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;if(!l2)continue;
+    const u=Math.max(0,Math.min(1,((xy[0]-A[0])*dx+(xy[1]-A[1])*dy)/l2));const ex=A[0]+u*dx-xy[0],ey=A[1]+u*dy-xy[1],dd=ex*ex+ey*ey;
+    if(dd<bd-1e-12&&(!gps||T[j]>=nowM-2)){bd=dd;ang=Math.atan2(dy,dx)*180/Math.PI}}
+  RUN.pos={xy,gps:!!gps,dl,ang};
   if(RUN.first){RUN.first=false;const [x,y]=RUN.pos.xy;const v=MAP.vb,f=Math.min(1,.02/unitsPerPx());MAP.vb={x:x-v.w*f/2,y:y-v.h*f/2,w:v.w*f,h:v.h*f};applyVB()}
   drawVeh();renderLabels();
   // the stops still ahead, with their times
@@ -3600,7 +3604,15 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
 function drawVeh(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapVeh');
   if(!RUN.d||!RUN.pos||MAP.view==='schema'){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapVeh'}svg.appendChild(g);const k=unitsPerPx();const [x,y]=RUN.pos.xy;const s0=depStyle(RUN.d.r);
-  g.innerHTML=`<g transform="translate(${x} ${y}) scale(${k.toFixed(5)})"><circle r="15" fill="${s0.bg}" stroke="#fff" stroke-width="3"/><text y="5" text-anchor="middle" style="font:700 13px Roboto,sans-serif;fill:${s0.fg}">${esc(RUN.d.r.n)}</text>${RUN.pos.gps?'':'<circle r="19" fill="none" stroke="'+s0.bg+'" stroke-width="1.5" stroke-dasharray="3 3"/>'}</g>`}
+  // the vehicle: its kind (bus, tram, trolleybus, train, metro, ferry) in a white circle in the line's colour, the line's number
+  // beside it, and an arrow the way it goes; a dashed ring where the position comes from the timetable, not the vehicle
+  const r=RUN.d.r;const kind=r.cat==='ferry'?'ferry':r.cat==='metro'?'metro':r.t==='trol'?'trol':r.t==='tram'?'tram':r.t==='rail'?'rail':'bus';
+  const ic=(ICONS[kind]||ICONS.bus).replace('<svg ','<svg x="-14" y="-14" width="28" height="28" style="color:'+s0.bg+'" ');
+  const n=String(r.n),w=Math.max(30,n.length*9+14);const a=RUN.pos.ang;
+  g.innerHTML=`<g transform="translate(${x} ${y}) scale(${k.toFixed(5)})">${a!=null?`<g transform="rotate(${a.toFixed(1)})"><path d="M36 0 L24 -9 L24 9 Z" fill="${pageLight()?'#14171a':'#f1f2f2'}" stroke="${pageLight()?'#fff':'#14171a'}" stroke-width="1.5"/></g>`:''}
+    ${RUN.pos.gps?'':'<circle r="27" fill="none" stroke="'+s0.bg+'" stroke-width="2" stroke-dasharray="4 4"/>'}
+    <circle r="22" fill="#fff" stroke="${s0.bg}" stroke-width="4" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))"/>${ic}
+    <g transform="translate(${a!=null&&Math.cos(a*Math.PI/180)>0.3?-26-w:26} -12)"><rect width="${w}" height="24" fill="${s0.bg}" ${s0.shape==='circle'?'rx="12"':''}/><text x="${w/2}" y="17" text-anchor="middle" style="font:700 15px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g></g>`}
 // ---- the user's own position on the map (a blue dot with the accuracy circle), followed while it is on ----
 function toggleMe(){const b=document.getElementById('mapMeBtn');
   if(MAP.meW!=null){navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null;MAP.me=null;b.setAttribute('aria-pressed','false');drawMe();return}
