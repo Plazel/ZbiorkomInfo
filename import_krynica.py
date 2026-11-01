@@ -10,6 +10,7 @@ Only the stops in the file change; the others keep their position, number and st
   the runs (the one on the right of the street in the direction of travel, or by the destinations given in PLATFORM_TOK).
 - ONE_WAY: stops served in one direction only.
 The notes of the file are printed; those not handled here need handling by hand.
+Then the road routes of the moved stops: python3 reczne/narzedzia/legs_odswiez.py
 Usage: python3 import_krynica.py przystanki-krynica.json
 """
 import json, sys, os
@@ -107,6 +108,7 @@ def main(src):
         json.dump(F[i], open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print('przystanki z pliku: %d; ustawione id: %d, z dwoma peronami: %d; usunięte (połączone z innymi): %s; przeniesione postoje: %d, usunięte postoje (jeden kierunek): %d'
           % (len(U), n1, n2, ', '.join('%s→%s' % (s, merge[s]) for s in gone) or '–', moved, cut))
+    print('teraz przebieg po ulicach dla przesuniętych przystanków: python3 reczne/narzedzia/legs_odswiez.py')
 
 
 if __name__ == '__main__':

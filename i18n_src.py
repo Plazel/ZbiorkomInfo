@@ -417,4 +417,11 @@ PHRASES = [
 ("Następny przystanek", "Next stop", "Nächste Haltestelle", "Nasledujúca zastávka", "Příští zastávka"),
 ("Ustalanie położenia… Możesz też wyszukać przystanek.", "Finding your position… You can also search for a stop.", "Standort wird ermittelt… Sie können auch eine Haltestelle suchen.", "Zisťuje sa poloha… Môžete aj vyhľadať zastávku.", "Zjišťuje se poloha… Můžete také vyhledat zastávku."),
 ("Wyszukaj przystanek, z którego jedziesz.", "Search for the stop you are leaving from.", "Suchen Sie die Haltestelle, von der Sie abfahren.", "Vyhľadajte zastávku, z ktorej cestujete.", "Vyhledejte zastávku, ze které jedete."),
+("Wyszukaj przystanek lub pojazd", "Search for a stop or vehicle", "Haltestelle oder Fahrzeug suchen", "Vyhľadať zastávku alebo vozidlo", "Vyhledat zastávku nebo vozidlo"),
+("Nazwa przystanku lub numer pojazdu", "Stop name or vehicle number", "Haltestellenname oder Fahrzeugnummer", "Názov zastávky alebo číslo vozidla", "Název zastávky nebo číslo vozidla"),
+("Ustawienia przewodnika", "Guide settings", "Einstellungen des Begleiters", "Nastavenia sprievodcu", "Nastavení průvodce"),
+("Wkrótce.", "Coming soon.", "Demnächst.", "Čoskoro.", "Brzy."),
+("Ustalanie kursu pojazdu…", "Finding the vehicle's trip…", "Fahrt des Fahrzeugs wird ermittelt…", "Zisťuje sa spoj vozidla…", "Zjišťuje se spoj vozidla…"),
+("Nie udało się ustalić kursu tego pojazdu.", "The trip of this vehicle could not be found.", "Die Fahrt dieses Fahrzeugs konnte nicht ermittelt werden.", "Spoj tohto vozidla sa nepodarilo zistiť.", "Spoj tohoto vozidla se nepodařilo zjistit."),
+("linia", "line", "Linie", "linka", "linka"),
 ]
