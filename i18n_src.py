@@ -443,4 +443,7 @@ PHRASES = [
 ("Głos", "Voice", "Stimme", "Hlas", "Hlas"),
 ("Tłumaczenia nazw przystanków", "Translations of stop names", "Übersetzungen der Haltestellennamen", "Preklady názvov zastávok", "Překlady názvů zastávek"),
 ("na język strony, np. „Dworzec Główny – Hauptbahnhof”", "into the page language, e.g. “Dworzec Główny – Main Station”", "in die Sprache der Seite, z. B. „Dworzec Główny – Hauptbahnhof“", "do jazyka stránky, napr. „Dworzec Główny – Hlavná stanica“", "do jazyka stránky, např. „Dworzec Główny – Hlavní nádraží“"),
+("Tablica przesiadek", "Change board", "Umsteigetafel", "Tabuľa prestupov", "Tabule přestupů"),
+("najbliższe odjazdy z następnego przystanku i przystanków do 200 m", "the next departures from the next stop and stops within 200 m", "die nächsten Abfahrten an der nächsten Haltestelle und an Haltestellen bis 200 m", "najbližšie odchody z nasledujúcej zastávky a zastávok do 200 m", "nejbližší odjezdy z příští zastávky a zastávek do 200 m"),
+("Numery linii przy przystankach", "Line numbers at stops", "Liniennummern an den Haltestellen", "Čísla liniek pri zastávkach", "Čísla linek u zastávek"),
 ]
