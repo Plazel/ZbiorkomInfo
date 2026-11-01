@@ -405,7 +405,8 @@ span.chip{cursor:inherit}
 .rpList .rl i{position:absolute;left:50%;top:50%;width:15px;height:15px;transform:translate(-50%,-50%);border-radius:50%;background:var(--bg);border:3px solid var(--fg);box-sizing:border-box}
 .rpList li.past{color:var(--muted)}.rpList li.past .rl::before{background:var(--muted)}.rpList li.past .rl i{border-color:var(--muted)}
 .rpList li.nx .n{font-weight:800}.rpList li.nx .rl i{width:20px;height:20px;background:var(--fg);box-shadow:inset 0 0 0 3px var(--bg)}
-.mapModal.run #mapList,.mapModal.run #mlTog{display:none!important}
+.mapModal.run #mapList,.mapModal.run #mlTog,.mapModal.run #mapVar{display:none!important}
+.rpList li{cursor:pointer}.rpList li:hover .n{text-decoration:underline}
 @media (min-width:761px){.mapModal.run .runPanel{position:relative;left:auto;right:auto;top:auto;bottom:auto;width:auto;max-height:none;min-height:0;border:0;border-right:1px solid var(--line);box-shadow:none;z-index:1}}.rpList .t{font-weight:700;font-variant-numeric:tabular-nums}
 #mapVeh{pointer-events:none}
 .mapPop .mr[data-rid]{cursor:pointer}.mapPop .mr[data-rid]:hover{background:#262b31}
@@ -3314,7 +3315,7 @@ function gdSegs0(kind,name,isLast){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],
   const ex=store.get('ztm.gdExtra',true);
   // in the Tricity, in Czech: the change to the S lines (SKM), at the main stations also to the other trains
   if(ex&&l==='cs'&&gdTri()){if(gdSKM(name))out.push(['Přestup na linky S.','cs',3]);
-    else if(/\bPKP\b|Dworzec G[łl]/.test(name))out.push(['Přestup na linky S a další vlakové spoje.','cs',3])}
+    else if(/\bPKP\b|Dworzec G[łl]|^Dworzec PKS$/.test(name))out.push(['Přestup na linky S a další vlakové spoje.','cs',3])}
   if(isLast&&ex)out.push([T[st+1]+'.',l,4]);
   // parts in the same language said together (no pause between them)
   return out.reduce((a,x)=>{const p=a[a.length-1];if(p&&p[1]===x[1]){p[0]+=(p[2]===x[2]||p[2]===0?' ':', ')+x[0];p[2]=x[2]}else a.push([x[0],x[1],x[2]]);return a},[]).map(x=>[x[0],x[1]])}
@@ -3583,10 +3584,10 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   let pos=gps;if(!pos){let j=T.findIndex(t=>t>nowM);if(j<0)j=T.length;
     if(j===0)pos=[P[0][2],P[0][3]];else if(j>=T.length)pos=[P[T.length-1][2],P[T.length-1][3]];
     else{const f=Math.max(0,Math.min(1,(nowM-T[j-1])/Math.max(.1,T[j]-T[j-1])));pos=[P[j-1][2]+(P[j][2]-P[j-1][2])*f,P[j-1][3]+(P[j][3]-P[j-1][3])*f]}}
-  const xy=proj(pos[0],pos[1]);let ang=null,bd=1e18;
+  const xy=proj(pos[0],pos[1]);let ang=null,bd=1e18,segJ=null;
   for(let j=1;j<P.length;j++){if(!P[j-1]||!P[j])continue;const A=proj(P[j-1][2],P[j-1][3]),B=proj(P[j][2],P[j][3]);const dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;if(!l2)continue;
     const u=Math.max(0,Math.min(1,((xy[0]-A[0])*dx+(xy[1]-A[1])*dy)/l2));const ex=A[0]+u*dx-xy[0],ey=A[1]+u*dy-xy[1],dd=ex*ex+ey*ey;
-    if(dd<bd-1e-12&&(!gps||T[j]>=nowM-2)){bd=dd;ang=Math.atan2(dy,dx)*180/Math.PI}}
+    if(dd<bd-1e-12&&(!gps||T[j]>=nowM-2)){bd=dd;segJ=j;ang=Math.atan2(dy,dx)*180/Math.PI}}
   RUN.pos={xy,gps:!!gps,dl,ang};
   if(RUN.first){RUN.first=false;const [x,y]=RUN.pos.xy;const v=MAP.vb,f=Math.min(1,.02/unitsPerPx());MAP.vb={x:x-v.w*f/2,y:y-v.h*f/2,w:v.w*f,h:v.h*f};applyVB()}
   drawVeh();renderLabels();
@@ -3595,11 +3596,13 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   document.getElementById('mapModal').classList.add('run');
   const s0=depStyle(d.r);const m=Math.round(dl);const live=d.live||gps;
   // as on the guide's display: the line of the route, the stops passed dimmed, the next one marked; times with the delay
-  const nx=Math.max(0,T.findIndex(t=>t>=nowM-.25));const last=d.ps.length-1;
+  const nx=gps&&segJ!=null?segJ:Math.max(0,T.findIndex(t=>t>=nowM-.25));const last=d.ps.length-1;   // (the vehicle seen: the next stop by its position)
   const rows=d.ps.map((id,j)=>{const X=IDX.stops[id]||['',''];const pl=d.t0+d.off[j];const ch=Math.round(T[j])!==Math.round(pl);
-    return `<li class="${j<nx?'past':j===nx?'nx':''}${j===0?' first':''}${j===last?' last':''}"><span class="t">${fmtT(T[j])}${ch?`<s>${fmtT(pl)}</s>`:''}</span><span class="rl"><i></i></span><span class="n">${esc(X[0])}${X[1]?' <span class="spPole">'+esc(X[1])+'</span>':''}</span></li>`}).join('');
+    return `<li data-sid="${esc(id)}" class="${j<nx?'past':j===nx?'nx':''}${j===0?' first':''}${j===last?' last':''}"><span class="t">${fmtT(T[j])}${ch?`<s>${fmtT(pl)}</s>`:''}</span><span class="rl"><i></i></span><span class="n">${esc(X[0])}${X[1]?' <span class="spPole">'+esc(X[1])+'</span>':''}</span></li>`}).join('');
   pn.innerHTML=`<div class="rpH"><span class="mb ${s0.shape}${sqCls(d.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(d.r.n)}</span><span class="rpD">→ ${esc(d.head)}</span><span class="rpL ${live?(m>0?'late':m<0?'early':'ok'):''}">${live?(m===0?'na czas':(m>0?'+':'−')+Math.abs(m)+' min'):'wg rozkładu'}</span><button type="button" class="mpX" aria-label="Zamknij">×</button></div><ol class="rpList">${rows}</ol>`;
   pn.querySelector('.mpX').onclick=closeRun;
+  pn.querySelectorAll('li[data-sid]').forEach(li=>li.onclick=()=>{const X=IDX.stops[li.dataset.sid];if(!X)return;const [x,y]=proj(X[2],X[3]);const v=MAP.vb;
+    const f=Math.min(1,SYM_K1*.5/unitsPerPx());MAP.vb={x:x-v.w*f/2,y:y-v.h*f/2,w:v.w*f,h:v.h*f};applyVB();renderLabels();drawVeh()});
   if(!RUN.scrolled){RUN.scrolled=true;const e=pn.querySelector('li.nx');if(e)e.scrollIntoView({block:'center'})}}
 function drawVeh(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapVeh');
   if(!RUN.d||!RUN.pos||MAP.view==='schema'){if(g)g.remove();return}
@@ -3612,7 +3615,9 @@ function drawVeh(){const svg=document.getElementById('mapSvg');if(!svg)return;le
   g.innerHTML=`<g transform="translate(${x} ${y}) scale(${k.toFixed(5)})">${a!=null?`<g transform="rotate(${a.toFixed(1)})"><path d="M36 0 L24 -9 L24 9 Z" fill="${pageLight()?'#14171a':'#f1f2f2'}" stroke="${pageLight()?'#fff':'#14171a'}" stroke-width="1.5"/></g>`:''}
     ${RUN.pos.gps?'':'<circle r="27" fill="none" stroke="'+s0.bg+'" stroke-width="2" stroke-dasharray="4 4"/>'}
     <circle r="22" fill="#fff" stroke="${s0.bg}" stroke-width="4" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))"/>${ic}
-    <g transform="translate(${a!=null&&Math.cos(a*Math.PI/180)>0.3?-26-w:26} -12)"><rect width="${w}" height="24" fill="${s0.bg}" ${s0.shape==='circle'?'rx="12"':''}/><text x="${w/2}" y="17" text-anchor="middle" style="font:700 15px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g></g>`}
+    ${s0.shape==='circle'?(()=>{const cr=Math.max(13,n.length*4.6+4);const cx=a!=null&&Math.cos(a*Math.PI/180)>0.3?-24-cr:24+cr;
+      return `<circle cx="${cx}" cy="0" r="${cr}" fill="${s0.bg}"/><text x="${cx}" y="5" text-anchor="middle" style="font:700 ${n.length>2?13:15}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text>`})()
+    :`<g transform="translate(${a!=null&&Math.cos(a*Math.PI/180)>0.3?-26-w:26} -12)"><rect width="${w}" height="24" fill="${s0.bg}"/><text x="${w/2}" y="17" text-anchor="middle" style="font:700 15px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`}</g>`}
 // ---- the user's own position on the map (a blue dot with the accuracy circle), followed while it is on ----
 function toggleMe(){const b=document.getElementById('mapMeBtn');
   if(MAP.meW!=null){navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null;MAP.me=null;b.setAttribute('aria-pressed','false');drawMe();return}
@@ -3700,6 +3705,7 @@ function setupMap(){
     if(v==='tt'){if(DEP.open){closeDep();return}if(MAP.open)closeMap();else if(location.hash)location.hash='';return}
     if(v==='dep'){if(!DEP.open)openDep();return}
     if(DEP.open)closeDep();
+    if(v==='map'&&MAP.open&&typeof RUN!=='undefined'&&RUN.d){closeRun();return}   // the reduced view of a run: the ordinary map, at the same place
     if(!MAP.open){if(MAP.city!==city){MAP.vb=null;MAP.vbs=null}await openMap()}});   // the views (lines, map, diagram) are chosen in the map window
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MAP.open&&document.getElementById('cityMenu').hidden)closeMap()});
   window.addEventListener('resize',()=>{if(MAP.open&&MAP.vb){if(MAP.rot)setMapRot(MAP.rot,true);scheduleLabels();drawBase()}});
