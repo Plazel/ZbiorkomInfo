@@ -453,4 +453,8 @@ PHRASES = [
 ("← Wybór kursu", "← Trip choice", "← Fahrtauswahl", "← Výber spoja", "← Výběr spoje"),
 ("Pokaż pojazd na mapie", "Show the vehicle on the map", "Fahrzeug auf der Karte zeigen", "Zobraziť vozidlo na mape", "Zobrazit vozidlo na mapě"),
 ("na żywo", "live", "live", "naživo", "živě"),
+("na czas", "on time", "pünktlich", "načas", "včas"),
+("wg rozkładu", "per timetable", "laut Fahrplan", "podľa cestovného poriadku", "podle jízdního řádu"),
+("Brygada", "Duty", "Umlauf", "Turnus", "Turnus"),
+("Brak danych o pojeździe", "No vehicle data", "Keine Fahrzeugdaten", "Žiadne údaje o vozidle", "Žádné údaje o vozidle"),
 ]
