@@ -365,6 +365,12 @@ ROWS = [
 ("Dane rozkładowe pochodzą z plików PDF udostępnianych przez przewoźnika na stronie mpgk-krynica.pl", "The timetable data come from the PDF files published by the operator at mpgk-krynica.pl", "Die Fahrplandaten stammen aus den PDF-Dateien, die der Betreiber auf mpgk-krynica.pl veröffentlicht", "Údaje cestovného poriadku pochádzajú z PDF súborov, ktoré dopravca zverejňuje na mpgk-krynica.pl", "Údaje jízdního řádu pocházejí z PDF souborů, které dopravce zveřejňuje na mpgk-krynica.pl"),
 ("Wcześniej", "Earlier", "Früher", "Skôr", "Dříve"),
 ("Później", "Later", "Später", "Neskôr", "Později"),
+    ("na czas", "on time", "pünktlich", "načas", "včas"),
+    ("wg rozkładu", "per timetable", "laut Fahrplan", "podľa cestovného poriadku", "podle jízdního řádu"),
+    ("Brygada", "Duty", "Umlauf", "Turnus", "Turnus"),
+    ("Brak danych o pojeździe", "No vehicle data", "Keine Fahrzeugdaten", "Žiadne údaje o vozidle", "Žádné údaje o vozidle"),
+    ("Czas od ostatniej pozycji pojazdu", "Time since the vehicle's last position", "Zeit seit der letzten Fahrzeugposition", "Čas od poslednej polohy vozidla", "Čas od poslední polohy vozidla"),
+    ("przystanek", "stop", "Haltestelle", "zastávka", "zastávka"),
 ]
 
 WEEKDAYS = {
@@ -453,9 +459,4 @@ PHRASES = [
 ("← Wybór kursu", "← Trip choice", "← Fahrtauswahl", "← Výber spoja", "← Výběr spoje"),
 ("Pokaż pojazd na mapie", "Show the vehicle on the map", "Fahrzeug auf der Karte zeigen", "Zobraziť vozidlo na mape", "Zobrazit vozidlo na mapě"),
 ("na żywo", "live", "live", "naživo", "živě"),
-("na czas", "on time", "pünktlich", "načas", "včas"),
-("wg rozkładu", "per timetable", "laut Fahrplan", "podľa cestovného poriadku", "podle jízdního řádu"),
-("Brygada", "Duty", "Umlauf", "Turnus", "Turnus"),
-("Brak danych o pojeździe", "No vehicle data", "Keine Fahrzeugdaten", "Žiadne údaje o vozidle", "Žádné údaje o vozidle"),
-("Czas od ostatniej pozycji pojazdu", "Time since the vehicle's last position", "Zeit seit der letzten Fahrzeugposition", "Čas od poslednej polohy vozidla", "Čas od poslední polohy vozidla"),
 ]
