@@ -4301,7 +4301,7 @@ function gsShow(items){GS=items;GSi=items.length?0:-1;const ul=document.getEleme
     if(it.k==='l'){li.appendChild(chip(it.r,'',true));li.append(it.r.ends.join(' – '));const sm=document.createElement('small');sm.textContent='linia';li.appendChild(sm)}
     else if(it.k==='c'){it.lines.forEach(n=>li.appendChild(chip(n,'',true)));const sm=document.createElement('small');sm.textContent='linie łączone';li.appendChild(sm)}
     else if(it.k==='v'){const t=document.createElement('span');t.textContent=trS('Pojazd')+' '+it.v.label;li.append(t);const sm=document.createElement('small');sm.textContent=trS('linia')+' '+it.v.line+(it.v.head?' → '+it.v.head:'');li.appendChild(sm)}
-    else{const p=document.createElement('span');p.className='gsPin';p.textContent='●';li.append(p,it.n+(it.p?' '+it.p:''));const sm=document.createElement('small');sm.textContent=it.town?trS('przystanek')+' · '+it.town:'przystanek';li.appendChild(sm)}
+    else{const p=document.createElement('span');p.className='gsPin';p.textContent='●';li.append(p,it.n+(it.p?' '+it.p:''));if(it.town){const sm=document.createElement('small');sm.textContent=it.town;li.appendChild(sm)}}
     li.onmousedown=e=>{e.preventDefault();gsGo(it)};ul.appendChild(li)})}
 {const inp=document.getElementById('gsIn');
   inp.addEventListener('input',()=>{if(IDX)gsShow(gsItems(inp.value))});
