@@ -185,6 +185,7 @@ span.chip{cursor:inherit}
 .slist li.var button::before{content:"";position:absolute;left:21px;top:50%;width:19px;margin-top:-1px;border-top:2px solid var(--lc,var(--chip-grey));opacity:.6}
 .slist .tag{font-size:.75rem;color:var(--muted);margin-left:auto;white-space:nowrap}
 .hand{width:15px;height:15px;flex:none;vertical-align:-2px;color:var(--hand)}
+.gsRow .nm .hand{width:.8em;height:.8em;vertical-align:-.08em}
 .slist .hand{margin-left:-6px}
 .notes b.k .hand{width:16px;height:16px}
 .slist .num{font-size:.75rem;color:var(--muted);display:inline-flex;align-items:center;gap:3px}
@@ -1009,8 +1010,8 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
  <button type="button" data-nav="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Mapa</span></button>
  <button type="button" data-nav="dep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M2.5 4h19v15h-19z"/><path d="M6 9h3M11 9h7M6 12.5h3M11 12.5h7M6 16h3M11 16h4"/></svg><span>Odjazdy</span></button>
  <button type="button" data-nav="jp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><circle cx="5" cy="19" r="2.6"/><path d="M19 2.6a3.6 3.6 0 0 1 3.6 3.6c0 2.7-3.6 6.2-3.6 6.2s-3.6-3.5-3.6-6.2A3.6 3.6 0 0 1 19 2.6z"/><circle cx="19" cy="6.2" r="1.2" fill="currentColor" stroke="none"/><path d="M8.2 19H19v-4.4" stroke-dasharray="2.4 2.1"/></svg><span>Połączenia</span></button>
- <button type="button" data-nav="takt" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 5h6l5 5v6l-5 5H9l-5-5v-6z"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><span>Takty</span></button>
  <button type="button" data-nav="guide" class="railA11y" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Przewodnik</span></button><button type="button" data-nav="bryg" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 3.5h16v13H4z"/><path d="M4 11h16M8 16.5v3M16 16.5v3M8 7h8"/><path d="M7 13h2v2H7zM15 13h2v2h-2z" fill="currentColor" stroke="none"/></svg><span>Brygady</span></button>
+ <button type="button" data-nav="takt" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 5h6l5 5v6l-5 5H9l-5-5v-6z"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><span>Takty</span></button>
 </nav>
 <div class="mapModal" id="mapModal" hidden role="dialog" aria-modal="true" aria-labelledby="mapTitle">
  <div class="mapHead"><h2 id="mapTitle">Schemat sieci</h2><span id="mapStatus" class="hint"></span>
@@ -3252,8 +3253,8 @@ function reopenStopPop(pa){if(!pa||!MAP.stopG)return;let gi=pa.gi;let G=MAP.stop
 // stands for the user's position ----
 const GUIDE={open:false,watch:null,pos:null,fake:null,run:null,voice:false,lastAnn:'',tm:0,pick:false,choice:null,j:0};
 // [next stop, end of the line] and the same for stations (rail and metro lines)
-const GD_TXT={pl:['Następny przystanek','Przystanek końcowy','Następna stacja','Stacja końcowa'],de:['Nächste Haltestelle','Endhaltestelle','Nächster Halt','Endstation'],
-  en:['Next stop','Last stop','Next station','Last station'],cs:['Příští zastávka','Konečná zastávka','Příští stanice','Konečná stanice'],sk:['Nasledujúca zastávka','Konečná zastávka','Nasledujúca stanica','Konečná stanica']};
+const GD_TXT={pl:['Następny przystanek','Przystanek końcowy','Następna stacja','Stacja końcowa','Przystanek na żądanie'],de:['Nächste Haltestelle','Endhaltestelle','Nächster Halt','Endstation','Halt auf Verlangen'],
+  en:['Next stop','Last stop','Next station','Last station','Request stop'],cs:['Příští zastávka','Konečná zastávka','Příští stanice','Konečná stanice','Zastávka na znamení'],sk:['Nasledujúca zastávka','Konečná zastávka','Nasledujúca stanica','Konečná stanica','Zastávka na znamenie']};
 // the language of a town's stop names (spoken in it); the words around them in the language of the page
 const GD_CITY_LANG={prg:'cs',fl:'de'};
 const GD_LOC={pl:'pl-PL',de:'de-DE',en:'en-GB',cs:'cs-CZ',sk:'sk-SK'};
@@ -3306,12 +3307,12 @@ const gdTri=()=>['gda','sop','gdy','wej','all'].includes(city);
 const gdSKM=name=>/\bSKM\b/.test(name)||gdTri()&&/\bPKM\b/.test(name);   // (PKM: the Tricity's Pomeranian Metropolitan Railway, not Poznań's)
 const gdNoTrn=(name,l)=>l==='cs'&&gdSKM(name);
 const gdTrnText=name=>{const l=gdLang();if(l==='pl'||gdNameLang()!=='pl'||!store.get('ztm.gdTrans',false)||gdNoTrn(name,l))return '';const t=GD_TRN[name]&&GD_TRN[name][l];return t?t.map(x=>x[0]).join(' '):''};
-const gdNameHtml=name=>{const t=gdTrnText(name);return `<span>${esc(name)}${t?` <small class="gsTrn">${esc(t)}</small>`:''}</span>`};
+const gdNameHtml=(name,ex)=>{const t=gdTrnText(name);return `<span>${esc(name)}${ex?' '+ex:''}${t?` <small class="gsTrn">${esc(t)}</small>`:''}</span>`};
 // how some names are said (the spelling stays on the screen)
 const GD_SAY=[[/Groddecka/g,'Grodeka'],[/Traugutta/g,'Trauguta'],[/Westerplatte/g,'Westerplate']];
 const gdSayFix=t=>GD_SAY.reduce((x,[a,b])=>x.replace(a,b),t);
-function gdSegs(kind,name,isLast){return gdSegs0(kind,name,isLast).map(([t,l])=>[l==='pl'?gdSayFix(t):t,l])}
-function gdSegs0(kind,name,isLast){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
+function gdSegs(kind,name,isLast,req){return gdSegs0(kind,name,isLast,req).map(([t,l])=>[l==='pl'?gdSayFix(t):t,l])}
+function gdSegs0(kind,name,isLast,req){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);out.push([name,nl,1]);
   const tr=l!=='pl'&&nl==='pl'&&store.get('ztm.gdTrans',false)&&!gdNoTrn(name,l)&&GD_TRN[name]&&GD_TRN[name][l];if(tr)tr.forEach(([t,x])=>out.push([t,x,2]));
   const ex=store.get('ztm.gdExtra',true);
@@ -3319,8 +3320,10 @@ function gdSegs0(kind,name,isLast){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],
   if(ex&&l==='cs'&&gdTri()){if(gdSKM(name))out.push(['Přestup na linky S.','cs',3]);
     else if(/\bPKP\b|Dworzec G[łl]|^Dworzec PKS$/.test(name))out.push(['Přestup na linky S a další vlakové spoje.','cs',3])}
   if(isLast&&ex)out.push([T[st+1]+'.',l,4]);
+  // a stop on request: always said (whatever the extra messages setting), so that the passenger signals in time
+  if(req&&!isLast)out.push([T[4]+'.',l,5]);
   // parts in the same language said together (no pause between them)
-  return out.reduce((a,x)=>{const p=a[a.length-1];if(p&&p[1]===x[1]){p[0]+=(p[2]===x[2]||p[2]===0?' ':', ')+x[0];p[2]=x[2]}else a.push([x[0],x[1],x[2]]);return a},[]).map(x=>[x[0],x[1]])}
+  return out.reduce((a,x)=>{const p=a[a.length-1];if(p&&p[1]===x[1]){p[0]+=(p[2]===x[2]||p[2]===0?' ':x[2]===5?'. ':', ')+x[0];p[2]=x[2]}else a.push([x[0],x[1],x[2]]);return a},[]).map(x=>[x[0],x[1]])}
 const gdPiperOk=l=>!!GDV.ready[l];
 // announcements with the app in the background or the phone locked: silence played in a loop keeps the page running (a
 // page playing media is not suspended) and its playback events drive the guide where the timers are slowed down; the media controls of the system show it, and pausing them mutes
@@ -3348,7 +3351,7 @@ async function gdNotify(text){const ms=navigator.mediaSession;
       actions:[{action:'mute',title:trS('Wycisz zapowiedzi')}],data:{url:location.href}})}catch(e){}}
 async function gdNotifyClose(){try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(!reg)return;(await reg.getNotifications({tag:'zbiorkom-guide'})).forEach(n=>n.close())}catch(e){}}
 if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',e=>{if(e.data==='gd-mute')gdMute();else if(e.data==='gd-open'&&!GUIDE.open)openGuide()});
-function gdPrepare(kind,name,isLast){if(!GUIDE.voice)return;gdSegs(kind,name,isLast).forEach(([t,l])=>{if(gdPiperOk(l))gdWav(t,l).catch(()=>{})})}
+function gdPrepare(kind,name,isLast,req){if(!GUIDE.voice)return;gdSegs(kind,name,isLast,req).forEach(([t,l])=>{if(gdPiperOk(l))gdWav(t,l).catch(()=>{})})}
 // at a stop: the gong, then the stop's name
 const GD_GONG=new Audio('dzwieki/gong.mp3');GD_GONG.preload='auto';
 const GD_AUD=new Audio();
@@ -3366,9 +3369,9 @@ if(window.speechSynthesis)try{speechSynthesis.getVoices()}catch(e){}
 async function gdSpeakLocal(text,l,queued){if(!queued)await gdVoicesReady();return new Promise(res=>{if(!window.speechSynthesis)return res();const u=new SpeechSynthesisUtterance(text);u.lang=GD_LOC[l]||l;
   const v=gdLocalVoice(l);if(v)u.voice=v;u.rate=.95;u.onend=u.onerror=()=>res();setTimeout(res,15000);
   try{speechSynthesis.speak(u)}catch(e){res()}})}
-async function gdSay(kind,name,isLast){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
+async function gdSay(kind,name,isLast,req){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
   try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
-  const segs=gdSegs(kind,name,isLast).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
+  const segs=gdSegs(kind,name,isLast,req).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
   gdNotify(kind==='next'?segs.map(x=>x[0]).join(' '):name);
   if(kind==='at'){await gdPlay(GD_GONG);if(tok!==GUIDE.sayTok)return}
   const urls=await Promise.all(segs.map(x=>x[2]||null));if(tok!==GUIDE.sayTok)return;
@@ -3410,8 +3413,13 @@ async function gdRunOf(v){const r=IDX.routes.find(x=>x.n===v.line&&inCityOf(x,ci
     for(let j=0;j<ps.length-1;j++){const A=IDX.stops[d.stops[ps[j]][0]],B=IDX.stops[d.stops[ps[j+1]][0]];if(!A||!B)continue;const a=xy(A),b=xy(B),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0;const dist=Math.hypot(a[0]+u*dx,a[1]+u*dy);
       if(!best||dist<best.dist)best={dist,r,ps:ps.map(i=>d.stops[i][0]),off,t0,head:sName(d.stops[ps[ps.length-1]][0])}}}));
   return best&&best.dist<400?best:null}
-function gdChoose(run){if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
-async function gdTick(){if(!GUIDE.open||GUIDE.busy)return;GUIDE.lastTick=Date.now();gdBackBtn();const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
+// the stops of the run served on request (as in the timetables: the route's direction that has the run's stops)
+const gdReq=j=>{const R=GUIDE.run;return !!(R&&R.req&&R.ps&&R.req.has(R.ps[j]))};
+async function gdReqLoad(R){if(!R||!R.r||!R.ps||R.req)return;R.req=new Set();try{const D=await loadRoute(R.r.id);const ps=new Set(R.ps);let best=null,bn=-1;
+    (D.dirs||[]).forEach(d=>{const n=d.stops.filter(x=>ps.has(x[0])).length;if(n>bn){bn=n;best=d}});
+    if(best)best.stops.forEach(x=>{if(x[2]&&ps.has(x[0]))R.req.add(x[0])});if(R.req.size&&GUIDE.run===R)gdTick()}catch(e){}}
+function gdChoose(run){gdReqLoad(run);if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
+async function gdTick(){if(!GUIDE.open||GUIDE.busy)return;if(GUIDE.run&&!GUIDE.run.req)gdReqLoad(GUIDE.run);GUIDE.lastTick=Date.now();gdBackBtn();const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
   if(GUIDE.run){GUIDE.busy=true;try{const q=await gdRunPos(h);if(q)gdProgress(q.p,q.src,q);else st.textContent=trS('Ustalanie położenia…')}finally{GUIDE.busy=false}return}
   if(GUIDE.stopSel)return;
   if(!h){st.textContent=trS(navigator.geolocation?'Ustalanie położenia… Możesz też wyszukać przystanek.':'Wyszukaj przystanek, z którego jedziesz.');return}
@@ -3478,10 +3486,10 @@ function gdProgress(h,src,q){const R=GUIDE.run,st=document.getElementById('gdSta
   if(q&&q.si!=null&&q.si>=0&&q.si<=last&&P[q.si]&&distM(h[0],h[1],P[q.si][2],P[q.si][3])<1500&&(fresh||q.si>=GUIDE.j)){if(fresh)GUIDE.j=0;
     if(q.at){cur=q.si;next=q.si+1}else{cur=dA<near&&bj===q.si-1?bj:null;next=q.si}GUIDE.j=Math.max(GUIDE.j,q.si-(q.at?0:1))}
   if(GUIDE.annMax==null)GUIDE.annMax=-1;
-  if(next<=last){gdPrepare('at',P[next][0],next===last);if(cur!=null)gdPrepare('next',P[next][0],next===last)}
+  if(next<=last){gdPrepare('at',P[next][0],next===last);if(cur!=null)gdPrepare('next',P[next][0],next===last,gdReq(next))}
   // each stop said once and only forwards: "at" a stop not said yet, "next" for a stop beyond the last one said
   if(cur!=null&&cur>GUIDE.annMax){GUIDE.annMax=cur;GUIDE.lastAnn='at'+cur;gdSay('at',P[cur][0],cur===last)}
-  else if(cur==null&&next<=last&&next>GUIDE.annMax&&dA>=near&&GUIDE.lastAnn!=='nx'+next&&next>(GUIDE.nxMax||-1)){GUIDE.nxMax=next;GUIDE.lastAnn='nx'+next;gdSay('next',P[next][0],next===last)}
+  else if(cur==null&&next<=last&&next>GUIDE.annMax&&dA>=near&&GUIDE.lastAnn!=='nx'+next&&next>(GUIDE.nxMax||-1)){GUIDE.nxMax=next;GUIDE.lastAnn='nx'+next;gdSay('next',P[next][0],next===last,gdReq(next))}
   // where the position comes from: shown under the display
   const tri=['gda','sop','gdy','all'].includes(city);
   R.src=bd>500?trS('Jesteś daleko od trasy tego kursu.'):trS(src==='veh'?(tri?'Położenie pojazdu na żywo (GPS pojazdu)':'Położenie pojazdu na żywo (GTFS-RT)'):src==='test'?'TEST: wskazane miejsce':src==='tt'?'Położenie według rozkładu jazdy':'Położenie według GPS telefonu');
@@ -3542,9 +3550,10 @@ function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(las
   const mins=j=>{const m=T[j]+lag-nowM;return m<1?'&lt; <span>1 min</span>':Math.round(m)+' min'};
   const s0=depStyle(R.r);const tr=j=>{if(!store.get('ztm.gdChips',true))return '';const t=gdTransfers(R.ps[j],R.r,T[j]+lag);return t?`<div class="gsTr">${t}</div>`:''};
   const to=Math.min(last,hd+MID);const gap=to<last;const rows=[];
-  for(let j=to;j>hd;j--)rows.push(`<div data-j="${j}" class="gsRow${j===to&&!gap?' top':''}${j===last?' term':''}"><span class="tl">${mins(j)}</span><span class="rl"><i></i></span><div class="nm">${gdNameHtml(P[j][0])}${tr(j)}</div></div>`);
+  const hand=j=>gdReq(j)?HAND:'';
+  for(let j=to;j>hd;j--)rows.push(`<div data-j="${j}" class="gsRow${j===to&&!gap?' top':''}${j===last?' term':''}"><span class="tl">${mins(j)}</span><span class="rl"><i></i></span><div class="nm">${gdNameHtml(P[j][0],hand(j))}${tr(j)}</div></div>`);
   const rl=R.r.t==='rail';const lbl=trS(hd===last?(rl?'Stacja końcowa':'Przystanek końcowy'):cur!=null?(rl?'Stacja':'Przystanek'):(rl?'Następna stacja':'Następny przystanek'));
-  const now=`<div data-j="${hd}" class="gsRow now${cur!=null?' at':''}${hd===last||rows.length===0?' top':''}"><span class="tl">${cur==null&&hd<last||cur==null?mins(hd):''}</span><span class="rl"><i></i></span><div class="nm"><small>${esc(lbl)}</small>${gdNameHtml(P[hd][0])}${tr(hd)}</div></div>`;
+  const now=`<div data-j="${hd}" class="gsRow now${cur!=null?' at':''}${hd===last||rows.length===0?' top':''}"><span class="tl">${cur==null&&hd<last||cur==null?mins(hd):''}</span><span class="rl"><i></i></span><div class="nm"><small>${esc(lbl)}</small>${gdNameHtml(P[hd][0],hand(hd))}${tr(hd)}</div></div>`;
   const clk='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.5 2.5"/></svg>';
   return `<div class="gsTopb"><span class="mb ${s0.shape}${sqCls(R.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
 <div class="gtt"><small>${esc(trS('Kierunek'))}</small><b>${esc(R.head)}${gdTrnText(R.head)?` <small class="gsTrn">${esc(gdTrnText(R.head))}</small>`:''}</b>${hd<last?`<small class="ta">${clk}${fmtT(T[last]+lag)} · ${mins(last)}</small>`:''}</div>
