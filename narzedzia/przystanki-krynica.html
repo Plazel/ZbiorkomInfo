@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<title>Przystanki Krynicy i Muszyny</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#fff;--fg:#1d2126;--muted:#5d6670;--line:#d5dae0;--panel:#f3f5f7;--brand:#d71920}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Roboto,"Segoe UI",sans-serif;color:var(--fg);background:var(--bg)}
+.app{display:grid;grid-template-columns:340px 1fr;height:100%}
+@media (max-width:760px){.app{grid-template-columns:1fr;grid-template-rows:48% 52%}.side{order:2}}
+.side{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+.head{padding:10px 12px;border-bottom:1px solid var(--line)}.head h1{font-size:1.05rem;margin:0 0 4px}.head p{margin:0;font-size:.8rem;color:var(--muted)}
+.tools{display:flex;gap:6px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
+button,input,textarea,select{font:inherit}
+.btn{border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:6px 10px;cursor:pointer}.btn:hover{background:var(--panel)}.btn.pri{background:var(--fg);color:#fff;border-color:var(--fg)}
+#q{flex:1;min-width:120px;border:1px solid var(--line);padding:6px 8px}
+#q:focus,textarea:focus,input:focus{outline:none;border-color:var(--fg)}
+ul{list-style:none;margin:0;padding:0;overflow:auto;flex:1}
+li{padding:7px 12px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;gap:8px;align-items:center}
+li:hover{background:var(--panel)}li.on{background:#fff4c2}
+li .n{flex:1;min-width:0}li .m{font-size:.75rem;color:var(--muted)}
+.dot{width:10px;height:10px;flex:none;border:2px solid #fff;box-shadow:0 0 0 1px #888}
+.done .dot{background:#1f9a3e}.todo .dot{background:#e8a400}
+.edit{border-top:1px solid var(--line);padding:10px 12px;display:grid;gap:8px;background:var(--panel)}
+.edit[hidden]{display:none}.edit b{font-size:.95rem}.edit .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.edit input[type=text]{width:64px;border:1px solid var(--line);padding:5px 6px}.edit textarea{width:100%;min-height:54px;border:1px solid var(--line);padding:6px}
+#map{height:100%;min-height:0}
+.pm{background:none;border:0}.pm span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid #2f63ad;font:700 11px Roboto,sans-serif;color:#2f63ad;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.pm.sel span{border-color:var(--brand);color:var(--brand);transform:scale(1.25)}.pm.done span{border-color:#1f9a3e;color:#1f9a3e}
+.toast{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--fg);color:#fff;padding:8px 14px;z-index:9999;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="app">
+ <div class="side">
+  <div class="head"><h1>Przystanki Krynicy-Zdroju i Muszyny</h1>
+   <p>Wybierz przystanek z listy lub na mapie i przeciągnij jego znacznik w dokładne miejsce na zdjęciu. Przystanek po obu stronach ulicy: „Dodaj drugi peron” i ustaw oba. Postęp zapisuje się w tej przeglądarce; na koniec pobierz plik i prześlij go.</p></div>
+  <div class="tools"><input id="q" type="search" placeholder="Szukaj przystanku"><select id="flt" class="btn"><option value="">Wszystkie</option><option value="todo">Do sprawdzenia</option><option value="done">Gotowe</option></select>
+   <button class="btn" id="layer" type="button">Mapa / zdjęcie</button><button class="btn pri" id="exp" type="button">Pobierz plik</button><button class="btn" id="copy" type="button">Kopiuj</button></div>
+  <ul id="list"></ul>
+  <div class="edit" id="edit" hidden>
+   <b id="eName"></b>
+   <div class="row" id="ePoles"></div>
+   <div class="row"><button class="btn" id="addPole" type="button">Dodaj drugi peron</button><button class="btn" id="delPole" type="button">Usuń drugi peron</button><label><input type="checkbox" id="eDone"> gotowe</label></div>
+   <textarea id="eNote" placeholder="Uwagi (np. przystanek nie istnieje, inna nazwa, tylko w jednym kierunku)"></textarea>
+  </div>
+ </div>
+ <div id="map"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const KEY='kmStops.v1';
+let S={};try{S=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){S={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const toast=t=>{const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)};
+const map=L.map('map',{zoomControl:true,maxZoom:21}).setView([49.42,20.95],13);
+const photo=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19,attribution:'Zdjęcie: Esri, Maxar, Earthstar Geographics'});
+const labels=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
+const plain=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
+photo.addTo(map);labels.addTo(map);let isPhoto=true;
+document.getElementById('layer').onclick=()=>{if(isPhoto){map.removeLayer(photo);map.removeLayer(labels);plain.addTo(map)}else{map.removeLayer(plain);photo.addTo(map);labels.addTo(map)}isPhoto=!isPhoto};
+let STOPS=[],LINES={},SEL=null;const MK={};
+const icon=(t,cls)=>L.divIcon({className:'pm '+(cls||''),html:'<span>'+t+'</span>',iconSize:[30,30],iconAnchor:[15,15]});
+const st=id=>S[id]||(S[id]={poles:[{p:'',lat:null,lon:null}],note:'',done:false});
+function poles(s){const x=st(s.id);return x.poles.map((p,i)=>({p:p.p||(x.poles.length>1?['01','02'][i]:s.pole||''),lat:p.lat!=null?p.lat:s.lat+(i?0.00012:0),lon:p.lon!=null?p.lon:s.lon+(i?0.00012:0)}))}
+function drawMarkers(){Object.values(MK).flat().forEach(m=>map.removeLayer(m));for(const k in MK)delete MK[k];
+  STOPS.forEach(s=>{const x=st(s.id);MK[s.id]=poles(s).map((P,i)=>{const m=L.marker([P.lat,P.lon],{icon:icon(P.p||'•',(SEL===s.id?'sel ':'')+(x.done?'done':'')),draggable:true,title:s.name+(P.p?' '+P.p:'')}).addTo(map);
+    m.on('click',()=>select(s.id,false));
+    m.on('dragend',()=>{const ll=m.getLatLng();x.poles[i]=x.poles[i]||{p:''};x.poles[i].lat=+ll.lat.toFixed(6);x.poles[i].lon=+ll.lng.toFixed(6);if(!x.poles[i].p&&x.poles.length>1)x.poles[i].p=['01','02'][i];save();select(s.id,false)});
+    return m})})}
+function list(){const q=document.getElementById('q').value.trim().toLowerCase(),f=document.getElementById('flt').value;const ul=document.getElementById('list');ul.innerHTML='';
+  STOPS.filter(s=>(!q||s.name.toLowerCase().includes(q))&&(!f||(f==='done')===!!st(s.id).done)).forEach(s=>{const li=document.createElement('li');const x=st(s.id);
+    li.className=(x.done?'done':'todo')+(SEL===s.id?' on':'');li.innerHTML='<span class="dot"></span><span class="n"></span>';li.querySelector('.n').innerHTML='';
+    const n=document.createElement('div');n.textContent=s.name;const m=document.createElement('div');m.className='m';m.textContent=(LINES[s.name]||[]).join(', ')+(x.poles.length>1?' · 2 perony':'')+(x.note?' · uwagi':'');
+    li.querySelector('.n').append(n,m);li.onclick=()=>select(s.id,true);ul.appendChild(li)})}
+function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);const E=document.getElementById('edit');E.hidden=false;
+  document.getElementById('eName').textContent=s.name+' ('+id+')';
+  const pr=document.getElementById('ePoles');pr.innerHTML='Numer peronu: ';poles(s).forEach((P,i)=>{const inp=document.createElement('input');inp.type='text';inp.value=P.p;inp.placeholder=i?'02':'01';
+    inp.onchange=()=>{x.poles[i]=x.poles[i]||{lat:null,lon:null};x.poles[i].p=inp.value.trim();save();drawMarkers()};pr.appendChild(inp)});
+  document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>1;
+  document.getElementById('eDone').checked=!!x.done;document.getElementById('eNote').value=x.note||'';
+  drawMarkers();list();if(fly){const P=poles(s)[0];map.setView([P.lat,P.lon],Math.max(map.getZoom(),18))}}
+document.getElementById('addPole').onclick=()=>{if(!SEL)return;const s=STOPS.find(x=>x.id===SEL);const x=st(SEL);const P=poles(s)[0];
+  x.poles[0]={p:x.poles[0].p||'01',lat:P.lat,lon:P.lon};x.poles[1]={p:'02',lat:P.lat+0.00012,lon:P.lon+0.00012};save();select(SEL,false)};
+document.getElementById('delPole').onclick=()=>{if(!SEL)return;const x=st(SEL);x.poles=x.poles.slice(0,1);save();select(SEL,false)};
+document.getElementById('eDone').onchange=e=>{if(!SEL)return;st(SEL).done=e.target.checked;save();select(SEL,false)};
+document.getElementById('eNote').oninput=e=>{if(!SEL)return;st(SEL).note=e.target.value;save()};
+document.getElementById('q').oninput=list;document.getElementById('flt').onchange=list;
+function exportData(){const out={made:new Date().toISOString(),stops:{}};STOPS.forEach(s=>{const x=S[s.id];if(!x)return;const moved=x.poles.some(p=>p.lat!=null);if(!moved&&!x.note&&!x.done&&x.poles.length<2)return;
+  out.stops[s.id]={name:s.name,poles:poles(s).map(P=>({p:P.p,lat:+P.lat.toFixed(6),lon:+P.lon.toFixed(6)})),note:x.note||'',done:!!x.done}});return JSON.stringify(out,null,1)}
+document.getElementById('exp').onclick=()=>{const b=new Blob([exportData()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='przystanki-krynica.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(exportData());toast('Skopiowano – wklej w rozmowie')}catch(e){toast('Nie udało się skopiować – użyj „Pobierz plik”')}};
+Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null)]).then(([I,M])=>{
+  STOPS=Object.entries(I.stops).filter(([k,v])=>/^km\d/.test(k)).map(([id,v])=>({id,name:v[0],pole:v[1]||'',lat:v[2],lon:v[3]})).sort((a,b)=>a.name.localeCompare(b.name,'pl'));
+  I.routes.filter(r=>(r.c||[]).includes('km')||(r.c||[]).includes('kmx')).forEach(r=>(r.sn||[]).forEach(n=>(LINES[n]=LINES[n]||[]).includes(r.n)||LINES[n].push(r.n)));
+  // the lines' courses, thin, as a guide
+  if(M)Object.entries(M.routes).forEach(([id,R])=>{if(!/^km/.test(id))return;(R.g||[]).forEach(c=>{const pts=[];let x=0,y=0;for(let i=0;i<c.length;i+=2){x+=c[i];y+=c[i+1];const X=x/100,Y=y/100;pts.push([-Y/1000,X/(Math.cos(54.45*Math.PI/180)*1000)])}L.polyline(pts,{color:'#ffeb3b',weight:2,opacity:.8,interactive:false}).addTo(map)})});
+  const b=L.latLngBounds(STOPS.map(s=>[s.lat,s.lon]));map.fitBounds(b,{padding:[20,20]});drawMarkers();list()});
+</script>
+</body>
+</html>

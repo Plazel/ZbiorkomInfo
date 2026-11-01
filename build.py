@@ -609,54 +609,107 @@ try:
 except StopIteration:
     print('Kolej Krynica-Zdrój – Kraków: brak stacji w danych')
 
-# ---------------- Kraków: SKA (Szybka Kolej Aglomeracyjna, Koleje Małopolskie), lines SKA1–SKA3 ----------------
-# whole runs; their stations get their own ids ('q…'), as members of the Kraków area (shown on its map as "S")
-SKA_IDS = []
-SKA_LINES = {'KML_SKA1': ('kSKA1', 'SKA1', '#00b1eb'), 'KML_SKA2': ('kSKA2', 'SKA2', '#e82f89'), 'KML_SKA3': ('kSKA3', 'SKA3', '#e8a400')}
-try:
-    sk_trips = {r['trip_id']: r for r in rd(P + '/trips.txt') if r['route_id'] in SKA_LINES}
-    skst = collections.defaultdict(list)
-    for r in rd(P + '/stop_times.txt'):
-        if r['trip_id'] in sk_trips:
-            skst[r['trip_id']].append((int(r['stop_sequence']), station(r['stop_id']), tmin(r['departure_time']), r['pickup_type'] or '0', r['drop_off_type'] or '0', plat.get(r['stop_id'], '')))
-    for v in skst.values(): v.sort()
-    for rid, (lid, num, col) in SKA_LINES.items():
-        rot = {t: (lid, r['service_id']) for t, r in sk_trips.items() if r['route_id'] == rid and t in skst}
+# ---------------- more trains: SKA in Kraków, Koleje Mazowieckie and WKD in Warszawa, line R in the Tricity ----------------
+# add_rail(): the trips of the given routes of a GTFS folder as lines; whole runs, or (cut) only their part between two
+# stations. Stations get ids prefix + station + 'p' + platform; area: the area of the lines (a separate one is registered
+# in NEW_ROUTE_IDS for its map files), or a function of the station name.
+SKA_IDS = []; EXTRA_RAIL = collections.defaultdict(list)
+def add_rail(folder, sel, area, prefix, op_default, cut=None, skip_names=(), set_c=True):
+    par, rs_, pl_ = {}, {}, {}
+    for r in rd(folder + '/stops.txt'):
+        par[r['stop_id']] = r.get('parent_station') or r['stop_id']
+        m = re.match(r'\s*(\d+)', r.get('platform_code') or ''); pl_[r['stop_id']] = m.group(1) if m else ''
+        if not r.get('parent_station'): rs_[r['stop_id']] = r
+    st_ = lambda sid: par.get(sid, sid)
+    nm_ = lambda s: rs_[s]['stop_name'] if s in rs_ else s
+    trips = {r['trip_id']: r for r in rd(folder + '/trips.txt') if r['route_id'] in sel}
+    rows = collections.defaultdict(list)
+    for r in rd(folder + '/stop_times.txt'):
+        if r['trip_id'] in trips:
+            rows[r['trip_id']].append((int(r['stop_sequence']), st_(r['stop_id']), tmin(r['departure_time'] or r['arrival_time']), r.get('pickup_type') or '0', r.get('drop_off_type') or '0', pl_.get(r['stop_id'], '')))
+    for v in rows.values(): v.sort()
+    if skip_names:
+        for t in [t for t, v in rows.items() if any(nm_(x[1]) in skip_names for x in v)]: del rows[t]
+    seq = None
+    if cut:   # the stations between the two ends, in order (from the longest run through both)
+        best = []
+        for v in rows.values():
+            ns = [nm_(x[1]) for x in v]
+            if cut[0] in ns and cut[1] in ns:
+                a, b = ns.index(cut[0]), ns.index(cut[1]); seg = [x[1] for x in (v[a:b + 1] if a < b else v[b:a + 1][::-1])]
+                if len(seg) > len(best): best = seg
+        seq = best
+        if not seq: print('Kolej %s: brak odcinka %s – %s' % (op_default, *cut)); return []
+    lines = collections.defaultdict(list)
+    for rid, v in sel.items(): lines[v[0]].append(rid)
+    out_ids = []
+    for lid, rids in lines.items():
+        num, col, op = sel[rids[0]][1], sel[rids[0]][2], sel[rids[0]][3] or op_default
+        rot = {t: (lid, r['service_id']) for t, r in trips.items() if r['route_id'] in rids and t in rows}
         if not rot: continue
-        chosen, dates = choose(feed_days(P, rot), 'Koleje Małopolskie')
+        chosen, dates = choose(feed_days(folder, rot), op)
         if not dates.get(lid): continue
-        # direction 0: the way of the longest run
-        ref = max((skst[t] for t in chosen), key=len, default=[]); seq = [x[1] for x in ref]
-        def sk_dir(run):
-            common = [x[1] for x in run if x[1] in seq]
-            if len(common) >= 2: return '0' if seq.index(common[-1]) > seq.index(common[0]) else '1'
-            return '0' if float(rstops[run[-1][1]]['stop_lon']) > float(rstops[run[0][1]]['stop_lon']) else '1'
-        pc = collections.defaultdict(collections.Counter); runs = []
+        runs = []
         for tid, lst in chosen.items():
-            run = skst[tid]
+            run = rows[tid]
+            if seq is not None: run = [x for x in run if x[1] in seq]
             if len(run) < 2: continue
-            d = sk_dir(run)
+            runs.append((tid, lst, run))
+        if not runs: continue
+        ref = seq or [x[1] for x in max((r[2] for r in runs), key=len)]
+        def d_of(run):
+            c = [x[1] for x in run if x[1] in ref]
+            if len(c) >= 2: return '0' if ref.index(c[-1]) > ref.index(c[0]) else '1'
+            return '0' if float(rs_[run[-1][1]]['stop_lon']) > float(rs_[run[0][1]]['stop_lon']) else '1'
+        pc = collections.defaultdict(collections.Counter)
+        for tid, lst, run in runs:
+            d = d_of(run)
             for x in run: pc[(d, x[1])][x[5]] += 1
-            for _, k in lst: runs.append((tid, k, d, run))
         groups = collections.defaultdict(list)
-        for tid, k, d, run in runs:
-            rows2 = []
+        for tid, lst, run in runs:
+            d = d_of(run); rows2 = []
             for x in run:
                 pl = pc[(d, x[1])].most_common(1)[0][0]
-                sid = 'q' + x[1] + 'p' + pl
+                sid = prefix + x[1] + 'p' + pl
                 if sid not in STOPS:
-                    r = rstops[x[1]]
-                    STOPS[sid] = [r['stop_name'], pl, round(float(r['stop_lat']), 5), round(float(r['stop_lon']), 5), 'krk', 'rail']
+                    r = rs_[x[1]]
+                    STOPS[sid] = [r['stop_name'], pl, round(float(r['stop_lat']), 5), round(float(r['stop_lon']), 5), area(r['stop_name']) if callable(area) else area, 'rail']
                 rows2.append((sid, x[2], x[3], x[4]))
-            shp = sk_trips[tid].get('shape_id')
-            if shp: SHAPE_OF.setdefault((lid, tuple(x[0] for x in rows2)), 'r' + shp + '|c')
-            groups[lid].append((k, False, d, rows2, (sname(run[0][1]), sname(run[-1][1]))))
+            shp = trips[tid].get('shape_id')
+            if shp and folder == P: SHAPE_OF.setdefault((lid, tuple(x[0] for x in rows2)), 'r' + shp + '|c')
+            full = rows[tid]
+            for _, k in lst: groups[lid].append((k, False, d, rows2, (nm_(run[0][1]) if seq is None or full[0][1] in seq else None, nm_(full[-1][1]))))
         n0 = len(ROUTES_OUT)
-        build_routes(dict(groups), {lid: {'id': lid, 'n': num, 't': 'rail', 'op': 'Koleje Małopolskie', 'dates': dates[lid]}})
-        for r in ROUTES_OUT[n0:]: r['c'] = ['krk']; r['f'] = True; r['k'] = col; r['cat'] = 'rail'; SKA_IDS.append(r['id'])
-        print('SKA Kraków', num + ':', len(groups[lid]), 'kursów')
-except Exception as e:
-    print('SKA Kraków: pominięto (%s)' % e)
+        build_routes(dict(groups), {lid: {'id': lid, 'n': num, 't': 'rail', 'op': op, 'dates': dates[lid], **({'main_ends': cut} if cut else {})}})
+        for r in ROUTES_OUT[n0:]:
+            if set_c: r['c'] = [area]
+            r['f'] = True; r['k'] = col; r['cat'] = 'rail'; out_ids.append(r['id'])
+        print('Kolej %s %s: %d kursów' % (op, num, len(runs)))
+    return out_ids
+try:
+    # Kraków: SKA1–SKA3 (Koleje Małopolskie, and POLREGIO's trains on SKA2 and SKA3)
+    _ska = {'KML_SKA1': ('kSKA1', 'SKA1', '#00b1eb', 'Koleje Małopolskie'), 'KML_SKA2': ('kSKA2', 'SKA2', '#e82f89', 'Koleje Małopolskie'),
+            'PR_SKA2': ('kSKA2', 'SKA2', '#e82f89', 'Koleje Małopolskie'), 'KML_SKA3': ('kSKA3', 'SKA3', '#e8a400', 'Koleje Małopolskie'),
+            'PR_SKA3': ('kSKA3', 'SKA3', '#e8a400', 'Koleje Małopolskie')}
+    EXTRA_RAIL['krk'] += add_rail(P, _ska, 'krk', 'q', 'Koleje Małopolskie')
+except Exception as e: print('SKA Kraków: pominięto (%s)' % e)
+try:
+    # Warszawa: Koleje Mazowieckie (regional lines, whole runs)
+    _km = {r['route_id']: ('kKM' + r['route_short_name'], r['route_short_name'], '#' + (r.get('route_color') or '008800'), 'Koleje Mazowieckie')
+           for r in rd(P + '/routes.txt') if r['agency_id'] == 'KM' and r['route_type'] == '2' and not r['route_id'].endswith('_BUS')}
+    EXTRA_RAIL['waw'] += add_rail(P, _km, 'waw', 'q', 'Koleje Mazowieckie')
+except Exception as e: print('Koleje Mazowieckie: pominięto (%s)' % e)
+try:
+    # Warszawa: WKD (Warszawska Kolej Dojazdowa, its own GTFS from mkuran.pl)
+    _wz = os.path.join(SCR, 'wkd.zip'); fetch('https://mkuran.pl/gtfs/wkd.zip', _wz); zipfile.ZipFile(_wz).extractall(os.path.join(SCR, 'wkd')); os.remove(_wz)
+    EXTRA_RAIL['waw'] += add_rail(os.path.join(SCR, 'wkd'), {'A': ('kWKD', 'WKD', '#990099', 'Warszawska Kolej Dojazdowa')}, 'waw', 'w', 'Warszawska Kolej Dojazdowa')
+except Exception as e: print('WKD: pominięto (%s)' % e)
+try:
+    # the Tricity: line R, the regional trains between Pruszcz Gdański and Wejherowo (not those of PKM, S2 and S22)
+    _rr = {r['route_id']: ('kR', 'R', '#7a3b8f', 'POLREGIO') for r in rd(P + '/routes.txt')
+           if r['route_id'] in ('PR_REG', 'PR_RP') or (r['agency_id'] == 'SKMT' and r['route_id'] != 'SKMT_S1' and r['route_type'] == '2')}
+    add_rail(P, _rr, rail_city, 'k', 'POLREGIO', cut=('Pruszcz Gdański', 'Wejherowo'), skip_names=('Gdańsk Port Lotniczy', 'Gdańsk Kokoszki', 'Gdańsk Osowa'), set_c=False)
+except Exception as e: print('Linia R: pominięto (%s)' % e)
 
 
 # ---------------- street courses for lines whose feed has no shapes ----------------
@@ -1031,7 +1084,7 @@ def city_kind(area, short, rtype):
     if area == 'ldz' and short.startswith('Z'): return 'repl'
     return 'bus'
 NEW_ROUTE_IDS = collections.defaultdict(list)
-NEW_ROUTE_IDS['krk'].extend(SKA_IDS)   # the SKA trains belong to the Kraków files (map, schema)
+for _a, _ids in EXTRA_RAIL.items(): NEW_ROUTE_IDS[_a].extend(_ids)   # the added trains belong to their area's files (map, schema)
 for area, A in NEW_AREAS.items():
     try:
         rot, tmeta, rmeta, tkey = {}, {}, {}, {}
@@ -1438,6 +1491,22 @@ def trim(path, a, b, tol=0.3):
     ia = next((i for i, d in enumerate(da) if d < tol), min(range(len(path)), key=da.__getitem__))
     ib = next((i for i in range(len(path) - 1, -1, -1) if db[i] < tol), min(range(len(path)), key=db.__getitem__))
     return path[ia:ib + 1] if ib - ia >= 1 else path
+_LOOP_CP = os.path.join(HERE, 'reczne', 'petle_cache.json')
+_LOOP = json.load(open(_LOOP_CP, encoding='utf-8')) if os.path.exists(_LOOP_CP) else {}
+def loop_leg(a, b):
+    """the streets from stop a to stop b (two platforms of one terminus), by the road graph; cached in reczne/petle_cache.json"""
+    pa, pb = STOPS[a][2:4], STOPS[b][2:4]
+    key = '%s|%s|%s|%s' % (a, b, pa, pb)
+    if key in _LOOP: return _LOOP[key]
+    res = None
+    try:
+        import drogi
+        dd = drogi.dist(pa, pb)
+        if 25 < dd < 900:
+            legs, _odd = drogi.road_legs({(a, b)}, {a: pa, b: pb}, log=lambda m: None, margin=(.006, .009))
+            res = legs.get((a, b))
+    except Exception as e: print('Pętla %s–%s: %s' % (a, b, e))
+    _LOOP[key] = res; return res
 MAPD = {}
 for f in sorted(os.listdir(OUT + '/r')):
     d = json.load(open(OUT + '/r/' + f, encoding='utf-8'))
@@ -1482,6 +1551,15 @@ for f in sorted(os.listdir(OUT + '/r')):
             shp = vsh[k] if k < len(vsh) else None
             var_lines.append(trim([PJ(q[0], q[1]) for q in shp], PJ(STOPS[sids[0]][2], STOPS[sids[0]][3]), PJ(STOPS[sids[-1]][2], STOPS[sids[-1]][3])) if shp else [PJ(STOPS[s][2], STOPS[s][3]) for s in sids if s in STOPS])
     geo = via_fix(d['id'], merged_lines(dirs_xy))
+    # terminus loops: a line arriving at one platform of its last stop and leaving from another (e.g. 179 at Oliwa) gets the
+    # streets between the two drawn, so the loop is closed on the map
+    for _i, _a in enumerate(dirs_st):
+        for _j, _b in enumerate(dirs_st):
+            if _i == _j or not _a or not _b: continue
+            _e, _s = _a[-1], _b[0]
+            if _e != _s and _e in STOPS and _s in STOPS and STOPS[_e][0] == STOPS[_s][0]:
+                _pl = loop_leg(_e, _s)
+                if _pl: geo.append([PJ(la, lo) for la, lo in _pl])
     var_lines = via_fix(d['id'], var_lines)
     # variant routes (short turns, extensions, depot runs): only the parts that leave the main route
     vgeo = []
@@ -1523,6 +1601,7 @@ for f in sorted(os.listdir(OUT + '/r')):
     dp = sorted({x[0] for dd in d.get('dirs', []) for x in dd.get('stops', []) if isinstance(x, list) and len(x) > 4 and x[4]})
     MAPD[d['id']] = {'lt': lt, 'g': rnd(geo), 'v': rnd(vgeo), 'd': dirs_st, 've': sorted(ve), 'vs': sorted(vstops - ve), 'sn': sn, 'vr': vlist, **({'dp': dp} if dp else {})}
 _new_of = {rid: a for a, ids in NEW_ROUTE_IDS.items() for rid in ids}
+json.dump(_LOOP, open(_LOOP_CP, 'w', encoding='utf-8'), separators=(',', ':'))
 json.dump({'routes': {k: v for k, v in MAPD.items() if k not in _new_of}}, open(OUT + '/map.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 for a in NEW_AREAS:   # the network map of each big city in a file of its own
     json.dump({'routes': {k: v for k, v in MAPD.items() if _new_of.get(k) == a}}, open(OUT + '/map_%s.json' % a, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
