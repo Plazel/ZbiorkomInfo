@@ -446,4 +446,8 @@ PHRASES = [
 ("Tablica przesiadek", "Change board", "Umsteigetafel", "Tabuľa prestupov", "Tabule přestupů"),
 ("najbliższe odjazdy z następnego przystanku i przystanków do 200 m", "the next departures from the next stop and stops within 200 m", "die nächsten Abfahrten an der nächsten Haltestelle und an Haltestellen bis 200 m", "najbližšie odchody z nasledujúcej zastávky a zastávok do 200 m", "nejbližší odjezdy z příští zastávky a zastávek do 200 m"),
 ("Numery linii przy przystankach", "Line numbers at stops", "Liniennummern an den Haltestellen", "Čísla liniek pri zastávkach", "Čísla linek u zastávek"),
+("Automatyczne odtwarzanie zapowiedzi", "Play announcements automatically", "Ansagen automatisch abspielen", "Automatické prehrávanie hlásení", "Automatické přehrávání hlášení"),
+("zapowiedzi włączają się same po wybraniu kursu", "announcements switch on by themselves when a trip is chosen", "Ansagen schalten sich nach Auswahl einer Fahrt von selbst ein", "hlásenia sa zapnú samy po výbere spoja", "hlášení se zapnou sama po výběru spoje"),
+("Animacja", "Animation", "Animation", "Animácia", "Animace"),
+("przystanek, z którego pojazd odjechał, znika, a kolejne płynnie zjeżdżają w dół", "the stop just left fades away and the next ones slide smoothly down", "die verlassene Haltestelle verschwindet und die folgenden gleiten sanft nach unten", "zastávka, z ktorej vozidlo odišlo, zmizne a ďalšie plynulo zídu nadol", "zastávka, ze které vozidlo odjelo, zmizí a další plynule sjedou dolů"),
 ]
