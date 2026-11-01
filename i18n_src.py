@@ -441,4 +441,6 @@ PHRASES = [
 ("Żeński", "Female", "Weiblich", "Ženský", "Ženský"),
 ("Męski", "Male", "Männlich", "Mužský", "Mužský"),
 ("Głos", "Voice", "Stimme", "Hlas", "Hlas"),
+("Tłumaczenia nazw przystanków", "Translations of stop names", "Übersetzungen der Haltestellennamen", "Preklady názvov zastávok", "Překlady názvů zastávek"),
+("na język strony, np. „Dworzec Główny – Hauptbahnhof”", "into the page language, e.g. “Dworzec Główny – Main Station”", "in die Sprache der Seite, z. B. „Dworzec Główny – Hauptbahnhof“", "do jazyka stránky, napr. „Dworzec Główny – Hlavná stanica“", "do jazyka stránky, např. „Dworzec Główny – Hlavní nádraží“"),
 ]
