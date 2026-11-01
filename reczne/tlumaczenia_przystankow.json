@@ -206,12 +206,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Brzeźnica",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -348,12 +348,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Chylonia",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -374,6 +374,64 @@
 [
 "železničná stanica",
 "sk"
+]
+]
+},
+"Chylonia Dworzec PKP - os. Meksyk": {
+"en": [
+[
+"Chylonia",
+"pl"
+],
+[
+"railway station –",
+"en"
+],
+[
+"os. Meksyk",
+"pl"
+]
+],
+"de": [
+[
+"Chylonia",
+"pl"
+],
+[
+"Bahnhof –",
+"de"
+],
+[
+"os. Meksyk",
+"pl"
+]
+],
+"cs": [
+[
+"Chylonia",
+"pl"
+],
+[
+"nádraží –",
+"cs"
+],
+[
+"os. Meksyk",
+"pl"
+]
+],
+"sk": [
+[
+"Chylonia",
+"pl"
+],
+[
+"železničná stanica –",
+"sk"
+],
+[
+"os. Meksyk",
+"pl"
 ]
 ]
 },
@@ -540,12 +598,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Czyżyny",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -582,12 +640,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Dopiewo",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -1156,42 +1214,274 @@
 "Gdynia Dworzec Gł. PKP": {
 "en": [
 [
-"Gdynia Dworzec Gł.",
+"Gdynia",
 "pl"
 ],
 [
-"railway station",
+"Main Station",
 "en"
 ]
 ],
 "de": [
 [
-"Bahnhof",
-"de"
+"Gdynia",
+"pl"
 ],
 [
-"Gdynia Dworzec Gł.",
-"pl"
+"Hauptbahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Gdynia Dworzec Gł.",
+"Gdynia",
 "pl"
 ],
 [
-"nádraží",
+"hlavní nádraží",
 "cs"
 ]
 ],
 "sk": [
 [
-"Gdynia Dworzec Gł.",
+"Gdynia",
 "pl"
 ],
 [
-"železničná stanica",
+"hlavná stanica",
 "sk"
+]
+]
+},
+"Gdynia Dworzec Gł. PKP - Dworcowa": {
+"en": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Main Station –",
+"en"
+],
+[
+"Dworcowa",
+"pl"
+]
+],
+"de": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Hauptbahnhof –",
+"de"
+],
+[
+"Dworcowa",
+"pl"
+]
+],
+"cs": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavní nádraží –",
+"cs"
+],
+[
+"Dworcowa",
+"pl"
+]
+],
+"sk": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavná stanica –",
+"sk"
+],
+[
+"Dworcowa",
+"pl"
+]
+]
+},
+"Gdynia Dworzec Gł. PKP - Hala": {
+"en": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Main Station –",
+"en"
+],
+[
+"Hala",
+"pl"
+]
+],
+"de": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Hauptbahnhof –",
+"de"
+],
+[
+"Hala",
+"pl"
+]
+],
+"cs": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavní nádraží –",
+"cs"
+],
+[
+"Hala",
+"pl"
+]
+],
+"sk": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavná stanica –",
+"sk"
+],
+[
+"Hala",
+"pl"
+]
+]
+},
+"Gdynia Dworzec Gł. PKP - Morska": {
+"en": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Main Station –",
+"en"
+],
+[
+"Morska",
+"pl"
+]
+],
+"de": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Hauptbahnhof –",
+"de"
+],
+[
+"Morska",
+"pl"
+]
+],
+"cs": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavní nádraží –",
+"cs"
+],
+[
+"Morska",
+"pl"
+]
+],
+"sk": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavná stanica –",
+"sk"
+],
+[
+"Morska",
+"pl"
+]
+]
+},
+"Gdynia Dworzec Gł. PKP - Wolności": {
+"en": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Main Station –",
+"en"
+],
+[
+"Wolności",
+"pl"
+]
+],
+"de": [
+[
+"Gdynia",
+"pl"
+],
+[
+"Hauptbahnhof –",
+"de"
+],
+[
+"Wolności",
+"pl"
+]
+],
+"cs": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavní nádraží –",
+"cs"
+],
+[
+"Wolności",
+"pl"
+]
+],
+"sk": [
+[
+"Gdynia",
+"pl"
+],
+[
+"hlavná stanica –",
+"sk"
+],
+[
+"Wolności",
+"pl"
 ]
 ]
 },
@@ -1284,6 +1574,60 @@
 [
 "železničná stanica",
 "sk"
+]
+]
+},
+"Gościcino PKP - Fabryczna": {
+"en": [
+[
+"Gościcino",
+"pl"
+],
+[
+"railway station –",
+"en"
+],
+[
+"Fabryczna",
+"pl"
+]
+],
+"de": [
+[
+"Bahnhof",
+"de"
+],
+[
+"Gościcino – Fabryczna",
+"pl"
+]
+],
+"cs": [
+[
+"Gościcino",
+"pl"
+],
+[
+"nádraží –",
+"cs"
+],
+[
+"Fabryczna",
+"pl"
+]
+],
+"sk": [
+[
+"Gościcino",
+"pl"
+],
+[
+"železničná stanica –",
+"sk"
+],
+[
+"Fabryczna",
+"pl"
 ]
 ]
 },
@@ -1433,6 +1777,60 @@
 ],
 [
 "PKM",
+"pl"
+]
+]
+},
+"Janowo SKM - Sobieskiego": {
+"en": [
+[
+"Janowo SKM",
+"pl"
+],
+[
+"station –",
+"en"
+],
+[
+"Sobieskiego",
+"pl"
+]
+],
+"de": [
+[
+"S-Bahnhof",
+"de"
+],
+[
+"Janowo – Sobieskiego",
+"pl"
+]
+],
+"cs": [
+[
+"Janowo",
+"pl"
+],
+[
+"stanice",
+"cs"
+],
+[
+"SKM – Sobieskiego",
+"pl"
+]
+],
+"sk": [
+[
+"Janowo",
+"pl"
+],
+[
+"stanica",
+"sk"
+],
+[
+"SKM – Sobieskiego",
 "pl"
 ]
 ]
@@ -1625,6 +2023,60 @@
 ],
 [
 "SKM",
+"pl"
+]
+]
+},
+"Kamienny Potok SKM - Niepodległości": {
+"en": [
+[
+"Kamienny Potok SKM",
+"pl"
+],
+[
+"station –",
+"en"
+],
+[
+"Niepodległości",
+"pl"
+]
+],
+"de": [
+[
+"S-Bahnhof",
+"de"
+],
+[
+"Kamienny Potok – Niepodległości",
+"pl"
+]
+],
+"cs": [
+[
+"Kamienny Potok",
+"pl"
+],
+[
+"stanice",
+"cs"
+],
+[
+"SKM – Niepodległości",
+"pl"
+]
+],
+"sk": [
+[
+"Kamienny Potok",
+"pl"
+],
+[
+"stanica",
+"sk"
+],
+[
+"SKM – Niepodległości",
 "pl"
 ]
 ]
@@ -1948,12 +2400,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Krynica-Zdrój",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -2342,12 +2794,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Mosina",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -2564,12 +3016,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Niepołomice",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -2606,12 +3058,12 @@
 ],
 "de": [
 [
-"Busbahnhof",
-"de"
-],
-[
 "Nowy Sącz",
 "pl"
+],
+[
+"Busbahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -2648,12 +3100,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Nowy Sącz",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -2716,6 +3168,114 @@
 [
 "železničná stanica",
 "sk"
+]
+]
+},
+"Orłowo SKM - \"Klif\"": {
+"en": [
+[
+"Orłowo SKM",
+"pl"
+],
+[
+"station –",
+"en"
+],
+[
+"Klif",
+"pl"
+]
+],
+"de": [
+[
+"S-Bahnhof",
+"de"
+],
+[
+"Orłowo – Klif",
+"pl"
+]
+],
+"cs": [
+[
+"Orłowo",
+"pl"
+],
+[
+"stanice",
+"cs"
+],
+[
+"SKM – Klif",
+"pl"
+]
+],
+"sk": [
+[
+"Orłowo",
+"pl"
+],
+[
+"stanica",
+"sk"
+],
+[
+"SKM – Klif",
+"pl"
+]
+]
+},
+"Orłowo SKM - Orłowska": {
+"en": [
+[
+"Orłowo SKM",
+"pl"
+],
+[
+"station –",
+"en"
+],
+[
+"Orłowska",
+"pl"
+]
+],
+"de": [
+[
+"S-Bahnhof",
+"de"
+],
+[
+"Orłowo – Orłowska",
+"pl"
+]
+],
+"cs": [
+[
+"Orłowo",
+"pl"
+],
+[
+"stanice",
+"cs"
+],
+[
+"SKM – Orłowska",
+"pl"
+]
+],
+"sk": [
+[
+"Orłowo",
+"pl"
+],
+[
+"stanica",
+"sk"
+],
+[
+"SKM – Orłowska",
+"pl"
 ]
 ]
 },
@@ -5268,12 +5828,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Palędzie",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -5496,12 +6056,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Pruszcz Gdański Pruszcz Gdański",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -5836,12 +6396,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Reda",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -5911,6 +6471,60 @@
 ],
 [
 "SKM",
+"pl"
+]
+]
+},
+"Redłowo SKM - Park Technologiczny": {
+"en": [
+[
+"Redłowo SKM",
+"pl"
+],
+[
+"station –",
+"en"
+],
+[
+"Park Technologiczny",
+"pl"
+]
+],
+"de": [
+[
+"S-Bahnhof",
+"de"
+],
+[
+"Redłowo – Park Technologiczny",
+"pl"
+]
+],
+"cs": [
+[
+"Redłowo",
+"pl"
+],
+[
+"stanice",
+"cs"
+],
+[
+"SKM – Park Technologiczny",
+"pl"
+]
+],
+"sk": [
+[
+"Redłowo",
+"pl"
+],
+[
+"stanica",
+"sk"
+],
+[
+"SKM – Park Technologiczny",
 "pl"
 ]
 ]
@@ -6020,12 +6634,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Rumia",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -6130,6 +6744,114 @@
 [
 "železničná stanica",
 "sk"
+]
+]
+},
+"Sopot PKP - Marynarzy": {
+"en": [
+[
+"Sopot",
+"pl"
+],
+[
+"railway station –",
+"en"
+],
+[
+"Marynarzy",
+"pl"
+]
+],
+"de": [
+[
+"Bahnhof",
+"de"
+],
+[
+"Sopot – Marynarzy",
+"pl"
+]
+],
+"cs": [
+[
+"Sopot",
+"pl"
+],
+[
+"nádraží –",
+"cs"
+],
+[
+"Marynarzy",
+"pl"
+]
+],
+"sk": [
+[
+"Sopot",
+"pl"
+],
+[
+"železničná stanica –",
+"sk"
+],
+[
+"Marynarzy",
+"pl"
+]
+]
+},
+"Sopot PKP - Niepodległości": {
+"en": [
+[
+"Sopot",
+"pl"
+],
+[
+"railway station –",
+"en"
+],
+[
+"Niepodległości",
+"pl"
+]
+],
+"de": [
+[
+"Bahnhof",
+"de"
+],
+[
+"Sopot – Niepodległości",
+"pl"
+]
+],
+"cs": [
+[
+"Sopot",
+"pl"
+],
+[
+"nádraží –",
+"cs"
+],
+[
+"Niepodległości",
+"pl"
+]
+],
+"sk": [
+[
+"Sopot",
+"pl"
+],
+[
+"železničná stanica –",
+"sk"
+],
+[
+"Niepodległości",
+"pl"
 ]
 ]
 },
@@ -6365,6 +7087,60 @@
 ]
 ]
 },
+"Stocznia SKM - Morska": {
+"en": [
+[
+"Stocznia SKM",
+"pl"
+],
+[
+"station –",
+"en"
+],
+[
+"Morska",
+"pl"
+]
+],
+"de": [
+[
+"S-Bahnhof",
+"de"
+],
+[
+"Stocznia – Morska",
+"pl"
+]
+],
+"cs": [
+[
+"Stocznia",
+"pl"
+],
+[
+"stanice",
+"cs"
+],
+[
+"SKM – Morska",
+"pl"
+]
+],
+"sk": [
+[
+"Stocznia",
+"pl"
+],
+[
+"stanica",
+"sk"
+],
+[
+"SKM – Morska",
+"pl"
+]
+]
+},
 "Stryków Dworzec PKP": {
 "en": [
 [
@@ -6378,12 +7154,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Stryków",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -6562,12 +7338,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Swarzędz",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -7328,12 +8104,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Wejherowo Broniewskiego -",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -7370,12 +8146,12 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Wejherowo",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
@@ -7856,12 +8632,12 @@
 ],
 "de": [
 [
-"Busbahnhof",
-"de"
-],
-[
 "Środa Wielkopolska",
 "pl"
+],
+[
+"Busbahnhof",
+"de"
 ]
 ],
 "cs": [
