@@ -3737,6 +3737,7 @@ function setupMap(){
     if(MAP.find){MAP.find=null;drawFind()}
     if(document.getElementById('mapPop')||MAP.stopHL){closeStopPop();return}
     const pl=e.target.closest('polyline,[data-id],[data-ids]');if(!pl||MAP.moved)return;
+    if(RUN.d)return;   // the reduced view (one run): its line stays as it is
     if(pl.dataset.ids&&!pl.dataset.id){const ids=pl.dataset.ids.split(' ');const all=ids.every(i=>MAP.hl.has(i));ids.forEach(i=>all?MAP.hl.delete(i):MAP.hl.add(i));applyHL();return}
     const id=pl.dataset.id;MAP.hl.has(id)?MAP.hl.delete(id):MAP.hl.add(id);applyHL()});
   document.getElementById('mapIn').onclick=()=>zoomMap(1/1.4);document.getElementById('mapOut').onclick=()=>zoomMap(1.4);
