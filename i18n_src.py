@@ -457,4 +457,5 @@ PHRASES = [
 ("wg rozkładu", "per timetable", "laut Fahrplan", "podľa cestovného poriadku", "podle jízdního řádu"),
 ("Brygada", "Duty", "Umlauf", "Turnus", "Turnus"),
 ("Brak danych o pojeździe", "No vehicle data", "Keine Fahrzeugdaten", "Žiadne údaje o vozidle", "Žádné údaje o vozidle"),
+("Czas od ostatniej pozycji pojazdu", "Time since the vehicle's last position", "Zeit seit der letzten Fahrzeugposition", "Čas od poslednej polohy vozidla", "Čas od poslední polohy vozidla"),
 ]
