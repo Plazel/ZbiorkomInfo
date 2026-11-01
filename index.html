@@ -762,7 +762,6 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gdLoc[aria-pressed=true]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
 .gdIco[aria-expanded=true]{background:var(--panel)}
 .mapErase{display:inline-grid;place-items:center;padding:0;width:38px;height:38px}
-#gdVoice.ld{background:conic-gradient(color-mix(in srgb,var(--fg) 22%,transparent) calc(var(--p)*360deg),transparent 0)}
 @media (max-width:520px){.gdTop .gdPop{position:fixed;left:12px;right:12px;width:auto;top:calc(var(--top-h) + 58px)}}
 .gdPop{position:absolute;left:0;top:calc(100% + 4px);z-index:6;width:min(360px,calc(100vw - 32px));background:var(--bg);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px}
 .gdPopR{left:auto;right:0}.gdOpt{display:flex;gap:10px;align-items:flex-start;margin-top:10px;cursor:pointer}.gdOpt input{margin-top:2px}.gdOpt small{display:block;color:var(--muted);font-size:.85em}.gdPop p{margin:6px 0 0;color:var(--muted)}.gdPop .gdAc{position:static;box-shadow:none;margin-top:6px;border:0;border-top:1px solid var(--line)}
@@ -3253,32 +3252,28 @@ function closeGuide(){document.getElementById('guideModal').hidden=true;GUIDE.op
   if(GUIDE.watch!=null&&!GUIDE.run){navigator.geolocation.clearWatch(GUIDE.watch);GUIDE.watch=null}try{speechSynthesis.cancel()}catch(e){}navMark()}
 const GD_SPK='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5h3.5L11 5.5v13l-4.5-4H3z"/>';
 function gdVoiceBtn(){const b=document.getElementById('gdVoice');b.setAttribute('aria-pressed',String(GUIDE.voice));
-  b.classList.toggle('ld',GUIDE.voice&&GDV.prog!=null);b.style.setProperty('--p',GDV.prog==null?0:GDV.prog);
-  b.title=trS('Zapowiedzi głosowe')+(GUIDE.voice&&GDV.prog!=null?' – '+trS('pobieranie głosu')+' '+Math.round(GDV.prog*100)+'%':'');
+
   b.innerHTML=GD_SPK+(GUIDE.voice?'<path d="M14.5 9.2a4 4 0 0 1 0 5.6M17.3 6.4a8 8 0 0 1 0 11.2" stroke-linecap="round"/>':'<path d="M15 9.5l5 5M20 9.5l-5 5" stroke-linecap="round"/>')+'</svg>'}
-// the announcements in one voice on every device: Piper (open speech synthesis, MIT) run in the browser, with the same voice
-// model everywhere, downloaded once when the announcements are switched on (kept by the browser) – the device's own voices
-// differ from one system to another and are used only until the model is ready or where it cannot run
-const GD_PIPER={pl:'pl_PL-gosia-medium',de:'de_DE-thorsten-medium',en:'en_GB-alan-medium',cs:'cs_CZ-jirka-medium',sk:'sk_SK-lili-medium'};
-const GDV={mod:null,ready:{},loading:{},cache:new Map(),prog:null};
-const gdTtsMod=()=>GDV.mod||(GDV.mod=import('https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.4/+esm').catch(e=>{GDV.mod=null;throw e}));
-function gdVoiceLoad(l){const id=GD_PIPER[l];if(!id)return Promise.resolve(false);if(GDV.ready[id])return Promise.resolve(true);
-  return GDV.loading[id]||(GDV.loading[id]=(async()=>{const tts=await gdTtsMod();const have=await tts.stored().catch(()=>[]);
-    if(!have.includes(id)){GDV.prog=0;gdVoiceBtn()}
-    const prog=p=>{if(p&&p.total&&/\.onnx$/.test(p.url||'')){GDV.prog=p.loaded/p.total;gdVoiceBtn()}};
-    // the first synthesis downloads the model (once; the browser keeps it) and loads it; a model kept broken is fetched again
-    try{await tts.predict({text:'.',voiceId:id},prog)}catch(e){await tts.remove(id).catch(()=>{});await tts.predict({text:'.',voiceId:id},prog)}
-    GDV.ready[id]=true;GDV.prog=null;gdVoiceBtn();return true})().catch(e=>{console.warn('piper',e);delete GDV.loading[id];GDV.prog=null;gdVoiceBtn();return false}))}
-function gdWav(text,l){const id=GD_PIPER[l];const k=id+'|'+text;
-  if(!GDV.cache.has(k)){GDV.cache.set(k,gdTtsMod().then(t=>t.predict({text,voiceId:id})).then(b=>URL.createObjectURL(b)).catch(e=>{GDV.cache.delete(k);throw e}));
-    if(GDV.cache.size>60){const [k0,p0]=GDV.cache.entries().next().value;GDV.cache.delete(k0);p0.then(u=>URL.revokeObjectURL(u),()=>{})}}
+// the announcements in one voice on every device: Microsoft Azure neural voices, spoken through our Cloudflare worker
+// (proxy/worker.js), which keeps every text once synthesised – the device's own voices differ from one system to another and
+// are used only where the common voice cannot be had (the worker not set up, no connection, the free monthly quota used up)
+const GD_VOICE={pl:'pl-PL-ZofiaNeural',cs:'cs-CZ-VlastaNeural',sk:'sk-SK-ViktoriaNeural',de:'de-DE-KatjaNeural',en:'en-GB-SoniaNeural'};
+const GDV={ready:{},loading:{},cache:new Map()};
+const gdTtsUrl=(t,l)=>RT_PROXY?RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(GD_VOICE[l])+'&t='+encodeURIComponent(t):null;
+function gdWav(text,l){const k=l+'|'+text;
+  if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l);if(!u)throw new Error('no proxy');const r=await fetch(u);
+      if(!r.ok||!/audio/.test(r.headers.get('content-type')||''))throw new Error('tts '+r.status);return URL.createObjectURL(await r.blob())})().catch(e=>{GDV.cache.delete(k);throw e}));
+    if(GDV.cache.size>80){const [k0,p0]=GDV.cache.entries().next().value;GDV.cache.delete(k0);p0.then(u=>URL.revokeObjectURL(u),()=>{})}}
   return GDV.cache.get(k)}
+// whether the common voice answers (tried once when the announcements are switched on)
+function gdVoiceLoad(l){if(!GD_VOICE[l])return Promise.resolve(false);if(GDV.ready[l])return Promise.resolve(true);
+  return GDV.loading[l]||(GDV.loading[l]=gdWav(GD_TXT[l][0],l).then(()=>(GDV.ready[l]=true)).catch(()=>{setTimeout(()=>{delete GDV.loading[l]},60000);return false}))}
 // what is said, in parts each in its language: "Next stop:" (the page's language) – the name (the town's language) – "Last stop" (an
 // extra message, the page's language, unless switched off in the settings); at a stop: the gong, the name (and "Last stop")
 function gdSegs(kind,name,isLast){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l]);out.push([name,nl]);
   if(isLast&&store.get('ztm.gdExtra',true))out.push([T[st+1]+'.',l]);return out}
-const gdPiperOk=l=>!!GDV.ready[GD_PIPER[l]];
+const gdPiperOk=l=>!!GDV.ready[l];
 // announcements with the app in the background or the phone locked: silence played in a loop keeps the page running (a
 // page playing media is not suspended) and its playback events drive the guide where the timers are slowed down; the media controls of the system show it, and pausing them mutes
 // the announcements; on a phone also a notification (where allowed) whose tap opens the app and whose button mutes
