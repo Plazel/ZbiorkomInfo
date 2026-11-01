@@ -452,4 +452,5 @@ PHRASES = [
 ("przystanek, z którego pojazd odjechał, znika, a kolejne płynnie zjeżdżają w dół", "the stop just left fades away and the next ones slide smoothly down", "die verlassene Haltestelle verschwindet und die folgenden gleiten sanft nach unten", "zastávka, z ktorej vozidlo odišlo, zmizne a ďalšie plynulo zídu nadol", "zastávka, ze které vozidlo odjelo, zmizí a další plynule sjedou dolů"),
 ("← Wybór kursu", "← Trip choice", "← Fahrtauswahl", "← Výber spoja", "← Výběr spoje"),
 ("Pokaż pojazd na mapie", "Show the vehicle on the map", "Fahrzeug auf der Karte zeigen", "Zobraziť vozidlo na mape", "Zobrazit vozidlo na mapě"),
+("na żywo", "live", "live", "naživo", "živě"),
 ]
