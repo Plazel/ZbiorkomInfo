@@ -3267,7 +3267,7 @@ const GDV={ready:{},loading:{},cache:new Map()};
 const gdTtsUrl=(t,l)=>RT_PROXY?RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(GD_VOICE[l])+'&t='+encodeURIComponent(t):null;
 function gdWav(text,l){const k=GD_VOICE[l]+'|'+text;
   if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l);if(!u)throw new Error('no proxy');const r=await fetch(u);
-      if(!r.ok||!/audio/.test(r.headers.get('content-type')||''))throw new Error('tts '+r.status);return URL.createObjectURL(await r.blob())})().catch(e=>{GDV.cache.delete(k);throw e}));
+      if(!r.ok||!/audio/.test(r.headers.get('content-type')||''))throw new Error('tts '+r.status);GDV.by=r.headers.get('x-voice-by')||GDV.by;return URL.createObjectURL(await r.blob())})().catch(e=>{GDV.cache.delete(k);throw e}));
     if(GDV.cache.size>80){const [k0,p0]=GDV.cache.entries().next().value;GDV.cache.delete(k0);p0.then(u=>URL.revokeObjectURL(u),()=>{})}}
   return GDV.cache.get(k)}
 // whether the common voice answers (tried once when the announcements are switched on)
@@ -3446,7 +3446,7 @@ function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(las
   return `<div class="gsTopb"><span class="mb ${s0.shape}${sqCls(R.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
 <div class="gtt"><small>${esc(trS('Kierunek'))}</small><b>${esc(R.head)}</b>${hd<last?`<small class="ta">${clk}${fmtT(T[last]+lag)} · ${mins(last)}</small>`:''}</div>
 <div class="rt">${R.vlabel?`<small>${esc(trS('Pojazd'))} <b>${esc(R.vlabel)}</b></small>`:''}<b class="gsClock">${gdClock()}</b></div></div>
-<div class="gsFoot">${esc(R.src||'')}</div>
+<div class="gsFoot">${esc(R.src||'')}${GUIDE.voice&&GDV.by?' · '+esc(trS('Głos'))+': '+esc(GDV.by):''}</div>
 <div class="gsBody">${gap?`<div class="gsGap"><span></span><span class="rl"></span><span></span></div>`:'<div class="gsFill"></div>'}${rows.join('')}${now}</div>`}
 document.getElementById('a11ySw').onchange=e=>a11ySet(e.target.checked);
 a11ySet(store.get('ztm.a11y',false));
