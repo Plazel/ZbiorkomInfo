@@ -26,7 +26,7 @@ li .n{flex:1;min-width:0}li .m{font-size:.75rem;color:var(--muted)}
 .dot{width:10px;height:10px;flex:none;border:2px solid #fff;box-shadow:0 0 0 1px #888}
 .done .dot{background:#1f9a3e}.todo .dot{background:#e8a400}
 .edit{border-top:1px solid var(--line);padding:10px 12px;display:grid;gap:8px;background:var(--panel)}
-.edit[hidden]{display:none}.edit b{font-size:.95rem}.edit .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.edit[hidden]{display:none}.dirs{font-size:.85rem;display:grid;gap:4px}.dirs div{display:flex;gap:6px;align-items:baseline}.dirs b{white-space:nowrap}.dirs i{font-style:normal;display:inline-block;width:12px;height:12px;flex:none;border-radius:50%;align-self:center}.edit b{font-size:.95rem}.edit .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .edit input[type=text]{width:64px;border:1px solid var(--line);padding:5px 6px}.edit textarea{width:100%;min-height:54px;border:1px solid var(--line);padding:6px}
 #map{height:100%;min-height:0}
 .pm{background:none;border:0}.pm span{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid #2f63ad;font:700 11px Roboto,sans-serif;color:#2f63ad;box-shadow:0 1px 4px rgba(0,0,0,.4)}
@@ -46,6 +46,7 @@ li .n{flex:1;min-width:0}li .m{font-size:.75rem;color:var(--muted)}
    <b id="eName"></b>
    <div class="row" id="ePoles"></div>
    <div class="row"><button class="btn" id="addPole" type="button">Dodaj drugi peron</button><button class="btn" id="delPole" type="button">Usuń drugi peron</button><label><input type="checkbox" id="eDone"> gotowe</label></div>
+   <div class="dirs" id="eDirs"></div>
    <textarea id="eNote" placeholder="Uwagi (np. przystanek nie istnieje, inna nazwa, tylko w jednym kierunku)"></textarea>
   </div>
  </div>
@@ -64,7 +65,8 @@ const labels=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_
 const plain=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key='+CK,{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
 photo.addTo(map);labels.addTo(map);let isPhoto=true;
 document.getElementById('layer').onclick=()=>{if(isPhoto){map.removeLayer(photo);map.removeLayer(labels);plain.addTo(map)}else{map.removeLayer(plain);photo.addTo(map);labels.addTo(map)}isPhoto=!isPhoto};
-let STOPS=[],LINES={},SEL=null;const MK={};
+let STOPS=[],LINES={},SEL=null,DIRS={};const MK={};let ARROWS=[];
+const DCOL=['#d71920','#1f6fd1','#1f9a3e','#8e24aa','#e8a400','#00838f'];
 const icon=(t,cls)=>L.divIcon({className:'pm '+(cls||''),html:'<span>'+t+'</span>',iconSize:[30,30],iconAnchor:[15,15]});
 const st=id=>S[id]||(S[id]={poles:[{p:'',lat:null,lon:null}],note:'',done:false});
 function poles(s){const x=st(s.id);return x.poles.map((p,i)=>({p:p.p||(x.poles.length>1?['01','02'][i]:s.pole||''),lat:p.lat!=null?p.lat:s.lat+(i?0.00012:0),lon:p.lon!=null?p.lon:s.lon+(i?0.00012:0)}))}
@@ -84,6 +86,14 @@ function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);c
     inp.onchange=()=>{x.poles[i]=x.poles[i]||{lat:null,lon:null};x.poles[i].p=inp.value.trim();save();drawMarkers()};pr.appendChild(inp)});
   document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>1;
   document.getElementById('eDone').checked=!!x.done;document.getElementById('eNote').value=x.note||'';
+  // where the buses go from here: an arrow to the next stop for each direction, listed with its lines and terminus
+  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=Object.values(DIRS[id]||{});const P0=poles(s)[0];
+  document.getElementById('eDirs').innerHTML=D.length?'<b>Odjazdy w kierunku:</b>'+D.map((d,i)=>`<div><i style="background:${DCOL[i%DCOL.length]}"></i><span>→ <b>${d.next}</b> (linie ${[...d.lines].join(', ')}; do: ${[...d.heads].join(', ')})</span></div>`).join(''):'<span>Przystanek końcowy (brak odjazdów dalej).</span>';
+  D.forEach((d,i)=>{const n=STOPS.find(x=>x.id===d.nid);const to=n?poles(n)[0]:{lat:d.lat,lon:d.lon};const col=DCOL[i%DCOL.length];
+    const f=Math.min(1,0.0012/Math.max(1e-6,Math.hypot(to.lat-P0.lat,(to.lon-P0.lon)*.65)));const end=[P0.lat+(to.lat-P0.lat)*f,P0.lon+(to.lon-P0.lon)*f];
+    ARROWS.push(L.polyline([[P0.lat,P0.lon],end],{color:col,weight:5,opacity:.9,interactive:false}).addTo(map));
+    ARROWS.push(L.polyline([[P0.lat,P0.lon],[to.lat,to.lon]],{color:col,weight:2,opacity:.7,dashArray:'4 6',interactive:false}).addTo(map));
+    ARROWS.push(L.circleMarker(end,{radius:5,color:col,fillColor:col,fillOpacity:1,interactive:false}).addTo(map))});
   drawMarkers();list();if(fly){const P=poles(s)[0];map.setView([P.lat,P.lon],Math.max(map.getZoom(),18))}}
 document.getElementById('addPole').onclick=()=>{if(!SEL)return;const s=STOPS.find(x=>x.id===SEL);const x=st(SEL);const P=poles(s)[0];
   x.poles[0]={p:x.poles[0].p||'01',lat:P.lat,lon:P.lon};x.poles[1]={p:'02',lat:P.lat+0.00012,lon:P.lon+0.00012};save();select(SEL,false)};
@@ -95,7 +105,10 @@ function exportData(){const out={made:new Date().toISOString(),stops:{}};STOPS.f
   out.stops[s.id]={name:s.name,poles:poles(s).map(P=>({p:P.p,lat:+P.lat.toFixed(6),lon:+P.lon.toFixed(6)})),note:x.note||'',done:!!x.done}});return JSON.stringify(out,null,1)}
 document.getElementById('exp').onclick=()=>{const b=new Blob([exportData()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='przystanki-krynica.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
 document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(exportData());toast('Skopiowano – wklej w rozmowie')}catch(e){toast('Nie udało się skopiować – użyj „Pobierz plik”')}};
-Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null)]).then(([I,M])=>{
+Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null),fetch('../data/rp/km_0.json').then(r=>r.json()).catch(()=>({}))]).then(([I,M,RP])=>{
+  Object.values(RP).forEach(R=>(R.dirs||[]).forEach(d=>{const ids=d.stops.map(x=>x[0]);const head=I.stops[ids[ids.length-1]]?I.stops[ids[ids.length-1]][0]:d.head;
+    (d.pats||[]).forEach(pt=>{for(let j=0;j<pt.length-1;j++){const a=ids[pt[j]],b=ids[pt[j+1]];if(!a||!b||a===b)continue;const B=I.stops[b];if(!B)continue;
+      const o=(DIRS[a]=DIRS[a]||{});const e=o[b]||(o[b]={nid:b,next:B[0],lat:B[2],lon:B[3],lines:new Set(),heads:new Set()});e.lines.add(R.n);e.heads.add(d.head||head)}})}));
   STOPS=Object.entries(I.stops).filter(([k,v])=>/^km\d/.test(k)).map(([id,v])=>({id,name:v[0],pole:v[1]||'',lat:v[2],lon:v[3]})).sort((a,b)=>a.name.localeCompare(b.name,'pl'));
   I.routes.filter(r=>(r.c||[]).includes('km')||(r.c||[]).includes('kmx')).forEach(r=>(r.sn||[]).forEach(n=>(LINES[n]=LINES[n]||[]).includes(r.n)||LINES[n].push(r.n)));
   // the lines' courses, thin, as a guide
