@@ -2972,7 +2972,7 @@ function layoutHL(){
   curVariants().forEach(vs=>{
     if(vs.main){svg.querySelectorAll(`#mapLines polyline.var[data-id="${vs.id}"]`).forEach(p=>p.classList.add('nov'));return}
     svg.querySelectorAll(`#mapLines polyline[data-id="${vs.id}"]`).forEach(p=>p.classList.add('nov'));
-    vh+=vs.es.filter(e=>e.g.length>1).map(e=>{const f=MAP.par&&MAP.drawn==='geo'&&MAP.par.fit(e.g,vs.id);
+    vh+=vs.es.filter(e=>e.g.length>1).map(e=>{const f=vs.l!=='run'&&MAP.par&&MAP.drawn==='geo'&&MAP.par.fit(e.g,vs.id);   // (one run followed: on its own course, not moved aside)
       const pts=f?f.pts.map((q,i)=>(q[0]+f.nx[i]*f.sl[i]*W0).toFixed(2)+','+(q[1]+f.ny[i]*f.sl[i]*W0).toFixed(2)):e.g.map(q=>q[0]+','+q[1]);
       return `<polyline points="${pts.join(' ')}" style="stroke:${lineColor(vs.r)}"/>`}).join('')});
   const ids=[...MAP.hl].filter(id=>MAP.data.routes[id]&&MAP.byId[id]&&(MAP.night||MAP.byId[id].t!=='night'));
@@ -3092,7 +3092,7 @@ function variantItems(vs,k,v,m){
       const key=S[0]+'|'+isT;if(seen.has(key))return;seen.add(key);
       const [x,y]=proj(S[2],S[3]);const sn=path.length>1?snapTo(x,y):{p:[x,y],seg:[1,0]};
       const X=sn.p[0],Y=sn.p[1];if(X<v.x-m||X>v.x+v.w+m||Y<v.y-m||Y>v.y+v.h+m)return;
-      const L={name:S[0],lines:new Set([id]),vlines:new Set(),dirs:{[id]:{0:sn.seg}}};
+      const L={name:S[0],lines:new Set([id]),vlines:new Set(),dirs:{[id]:vs.l==='run'?{0:sn.seg,1:sn.seg}:{0:sn.seg}}};   // (one run followed: plain dots, its direction needs no marking)
       last={L,mine:[id],X,Y,SEG:sn.seg,term:isT?[r]:[],vterm:[],isT,pri:(isT?2000:0)+1};items.push(last)})});
   return items;
 }
