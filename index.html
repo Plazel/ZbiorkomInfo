@@ -768,22 +768,24 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gdPick ul{list-style:none;margin:0;padding:0;border:1px solid var(--line)}.gdPick li{border-top:1px solid var(--line)}.gdPick li:first-child{border-top:0}
 .gdPick button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;font:inherit;border:0;background:var(--bg);color:var(--fg);padding:10px 12px;cursor:pointer}.gdPick button:hover{background:var(--panel)}
 .gdPick small{color:var(--muted);margin-left:auto;white-space:nowrap}
-.gdSip{flex:1;display:flex;flex-direction:column;background:#232629;color:#fff;font-family:Roboto,"Segoe UI",sans-serif;min-height:320px;--gs:clamp(16px,min(2.6vw,3.4vh),32px)}
-.gsBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 14px;background:#000;color:#cfd4da;font-size:calc(var(--gs)*.55)}.gsBar b{color:#fff;font-size:calc(var(--gs)*.8);font-variant-numeric:tabular-nums}
+.gdSip{--sB:#232629;--sH:#000;--sF:#fff;--sM:#aeb4ba;--sR:#fff;--sL:#3a3f44;--sA:#ffd23f}
+:root:not([data-theme=dark]) .gdSip{--sB:#eef0f2;--sH:#fff;--sF:#14171a;--sM:#5c6670;--sR:#14171a;--sL:#d5d9de;--sA:#b25e00}
+.gdSip{flex:1;display:flex;flex-direction:column;background:var(--sB);color:var(--sF);border:1px solid var(--sL);font-family:Roboto,"Segoe UI",sans-serif;min-height:320px;--gs:clamp(16px,min(2.6vw,3.4vh),32px)}
+.gsBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 14px;background:var(--sH);color:var(--sM);font-size:calc(var(--gs)*.55)}.gsBar b{color:var(--sF);font-size:calc(var(--gs)*.8);font-variant-numeric:tabular-nums}
 .gsBody{flex:1;display:flex;flex-direction:column}.gsRow,.gsGap{display:grid;grid-template-columns:calc(var(--gs)*3.4) calc(var(--gs)*1.6) 1fr auto;align-items:stretch}
-.gsGap{flex:1;min-height:calc(var(--gs)*1.4)}.gsGap.solid{min-height:0}.gsGap.solid .rl::before{border-left-style:solid}.gsGap .rl{position:relative}.gsGap .rl::before{content:"";position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);border-left:calc(var(--gs)*.32) dotted #fff}
+.gsGap{flex:1;min-height:calc(var(--gs)*1.4)}.gsGap.solid{min-height:0}.gsGap.solid .rl::before{border-left-style:solid}.gsGap .rl{position:relative}.gsGap .rl::before{content:"";position:absolute;left:50%;top:0;bottom:0;transform:translateX(-50%);border-left:calc(var(--gs)*.32) dotted var(--sR)}
 .gsRow .tc{align-self:center;padding:0 14px;font-size:calc(var(--gs)*.9);font-weight:700;font-variant-numeric:tabular-nums}.gsRow .tc{display:flex;align-items:center;gap:6px;white-space:nowrap}.gsRow .tc svg{width:.9em;height:.9em}
-.gsRow .tl{align-self:center;text-align:right;font-size:calc(var(--gs)*.85);padding-right:6px;font-variant-numeric:tabular-nums;color:#e8ebee}
-.gsRow .rl{position:relative}.gsRow .rl::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:calc(var(--gs)*.32);transform:translateX(-50%);background:#fff}
+.gsRow .tl{align-self:center;text-align:right;font-size:calc(var(--gs)*.85);padding-right:6px;font-variant-numeric:tabular-nums;;color:var(--sF)}
+.gsRow .rl{position:relative}.gsRow .rl::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:calc(var(--gs)*.32);transform:translateX(-50%);background:var(--sR)}
 .gsRow.last .rl::before{bottom:50%}
-.gsRow .rl i{position:absolute;left:50%;top:50%;width:calc(var(--gs)*1.05);height:calc(var(--gs)*1.05);transform:translate(-50%,-50%);border-radius:50%;background:#232629;border:calc(var(--gs)*.16) solid #fff;box-sizing:border-box}
-.gsRow.next .rl i{background:#232629}.gsRow.last .rl i{box-shadow:inset 0 0 0 calc(var(--gs)*.14) #232629,inset 0 0 0 calc(var(--gs)*.5) #fff}
+.gsRow .rl i{position:absolute;left:50%;top:50%;width:calc(var(--gs)*1.05);height:calc(var(--gs)*1.05);transform:translate(-50%,-50%);border-radius:50%;background:var(--sB);border:calc(var(--gs)*.16) solid var(--sR);box-sizing:border-box}
+.gsRow.last .rl i{background:var(--sH);box-shadow:inset 0 0 0 calc(var(--gs)*.14) var(--sH),inset 0 0 0 calc(var(--gs)*.5) var(--sR)}
 .gsRow .nm{padding:calc(var(--gs)*.32) 14px calc(var(--gs)*.32) 4px;min-width:0}.gsRow .nm>span{display:block;font-size:var(--gs);line-height:1.15}
-.gsRow.next{background:#000}.gsRow.next .nm>span{font-weight:800;font-size:calc(var(--gs)*1.3)}.gsRow.last{background:#000}.gsRow.last .nm>span{font-weight:800;font-size:calc(var(--gs)*1.15)}
-.gsRow.at .nm>span{color:#ffd23f}
-.gsTr{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.gsTr .chip{transform:none;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
-.gsHead{display:flex;align-items:center;gap:16px;padding:12px 14px;background:#000;border-bottom:2px solid #3a3f44}.gsHead .hn{min-width:0}.gsHead .hn small{display:block;color:#aeb4ba;font-size:calc(var(--gs)*.6)}.gsHead .hn>span{display:block;font-weight:800;font-size:calc(var(--gs)*1.45);line-height:1.1}.gsHead.at .hn>span{color:#ffd23f}.gsHead .mb{min-width:calc(var(--gs)*2.3);height:calc(var(--gs)*2.3);display:grid;place-items:center;font:700 calc(var(--gs)*1.25) "Roboto Condensed",sans-serif;padding:0 8px}
-.gsHead .mb.circle{border-radius:50%;width:calc(var(--gs)*2.3);padding:0}.gsHead .mb.rect.sq{width:calc(var(--gs)*2.3);padding:0}.gsHead .hd{font-size:calc(var(--gs)*.8);color:#cfd4da}.gsHead .hd b{color:#fff}
+.gsRow.next .nm>span{font-weight:800;font-size:calc(var(--gs)*1.3)}.gsRow.last{background:var(--sH);border-top:2px solid var(--sL)}.gsRow.last .nm>span{font-weight:800;font-size:calc(var(--gs)*1.15)}
+
+.gsTr{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.gsTr .chip{transform:none;box-shadow:0 0 0 1px var(--sL)}
+.gsHead{display:flex;align-items:center;gap:16px;padding:12px 14px;background:var(--sH);border-bottom:2px solid var(--sL)}.gsHead .hn{min-width:0}.gsHead .hn small{display:block;color:var(--sM);font-size:calc(var(--gs)*.6)}.gsHead .hn>span{display:block;font-weight:800;font-size:calc(var(--gs)*1.45);line-height:1.1}.gsHead.at .hn>span{color:var(--sA)}.gsHead .mb{min-width:calc(var(--gs)*2.3);height:calc(var(--gs)*2.3);display:grid;place-items:center;font:700 calc(var(--gs)*1.25) "Roboto Condensed",sans-serif;padding:0 8px}
+.gsHead .mb.circle{border-radius:50%;width:calc(var(--gs)*2.3);padding:0}.gsHead .mb.rect.sq{width:calc(var(--gs)*2.3);padding:0}
 @media (max-width:760px){.guideModal{left:0;bottom:calc(60px + env(safe-area-inset-bottom,0px))}}
 .jpModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);display:grid;grid-template-columns:min(520px,48vw) 1fr}
 .jpSide{overflow:auto;border-right:1px solid var(--line);padding:16px 16px 40px}
@@ -3252,10 +3254,18 @@ async function rtVehGet(url){const c=RV_CACHE[url];if(c&&Date.now()-c.t<10000)re
       out.push(e)});return out}catch(e){}}throw new Error('vp')})();
   RV_CACHE[url]={t:Date.now(),p};p.catch(()=>{delete RV_CACHE[url]});return p}
 // the run of a vehicle in the timetable: its line, the start time, the pattern it is on (nearest to it)
+// a vehicle's headsign and a run's terminus name the same place (written a little differently by the operator); no headsign: not known
+function gdSameHead(h,head){if(!h)return true;const a=fold(h).replace(/[^a-z0-9]/g,''),b=fold(head).replace(/[^a-z0-9]/g,'');if(!a||!b)return true;
+  return a.includes(b.slice(0,8))||b.includes(a.slice(0,8))}
+// a vehicle on a run's course (within 300 m of it)
+function gdOnRun(R,v){const P=R.ps.map(id=>IDX.stops[id]).filter(Boolean);const cs=Math.cos(v.lat*Math.PI/180);const xy=S=>[(S[3]-v.lon)*cs*111320,(S[2]-v.lat)*110540];
+  for(let j=0;j<P.length-1;j++){const a=xy(P[j]),b=xy(P[j+1]),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0;if(Math.hypot(a[0]+u*dx,a[1]+u*dy)<300)return true}
+  return P.length<2}
 async function gdRunOf(v){const r=IDX.routes.find(x=>x.n===v.line&&inCityOf(x,city));if(!r)return null;let L;try{L=await loadRoute(r.id)}catch(e){return null}
   const base=new Date();base.setHours(0,0,0,0);const tS=v.start?(Date.parse(v.start)-base)/60000:v.t0;const cs=Math.cos(v.lat*Math.PI/180);
   const xy=S=>[(S[3]-v.lon)*cs*111320,(S[2]-v.lat)*110540];let best=null;
   for(const [key,sh] of depDayKeys())L.dirs.forEach(d=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(tS!=null&&Math.abs(t0-tS)>4)return;const [pat,off]=d.prof[pi];const ps=d.pats[pat];
+    if(!gdSameHead(v.head,sName(d.stops[ps[ps.length-1]][0])))return;   // not the other way along the same streets
     for(let j=0;j<ps.length-1;j++){const A=IDX.stops[d.stops[ps[j]][0]],B=IDX.stops[d.stops[ps[j+1]][0]];if(!A||!B)continue;const a=xy(A),b=xy(B),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0;const dist=Math.hypot(a[0]+u*dx,a[1]+u*dy);
       if(!best||dist<best.dist)best={dist,r,ps:ps.map(i=>d.stops[i][0]),off,t0,head:sName(d.stops[ps[ps.length-1]][0])}}}));
   return best&&best.dist<400?best:null}
@@ -3294,7 +3304,8 @@ async function gdRunPos(h){const R=GUIDE.run;if(GUIDE.fake)return {p:GUIDE.fake,
   let V=null;try{V=await gdVehicles()}catch(e){}
   if(V){let v=R.veh?V.find(x=>x.id===R.veh):null;
     if(!v){const base=new Date();base.setHours(0,0,0,0);
-      v=V.find(x=>x.line===R.r.n&&Math.abs((x.start?(Date.parse(x.start)-base)/60000:x.t0)-R.t0)<=3);if(v)R.veh=v.id}
+      // the run's vehicle: its line, its start time, going the run's way (its headsign) and on the run's course
+      v=V.find(x=>x.line===R.r.n&&Math.abs((x.start?(Date.parse(x.start)-base)/60000:x.t0)-R.t0)<=3&&gdSameHead(x.head,R.head)&&gdOnRun(R,x));if(v)R.veh=v.id}
     if(v){if(v.label)R.vlabel=v.label;if(h&&distM(h[0],h[1],v.lat,v.lon)<80)return {p:h,src:'me'};return {p:[v.lat,v.lon],src:'veh'}}}
   if(h&&!R.fromStop)return {p:h,src:'me'};
   // the timetable: between the stops it should be between now
@@ -3317,16 +3328,25 @@ function gdProgress(h,src){const R=GUIDE.run,st=document.getElementById('gdStat'
   // as many stops between as fit on the screen
   const gm=document.getElementById('guideModal');sip.hidden=false;
   for(let m=6;m>=1;m--){sip.innerHTML=gdSipHtml(R,P,cur,next,m);if(gm.scrollHeight<=gm.clientHeight+1)break}}
-// the lines one can change to at a stop (of this city, other than the ride's own line)
+// the lines one can change to at a stop: those with a stop of that name within 400 m (not a stop of the same name in another
+// town of the area), other than the ride's own line; a night line only when it calls there about the time the ride does
 const GD_TR={};
-function gdTransfers(name,r){const k=city+'|'+name;if(!GD_TR[k])GD_TR[k]=IDX.routes.filter(x=>inCityOf(x,city)&&(x.sn||[]).includes(name));
-  const seen=new Set();return GD_TR[k].filter(x=>x.n!==r.n&&!seen.has(x.n)&&seen.add(x.n)).slice(0,14).map(x=>chip(x,'small',true).outerHTML).join('')}
+function gdTrLoad(sid){if(GD_TR[sid])return GD_TR[sid];const S=IDX.stops[sid];
+  const cand=IDX.routes.filter(x=>(x.sn||[]).includes(S[0])&&inCityOf(x,city));GD_TR[sid]={ok:false,list:[]};
+  (async()=>{const out=[];for(const r of cand){let L;try{L=await loadRoute(r.id)}catch(e){continue}const T=[];let near=false;
+      (L.dirs||[]).forEach(d=>{const ks=new Set();d.stops.forEach((x,k)=>{const X=IDX.stops[x[0]];if(X&&X[0]===S[0]&&distM(X[2],X[3],S[2],S[3])<400)ks.add(k)});if(!ks.size)return;near=true;
+        if(r.t==='night')for(const [key,sh] of depDayKeys())planOf(d,key).forEach(([tt,pi])=>{const pr=d.prof[pi];if(!pr)return;const ps=d.pats[pr[0]];ps.forEach((k,q)=>{if(ks.has(k))T.push(tt+sh+pr[1][q])})})});
+      if(near)out.push({r,T})}
+    GD_TR[sid]={ok:true,list:out}})();
+  return GD_TR[sid]}
+function gdTransfers(sid,r,tAt){const E=gdTrLoad(sid);if(!E.ok)return '';const seen=new Set();
+  return E.list.filter(({r:x,T})=>x.n!==r.n&&(x.t!=='night'||T.some(t=>t>=tAt-10&&t<=tAt+40))&&!seen.has(x.n)&&seen.add(x.n)).slice(0,14).map(({r:x})=>chip(x,'small',true).outerHTML).join('')}
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
   const lag=Math.max(0,nowM-T[hd]);   // a run behind its timetable: the times ahead later by as much
   const mins=j=>{const m=T[j]+lag-nowM;return m<1?'&lt; 1 min':Math.round(m)+' min'};
-  const s0=depStyle(R.r);const tr=j=>{const t=gdTransfers(P[j][0],R.r);return t?`<div class="gsTr">${t}</div>`:''};
+  const s0=depStyle(R.r);const tr=j=>{const t=gdTransfers(R.ps[j],R.r,T[j]+lag);return t?`<div class="gsTr">${t}</div>`:''};
   const to=Math.min(last-1,hd+MID);const gap=to<last-1;const rows=[];
   for(let j=hd+1;j<=to;j++)rows.push(`<div class="gsRow${j===hd+1?' first':''}"><span class="tl">${mins(j)}</span><span class="rl"><i></i></span><div class="nm"><span>${esc(P[j][0])}</span>${tr(j)}</div></div>`);
   if(hd<last)rows.push(`<div class="gsGap${gap?'':' solid'}"><span></span><span class="rl"></span><span></span></div>`);
