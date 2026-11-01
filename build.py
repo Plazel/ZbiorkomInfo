@@ -51,7 +51,7 @@ try:
     import flensburg_gtfs
     _fc = os.path.join(HERE, 'cache', 'fl')
     if not os.path.exists(_fc + '/stop_times.txt') or (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) > 6 * 86400:
-        os.makedirs(os.path.dirname(_fc), exist_ok=True); flensburg_gtfs.build(flensburg_gtfs.URL, _fc)
+        os.makedirs(os.path.dirname(_fc), exist_ok=True); flensburg_gtfs.build(flensburg_gtfs.current_url(), _fc)
     shutil.copytree(_fc, os.path.join(SCR, 'fl'))
 except Exception as e: print('Flensburg: bez danych (%s)' % e)
 fetch(SOURCES['ztrips'], os.path.join(SCR, 'ztrips.json'))

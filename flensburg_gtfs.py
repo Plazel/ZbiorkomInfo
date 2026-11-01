@@ -7,6 +7,19 @@ import csv, io, os, sys, urllib.request, zipfile, shutil
 
 URL = 'https://opendata.schleswig-holstein.de/dataset/5e0652d8-7f59-42fc-92ab-a6358f800e1d/resource/d26a3f87-b8a9-4c02-ab2e-13ea4755ebc3/download/fahrplandaten'
 AGENCY = 'Aktiv Bus Flensburg GmbH'
+DATASET = '5e0652d8-7f59-42fc-92ab-a6358f800e1d'
+
+
+def current_url():
+    """the dataset's GTFS file as listed now (its resource id changes when the data is renewed)"""
+    try:
+        import json
+        req = urllib.request.Request('https://opendata.schleswig-holstein.de/api/3/action/package_show?id=' + DATASET, headers={'User-Agent': 'Mozilla/5.0 (rozklady-trojmiasto)'})
+        res = json.load(urllib.request.urlopen(req, timeout=60))['result']['resources']
+        for r in res:
+            if 'GTFS' in (r.get('format') or '').upper() or 'fahrplan' in (r.get('name') or '').lower(): return r['url']
+    except Exception: pass
+    return URL
 
 
 def build(src, out, log=print):
