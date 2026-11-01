@@ -59,8 +59,9 @@ const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const toast=t=>{const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)};
 const map=L.map('map',{zoomControl:true,maxZoom:21}).setView([49.42,20.95],13);
 const photo=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:21,maxNativeZoom:19,attribution:'Zdjęcie: Esri, Maxar, Earthstar Geographics'});
-const labels=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
-const plain=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
+const CK='cb1_4vdw_1_23a15f607749c4261b38e021';
+const labels=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png?key='+CK,{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
+const plain=L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key='+CK,{maxZoom:21,maxNativeZoom:20,subdomains:'abcd',attribution:'© OpenStreetMap, © CARTO'});
 photo.addTo(map);labels.addTo(map);let isPhoto=true;
 document.getElementById('layer').onclick=()=>{if(isPhoto){map.removeLayer(photo);map.removeLayer(labels);plain.addTo(map)}else{map.removeLayer(plain);photo.addTo(map);labels.addTo(map)}isPhoto=!isPhoto};
 let STOPS=[],LINES={},SEL=null;const MK={};
@@ -75,7 +76,7 @@ function drawMarkers(){Object.values(MK).flat().forEach(m=>map.removeLayer(m));f
 function list(){const q=document.getElementById('q').value.trim().toLowerCase(),f=document.getElementById('flt').value;const ul=document.getElementById('list');ul.innerHTML='';
   STOPS.filter(s=>(!q||s.name.toLowerCase().includes(q))&&(!f||(f==='done')===!!st(s.id).done)).forEach(s=>{const li=document.createElement('li');const x=st(s.id);
     li.className=(x.done?'done':'todo')+(SEL===s.id?' on':'');li.innerHTML='<span class="dot"></span><span class="n"></span>';li.querySelector('.n').innerHTML='';
-    const n=document.createElement('div');n.textContent=s.name;const m=document.createElement('div');m.className='m';m.textContent=(LINES[s.name]||[]).join(', ')+(x.poles.length>1?' · 2 perony':'')+(x.note?' · uwagi':'');
+    const n=document.createElement('div');n.textContent=s.name;const m=document.createElement('div');m.className='m';m.textContent=(s.pole?'peron '+s.pole+' · ':'')+'linie '+(LINES[s.name]||[]).join(', ')+(x.poles.length>1?' · 2 perony':'')+(x.note?' · uwagi':'');
     li.querySelector('.n').append(n,m);li.onclick=()=>select(s.id,true);ul.appendChild(li)})}
 function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);const E=document.getElementById('edit');E.hidden=false;
   document.getElementById('eName').textContent=s.name+' ('+id+')';
