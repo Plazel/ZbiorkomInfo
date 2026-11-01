@@ -3617,7 +3617,8 @@ function drawVeh(){const svg=document.getElementById('mapSvg');if(!svg)return;le
     <circle r="22" fill="#fff" stroke="${s0.bg}" stroke-width="4" style="filter:drop-shadow(0 2px 3px rgba(0,0,0,.35))"/>${ic}
     ${s0.shape==='circle'?(()=>{const cr=Math.max(13,n.length*4.6+4);const cx=a!=null&&Math.cos(a*Math.PI/180)>0.3?-24-cr:24+cr;
       return `<circle cx="${cx}" cy="0" r="${cr}" fill="${s0.bg}"/><text x="${cx}" y="5" text-anchor="middle" style="font:700 ${n.length>2?13:15}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text>`})()
-    :`<g transform="translate(${a!=null&&Math.cos(a*Math.PI/180)>0.3?-26-w:26} -12)"><rect width="${w}" height="24" fill="${s0.bg}"/><text x="${w/2}" y="17" text-anchor="middle" style="font:700 15px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`}</g>`}
+    :(()=>{const q=n.length<=3?28:n.length*8+12;   // a square, as the line symbols on the page (only longer names widen it)
+      return `<g transform="translate(${a!=null&&Math.cos(a*Math.PI/180)>0.3?-26-q:26} -14)"><rect width="${q}" height="28" fill="${s0.bg}"/><text x="${q/2}" y="19" text-anchor="middle" style="font:700 ${n.length>2?13:15}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`})()}</g>`}
 // ---- the user's own position on the map (a blue dot with the accuracy circle), followed while it is on ----
 function toggleMe(){const b=document.getElementById('mapMeBtn');
   if(MAP.meW!=null){navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null;MAP.me=null;b.setAttribute('aria-pressed','false');drawMe();return}
