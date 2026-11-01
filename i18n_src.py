@@ -437,4 +437,7 @@ PHRASES = [
 ("Stacja końcowa", "Last station", "Endstation", "Konečná stanice", "Konečná stanica"),
 ("Stacja", "Station", "Station", "Stanice", "Stanica"),
 ("Następna stacja", "Next station", "Nächster Halt", "Příští stanice", "Nasledujúca stanica"),
+("Głos zapowiedzi", "Announcement voice", "Stimme der Ansagen", "Hlas hlásení", "Hlas hlášení"),
+("Żeński", "Female", "Weiblich", "Ženský", "Ženský"),
+("Męski", "Male", "Männlich", "Mužský", "Mužský"),
 ]
