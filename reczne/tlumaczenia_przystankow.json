@@ -500,31 +500,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Czerwonak",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Czerwonak",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Czerwonak",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Czerwonak",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Czerwonak",
+"PKM",
 "pl"
 ]
 ]
@@ -2386,31 +2394,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Luboń",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Luboń",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Luboń",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Luboń",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Luboń",
+"PKM",
 "pl"
 ]
 ]
@@ -2596,32 +2612,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Muszyna",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Muszyna",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Muszyna",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3406,32 +3422,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Halinów",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Halinów",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Halinów",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3490,32 +3506,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Józefów",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Józefów",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Józefów",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3532,32 +3548,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Kobyłka",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Kobyłka",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Kobyłka",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3658,32 +3674,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Legionowo",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Legionowo",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Legionowo",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -4078,32 +4094,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Nowy Dwór Mazowiecki",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Nowy Dwór Mazowiecki",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Nowy Dwór Mazowiecki",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -4204,32 +4220,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Piaseczno",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Piaseczno",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Piaseczno",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -5002,32 +5018,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Wołomin",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Wołomin",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Wołomin",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -5296,32 +5312,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Zielonka",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Zielonka",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Zielonka",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -5810,31 +5826,39 @@
 ],
 "de": [
 [
-"WKD-Bahnhof",
-"de"
-],
-[
 "Pruszków",
 "pl"
+],
+[
+"WKD-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Pruszków",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"WKD Pruszków",
+"WKD",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Pruszków",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"WKD Pruszków",
+"WKD",
 "pl"
 ]
 ]
@@ -5950,31 +5974,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Puszczykowo",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Puszczykowo",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Puszczykowo",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Puszczykowo",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Puszczykowo",
+"PKM",
 "pl"
 ]
 ]
@@ -6374,32 +6406,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Sopot",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Sopot",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Sopot",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -6420,31 +6452,43 @@
 ],
 "de": [
 [
-"Bahnhof",
+"Sopot",
+"pl"
+],
+[
+"Bahnhof –",
 "de"
 ],
 [
-"Sopot – Marynarzy",
+"Marynarzy",
 "pl"
 ]
 ],
 "cs": [
 [
-"Nádraží",
+"Sopot",
+"pl"
+],
+[
+"nádraží –",
 "cs"
 ],
 [
-"Sopot – Marynarzy",
+"Marynarzy",
 "pl"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
+"Sopot",
+"pl"
+],
+[
+"železničná stanica –",
 "sk"
 ],
 [
-"Sopot – Marynarzy",
+"Marynarzy",
 "pl"
 ]
 ]
@@ -6466,31 +6510,43 @@
 ],
 "de": [
 [
-"Bahnhof",
+"Sopot",
+"pl"
+],
+[
+"Bahnhof –",
 "de"
 ],
 [
-"Sopot – Niepodległości",
+"Niepodległości",
 "pl"
 ]
 ],
 "cs": [
 [
-"Nádraží",
+"Sopot",
+"pl"
+],
+[
+"nádraží –",
 "cs"
 ],
 [
-"Sopot – Niepodległości",
+"Niepodległości",
 "pl"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
+"Sopot",
+"pl"
+],
+[
+"železničná stanica –",
 "sk"
 ],
 [
-"Sopot – Niepodległości",
+"Niepodległości",
 "pl"
 ]
 ]
