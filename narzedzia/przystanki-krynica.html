@@ -87,9 +87,9 @@ function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);c
   document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>1;
   document.getElementById('eDone').checked=!!x.done;document.getElementById('eNote').value=x.note||'';
   // where the buses go from here: an arrow to the next stop for each direction, listed with its lines and terminus
-  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=Object.values(DIRS[id]||{});const P0=poles(s)[0];
+  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=Object.values(DIRS['@'+id]||{}).filter((d,i,a)=>a.findIndex(x=>x.next===d.next)===i);const P0=poles(s)[0];
   document.getElementById('eDirs').innerHTML=D.length?'<b>Odjazdy w kierunku:</b>'+D.map((d,i)=>`<div><i style="background:${DCOL[i%DCOL.length]}"></i><span>→ <b>${d.next}</b> (linie ${[...d.lines].join(', ')}; do: ${[...d.heads].join(', ')})</span></div>`).join(''):'<span>Przystanek końcowy (brak odjazdów dalej).</span>';
-  D.forEach((d,i)=>{const n=STOPS.find(x=>x.id===d.nid);const to=n?poles(n)[0]:{lat:d.lat,lon:d.lon};const col=DCOL[i%DCOL.length];
+  D.forEach((d,i)=>{const n=STOPS.find(x=>x.all.includes(d.nid));const to=n?poles(n)[0]:{lat:d.lat,lon:d.lon};const col=DCOL[i%DCOL.length];
     const f=Math.min(1,0.0012/Math.max(1e-6,Math.hypot(to.lat-P0.lat,(to.lon-P0.lon)*.65)));const end=[P0.lat+(to.lat-P0.lat)*f,P0.lon+(to.lon-P0.lon)*f];
     ARROWS.push(L.polyline([[P0.lat,P0.lon],end],{color:col,weight:5,opacity:.9,interactive:false}).addTo(map));
     ARROWS.push(L.polyline([[P0.lat,P0.lon],[to.lat,to.lon]],{color:col,weight:2,opacity:.7,dashArray:'4 6',interactive:false}).addTo(map));
@@ -102,14 +102,22 @@ document.getElementById('eDone').onchange=e=>{if(!SEL)return;st(SEL).done=e.targ
 document.getElementById('eNote').oninput=e=>{if(!SEL)return;st(SEL).note=e.target.value;save()};
 document.getElementById('q').oninput=list;document.getElementById('flt').onchange=list;
 function exportData(){const out={made:new Date().toISOString(),stops:{}};STOPS.forEach(s=>{const x=S[s.id];if(!x)return;const moved=x.poles.some(p=>p.lat!=null);if(!moved&&!x.note&&!x.done&&x.poles.length<2)return;
-  out.stops[s.id]={name:s.name,poles:poles(s).map(P=>({p:P.p,lat:+P.lat.toFixed(6),lon:+P.lon.toFixed(6)})),note:x.note||'',done:!!x.done}});return JSON.stringify(out,null,1)}
+  out.stops[s.id]={name:s.name,ids:s.ids,poles:poles(s).map(P=>({p:P.p,lat:+P.lat.toFixed(6),lon:+P.lon.toFixed(6)})),note:x.note||'',done:!!x.done}});return JSON.stringify(out,null,1)}
 document.getElementById('exp').onclick=()=>{const b=new Blob([exportData()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='przystanki-krynica.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
 document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(exportData());toast('Skopiowano – wklej w rozmowie')}catch(e){toast('Nie udało się skopiować – użyj „Pobierz plik”')}};
 Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null),fetch('../data/rp/km_0.json').then(r=>r.json()).catch(()=>({}))]).then(([I,M,RP])=>{
   Object.values(RP).forEach(R=>(R.dirs||[]).forEach(d=>{const ids=d.stops.map(x=>x[0]);const head=I.stops[ids[ids.length-1]]?I.stops[ids[ids.length-1]][0]:d.head;
     (d.pats||[]).forEach(pt=>{for(let j=0;j<pt.length-1;j++){const a=ids[pt[j]],b=ids[pt[j+1]];if(!a||!b||a===b)continue;const B=I.stops[b];if(!B)continue;
       const o=(DIRS[a]=DIRS[a]||{});const e=o[b]||(o[b]={nid:b,next:B[0],lat:B[2],lon:B[3],lines:new Set(),heads:new Set()});e.lines.add(R.n);e.heads.add(d.head||head)}})}));
-  STOPS=Object.entries(I.stops).filter(([k,v])=>/^km\d/.test(k)).map(([id,v])=>({id,name:v[0],pole:v[1]||'',lat:v[2],lon:v[3]})).sort((a,b)=>a.name.localeCompare(b.name,'pl'));
+  // one entry per stop: the ids of one name close together (data from several sources, and the platforms the timetables
+  // derive per direction, e.g. 9a/9b) are one stop here; its second platform is added by hand where it really is one
+  const base=k=>k.replace(/_[ab]$/,'');const B={};
+  Object.entries(I.stops).forEach(([k,v])=>{if(!/^km/.test(k))return;const b=base(k);if(!B[b])B[b]={id:b,name:v[0],lat:v[2],lon:v[3],all:[]};B[b].all.push(k)});
+  const E=[];Object.values(B).forEach(b=>{let e=E.find(x=>x.name===b.name&&Math.hypot(x.lat-b.lat,(x.lon-b.lon)*.65)<.0015);
+    if(!e){e={id:b.id,name:b.name,pole:'',lat:b.lat,lon:b.lon,ids:[],all:[]};E.push(e)}e.ids.push(b.id);e.all.push(...b.all)});
+  STOPS=E.sort((a,b)=>a.name.localeCompare(b.name,'pl'));
+  // the directions of an entry: those of all its ids
+  STOPS.forEach(e=>{const m={};e.all.forEach(k=>Object.assign(m,DIRS[k]||{}));DIRS['@'+e.id]=m});
   I.routes.filter(r=>(r.c||[]).includes('km')||(r.c||[]).includes('kmx')).forEach(r=>(r.sn||[]).forEach(n=>(LINES[n]=LINES[n]||[]).includes(r.n)||LINES[n].push(r.n)));
   // the lines' courses, thin, as a guide
   if(M)Object.entries(M.routes).forEach(([id,R])=>{if(!/^km/.test(id))return;(R.g||[]).forEach(c=>{const pts=[];let x=0,y=0;for(let i=0;i<c.length;i+=2){x+=c[i];y+=c[i+1];const X=x/100,Y=y/100;pts.push([-Y/1000,X/(Math.cos(54.45*Math.PI/180)*1000)])}L.polyline(pts,{color:'#ffeb3b',weight:2,opacity:.8,interactive:false}).addTo(map)})});

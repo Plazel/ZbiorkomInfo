@@ -821,7 +821,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .jpPick{position:absolute;left:12px;top:12px;display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:.82rem;box-shadow:0 2px 10px rgba(0,0,0,.1)}
 .jpZoom{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
 .jpZoom button{border:0;background:var(--bg);color:var(--fg);width:34px;height:34px;font-size:1.1rem;cursor:pointer}.jpZoom button+button{border-top:1px solid var(--line)}
-.jpAttr{position:absolute;right:8px;bottom:6px;font-size:.7rem;color:var(--muted);margin:0}
+.jpAttr{position:absolute;right:8px;bottom:6px;font-size:.7rem;color:var(--muted);margin:0}.mapAttr.jpAttr2{bottom:8px!important;z-index:2}
 .jpSet{display:flex;flex-direction:column;gap:6px;font-size:.88rem}.jpSet b{font-size:.78rem;color:var(--muted);font-weight:500;margin-top:4px}
 .jpSet label{display:flex;align-items:center;gap:8px;cursor:pointer}
 .jpSet input[type=radio]{appearance:none;-webkit-appearance:none;width:18px;height:18px;margin:0;border:2px solid var(--muted);border-radius:50%;display:grid;place-items:center;cursor:pointer;flex:none;background:var(--bg)}
@@ -1040,7 +1040,7 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
  <div class="jpMap" id="jpMap"><canvas id="jpCv"></canvas>
   <div class="jpPick"><span>Kliknięcie na mapie ustawia:</span><div class="seg" role="group"><button type="button" data-jpick="from" aria-pressed="true">Początek</button><button type="button" data-jpick="to" aria-pressed="false">Cel</button></div></div>
   <div class="jpZoom"><button type="button" id="jpIn" aria-label="Przybliż">+</button><button type="button" id="jpOut" aria-label="Oddal">−</button></div>
-  <p class="jpAttr">Mapa: © OpenStreetMap</p></div>
+  <p class="mapAttr jpAttr2">Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">autorzy OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></p></div>
 </div>
 <div class="wrap" id="app"><p class="loading">Wczytywanie rozkładów ZTM Gdańsk…</p></div>
 
