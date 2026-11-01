@@ -16,6 +16,8 @@ COSTS = dict(drogi.COST, transit=1.0, minor=1.05, service=1.3, track=2.5)   # tr
 CHUNK = 1500.0                           # metres of shape per routed piece
 CORR = 70.0                              # metres: roads farther from the shape are not used
 SOFT = 14.0                              # metres: the cost grows with (distance / SOFT)^2
+CONTRA = 6.0                             # cost factor against a one-way street
+VERSION = 2                              # (a new way of matching: every shape matched again)
 
 
 def to_px(lat, lon):
@@ -36,10 +38,12 @@ class Matcher:
         # trains: a wider corridor (the railway shapes in the data are often coarse; tracks are few, so no other line is near)
         self.corr, self.soft = (450.0, 90.0) if rail else (CORR, SOFT)
         self.r = drogi.TileRouter(bbox, log=log, costs=RAIL if rail else COSTS)
-        adj = self.r.adj   # the shape gives the direction: one-way restrictions are not needed (and bus lanes run against them)
+        # one-way streets: the way along them is cheap, against them dear (not forbidden: bus lanes and tram tracks run
+        # against them here and there); so on a road of two carriageways the course keeps to the right one
+        adj = self.r.adj
         for a in list(adj):
             for b, cm in list(adj[a].items()):
-                if a not in adj[b]: adj[b][a] = cm
+                if a not in adj[b]: adj[b][a] = (cm[0] * CONTRA, cm[1])
         lat = (bbox[0] + bbox[1]) / 2
         self.mpp = 40075016.686 * math.cos(math.radians(lat)) / PX   # metres per grid unit here
 
@@ -148,7 +152,7 @@ class Matcher:
 def match_all(shapes, keys, area_of, cache_path, log=print):
     """shapes: {key: [[lat, lon], …]}; matches those in keys, one road graph per area (area_of(key)); in place"""
     cache = json.load(open(cache_path, encoding='utf-8')) if os.path.exists(cache_path) else {}
-    h = lambda pts: hashlib.md5(json.dumps(pts).encode()).hexdigest()[:16]
+    h = lambda pts: hashlib.md5((json.dumps(pts) + ('|v%d' % VERSION if VERSION > 1 else '')).encode()).hexdigest()[:16]
     todo = collections.defaultdict(list); done = 0
     for k in keys:
         pts = shapes.get(k)

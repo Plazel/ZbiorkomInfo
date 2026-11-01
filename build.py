@@ -1577,7 +1577,7 @@ for f in sorted(os.listdir(OUT + '/r')):
                 if not note and dd.get('tnotes'):
                     tc = collections.Counter(dd['tnotes'][t[3]] for pl in dd.get('plans', []) for t in pl if len(t) > 3 and dd['prof'][t[1]][0] == k)
                     note = tc.most_common(1)[0][0] if tc else ''
-                e = vr[(di, nm)] = {'d': di, 'm': 1 if k == 0 else 0, 's': sids, 'g': rdp(path, 0.15), 'n': 0, 'v': via,
+                e = vr[(di, nm)] = {'d': di, 'm': 1 if k == 0 else 0, 's': sids, 'g': rdp(path, 0.02), 'n': 0, 'v': via,
                                     'l': d.get('lt', []).index(note) if note and note in d.get('lt', []) else -1}
             e['n'] += cnt.get(k, 0)
         main = [dd['stops'][i][0] for i in dd['pats'][0]]
