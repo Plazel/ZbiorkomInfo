@@ -440,4 +440,5 @@ PHRASES = [
 ("Głos zapowiedzi", "Announcement voice", "Stimme der Ansagen", "Hlas hlásení", "Hlas hlášení"),
 ("Żeński", "Female", "Weiblich", "Ženský", "Ženský"),
 ("Męski", "Male", "Männlich", "Mužský", "Mužský"),
+("Głos", "Voice", "Stimme", "Hlas", "Hlas"),
 ]
