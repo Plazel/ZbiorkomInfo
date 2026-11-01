@@ -69,9 +69,21 @@ document.getElementById('layer').onclick=()=>{if(isPhoto){map.removeLayer(photo)
 // the platform of a direction when a stop has two: the one on the right of the way the buses go (traffic keeps right),
 // judged from the stop before (most runs) and the stop after; the same rule as the import (import_krynica.py)
 function posOf(id){const n=STOPS.find(x=>x.all.includes(id));if(n)return poles(n)[0];const S=ISTOPS[id];return S?{lat:S[2],lon:S[3]}:null}
+// the lines' courses, in pieces on a grid, to find the way of the street at a stop
+const SEG={};const gk=(la,lo)=>Math.floor(la/.002)+':'+Math.floor(lo/.003);
+function segAdd(pts){for(let i=0;i<pts.length-1;i++){const [a,b]=[pts[i],pts[i+1]];const k=gk((a[0]+b[0])/2,(a[1]+b[1])/2);(SEG[k]=SEG[k]||[]).push([a,b])}}
+// the street's direction at a place: the nearest piece of a course within ~60 m (as a unit vector in metres, any of its two senses)
+function streetDir(la,lo){const cs=Math.cos(la*Math.PI/180);let best=null,bd=60;
+  for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)(SEG[gk(la+i*.002,lo+j*.003)]||[]).forEach(([a,b])=>{
+    const ax=(a[1]-lo)*cs*111320,ay=(a[0]-la)*110540,bx=(b[1]-lo)*cs*111320,by=(b[0]-la)*110540,dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;if(!l2)return;
+    const u=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/l2)),dd=Math.hypot(ax+u*dx,ay+u*dy);if(dd<bd){bd=dd;const l=Math.sqrt(l2);best=[dx/l,dy/l]}});
+  return best}
 function sideOf(s,PP,d){const xy=P=>[P.lon*Math.cos(P.lat*Math.PI/180),P.lat];const c=[(xy(PP[0])[0]+xy(PP[1])[0])/2,(xy(PP[0])[1]+xy(PP[1])[1])/2];
   const nb=posOf(d.nid);if(!nb)return 0;const b=xy(nb);const votes=[0,0];const pr=Object.entries(d.prev||{});if(!pr.length)pr.push([null,1]);
-  pr.forEach(([k,w])=>{const pa=k&&posOf(k);const a=pa?xy(pa):c;const dx=b[0]-a[0],dy=b[1]-a[1];if(!dx&&!dy)return;
+  // the way of the street between the two platforms; only the platforms' distance across it then counts, not how far apart along it they are
+  const sd0=streetDir((PP[0].lat+PP[1].lat)/2,(PP[0].lon+PP[1].lon)/2);
+  pr.forEach(([k,w])=>{const pa=k&&posOf(k);const a=pa?xy(pa):c;let dx=b[0]-a[0],dy=b[1]-a[1];if(!dx&&!dy)return;
+    if(sd0){const g=sd0[0]*dx+sd0[1]*dy>=0?1:-1;dx=sd0[0]*g;dy=sd0[1]*g}
     const sd=P=>{const q=xy(P);return dx*(q[1]-c[1])-dy*(q[0]-c[0])};votes[sd(PP[1])<sd(PP[0])?1:0]+=w});
   return votes[1]>votes[0]?1:0}
 // at most two termini named for a direction, those most runs go to; the other lines only by number
@@ -140,7 +152,7 @@ Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.js
   STOPS.forEach(e=>{const m={};e.all.forEach(k=>Object.assign(m,DIRS[k]||{}));DIRS['@'+e.id]=m});
   I.routes.filter(r=>(r.c||[]).includes('km')||(r.c||[]).includes('kmx')).forEach(r=>(r.sn||[]).forEach(n=>(LINES[n]=LINES[n]||[]).includes(r.n)||LINES[n].push(r.n)));
   // the lines' courses, thin, as a guide
-  if(M)Object.entries(M.routes).forEach(([id,R])=>{if(!/^km/.test(id))return;(R.g||[]).forEach(c=>{const pts=[];let x=0,y=0;for(let i=0;i<c.length;i+=2){x+=c[i];y+=c[i+1];const X=x/100,Y=y/100;pts.push([-Y/1000,X/(Math.cos(54.45*Math.PI/180)*1000)])}L.polyline(pts,{color:'#ffeb3b',weight:2,opacity:.8,interactive:false}).addTo(map)})});
+  if(M)Object.entries(M.routes).forEach(([id,R])=>{if(!/^km/.test(id))return;(R.g||[]).forEach(c=>{const pts=[];let x=0,y=0;for(let i=0;i<c.length;i+=2){x+=c[i];y+=c[i+1];const X=x/100,Y=y/100;pts.push([-Y/1000,X/(Math.cos(54.45*Math.PI/180)*1000)])}segAdd(pts);L.polyline(pts,{color:'#ffeb3b',weight:2,opacity:.8,interactive:false}).addTo(map)})});
   const b=L.latLngBounds(STOPS.map(s=>[s.lat,s.lon]));map.fitBounds(b,{padding:[20,20]});drawMarkers();list()});
 </script>
 </body>

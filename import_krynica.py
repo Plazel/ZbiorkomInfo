@@ -13,6 +13,21 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 PATH = os.path.join(HERE, 'reczne', 'krynica_muszyna.json')
 
 
+def street_dir(legs, a, sid, b, cx, cy):
+    """direction of travel at a place (x = lon*cos(lat), y = lat): the nearest piece (within ~60 m) of the trip's course
+    from the stop before through this one to the stop after"""
+    pts = (legs.get('%s %s' % (a, sid)) or []) + (legs.get('%s %s' % (sid, b)) or [])
+    best, bd = None, 60 / 110540
+    for (la1, lo1), (la2, lo2) in zip(pts, pts[1:]):
+        ax, ay = lo1 * math.cos(math.radians(la1)) - cx, la1 - cy
+        bx, by = lo2 * math.cos(math.radians(la2)) - cx, la2 - cy
+        dx, dy = bx - ax, by - ay; l2 = dx * dx + dy * dy
+        if not l2: continue
+        u = max(0, min(1, -(ax * dx + ay * dy) / l2)); d = math.hypot(ax + u * dx, ay + u * dy)
+        if d < bd: bd, best = d, (dx, dy)
+    return best
+
+
 def main(src):
     D = json.load(open(PATH, encoding='utf-8'))
     U = json.load(open(src, encoding='utf-8'))['stops']
@@ -44,6 +59,10 @@ def main(src):
             dx, dy = pb[0] - pa[0], pb[1] - pa[1]
             if dx == 0 and dy == 0: continue
             cx = (pos(sid)[0] + pos(two[sid])[0]) / 2; cy = (pos(sid)[1] + pos(two[sid])[1]) / 2
+            # the way the street goes there (the trip's course in and out of the stop), so that only the platforms'
+            # distance across the street counts, not how far apart along it they are (as in the tool)
+            sd = street_dir(D.get('legs') or {}, a, sid, b, cx, cy)
+            if sd: dx, dy = sd
             side = lambda i: dx * (pos(i)[1] - cy) - dy * (pos(i)[0] - cx)   # < 0: right of the direction
             if side(two[sid]) < side(sid): x[0] = two[sid]; moved += 1
     # shapes between stops: the same course for the new platform ids
