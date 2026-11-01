@@ -3245,6 +3245,22 @@ async function openStopPop(name,pole,e,gi,merged){closeStopPop(true);MAP.popAt={
 function runEdge(id,dep){const M=MAP.data&&MAP.data.routes[id];if(!M||!M.vr||!dep||!dep.ps)return null;const W=new Set(dep.ps);let e=null,bs=-1e9;
   M.vr.forEach(x=>{if(!x.g||x.g.length<2)return;const sc=x.s.filter(s=>W.has(s)).length*2-x.s.length-W.size+(x.d===dep.di?.5:0);if(sc>bs){bs=sc;e=x}});
   return e&&bs>-W.size?e:null}
+// the run's course in full detail: its variant's course is simplified (straight between a few points), the line's drawn course
+// follows the streets and tracks closely; where both go the same way, the drawn course's points are put in between
+function runDetail(id,e){const M=MAP.data&&MAP.data.routes[id];if(!M||!e||!e.g||e.g.length<2)return e;const C=[...(M.g||[]),...(M.v||[])].filter(c=>c.length>1);if(!C.length)return e;
+  const TOL=.15;   // (about 15 m)
+  const near=q=>{let best=null;C.forEach((c,ci)=>{for(let i=1;i<c.length;i++){const A=c[i-1],B=c[i],dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,((q[0]-A[0])*dx+(q[1]-A[1])*dy)/l2)):0;
+    const d=Math.hypot(A[0]+u*dx-q[0],A[1]+u*dy-q[1]);if(!best||d<best.d)best={d,ci,a:i-1+u}}});return best};
+  const len=(c,a,b)=>{let L=0;const pt=x=>{const i=Math.min(c.length-2,Math.floor(x)),f=x-i;return [c[i][0]+(c[i+1][0]-c[i][0])*f,c[i][1]+(c[i+1][1]-c[i][1])*f]};
+    const xs=[a,...Array.from({length:Math.max(0,Math.ceil(b)-Math.floor(a)-1)},(_,k)=>Math.floor(a)+1+k).filter(x=>x>a&&x<b),b].map(pt);for(let i=1;i<xs.length;i++)L+=Math.hypot(xs[i][0]-xs[i-1][0],xs[i][1]-xs[i-1][1]);return L};
+  // matched points moved onto the drawn course (so that the line does not zigzag between the two), the course's own points between them
+  const N=e.g.map(near);const on=N.map(x=>x&&x.d<TOL);const at=(c,x)=>{const i=Math.min(c.length-2,Math.floor(x)),f=x-i;return [c[i][0]+(c[i+1][0]-c[i][0])*f,c[i][1]+(c[i+1][1]-c[i][1])*f]};
+  const out=[on[0]?at(C[N[0].ci],N[0].a):e.g[0]];
+  for(let i=1;i<e.g.length;i++){const P=e.g[i-1],Q=e.g[i],a=N[i-1],b=N[i];
+    if(on[i-1]&&on[i]&&a.ci===b.ci){const c=C[a.ci],lo=Math.min(a.a,b.a),hi=Math.max(a.a,b.a),L=len(c,lo,hi),D=Math.hypot(Q[0]-P[0],Q[1]-P[1]);
+      if(L<=D*1.6+.1){const mid=[];for(let k=Math.floor(lo)+1;k<=Math.ceil(hi)-1;k++)if(k>lo&&k<hi)mid.push(c[k]);if(a.a>b.a)mid.reverse();out.push(...mid);out.push(at(c,b.a));continue}}
+    out.push(on[i]&&!(on[i-1]&&a.ci===b.ci)?Q:on[i]?at(C[b.ci],b.a):Q)}
+  return Object.assign({},e,{g:out})}
 function runVariant(id,dep){const M=MAP.data.routes[id];if(!M||!M.vr||!dep||!dep.ps)return null;
   const nm=x=>(IDX.stops[x]||[''])[0];const want=dep.ps.map(nm).join('|');
   const es=M.vr.filter(e=>e.d===dep.di&&!(hideDepot&&e.dp));
@@ -3626,7 +3642,7 @@ async function openRunOnMap(d,list){
     const s0=depStyle(d.r);pn.innerHTML=`<div class="rpH">${runVehHtml(d)}</div>`}
   if(typeof DEP!=='undefined'&&DEP.open)closeDep();await openMap();runTitle(d,'');await new Promise(r=>setTimeout(r,120));if(MAP.view!=='osm')await setMapView('osm');
   RUN.d=d;RUN.first=true;RUN.scrolled=false;closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([d.r.id]);applyHL();
-  RUN.e=runEdge(d.r.id,d);const v=RUN.e?{run:RUN.e}:runVariant(d.r.id,d);if(v!=null){MAP.varOf[d.r.id]=v;updateVarPanel();renderLabels()}
+  RUN.e=runEdge(d.r.id,d);if(RUN.e)RUN.e=runDetail(d.r.id,RUN.e);const v=RUN.e?{run:RUN.e}:runVariant(d.r.id,d);if(v!=null){MAP.varOf[d.r.id]=v;updateVarPanel();renderLabels()}
   clearInterval(RUN.tm);try{await runTick()}finally{document.getElementById('mapModal').classList.remove('runInit')}RUN.tm=setInterval(runTick,5000);clearInterval(RUN.ageTm);RUN.ageTm=setInterval(runAge,1000);
   // the run kept in the history step of the map, so that going back and forward again opens this view again
   setTimeout(()=>{try{const st=history.state||{};if(st.ov==='map'&&RUN.d===d)history.replaceState(Object.assign({},st,{run:{id:d.r.id,ps:d.ps,off:d.off,t0:d.t0,head:d.head,trip:d.trip||null}}),'',location.href)}catch(e){}},80)}
