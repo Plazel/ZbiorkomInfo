@@ -3279,13 +3279,14 @@ function gdSegs(kind,name,isLast){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],s
   const out=[];if(kind==='next')out.push([T[st]+':',l]);out.push([name,nl]);
   if(isLast&&store.get('ztm.gdExtra',true))out.push([T[st+1]+'.',l]);return out}
 const gdPiperOk=l=>!!GDV.ready[GD_PIPER[l]];
-// announcements with the app in the background or the phone locked: a sound playing all the time (a very quiet hum) keeps the
-// page running (browsers suspend silent background pages); the media controls of the system show it, and pausing them mutes
+// announcements with the app in the background or the phone locked: silence played in a loop keeps the page running (a
+// page playing media is not suspended) and its playback events drive the guide where the timers are slowed down; the media controls of the system show it, and pausing them mutes
 // the announcements; on a phone also a notification (where allowed) whose tap opens the app and whose button mutes
 const GD_KEEP=new Audio();GD_KEEP.loop=true;
 (()=>{const sr=8000,n=sr*2,b=new DataView(new ArrayBuffer(44+n*2));const w=(o,t)=>[...t].forEach((c,i)=>b.setUint8(o+i,c.charCodeAt(0)));
   w(0,'RIFF');b.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');b.setUint32(16,16,true);b.setUint16(20,1,true);b.setUint16(22,1,true);b.setUint32(24,sr,true);b.setUint32(28,sr*2,true);b.setUint16(32,2,true);b.setUint16(34,16,true);w(36,'data');b.setUint32(40,n*2,true);
-  for(let i=0;i<n;i++)b.setInt16(44+i*2,Math.round((Math.random()*2-1)*3),true);GD_KEEP.src=URL.createObjectURL(new Blob([b],{type:'audio/wav'}))})();
+  GD_KEEP.src=URL.createObjectURL(new Blob([b],{type:'audio/wav'}))})();   // (all zeros: no sound at all)
+GD_KEEP.addEventListener('timeupdate',()=>{if(GUIDE.open&&GUIDE.voice&&Date.now()-(GUIDE.lastTick||0)>4500)gdTick()});
 const gdPhone=()=>matchMedia('(pointer:coarse)').matches;
 function gdKeepAwake(on){try{if(on){GD_KEEP.volume=1;const p_=GD_KEEP.play();if(p_)p_.catch(()=>{})}else GD_KEEP.pause()}catch(e){}
   const ms=navigator.mediaSession;
@@ -3355,7 +3356,7 @@ async function gdRunOf(v){const r=IDX.routes.find(x=>x.n===v.line&&inCityOf(x,ci
       if(!best||dist<best.dist)best={dist,r,ps:ps.map(i=>d.stops[i][0]),off,t0,head:sName(d.stops[ps[ps.length-1]][0])}}}));
   return best&&best.dist<400?best:null}
 function gdChoose(run){GUIDE.stopSel=null;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdTick()}
-async function gdTick(){if(!GUIDE.open||GUIDE.busy)return;const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
+async function gdTick(){if(!GUIDE.open||GUIDE.busy)return;GUIDE.lastTick=Date.now();const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
   if(GUIDE.run){GUIDE.busy=true;try{const q=await gdRunPos(h);if(q)gdProgress(q.p,q.src);else st.textContent=trS('Ustalanie położenia…')}finally{GUIDE.busy=false}return}
   if(GUIDE.stopSel)return;
   if(!h){st.textContent=trS(navigator.geolocation?'Ustalanie położenia… Możesz też wyszukać przystanek.':'Wyszukaj przystanek, z którego jedziesz.');return}
