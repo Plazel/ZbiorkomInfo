@@ -64,32 +64,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Aleja Batorego - Dw.",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Aleja Batorego - Dw.",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Aleja Batorego - Dw.",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -148,31 +148,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Bolechowo-Os.",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Bolechowo-Os.",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Bolechowo-Os.",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Bolechowo-Os.",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Bolechowo-Os.",
+"PKM",
 "pl"
 ]
 ]
@@ -274,31 +282,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Chludowo",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Chludowo",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Chludowo",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Chludowo",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Chludowo",
+"PKM",
 "pl"
 ]
 ]
@@ -458,31 +474,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Czerwonak/Os. Przylesie",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Czerwonak/Os. Przylesie",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Czerwonak/Os. Przylesie",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Czerwonak/Os. Przylesie",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Czerwonak/Os. Przylesie",
+"PKM",
 "pl"
 ]
 ]
@@ -1410,31 +1434,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Golęczewo",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Golęczewo",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Golęczewo",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Golęczewo",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Golęczewo",
+"PKM",
 "pl"
 ]
 ]
@@ -1452,32 +1484,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Gościcino",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Gościcino",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Gościcino",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -1498,31 +1530,43 @@
 ],
 "de": [
 [
-"Bahnhof",
+"Gościcino",
+"pl"
+],
+[
+"Bahnhof –",
 "de"
 ],
 [
-"Gościcino – Fabryczna",
+"Fabryczna",
 "pl"
 ]
 ],
 "cs": [
 [
-"Nádraží",
+"Gościcino",
+"pl"
+],
+[
+"nádraží –",
 "cs"
 ],
 [
-"Gościcino – Fabryczna",
+"Fabryczna",
 "pl"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
+"Gościcino",
+"pl"
+],
+[
+"železničná stanica –",
 "sk"
 ],
 [
-"Gościcino – Fabryczna",
+"Fabryczna",
 "pl"
 ]
 ]
@@ -1624,31 +1668,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Gądki",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Gądki",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Gądki",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Gądki",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Gądki",
+"PKM",
 "pl"
 ]
 ]
@@ -1754,32 +1806,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Jaśkowice",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Jaśkowice",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Jaśkowice",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -2444,31 +2496,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "M. Goślina",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"M. Goślina",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM M. Goślina",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"M. Goślina",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM M. Goślina",
+"PKM",
 "pl"
 ]
 ]
@@ -2528,32 +2588,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Milik",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Milik",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Milik",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -2742,32 +2802,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Niedźwiedź",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Niedźwiedź",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Niedźwiedź",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3086,31 +3146,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Owińska",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Owińska",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Owińska",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Owińska",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Owińska",
+"PKM",
 "pl"
 ]
 ]
@@ -3170,32 +3238,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Dawidy",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Dawidy",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Dawidy",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3212,32 +3280,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Dąbkowizna",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Dąbkowizna",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Dąbkowizna",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3842,32 +3910,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Michałów-Reginów",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Michałów-Reginów",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Michałów-Reginów",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -3968,32 +4036,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Mokry Ług",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Mokry Ług",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Mokry Ług",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -4010,32 +4078,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Nieporęt",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Nieporęt",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Nieporęt",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -4052,32 +4120,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Nowa Iwiczna",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Nowa Iwiczna",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Nowa Iwiczna",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -5228,32 +5296,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Zagościniec",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Zagościniec",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Zagościniec",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -5270,32 +5338,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Zalesie Górne",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Zalesie Górne",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Zalesie Górne",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -5522,31 +5590,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Paczkowo",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Paczkowo",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Paczkowo",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Paczkowo",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Paczkowo",
+"PKM",
 "pl"
 ]
 ]
@@ -5632,31 +5708,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Politechnika",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Politechnika",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"SKM Politechnika",
+"SKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Politechnika",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"SKM Politechnika",
+"SKM",
 "pl"
 ]
 ]
@@ -5742,32 +5826,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Powroźnik",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Powroźnik",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Powroźnik",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -6024,31 +6108,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Puszczykowo/Puszczykówko",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Puszczykowo/Puszczykówko",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Puszczykowo/Puszczykówko",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Puszczykowo/Puszczykówko",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Puszczykowo/Puszczykówko",
+"PKM",
 "pl"
 ]
 ]
@@ -6066,32 +6158,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Radziszów",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Radziszów",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Radziszów",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -6238,31 +6330,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Rosnówko",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Rosnówko",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Rosnówko",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Rosnówko",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Rosnówko",
+"PKM",
 "pl"
 ]
 ]
@@ -6280,32 +6380,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Rudawa",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Rudawa",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Rudawa",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -6364,32 +6464,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Rębiechowo Rębiechowo",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Rębiechowo Rębiechowo",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Rębiechowo Rębiechowo",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -6944,32 +7044,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Sucharskiego -",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Sucharskiego -",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Sucharskiego -",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -7028,31 +7128,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Szczodrzykowo/Kórnik",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Szczodrzykowo/Kórnik",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Szczodrzykowo/Kórnik",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Szczodrzykowo/Kórnik",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Szczodrzykowo/Kórnik",
+"PKM",
 "pl"
 ]
 ]
@@ -7788,32 +7896,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Wielkie Drogi",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Wielkie Drogi",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Wielkie Drogi",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -7940,32 +8048,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Zabierzów",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Zabierzów",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Zabierzów",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -8024,32 +8132,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Zelczyna",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Zelczyna",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Zelczyna",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 },
@@ -8066,31 +8174,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Złotniki/Os. Grzybowe",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Złotniki/Os. Grzybowe",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Złotniki/Os. Grzybowe",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Złotniki/Os. Grzybowe",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Złotniki/Os. Grzybowe",
+"PKM",
 "pl"
 ]
 ]
@@ -8108,31 +8224,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Złotniki",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Złotniki",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Złotniki",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Złotniki",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Złotniki",
+"PKM",
 "pl"
 ]
 ]
@@ -8150,31 +8274,39 @@
 ],
 "de": [
 [
-"S-Bahnhof",
-"de"
-],
-[
 "Łopuchowo/Osiedle",
 "pl"
+],
+[
+"S-Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Stanice",
+"Łopuchowo/Osiedle",
+"pl"
+],
+[
+"stanice",
 "cs"
 ],
 [
-"PKM Łopuchowo/Osiedle",
+"PKM",
 "pl"
 ]
 ],
 "sk": [
 [
-"Stanica",
+"Łopuchowo/Osiedle",
+"pl"
+],
+[
+"stanica",
 "sk"
 ],
 [
-"PKM Łopuchowo/Osiedle",
+"PKM",
 "pl"
 ]
 ]
@@ -8318,32 +8450,32 @@
 ],
 "de": [
 [
-"Bahnhof",
-"de"
-],
-[
 "Żegiestów",
 "pl"
+],
+[
+"Bahnhof",
+"de"
 ]
 ],
 "cs": [
 [
-"Nádraží",
-"cs"
-],
-[
 "Żegiestów",
 "pl"
+],
+[
+"nádraží",
+"cs"
 ]
 ],
 "sk": [
 [
-"Železničná stanica",
-"sk"
-],
-[
 "Żegiestów",
 "pl"
+],
+[
+"železničná stanica",
+"sk"
 ]
 ]
 }
