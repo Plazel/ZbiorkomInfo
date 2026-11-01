@@ -3311,8 +3311,13 @@ const GD_GONG=new Audio('dzwieki/gong.mp3');GD_GONG.preload='auto';
 const GD_AUD=new Audio();
 function gdPlay(a,src){return new Promise(res=>{let done=false;const end=()=>{if(!done){done=true;res()}};a.onended=end;a.onerror=end;if(src)a.src=src;try{a.currentTime=0}catch(e){}
   const pr=a.play();if(pr)pr.catch(end);setTimeout(end,src?20000:4000)})}
+// the device's voice: in Microsoft Edge the same neural voices as Azure (e.g. "Microsoft Zofia Online (Natural)"), chosen by
+// name and by the male/female setting; elsewhere the best one of the language (natural, Google, then any)
+function gdLocalVoice(l){const V=speechSynthesis.getVoices().filter(x=>x.lang&&x.lang.toLowerCase().replace('_','-').startsWith(l));if(!V.length)return null;
+  const want=(GD_VOICES[l]||[])[gdMale()?1:0]||'',nm=want.replace(/^[a-z]{2}-[A-Z]{2}-|Multilingual|Neural/g,'');
+  return V.find(x=>nm&&x.name.includes(nm))||V.find(x=>/Natural|Online/.test(x.name))||V.find(x=>/Google/.test(x.name))||V[0]}
 function gdSpeakLocal(text,l){return new Promise(res=>{if(!window.speechSynthesis)return res();const u=new SpeechSynthesisUtterance(text);u.lang=GD_LOC[l]||l;
-  const v=speechSynthesis.getVoices().find(x=>x.lang&&x.lang.toLowerCase().startsWith(l));if(v)u.voice=v;u.rate=.95;u.onend=u.onerror=()=>res();setTimeout(res,15000);
+  const v=gdLocalVoice(l);if(v)u.voice=v;u.rate=.95;u.onend=u.onerror=()=>res();setTimeout(res,15000);
   try{speechSynthesis.speak(u)}catch(e){res()}})}
 async function gdSay(kind,name,isLast){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
   try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
