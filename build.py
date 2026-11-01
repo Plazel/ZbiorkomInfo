@@ -14,7 +14,7 @@ Użycie:  python3 build.py              (zapisuje do ./data)
                                         normalnie odświeżany raz w miesiącu)
 Wymaga tylko Pythona 3.9+ (bez dodatkowych pakietów).
 """
-import csv, json, os, re, sys, time, collections, datetime, io, shutil, tempfile, urllib.request, zipfile, concurrent.futures
+import csv, json, os, re, sys, time, collections, datetime, io, shutil, tempfile, urllib.request, zipfile, concurrent.futures, math
 
 SOURCES = {
     'ztm':   'https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/resource/30e783e4-2bec-4a7d-bb22-ee3e3b26ca96/download/gtfsgoogle.zip',
@@ -832,13 +832,14 @@ if os.path.exists(MANUAL):
     }
     MPGK_SRC = {k for k, v in KMD['lines'].items() if 'MPGK' in v.get('op', '')} | {t['line'] for t in KMD['trips'] if re.fullmatch(r'K\d+', t['line'])}
     _KZ = 'Krynica-Zdrój '
-    _sid = {v[0]: k for k, v in KMD['stops'].items()}
+    _sid = {}
+    for k, v in KMD['stops'].items(): _sid.setdefault(v[0], k)   # (the first id of a name: not a second platform <id>b)
     _nm = lambda s: KMD['stops'][s][0].replace(_KZ, '')
     _mi = lambda x: int(x[:2]) * 60 + int(x[3:])
     def _mpgk_norm(st):
         """Akademia Rolnicza and Czarny Potok Pętla are served by every run between Czarny Potok and the Gondola"""
         G, AK, AZ, OS, PE = 'Czarny Potok Gondola', 'Czarny Potok Akademia Rolnicza', 'Czarny Potok Azoty', 'Czarny Potok Osiedle', 'Czarny Potok Pętla'
-        st = [[_nm(s), _mi(t)] for s, t in st]; out = []
+        st = [[_nm(s), _mi(t), s] for s, t in st]; out = []   # (the stop ids kept: a merged stop or a platform keeps its id)
         for x in st:
             if out and {out[-1][0], x[0]} == {G, AZ}: out.append([AK, (out[-1][1] + x[1]) // 2])
             out.append(x)
@@ -851,7 +852,7 @@ if os.path.exists(MANUAL):
                 tt = st[i + 1][1]; st[i + 2:i + 2] = [[PE, tt + 1], [OS, tt + 2]]; n = [x[0] for x in st]
         for i in range(1, len(st)):
             if st[i][1] < st[i - 1][1]: st[i][1] = st[i - 1][1]
-        return [[_sid[_KZ + a] if _KZ + a in _sid else _sid[a], '%02d:%02d' % divmod(b, 60)] for a, b in st]
+        return [[x[2] if len(x) > 2 else _sid[_KZ + x[0]] if _KZ + x[0] in _sid else _sid[x[0]], '%02d:%02d' % divmod(x[1], 60)] for x in st]
     def mpgk_line(n):
         j = ' | '.join(n); h = lambda w: w in j
         bank = h('Zdrojowa Bank'); zr = h('Źródlana'); zi = h('Zieleniewskiego'); pu = h('Pułaskiego')
@@ -884,6 +885,48 @@ if os.path.exists(MANUAL):
         if n[-1].endswith('Zawodzie Pętla') and 'Krynica-Zdrój Stara Droga Kościół' in n:
             i = n.index('Krynica-Zdrój Stara Droga Kościół') + 1
             if i < len(n) and n[i] != 'Krynica-Zdrój Piłsudskiego Szkoła': t['st'] = _ins(t['st'], i, 'Krynica-Zdrój Piłsudskiego Szkoła')
+    # stops with two platforms placed by hand (import_krynica.py): a run calls at the one on the right of the street in its
+    # direction of travel (traffic keeps right; the street's direction from the run's course there), or the one whose
+    # destinations (tok) come first among the stops still ahead; the same rule as the tool narzedzia/przystanki-krynica.html
+    PLAT = KMD.get('platforms', {})
+    _legs0 = KMD.get('legs', {})
+    def _xy(sid): S_ = KMD['stops'][sid]; return (S_[3] * math.cos(math.radians(S_[2])), S_[2])
+    def _street(a, sid, b, cx, cy):
+        pts = []
+        for p_, q_ in ((a, sid), (sid, b)):
+            if p_ and q_: pts += _legs0.get(p_ + ' ' + q_) or (_legs0.get(q_ + ' ' + p_) or [])[::-1]
+        best, bd = None, 60 / 110540
+        for (la1, lo1), (la2, lo2) in zip(pts, pts[1:]):
+            ax, ay = lo1 * math.cos(math.radians(la1)) - cx, la1 - cy; bx, by = lo2 * math.cos(math.radians(la2)) - cx, la2 - cy
+            dx, dy = bx - ax, by - ay; l2 = dx * dx + dy * dy
+            if not l2: continue
+            u = max(0, min(1, -(ax * dx + ay * dy) / l2)); d_ = math.hypot(ax + u * dx, ay + u * dy)
+            if d_ < bd: bd, best = d_, (dx, dy)
+        return best
+    def _platform(st, k):
+        sid = st[k][0]; P_ = PLAT[sid]; nid = P_['b']
+        tok = P_.get('tok')
+        if tok:
+            ahead = [KMD['stops'][x][0] for x, _ in st[k + 1:] if x in KMD['stops']]
+            for nm in ahead:
+                hit = [int(i) for i, ws in tok.items() if any(w in nm for w in ws)]
+                if len(hit) == 1: return nid if hit[0] == 1 else sid
+        a = st[k - 1][0] if k > 0 else None; b = st[k + 1][0] if k + 1 < len(st) else None
+        a = a if a in KMD['stops'] else None; b = b if b in KMD['stops'] else None
+        (x0, y0), (x1, y1) = _xy(sid), _xy(nid); cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        pa = _xy(a) if a else (cx, cy); pb = _xy(b) if b else (cx, cy)
+        dx, dy = pb[0] - pa[0], pb[1] - pa[1]
+        sd = _street(a, sid, b, cx, cy)
+        if sd: g = 1 if sd[0] * dx + sd[1] * dy >= 0 else -1; dx, dy = sd[0] * g, sd[1] * g
+        if not dx and not dy: return sid
+        side = lambda x, y: dx * (y - cy) - dy * (x - cx)   # < 0: right of the direction
+        return nid if side(x1, y1) < side(x0, y0) else sid
+    if PLAT:
+        _np = collections.Counter()
+        for t in KMD['trips']:
+            t['st'] = [[_platform(t['st'], k), tm] if sid in PLAT else [sid, tm] for k, (sid, tm) in enumerate(t['st'])]
+            for sid, _ in t['st']: _np[sid] += 1
+        print('Krynica/Muszyna: perony ustawione ręcznie –', ', '.join('%s %d/%d' % (KMD['stops'][s][0].replace(_KZ, ''), _np[s], _np[P_['b']]) for s, P_ in PLAT.items()))
     for k, (col, desc) in MPGK_LINES.items():
         KMD['lines'][k] = dict(KMD['lines'].get(k, {}), op='MPGK Krynica-Zdrój', name=k, color=col, desc=desc)
     hol = pl_holidays(TODAY.year) | pl_holidays(TODAY.year + 1)
@@ -895,9 +938,11 @@ if os.path.exists(MANUAL):
     _sl_p = os.path.join(HERE, 'reczne', 'mpgk_slupki.json')
     SLUP = json.load(open(_sl_p, encoding='utf-8')) if os.path.exists(_sl_p) else {}
     _fold = lambda x: re.sub(r'[^A-Z0-9]', '', __import__('unicodedata').normalize('NFD', x.upper().replace('Ł', 'L')).encode('ascii', 'ignore').decode())
+    _user = lambda sid: len(KMD['stops'].get(sid, ())) > 4 and KMD['stops'][sid][4] == 'user'   # placed by hand: its own platforms
     for sid, P_ in SLUP.items():
-        if sid in STOPS and '-' in P_: STOPS[sid][1] = P_['-']['code']
+        if sid in STOPS and '-' in P_ and not (_user(sid) and STOPS[sid][1]): STOPS[sid][1] = P_['-']['code']
     def _pole(sid, dest):
+        if _user(sid): return sid
         P_ = SLUP.get(sid)
         if not P_ or '-' in P_ or sid not in STOPS: return sid
         fd = _fold(dest); fd += 'GONDOLA' if 'CZARNYPOTOK' in fd else ''   # Czarny Potok Pętla/Osiedle: the Gondola side
@@ -905,7 +950,7 @@ if os.path.exists(MANUAL):
         v = sid + '_' + side
         if v not in STOPS: STOPS[v] = [STOPS[sid][0], P_[side]['code']] + STOPS[sid][2:]
         return v
-    _base = lambda x: x.split('_')[0]
+    _base = lambda x: re.sub(r'(?<=\d)b$', '', x.split('_')[0])   # km76_a, km76b (a second platform) -> km76
     for t in KMD['trips']:
         _dest = STOPS[t['st'][-1][0]][0] if t['st'][-1][0] in STOPS else ''
         t = dict(t, st=[[_pole(sid, _dest), tm] for sid, tm in t['st']]) if SLUP else t

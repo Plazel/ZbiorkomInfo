@@ -94,8 +94,8 @@ function dirTxt(d){const H=Object.keys(d.heads).sort((a,b)=>(d.runs[b]||0)-(d.ru
 let STOPS=[],LINES={},SEL=null,DIRS={},ISTOPS={};const MK={};let ARROWS=[];
 const DCOL=['#d71920','#1f6fd1','#1f9a3e','#8e24aa','#e8a400','#00838f'];
 const icon=(t,cls)=>L.divIcon({className:'pm '+(cls||''),html:'<span>'+t+'</span>',iconSize:[30,30],iconAnchor:[15,15]});
-const st=id=>S[id]||(S[id]={poles:[{p:'',lat:null,lon:null}],note:'',done:false});
-function poles(s){const x=st(s.id);return x.poles.map((p,i)=>({p:p.p||(x.poles.length>1?['01','02'][i]:s.pole||''),lat:p.lat!=null?p.lat:s.lat+(i?0.00012:0),lon:p.lon!=null?p.lon:s.lon+(i?0.00012:0)}))}
+const st=id=>{if(S[id])return S[id];const e=STOPS.find(x=>x.id===id);const ps=[{p:'',lat:null,lon:null}];if(e&&e.p2)ps.push({p:e.p2.p,lat:e.p2.lat,lon:e.p2.lon});return S[id]={poles:ps,note:'',done:false}};
+function poles(s){const x=st(s.id);return x.poles.map((p,i)=>({p:p.p||(i===0&&s.pole)||(x.poles.length>1?['01','02'][i]:''),lat:p.lat!=null?p.lat:s.lat+(i?0.00012:0),lon:p.lon!=null?p.lon:s.lon+(i?0.00012:0)}))}
 function drawMarkers(){Object.values(MK).flat().forEach(m=>map.removeLayer(m));for(const k in MK)delete MK[k];
   STOPS.forEach(s=>{const x=st(s.id);MK[s.id]=poles(s).map((P,i)=>{const m=L.marker([P.lat,P.lon],{icon:icon(P.p||'•',(SEL===s.id?'sel ':'')+(x.done?'done':'')),draggable:true,title:s.name+(P.p?' '+P.p:'')}).addTo(map);
     m.on('click',()=>select(s.id,false));
@@ -143,10 +143,14 @@ Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.js
       const pv=j>0?ids[pt[j-1]]:null;if(pv&&pv!==a){e.prev=e.prev||{};e.prev[pv]=(e.prev[pv]||0)+1}}})}));
   // one entry per stop: the ids of one name close together (data from several sources, and the platforms the timetables
   // derive per direction, e.g. 9a/9b) are one stop here; its second platform is added by hand where it really is one
-  const base=k=>k.replace(/_[ab]$/,'');const B={};
-  Object.entries(I.stops).forEach(([k,v])=>{if(!/^km/.test(k))return;const b=base(k);if(!B[b])B[b]={id:b,name:v[0],lat:v[2],lon:v[3],all:[]};B[b].all.push(k)});
+  // (a second platform placed before, <id>b, belongs to its stop too)
+  const base=k=>k.replace(/_[ab]$/,'').replace(/(\d)b$/,'$1');const B={};
+  Object.entries(I.stops).forEach(([k,v])=>{if(!/^km/.test(k))return;const b=base(k);if(!B[b])B[b]={id:b,name:v[0],lat:v[2],lon:v[3],pole:'',all:[]};B[b].all.push(k);
+    if(k===b){B[b].lat=v[2];B[b].lon=v[3];B[b].pole=v[1]||''}else if(k===b+'b')B[b].p2={p:v[1]||'02',lat:v[2],lon:v[3]}});
   const E=[];Object.values(B).forEach(b=>{let e=E.find(x=>x.name===b.name&&Math.hypot(x.lat-b.lat,(x.lon-b.lon)*.65)<.0015);
-    if(!e){e={id:b.id,name:b.name,pole:'',lat:b.lat,lon:b.lon,ids:[],all:[]};E.push(e)}e.ids.push(b.id);e.all.push(...b.all)});
+    if(!e){e={id:b.id,name:b.name,pole:b.pole,lat:b.lat,lon:b.lon,p2:b.p2,ids:[],all:[]};E.push(e)}e.ids.push(b.id);e.all.push(...b.all)});
+  // stops merged in the data since: what was noted for them goes with the stop kept
+  const MOVED={kmr1:'km68'};Object.entries(MOVED).forEach(([a,b])=>{if(S[a]&&!S[b]){S[b]=S[a];delete S[a];save()}});
   STOPS=E.sort((a,b)=>a.name.localeCompare(b.name,'pl'));
   // the directions of an entry: those of all its ids
   STOPS.forEach(e=>{const m={};e.all.forEach(k=>Object.assign(m,DIRS[k]||{}));DIRS['@'+e.id]=m});

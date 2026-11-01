@@ -1,79 +1,112 @@
 #!/usr/bin/env python3
 """Positions of the Krynica-Zdrój and Muszyna stops placed by hand (narzedzia/przystanki-krynica.html, "Pobierz plik")
-taken into reczne/krynica_muszyna.json.
+taken into reczne/krynica_muszyna.json (MPGK, Muszyna) and reczne/km_dodatkowe.json (RAFATEX, the Bardejov bus).
 
-A stop with one platform gets the new position (and number). A stop with two platforms (01 and 02, on the two sides of the
-street) gets a second stop id (<id>b); each trip then calls at the platform on the right-hand side of its direction of travel
-(traffic keeps right), judged from the previous and the next stop of the trip. The notes are printed.
+Only the stops in the file change; the others keep their position, number and state.
+- A stop of the tool may stand for several ids (data from several sources, one stop in reality): every id gets the position,
+  and the ids other than the first are merged into it (their runs call at the first id).
+- MERGE below: stops that are the same as another one (from the notes in the file): removed, their runs moved to the other.
+- A stop with two platforms gets a second id (<id>b). Which runs call at which platform is decided by build.py when it builds
+  the runs (the one on the right of the street in the direction of travel, or by the destinations given in PLATFORM_TOK).
+- ONE_WAY: stops served in one direction only.
+The notes of the file are printed; those not handled here need handling by hand.
 Usage: python3 import_krynica.py przystanki-krynica.json
 """
-import json, math, sys, os
+import json, sys, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PATH = os.path.join(HERE, 'reczne', 'krynica_muszyna.json')
+PATHS = [os.path.join(HERE, 'reczne', 'krynica_muszyna.json'), os.path.join(HERE, 'reczne', 'km_dodatkowe.json')]
 
-
-def street_dir(legs, a, sid, b, cx, cy):
-    """direction of travel at a place (x = lon*cos(lat), y = lat): the nearest piece (within ~60 m) of the trip's course
-    from the stop before through this one to the stop after"""
-    pts = (legs.get('%s %s' % (a, sid)) or []) + (legs.get('%s %s' % (sid, b)) or [])
-    best, bd = None, 60 / 110540
-    for (la1, lo1), (la2, lo2) in zip(pts, pts[1:]):
-        ax, ay = lo1 * math.cos(math.radians(la1)) - cx, la1 - cy
-        bx, by = lo2 * math.cos(math.radians(la2)) - cx, la2 - cy
-        dx, dy = bx - ax, by - ay; l2 = dx * dx + dy * dy
-        if not l2: continue
-        u = max(0, min(1, -(ax * dx + ay * dy) / l2)); d = math.hypot(ax + u * dx, ay + u * dy)
-        if d < bd: bd, best = d, (dx, dy)
-    return best
+# the same stop under two names / from two sources: removed id -> the id kept (notes of 2026-11-01)
+MERGE = {
+    'km108': 'km76',   # Krynica-Zdrój CPN (line 6) = Piłsudskiego Szkoła
+    'kmr3': 'km76',    # Słotwiny CPN (RAFATEX) = Piłsudskiego Szkoła
+    'kmr2': 'km74',    # "Krynica-Zdrój" (RAFATEX) = Piłsudskiego Hawana
+    'km93': 'km128',   # Pułaskiego Raj = Pułaskiego Szpital Wojskowy
+    'km107': 'km91',   # Muszyna Folwark Szkoła = Muszyna Kościuszki Szkoła
+    'km32': 'km23',    # Muszyna Rynek Obwodnica = Muszyna Obwodnica
+}
+# platforms given by the destinations: the platform (0 = first, 1 = second) whose word comes first among the stops still ahead
+PLATFORM_TOK = {
+    'km75': {0: ['Piłsudskiego Szkoła', 'Jastrzębia ZAiKS', 'Stara Droga', 'Nowy Sącz', 'Słotwin'],
+             1: ['Piłsudskiego Hawana', 'Zdrojowa Bank', 'Muszyna', 'Szpital']},
+    'km23': {0: ['Powroźnik', 'Wojkowa', 'Krynica', 'Nowy Sącz'],
+             1: ['Dubne', 'Złockie', 'Szczawnik', 'Kościuszki']},
+}
+# served in one direction only: stop -> the stop the runs that call there go on to (later in the run)
+ONE_WAY = {'km126': 'km127'}   # Stara Droga Ziarenko: only towards Stara Droga Gazownia
 
 
 def main(src):
-    D = json.load(open(PATH, encoding='utf-8'))
+    F = [json.load(open(p, encoding='utf-8')) for p in PATHS]
+    K = F[0]
     U = json.load(open(src, encoding='utf-8'))['stops']
-    S = D['stops']
-    two = {}
-    for sid, u in U.items():
-        if sid not in S: print('nieznany przystanek', sid); continue
+    stop_of = lambda sid: next((D['stops'] for D in F if sid in D['stops']), None)
+    merge = dict(MERGE)
+    for e in U.values():   # the ids the tool showed as one stop
+        ids = [i for i in e.get('ids') or [] if i not in merge and stop_of(i) is not None]
+        ids.sort(key=lambda i: i not in K['stops'])   # the id of the main file is kept (MPGK, with its stop numbers)
+        for i in ids[1:]: merge[i] = ids[0]
+        if ids: e['ids'] = ids[:1]
+    for a, b in list(merge.items()):
+        while b in merge: b = merge[b]
+        merge[a] = b
+    # runs: merged stops, one-way stops; the same stop twice in a row once
+    moved = cut = 0
+    for D in F:
+        for t in D['trips']:
+            st = []
+            for x in t['st']:
+                if x[0] in merge: x = [merge[x[0]]] + x[1:]; moved += 1
+                if st and st[-1][0] == x[0]: continue
+                st.append(x)
+            for sid, nxt in ONE_WAY.items():
+                ids = [x[0] for x in st]
+                if sid in ids and nxt not in ids[ids.index(sid) + 1:]:
+                    i = ids.index(sid)
+                    if 0 < i < len(st) - 1:
+                        a, b = st[i - 1][0], st[i + 1][0]; L = D.setdefault('legs', {})
+                        if '%s %s' % (a, b) not in L and '%s %s' % (a, sid) in L and '%s %s' % (sid, b) in L:
+                            L['%s %s' % (a, b)] = L['%s %s' % (a, sid)] + L['%s %s' % (sid, b)][1:]
+                        del st[i]; cut += 1
+            t['st'] = st
+        L = D.get('legs') or {}
+        for key in list(L):
+            a, b = key.split(' '); na, nb = merge.get(a, a), merge.get(b, b)
+            if (na, nb) != (a, b):
+                if na != nb: L.setdefault(na + ' ' + nb, L[key])
+                del L[key]
+    gone = [s for s in merge if any(s in D['stops'] for D in F)]
+    for D in F:
+        for s in merge: D['stops'].pop(s, None)
+    # positions, numbers, second platforms
+    plat = K.setdefault('platforms', {})
+    n1 = n2 = 0
+    for key, u in U.items():
+        if u.get('note'): print('UWAGA %s (%s): %s' % (key, u.get('name', ''), u['note']))
         ps = u.get('poles') or []
-        if u.get('note'): print('UWAGA %s (%s): %s' % (sid, S[sid][0], u['note']))
-        if not ps: continue
-        p0 = ps[0]
-        S[sid][1] = p0.get('p') or (S[sid][1] if len(ps) == 1 else '01')
-        S[sid][2], S[sid][3], S[sid][4] = round(p0['lat'], 5), round(p0['lon'], 5), 'user'
-        if len(ps) > 1:
-            nid = sid + 'b'; p1 = ps[1]
-            S[nid] = [S[sid][0], p1.get('p') or '02', round(p1['lat'], 5), round(p1['lon'], 5), 'user']
-            two[sid] = nid
-    # trips: the platform on the right of the direction of travel
-    pos = lambda i: (S[i][3] * math.cos(math.radians(S[i][2])), S[i][2])
-    moved = 0
-    for t in D['trips']:
-        st = t['st']
-        for k, x in enumerate(st):
-            sid = x[0]
-            if sid not in two: continue
-            a = st[k - 1][0] if k > 0 else None
-            b = st[k + 1][0] if k + 1 < len(st) else None
-            pa = pos(a) if a in S else pos(sid); pb = pos(b) if b in S else pos(sid)
-            dx, dy = pb[0] - pa[0], pb[1] - pa[1]
-            if dx == 0 and dy == 0: continue
-            cx = (pos(sid)[0] + pos(two[sid])[0]) / 2; cy = (pos(sid)[1] + pos(two[sid])[1]) / 2
-            # the way the street goes there (the trip's course in and out of the stop), so that only the platforms'
-            # distance across the street counts, not how far apart along it they are (as in the tool)
-            sd = street_dir(D.get('legs') or {}, a, sid, b, cx, cy)
-            if sd: dx, dy = sd
-            side = lambda i: dx * (pos(i)[1] - cy) - dy * (pos(i)[0] - cx)   # < 0: right of the direction
-            if side(two[sid]) < side(sid): x[0] = two[sid]; moved += 1
-    # shapes between stops: the same course for the new platform ids
-    legs = D.get('legs') or {}
-    for key in list(legs):
-        a, b = key.split(' ')
-        for na in [a, two.get(a)]:
-            for nb in [b, two.get(b)]:
-                if na and nb and (na, nb) != (a, b): legs.setdefault(na + ' ' + nb, legs[key])
-    json.dump(D, open(PATH, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print('przystanki: %d, z dwoma peronami: %d, przypisań do drugiego peronu: %d' % (len(U), len(two), moved))
+        ids = [i for i in (u.get('ids') or [key]) if i not in merge]
+        if not ps or not ids: continue
+        for sid in ids:
+            S = stop_of(sid)
+            if S is None: print('nieznany przystanek', sid); continue
+            p0 = ps[0]
+            S[sid][1] = p0.get('p') or S[sid][1]
+            S[sid][2], S[sid][3] = round(p0['lat'], 6), round(p0['lon'], 6)
+            S[sid][4:5] = ['user']; n1 += 1
+            nid = sid + 'b'
+            for D in F: D['stops'].pop(nid, None)
+            plat.pop(sid, None)
+            if len(ps) > 1:
+                p1 = ps[1]
+                K['stops'][nid] = [S[sid][0], p1.get('p') or '02', round(p1['lat'], 6), round(p1['lon'], 6), 'user']
+                plat[sid] = {'b': nid}
+                if sid in PLATFORM_TOK: plat[sid]['tok'] = PLATFORM_TOK[sid]
+                n2 += 1
+    for i, p in enumerate(PATHS):
+        json.dump(F[i], open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('przystanki z pliku: %d; ustawione id: %d, z dwoma peronami: %d; usunięte (połączone z innymi): %s; przeniesione postoje: %d, usunięte postoje (jeden kierunek): %d'
+          % (len(U), n1, n2, ', '.join('%s→%s' % (s, merge[s]) for s in gone) or '–', moved, cut))
 
 
 if __name__ == '__main__':
