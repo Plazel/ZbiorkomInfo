@@ -788,18 +788,16 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gsRow .rl i{position:absolute;left:50%;top:50%;width:calc(var(--gs)*1.05);height:calc(var(--gs)*1.05);transform:translate(-50%,-50%);border-radius:50%;background:var(--sB);border:calc(var(--gs)*.16) solid var(--sR);box-sizing:border-box}
 .gsRow.term .rl i{box-shadow:inset 0 0 0 calc(var(--gs)*.14) var(--sB),inset 0 0 0 calc(var(--gs)*.5) var(--sR)}.gsRow.now .rl i{width:calc(var(--gs)*1.4);height:calc(var(--gs)*1.4);background:var(--sR);box-shadow:inset 0 0 0 calc(var(--gs)*.18) var(--sH)}
 .gsRow .nm{padding:calc(var(--gs)*.32) 14px calc(var(--gs)*.32) 4px;min-width:0}.gsRow .nm>span{display:block;font-size:var(--gs);line-height:1.15}
-.gsRow.now{background:var(--sH);position:relative}.gsRow .rl{z-index:1}.gsRow.now .nm{padding-block:calc(var(--gs)*.45)}.gsRow.now .nm small{display:block;color:var(--sM);font-size:calc(var(--gs)*.6)}.gsRow.now .nm>span{font-weight:800;font-size:calc(var(--gs)*1.45);line-height:1.1}.gsRow.now .tl{font-weight:700}
+.gsRow.now{background:var(--sH);position:relative}.gsRow .rl{z-index:1}.gsRow.now .nm{padding-block:calc(var(--gs)*.45)}.gsRow.now .nm>small{display:block;color:var(--sM);font-size:calc(var(--gs)*.6)}.gsRow.now .nm>span{font-weight:800;font-size:calc(var(--gs)*1.45);line-height:1.1}.gsRow.now .tl{font-weight:700}
 .gsBody{justify-content:flex-start}.gsBody .gsGap{flex:none;min-height:calc(var(--gs)*1.5)}.gsBody .gsGap .rl::before{top:calc(var(--gs)*.15);bottom:calc(var(--gs)*.35)}
 .gsSip{}.gdSip{--bH:#232527;--bR:#17191a;--bR2:#1c1e20;--bS:#2c2f31}:root:not([data-theme=dark]) .gdSip{--bH:#d5dade;--bR:#fff;--bR2:#f4f6f7;--bS:#d0d5d9}
 .gsDeps{flex:1;min-height:calc(var(--gs)*5.2);overflow:hidden;background:var(--sB);border-top:2px solid var(--sL);display:flex;flex-direction:column}
 .gbT{font-size:calc(var(--gs)*.55);color:var(--sM);padding:5px 14px;background:var(--sH)}
-.gbH,.gbR{display:grid;grid-template-columns:calc(var(--gs)*1.7) minmax(0,1fr) calc(var(--gs)*3.6) calc(var(--gs)*6);align-items:center;column-gap:calc(var(--gs)*.5);padding:0 14px}
-.gbH{background:var(--bH);font-weight:700;font-size:calc(var(--gs)*.55);min-height:calc(var(--gs)*1.3)}.gbH .r{text-align:right}.gbH .c{text-align:center}
-.gbR{background:var(--bR);border-bottom:2px solid var(--bS);min-height:calc(var(--gs)*1.75)}.gbR:nth-of-type(even){background:var(--bR2)}
-.gbB{justify-self:center;display:grid;place-items:center;height:calc(var(--gs)*1.3);min-width:calc(var(--gs)*1.3);font:600 calc(var(--gs)*.62) "Roboto Condensed",sans-serif;padding:0 .15em;box-sizing:border-box}
-.gbB.circle{border-radius:50%;width:calc(var(--gs)*1.3);padding:0}.gbB.rect.sq{width:calc(var(--gs)*1.3);padding:0}
-.gbR .dh{font-size:calc(var(--gs)*.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gbR .dt{font-size:calc(var(--gs)*.8);font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-.gbR .dc{display:flex;flex-direction:column;align-items:center;line-height:1.1;min-width:0}.gbR .dc small{font-size:calc(var(--gs)*.45);color:var(--sM);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gbR .dc b{font-size:calc(var(--gs)*.62);white-space:nowrap}.gbR .dc svg{height:.95em;width:auto;vertical-align:-.12em;margin-right:.15em}
+.gbR{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,calc(var(--gs)*7.5)) calc(var(--gs)*3.2);align-items:center;column-gap:calc(var(--gs)*.5);padding:calc(var(--gs)*.22) 14px;
+  background:var(--bR);border-bottom:2px solid var(--bS);font-size:calc(var(--gs)*.7)}.gbR:nth-of-type(even){background:var(--bR2)}.gbR .chip{transform:none}
+.gbR .dh{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gbR .dt{font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.gbR .dc{display:flex;align-items:center;justify-content:flex-end;gap:.4em;min-width:0;color:var(--sM);white-space:nowrap}.gbR .ds{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.gbR .dpo{display:inline-flex;align-items:center;gap:.15em}.gbR .dpo svg{height:.95em;width:auto}
 .gsTrn{font-size:.55em;font-weight:400;color:var(--sM);margin-left:.4em;white-space:nowrap}
 
 .gsTr{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.gsTr .chip{transform:none;box-shadow:0 0 0 1px var(--sL)}
@@ -3335,7 +3333,11 @@ function gdPlay(a,src){return new Promise(res=>{let done=false;const end=()=>{if
 function gdLocalVoice(l){const V=speechSynthesis.getVoices().filter(x=>x.lang&&x.lang.toLowerCase().replace('_','-').startsWith(l));if(!V.length)return null;
   const want=(GD_VOICES[l]||[])[gdMale()?1:0]||'',nm=want.replace(/^[a-z]{2}-[A-Z]{2}-|Multilingual|Neural/g,'');
   return V.find(x=>nm&&x.name.includes(nm))||V.find(x=>/Natural|Online/.test(x.name))||V.find(x=>/Google/.test(x.name))||V[0]}
-function gdSpeakLocal(text,l){return new Promise(res=>{if(!window.speechSynthesis)return res();const u=new SpeechSynthesisUtterance(text);u.lang=GD_LOC[l]||l;
+// the device's voices come in a moment after the page opens: wait for them (else the first words go to a default voice)
+function gdVoicesReady(){if(!window.speechSynthesis||speechSynthesis.getVoices().length)return Promise.resolve();
+  return new Promise(res=>{const t=setTimeout(res,1500);speechSynthesis.addEventListener('voiceschanged',()=>{clearTimeout(t);res()},{once:true})})}
+if(window.speechSynthesis)try{speechSynthesis.getVoices()}catch(e){}
+async function gdSpeakLocal(text,l){await gdVoicesReady();return new Promise(res=>{if(!window.speechSynthesis)return res();const u=new SpeechSynthesisUtterance(text);u.lang=GD_LOC[l]||l;
   const v=gdLocalVoice(l);if(v)u.voice=v;u.rate=.95;u.onend=u.onerror=()=>res();setTimeout(res,15000);
   try{speechSynthesis.speak(u)}catch(e){res()}})}
 async function gdSay(kind,name,isLast){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
@@ -3480,13 +3482,13 @@ function gdBoard(R,sid,tAt){const E=gdBoardLoad(sid);if(!E.list)return '';const 
   const here=IDX.stops[sid][0];const seen=new Set();
   const L=E.list.filter(d=>d.r.n!==R.r.n&&d.t>=tAt+(d.st===here?0:2)&&d.t<=tAt+45&&!seen.has(d.r.n+'|'+d.head+'|'+d.t)&&seen.add(d.r.n+'|'+d.head+'|'+d.t)).slice(0,8);
   if(!L.length)return '';
-  return `<div class="gsDeps"><div class="gbT">${esc(trS('Przesiadki'))}</div><div class="gbH"><span>${esc(trS('Linia'))}</span><span>${esc(trS('Kierunek'))}</span><span class="r">${esc(trS('Odjazd'))}</span><span class="c">${esc(trS('Peron'))}</span></div>`+L.map(d=>{const m=Math.round(d.t-nowM);const st=depStyle(d.r);
-    return `<div class="gbR"><span class="gbB ${st.shape}${sqCls(d.r)}" style="background:${st.bg};color:${st.fg}">${esc(d.r.n)}</span><span class="dh">${esc(d.head)}${gdTrnText(d.head)?` <small class="gsTrn">${esc(gdTrnText(d.head))}</small>`:''}</span><span class="dt">${m<1?'&lt; 1 min':m+' min'}</span><span class="dc">${d.st!==here?`<small>${esc(d.st)}</small>`:''}${d.pole?`<b>${POLE}${esc(d.pole)}</b>`:''}</span></div>`}).join('')+'</div>'}
+  return `<div class="gsDeps"><div class="gbT">${esc(trS('Przesiadki'))}</div>`+L.map(d=>{const m=Math.round(d.t-nowM);const tn=gdTrnText(d.head);
+    return `<div class="gbR">${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="dc">${d.st!==here?`<span class="ds">${esc(d.st)}</span>`:''}${d.pole?`<span class="dpo">${POLE}${esc(d.pole)}</span>`:''}</span><span class="dt">${m<1?'&lt; <span>1 min</span>':m+' min'}</span></div>`}).join('')+'</div>'}
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
   const lag=Math.max(0,nowM-T[hd]);   // a run behind its timetable: the times ahead later by as much
-  const mins=j=>{const m=T[j]+lag-nowM;return m<1?'&lt; 1 min':Math.round(m)+' min'};
+  const mins=j=>{const m=T[j]+lag-nowM;return m<1?'&lt; <span>1 min</span>':Math.round(m)+' min'};
   const s0=depStyle(R.r);const tr=j=>{if(!store.get('ztm.gdChips',true))return '';const t=gdTransfers(R.ps[j],R.r,T[j]+lag);return t?`<div class="gsTr">${t}</div>`:''};
   const to=Math.min(last,hd+MID);const gap=to<last;const rows=[];
   for(let j=to;j>hd;j--)rows.push(`<div data-j="${j}" class="gsRow${j===to&&!gap?' top':''}${j===last?' term':''}"><span class="tl">${mins(j)}</span><span class="rl"><i></i></span><div class="nm">${gdNameHtml(P[j][0])}${tr(j)}</div></div>`);
