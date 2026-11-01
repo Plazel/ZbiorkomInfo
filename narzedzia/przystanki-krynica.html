@@ -87,8 +87,8 @@ function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);c
   document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>1;
   document.getElementById('eDone').checked=!!x.done;document.getElementById('eNote').value=x.note||'';
   // where the buses go from here: an arrow to the next stop for each direction, listed with its lines and terminus
-  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=Object.values(DIRS['@'+id]||{}).filter((d,i,a)=>a.findIndex(x=>x.next===d.next)===i);const P0=poles(s)[0];
-  document.getElementById('eDirs').innerHTML=D.length?'<b>Odjazdy w kierunku:</b>'+D.map((d,i)=>`<div><i style="background:${DCOL[i%DCOL.length]}"></i><span>→ <b>${d.next}</b> (linie ${[...d.lines].join(', ')}; do: ${[...d.heads].join(', ')})</span></div>`).join(''):'<span>Przystanek końcowy (brak odjazdów dalej).</span>';
+  ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=[];Object.values(DIRS['@'+id]||{}).forEach(d=>{if(d.next===s.name)return;const m=D.find(x=>x.next===d.next);if(!m){D.push({...d,heads:Object.fromEntries(Object.entries(d.heads).map(([h,l])=>[h,new Set(l)]))});return}Object.entries(d.heads).forEach(([h,l])=>l.forEach(n=>(m.heads[h]=m.heads[h]||new Set()).add(n)))});const P0=poles(s)[0];
+  document.getElementById('eDirs').innerHTML=D.length?'<b>Odjazdy w kierunku:</b>'+D.map((d,i)=>`<div><i style="background:${DCOL[i%DCOL.length]}"></i><span>→ ${Object.entries(d.heads).map(([h,l])=>`<b>${h}</b> (${[...l].join(', ')})`).join(', ')}</span></div>`).join(''):'<span>Przystanek końcowy (brak odjazdów dalej).</span>';
   D.forEach((d,i)=>{const n=STOPS.find(x=>x.all.includes(d.nid));const to=n?poles(n)[0]:{lat:d.lat,lon:d.lon};const col=DCOL[i%DCOL.length];
     const f=Math.min(1,0.0012/Math.max(1e-6,Math.hypot(to.lat-P0.lat,(to.lon-P0.lon)*.65)));const end=[P0.lat+(to.lat-P0.lat)*f,P0.lon+(to.lon-P0.lon)*f];
     ARROWS.push(L.polyline([[P0.lat,P0.lon],end],{color:col,weight:5,opacity:.9,interactive:false}).addTo(map));
@@ -106,9 +106,13 @@ function exportData(){const out={made:new Date().toISOString(),stops:{}};STOPS.f
 document.getElementById('exp').onclick=()=>{const b=new Blob([exportData()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='przystanki-krynica.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
 document.getElementById('copy').onclick=async()=>{try{await navigator.clipboard.writeText(exportData());toast('Skopiowano – wklej w rozmowie')}catch(e){toast('Nie udało się skopiować – użyj „Pobierz plik”')}};
 Promise.all([fetch('../data/index.json').then(r=>r.json()),fetch('../data/map.json').then(r=>r.json()).catch(()=>null),fetch('../data/rp/km_0.json').then(r=>r.json()).catch(()=>({}))]).then(([I,M,RP])=>{
-  Object.values(RP).forEach(R=>(R.dirs||[]).forEach(d=>{const ids=d.stops.map(x=>x[0]);const head=I.stops[ids[ids.length-1]]?I.stops[ids[ids.length-1]][0]:d.head;
+  // the direction of a line is the terminus of its basic variant: the course most runs take (the longest when equal)
+  Object.values(RP).forEach(R=>(R.dirs||[]).forEach(d=>{const ids=d.stops.map(x=>x[0]);const cnt={};
+    (d.plans||[]).forEach(pl=>(pl||[]).forEach(x=>{const pr=(d.prof||[])[x[1]];if(pr)cnt[pr[0]]=(cnt[pr[0]]||0)+1}));
+    let bp=0;(d.pats||[]).forEach((pt,i)=>{const c=cnt[i]||0,cb=cnt[bp]||0;if(c>cb||(c===cb&&pt.length>(d.pats[bp]||[]).length))bp=i});
+    const bpt=(d.pats||[])[bp];const tid=bpt?ids[bpt[bpt.length-1]]:ids[ids.length-1];const head=I.stops[tid]?I.stops[tid][0]:d.head;
     (d.pats||[]).forEach(pt=>{for(let j=0;j<pt.length-1;j++){const a=ids[pt[j]],b=ids[pt[j+1]];if(!a||!b||a===b)continue;const B=I.stops[b];if(!B)continue;
-      const o=(DIRS[a]=DIRS[a]||{});const e=o[b]||(o[b]={nid:b,next:B[0],lat:B[2],lon:B[3],lines:new Set(),heads:new Set()});e.lines.add(R.n);e.heads.add(d.head||head)}})}));
+      const o=(DIRS[a]=DIRS[a]||{});const e=o[b]||(o[b]={nid:b,next:B[0],lat:B[2],lon:B[3],lines:new Set(),heads:{}});e.lines.add(R.n);(e.heads[head]=e.heads[head]||new Set()).add(R.n)}})}));
   // one entry per stop: the ids of one name close together (data from several sources, and the platforms the timetables
   // derive per direction, e.g. 9a/9b) are one stop here; its second platform is added by hand where it really is one
   const base=k=>k.replace(/_[ab]$/,'');const B={};
