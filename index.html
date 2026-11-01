@@ -405,7 +405,7 @@ span.chip{cursor:inherit}
 .rpList .rl i{position:absolute;left:50%;top:50%;width:15px;height:15px;transform:translate(-50%,-50%);border-radius:50%;background:var(--bg);border:3px solid var(--fg);box-sizing:border-box}
 .rpList li.past{color:var(--muted)}.rpList li.past .rl::before{background:var(--muted)}.rpList li.past .rl i{border-color:var(--muted)}
 .rpList li.nx .n{font-weight:800}.rpList li.nx .rl i{width:20px;height:20px;background:var(--fg);box-shadow:inset 0 0 0 3px var(--bg)}
-.mapModal.run #mapList,.mapModal.run #mlTog,.mapModal.run #mapVar{display:none!important}
+.mapModal.run #mapList,.mapModal.run #mlTog,.mapModal.run #mapVar{display:none!important}.mapModal.runInit .mapArea{visibility:hidden}
 .rpList li{cursor:pointer}.rpList li:hover .n{text-decoration:underline}
 @media (min-width:761px){.mapModal.run .runPanel{position:relative;left:auto;right:auto;top:auto;bottom:auto;width:auto;max-height:none;min-height:0;border:0;border-right:1px solid var(--line);box-shadow:none;z-index:1}}.rpList .t{font-weight:700;font-variant-numeric:tabular-nums}
 #mapVeh{pointer-events:none}
@@ -3594,13 +3594,17 @@ const RUN={d:null,tm:0};
 async function openRunOnMap(d,list){
   if(!d.ps){const m=(list||[]).find(x=>x.r.n===d.r.n&&x.ps&&Math.abs(x.t-(d.sch!=null?d.sch:d.st!=null?d.st:d.t))<=1.5&&!x.live);if(m)Object.assign(d,{di:m.di,ps:m.ps,t0:m.t0,off:m.off,k:m.k})}
   if(!d.ps||!d.off)return;
+  // the reduced view from the start (the full map is never shown on the way): its panel at once, the map shown once it is on the vehicle
+  {const mm=document.getElementById('mapModal');mm.classList.add('run','runInit');let pn=document.getElementById('runPanel');
+    if(!pn){pn=document.createElement('div');pn.id='runPanel';pn.className='runPanel';const mb=document.querySelector('.mapBody');mb.insertBefore(pn,mb.querySelector('.mapArea'))}
+    const s0=depStyle(d.r);pn.innerHTML=`<div class="rpH"><span class="mb ${s0.shape}${sqCls(d.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(d.r.n)}</span><span class="rpD">→ ${esc(d.head)}</span></div>`}
   if(typeof DEP!=='undefined'&&DEP.open)closeDep();await openMap();await new Promise(r=>setTimeout(r,120));if(MAP.view!=='osm')await setMapView('osm');
   RUN.d=d;RUN.first=true;RUN.scrolled=false;closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([d.r.id]);applyHL();
   const v=runVariant(d.r.id,d);if(v!=null){MAP.varOf[d.r.id]=v;updateVarPanel();renderLabels()}
-  clearInterval(RUN.tm);await runTick();RUN.tm=setInterval(runTick,15000);
+  clearInterval(RUN.tm);try{await runTick()}finally{document.getElementById('mapModal').classList.remove('runInit')}RUN.tm=setInterval(runTick,15000);
   // the run kept in the history step of the map, so that going back and forward again opens this view again
   setTimeout(()=>{try{const st=history.state||{};if(st.ov==='map'&&RUN.d===d)history.replaceState(Object.assign({},st,{run:{id:d.r.id,ps:d.ps,off:d.off,t0:d.t0,head:d.head,trip:d.trip||null}}),'',location.href)}catch(e){}},80)}
-function closeRun(){clearInterval(RUN.tm);try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
+function closeRun(){clearInterval(RUN.tm);document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
 async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);return}
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;let dl=(d.delay||0)/60,gps=null;
   // ZTM Gdańsk: the vehicle's own position (a run from the guide's board: its vehicle found by line, start time and headsign)
