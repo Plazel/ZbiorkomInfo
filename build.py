@@ -813,6 +813,11 @@ for rk in groups:
     meta_of[rk] = {'id': rk, 'n': short, 't': t, 'op': 'ZDMiKP Bydgoszcz', 'dates': dates[rk]}
 street_shapes(groups, 'Bydgoszcz', trams={rk for rk, m in meta_of.items() if m['t'] == 'tram'})   # the feed has no shapes
 n0 = len(ROUTES_OUT); build_routes(groups, meta_of); print('ZDMiKP Bydgoszcz', len(ROUTES_OUT) - n0)
+# the trams in ZDMiKP's own colours (its tram network map), used all over the city
+BYD_TRAM_COLORS = {'2': '#2e3192', '3': '#ed1c24', '4': '#a6d423', '5': '#f6bc13', '6': '#00a650', '7': '#f47216', '8': '#a04636',
+                   '9': '#a52e84', '10': '#918f90', '11': '#e17793', 'ZaT': '#9d65b9', 'ZaT6': '#ec008c'}
+for r in ROUTES_OUT[n0:]:
+    if r['n'] in BYD_TRAM_COLORS: r['f'] = True; r['k'] = BYD_TRAM_COLORS[r['n']]; r['kt'] = '#ffffff'
 
 
 # ---------------- Krynica-Zdrój and Muszyna: no open data, timetables written down from the PDFs (reczne/) ----------------
