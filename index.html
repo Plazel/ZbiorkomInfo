@@ -1155,6 +1155,9 @@ Object.defineProperty(DAYNAMES,'x',{get:()=>XD_CUR?fmtX(XD_CUR):'Rozkład specja
 const xdOf=Ls=>{for(const L of Ls){const d=L&&L.dates&&L.dates['x'+WEEK];if(d)return d}return null};
 // day columns of a line: a line with its own timetable for school-free weekdays (key f, e.g. RAFATEX) gets a fourth column
 let hideX=false;   // read from the browser's storage with the other settings (store is defined further on)
+// a special day whose departures at this stop are those of an ordinary day (the special timetable differs elsewhere on the
+// line, or not at all here): no column of its own
+function dropSameX(days,deps,sig){if(!deps.x)return;const s=sig(deps.x);if(days.some(k=>k!=='x'&&deps[k]&&sig(deps[k])===s)){const i=days.indexOf('x');if(i>=0)days.splice(i,1);delete deps.x}}
 const DK=ds=>{if(hideX){const b0=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return b0}const b=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return ds.some(dd=>dd.tp&&dd.tp['x'+WEEK]!==undefined)?[...b.filter(k=>k==='w'||k==='f'),'x','s','h']:b};   // a special weekday sits between the weekdays and Saturdays
 const HOLIDAYS=['2026-11-01','2026-11-11','2026-12-25','2026-12-26','2027-01-01','2027-01-06'];
 // settings are kept in the browser's storage and, for the small ones (city, the departure board's stops…), also in a cookie,
@@ -1694,7 +1697,7 @@ async function renderStop(id,di,si){
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const L2=noteKey[tx];if(!used.includes(L2))used.push(L2);return L2};
   const now=todayType();let nextMarked=false;
-  const DAYS=DK(L.dirs),DEPS={};DAYS.forEach(day=>DEPS[day]=departures(d,si,day));const HS=hourUnion(Object.values(DEPS));
+  const DAYS=DK(L.dirs),DEPS={};DAYS.forEach(day=>DEPS[day]=departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
     if(!deps.length)return `<div class="col ecol${day==='x'?' xcol':''}"><h3>${DAYNAMES[day]}</h3><div class="empty">${emptyMsg(day,[r.op],L.dirs.some(dd=>tripsOf(dd,day).length))}</div></div>`;
@@ -1905,6 +1908,7 @@ async function renderComboStop(key,ci,i){
     cd.members.forEach(m=>{const r=C.rs[m.li],d=C.Ls[m.li].dirs[m.di];
       d.stops.forEach((s,k)=>{if(sName(s[0])===name&&s[2])anyReq.push(1)});comboDeps(d,m,name,day).forEach(x=>deps.push({...x,r,d}))});
     deps.sort((a,b)=>a.t-b.t);DEPS[day]=deps});
+  dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));
   const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
@@ -1947,7 +1951,7 @@ function lineSheet(r,L,di,si){
   const allD=DK(L.dirs).flatMap(day=>departures(d,si,day));const t0=allD.length?noteOf(d,allD[0]):'';
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const l=noteKey[tx];if(!used.includes(l))used.push(l);return l};
-  const cols={};DK(L.dirs).forEach(day=>cols[day]=departures(d,si,day).map(x=>({t:x.t,lt:letterFor(x)})));
+  const cols={};DK(L.dirs).forEach(day=>cols[day]=departures(d,si,day).map(x=>({t:x.t,lt:letterFor(x)})));dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));
   // the route: the main run, or where the stop is off it, the run most of its departures take; minutes along it
   let pat=0;
   if(!d.pats[0].includes(si)){const c={};DK(L.dirs).forEach(day=>departures(d,si,day).forEach(x=>c[x.pat]=(c[x.pat]||0)+1));
@@ -1976,6 +1980,7 @@ function comboSheet(C,ci,i){
     cd.members.forEach(m=>{const r=C.rs[m.li],d=C.Ls[m.li].dirs[m.di];
       d.stops.forEach((x,k)=>{if(sName(x[0])===name&&x[2])req=true});comboDeps(d,m,name,day).forEach(y=>deps.push({t:y.t,lt:letterFor(r,d,y),ln:r.n,lc:sheetCol(r)}))});
     cols[day]=deps.sort((a,b)=>a.t-b.t)});
+  dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.ln+':'+x.lt).join(','));
   const rs=C.rs.filter((r,k)=>cd.members.some(m=>m.li===k));
   return {rs,head:cd.common[cd.common.length-1],name,num:'',list,cols,notes:used.map(l=>[l,Object.keys(noteKey).find(k=>noteKey[k]===l)]),req,ops:rs.map(r=>r.op),combo:true};
 }
