@@ -1792,6 +1792,14 @@ if EMBED:
     print('Zapisano', dest, f'({os.path.getsize(dest) // 1024} KB)')
 
 # rozkłady brygad (osobny skrypt: pobiera GTFS przewoźników podających numery brygad)
+# Bydgoszcz: the stop numbers of ZDMiKP's live departures service (byd_live.py), once a month or when missing
+try:
+    _bl = os.path.join(OUT, 'byd_live.json')
+    if '--podklad' in sys.argv or not os.path.exists(_bl) or (datetime.datetime.now().timestamp() - os.path.getmtime(_bl)) > 30 * 86400:
+        import byd_live
+        _ls = sorted({int(str(r['n']).rstrip('N')) for r in ROUTES_OUT if r['id'].startswith('b') and str(r['n']).rstrip('N').isdigit()})
+        print('Bydgoszcz, odjazdy na żywo: %d przystanków' % byd_live.build(_ls, _bl))
+except Exception as e: print('Bydgoszcz, odjazdy na żywo: pominięto (%s)' % e)
 if '--bez-brygad' not in sys.argv:
     import subprocess
     subprocess.run([sys.executable, os.path.join(HERE, 'brygady.py'), OUT])

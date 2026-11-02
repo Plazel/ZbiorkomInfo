@@ -10,6 +10,9 @@
 //    - Microsoft Azure neural voices: AZURE_KEY and AZURE_REGION (the free tier F0 is never billed).
 //    Where neither answers (not set up, quota used up), the page uses the device's own voice.
 //
+// 3. Bydgoszcz: /byd?p=<stop number> returns the stop's live departures from ZDMiKP's passenger service (the boards at the
+//    stops; odjazdy.zdmikp.bydgoszcz.pl, plain http and no CORS header), kept 15 seconds.
+//
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
 // For the voices, ElevenLabs: elevenlabs.io → sign up (free) → Developers → API Keys → Create (access to Text to Speech);
@@ -25,6 +28,16 @@ const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs
 const EL_VOICE = { f: 'EXAVITQu4vr4xnSDxMaL', m: 'JBFqnCBsd6RMkjVDRZzb' };   // Sarah, George
 const MALE = /Marek|Antonin|Lukas|Florian|Ollie/;
 const xml = s => s.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
+
+async function byd(req, cors) {
+  const p = new URL(req.url).searchParams.get('p') || '';
+  if (!/^\d{1,6}$/.test(p)) return new Response('bad request', { status: 400, headers: cors });
+  const r = await fetch('http://odjazdy.zdmikp.bydgoszcz.pl/PresenterService.asmx/GetLCDEntries', {
+    method: 'POST', body: JSON.stringify({ iIdParada: +p, iIdLinea: 0 }),
+    headers: { 'Content-Type': 'application/json; charset=utf-8', 'User-Agent': 'ZbiorkomInfo/1.0' }, cf: { cacheTtl: 15 } });
+  const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8'); h.set('Cache-Control', 'max-age=15');
+  return new Response(r.ok ? await r.text() : '{"d":null}', { status: r.ok ? 200 : 502, headers: h });
+}
 
 async function tts(req, env, ctx, cors) {
   const u = new URL(req.url), voice = u.searchParams.get('v') || '', text = (u.searchParams.get('t') || '').trim();
@@ -71,6 +84,7 @@ export default {
     const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (new URL(req.url).pathname === '/tts') return tts(req, env, ctx, cors);
+    if (new URL(req.url).pathname === '/byd') return byd(req, cors);
     const target = new URL(req.url).searchParams.get('url');
     let u; try { u = new URL(target); } catch (e) { return new Response('url?', { status: 400, headers: cors }); }
     if (u.protocol !== 'https:' || !ALLOWED.includes(u.hostname)) return new Response('host not allowed', { status: 403, headers: cors });

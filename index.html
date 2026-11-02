@@ -3963,7 +3963,33 @@ async function depLiveGT(st){const area=RT_GTFS[st.c],feeds=RT_FEEDS[area];if(!f
       const tS=t0+off[k],t=tS+dl/60;if(t<nowM-1||t>nowM+120)continue;
       out.push({t,st:tS,r,head:sName(d.stops[ps[ps.length-1]][0]),pole:(IDX.stops[d.stops[ps[k]][0]]||[])[1]||'',live:true,delay:Math.round(dl),lastT:t,di:L.dirs.indexOf(d),ps:ps.map(i=>d.stops[i][0]),t0,off,k})}}
   if(!ok)return null;return out}
+// Bydgoszcz: ZDMiKP's live departures (the boards at the stops), through the worker (/byd): line, destination and minutes to
+// the departure of each pole; each matched with its run in the timetable (same line and way, the nearest scheduled time),
+// whose time it replaces (with the delay)
+const BYDL={map:null,c:new Map()};
+async function bydMap(){if(!BYDL.map)BYDL.map=fetch('data/byd_live.json').then(r=>r.ok?r.json():{}).catch(()=>({}));return BYDL.map}
+async function bydPole(iid){const c=BYDL.c.get(iid);if(c&&Date.now()-c.t<15000)return c.p;
+  const p=(async()=>{const ac=new AbortController();const to=setTimeout(()=>ac.abort(),6000);try{const r=await fetch(RT_PROXY.replace(/\/?$/,'/')+'byd?p='+iid,{signal:ac.signal,cache:'no-store'});if(!r.ok)return null;const j=await r.json();return Array.isArray(j.d)?j.d:null}finally{clearTimeout(to)}})().catch(()=>null);
+  BYDL.c.set(iid,{t:Date.now(),p});return p}
+async function depLiveBYD(st){if(!RT_PROXY)return null;const M=await bydMap();
+  const poles=Object.entries(IDX.stops).filter(([id,X])=>id[0]==='b'&&X[0]===st.n&&(!st.poles||!st.poles.length||st.poles.includes(X[1]||'')));
+  const ids=poles.map(([id,X])=>[M[String(parseInt(id.slice(1),10))],X[1]||'']).filter(x=>x[0]!=null);if(!ids.length)return null;
+  const got=await Promise.all(ids.map(([iid,pole])=>bydPole(iid).then(l=>l&&l.map(e=>({...e,pole})))));if(!got.some(Boolean))return null;
+  const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;
+  let sch=[];for(const [k,sh] of depDayKeys())sch.push(...await depFor({n:st.n,c:'byd',poles:st.poles||[]},k,sh));
+  sch=sch.filter(d=>d.t>nowM-40&&d.t<nowM+120);const used=new Set();const out=[];
+  const w1=t=>fold(t||'').replace(/[^a-z0-9 ]/g,' ').trim().split(/\s+/)[0]||'';
+  got.flat().filter(Boolean).sort((a,b)=>a.iMinHastaPaso-b.iMinHastaPaso).forEach(e=>{const n=String(e.sLinea||'').trim();if(!n)return;const t=nowM+Math.max(0,+e.iMinHastaPaso||0);
+    const r=IDX.routes.find(x=>x.n===n&&x.id[0]==='b')||IDX.routes.find(x=>x.n===n&&inCityOf(x,'byd'));if(!r)return;
+    const dw=w1(e.sDestino).slice(0,5);
+    const cand=sch.filter(d=>!used.has(d)&&d.r.n===n&&(!e.pole||!d.pole||d.pole===e.pole)&&d.t>=t-30&&d.t<=t+5);
+    const pick=L=>L.sort((a,b)=>Math.abs(a.t-t)-Math.abs(b.t-t))[0];
+    const m=pick(cand.filter(d=>dw&&fold(d.head).includes(dw)))||pick(cand);
+    if(m){used.add(m);out.push({...m,t,st:m.t,live:true,delay:Math.round((t-m.t)*60),lastT:t})}
+    else out.push({t,st:t,r,head:e.sDestino||'',pole:e.pole,live:true,delay:0,lastT:t})});
+  return out}
 async function depLive(st){
+  if(st.c==='byd')return depLiveBYD(st);
   if(RT_GTFS[st.c])return RT_LOCAL?depLiveRT(st):depLiveGT(st);
   if(!['gda','sop','gdy','all'].includes(st.c)||Date.now()<RT_DEAD)return null;
   const ids=ztmIds(st);if(!ids.length)return null;
