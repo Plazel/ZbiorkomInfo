@@ -3675,7 +3675,10 @@ document.getElementById('gdTest').onclick=async()=>{GUIDE.pick=true;closeGuide()
 // published, else where the timetable and its delay put it) and the stops still ahead ----
 const RUN={d:null,tm:0};
 async function openRunOnMap(d,list){
-  if(!d.ps||!d.off){const m=(list||[]).find(x=>x.r.n===d.r.n&&x.ps&&Math.abs(x.t-(d.sch!=null?d.sch:d.st!=null?d.st:d.t))<=1.5&&!x.live);if(m)Object.assign(d,{di:m.di,ps:m.ps,t0:m.t0,off:m.off,k:m.k})}
+  // a live departure: its run in the timetable – same line, same way (its destination) and platform, the time nearest
+  if(!d.ps||!d.off){const tt=d.sch!=null?d.sch:d.st!=null?d.st:d.t;
+    const C=(list||[]).filter(x=>x.r.n===d.r.n&&x.ps&&x.off&&!x.live&&Math.abs(x.t-tt)<=1.5&&(!d.pole||!x.pole||x.pole===d.pole)&&(!d.head||!x.head||gdSameHead(d.head,x.head)))
+      .sort((a,b)=>Math.abs(a.t-tt)-Math.abs(b.t-tt));const m=C[0];if(m)Object.assign(d,{di:m.di,ps:m.ps,t0:m.t0,off:m.off,k:m.k})}
   if(!d.ps||!d.off)return;
   // the reduced view from the start (the full map is never shown on the way): its panel at once, the map shown once it is on the vehicle
   {const mm=document.getElementById('mapModal');mm.classList.add('run','runInit');let pn=document.getElementById('runPanel');
