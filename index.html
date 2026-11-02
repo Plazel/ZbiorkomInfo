@@ -1439,7 +1439,7 @@ function openComboDlg(){let d=document.getElementById('coDlg');if(d)d.remove();
 const base=n=>{const m=n.match(/^(\d)(\d\d)$/);return m?m[2]:null};
 function autoGroups(){
   const by={};IDX.routes.filter(inCity).forEach(r=>{const b=base(r.n);if(b&&r.t!=='night'){const k=r.op+'|'+b;(by[k]=by[k]||[]).push(r.n)}});
-  const NOPAIR=new Set(['156+256','110+210']);   // automatic groups that are not shown
+  const NOPAIR=new Set(['156+256','110+210','127+227']);   // automatic groups that are not shown
   const DROP={'112+212+512':['512']};   // lines left out of an automatic group
   const v=Object.entries(by).filter(([,a])=>a.length>1).sort((a,b)=>a[0].localeCompare(b[0],'pl',{numeric:true})).map(([,a])=>a.sort())
     .filter(g=>!NOPAIR.has(g.join('+'))).map(g=>g.filter(n=>!(DROP[g.join('+')]||[]).includes(n))).filter(g=>g.length>1&&sharedCount(g)>=2);
