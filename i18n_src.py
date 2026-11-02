@@ -377,6 +377,8 @@ ROWS = [
     ("pozycja telefonu: przystanki przełączają się bez opóźnienia danych przewoźnika, gdy jedziesz w pojeździe z włączoną lokalizacją; bez niej – pozycja pojazdu", "phone position: stops change without the delay of the operator's data while you ride in the vehicle with location on; without it – the vehicle's position", "Telefonposition: Haltestellen wechseln ohne die Verzögerung der Betreiberdaten, wenn Sie mit eingeschalteter Ortung im Fahrzeug fahren; ohne sie – Fahrzeugposition", "poloha telefónu: zastávky sa prepínajú bez oneskorenia údajov dopravcu, keď cestujete vo vozidle so zapnutou polohou; bez nej – poloha vozidla", "poloha telefonu: zastávky se přepínají bez zpoždění dat dopravce, když jedete ve vozidle se zapnutou polohou; bez ní – poloha vozidla"),
     ("Bieżący", "Current", "Aktuell", "Aktuálny", "Aktuální"),
     ("Eksport", "Export", "Export", "Export", "Export"),
+    ("Nie znaleziono przystanku w pobliżu", "No stop nearby", "Keine Haltestelle in der Nähe", "V blízkosti sa nenašla zastávka", "V blízkosti nebyla nalezena zastávka"),
+    ("W promieniu 400 m nie ma przystanku ani pojazdu. Wyszukaj przystanek lub pojazd w polu wyszukiwania u góry.", "There is no stop or vehicle within 400 m. Search for a stop or vehicle in the search box at the top.", "Im Umkreis von 400 m gibt es keine Haltestelle und kein Fahrzeug. Suchen Sie oben im Suchfeld nach einer Haltestelle oder einem Fahrzeug.", "V okruhu 400 m nie je zastávka ani vozidlo. Vyhľadajte zastávku alebo vozidlo v poli vyhľadávania hore.", "V okruhu 400 m není zastávka ani vozidlo. Vyhledejte zastávku nebo vozidlo v poli vyhledávání nahoře."),
 ]
 
 WEEKDAYS = {
