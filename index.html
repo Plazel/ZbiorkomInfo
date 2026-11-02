@@ -411,7 +411,7 @@ span.chip{cursor:inherit}
 #mapTitle.rpT{display:flex;align-items:center;gap:10px;min-width:0}#mapTitle.rpT .rpD{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#mapTitle.rpT .rpL{font-size:.85rem;white-space:nowrap}
 #mapTitle .mb{height:28px;min-width:28px;display:grid;place-items:center;font:600 .95rem "Roboto Condensed",sans-serif;padding:0 4px;flex:none}#mapTitle .mb.circle{border-radius:50%;width:28px;padding:0}#mapTitle .mb.sq{width:28px;padding:0}
 .runPanel .rpAge{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}.runPanel .rpAge:not(:empty)::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:#1f9a3e;margin-right:5px;vertical-align:1px}.runPanel .rpAge.old::before{background:#b26a00}
-.runPanel .rpV{flex:1;min-width:0;font-weight:400;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.runPanel .rpV b{font-weight:700}.runPanel .rpV small{font-weight:400;color:var(--muted)}.mapModal.runInit .mapArea{visibility:hidden}
+.runPanel .rpV{flex:1;min-width:0;font-weight:400;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.runPanel .rpV b{font-weight:700}.runPanel .rpM{display:block;font-size:.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis}.runPanel .rpV small{font-weight:400;color:var(--muted)}.mapModal.runInit .mapArea{visibility:hidden}
 .rpList li{cursor:pointer}
 @media (min-width:761px){.mapModal.run .runPanel{position:relative;left:auto;right:auto;top:auto;bottom:auto;width:auto;max-height:none;min-height:0;border:0;border-right:1px solid var(--line);box-shadow:none;z-index:1}}.rpList .t{font-weight:700;font-variant-numeric:tabular-nums}
 #mapVeh{pointer-events:none}
@@ -1044,11 +1044,11 @@ html,body,*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style
 <nav class="rail" aria-label="Widok">
  <button type="button" data-nav="tt" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3.5 3.5h17v17h-17z"/><path d="M3.5 9h17M9 9v11.5M12 13h5.5M12 16.5h4"/></svg><span>Rozkłady</span></button>
  <button type="button" data-nav="map"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Mapa</span></button>
- <button type="button" data-nav="veh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><rect x="5" y="9" width="11" height="10" rx="1"/><path d="M5 14h11M7.5 19v2M13.5 19v2"/><circle cx="8" cy="16.5" r=".4" fill="currentColor"/><circle cx="13" cy="16.5" r=".4" fill="currentColor"/><path d="M17.5 7.5a4 4 0 0 1 0 5M19.8 5.2a7.3 7.3 0 0 1 0 9.6"/></svg><span>Pojazdy</span></button>
  <button type="button" data-nav="dep"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M2.5 4h19v15h-19z"/><path d="M6 9h3M11 9h7M6 12.5h3M11 12.5h7M6 16h3M11 16h4"/></svg><span>Odjazdy</span></button>
  <button type="button" data-nav="jp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><circle cx="5" cy="19" r="2.6"/><path d="M19 2.6a3.6 3.6 0 0 1 3.6 3.6c0 2.7-3.6 6.2-3.6 6.2s-3.6-3.5-3.6-6.2A3.6 3.6 0 0 1 19 2.6z"/><circle cx="19" cy="6.2" r="1.2" fill="currentColor" stroke="none"/><path d="M8.2 19H19v-4.4" stroke-dasharray="2.4 2.1"/></svg><span>Połączenia</span></button>
  <button type="button" data-nav="guide" class="railA11y" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Przewodnik</span></button><button type="button" data-nav="bryg" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 3.5h16v13H4z"/><path d="M4 11h16M8 16.5v3M16 16.5v3M8 7h8"/><path d="M7 13h2v2H7zM15 13h2v2h-2z" fill="currentColor" stroke="none"/></svg><span>Brygady</span></button>
  <button type="button" data-nav="takt" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 5h6l5 5v6l-5 5H9l-5-5v-6z"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><span>Takty</span></button>
+ <button type="button" data-nav="veh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><rect x="5" y="9" width="11" height="10" rx="1"/><path d="M5 14h11M7.5 19v2M13.5 19v2"/><circle cx="8" cy="16.5" r=".4" fill="currentColor"/><circle cx="13" cy="16.5" r=".4" fill="currentColor"/><path d="M17.5 7.5a4 4 0 0 1 0 5M19.8 5.2a7.3 7.3 0 0 1 0 9.6"/></svg><span>Pojazdy</span></button>
 </nav>
 <div class="mapModal" id="mapModal" hidden role="dialog" aria-modal="true" aria-labelledby="mapTitle">
  <div class="mapHead"><h2 id="mapTitle">Schemat sieci</h2><span id="mapStatus" class="hint"></span>
@@ -2238,7 +2238,7 @@ async function openMap(){
   let vw=store.get('ztm.mapView','osm');if(vw!=='schema'||sb.hidden)vw='osm';   // (the plain "Linie" view is gone: map or diagram)
   requestAnimationFrame(()=>{drawMap();setMapView(vw)});   // let the window paint first
 }
-function closeMap(){mapEl().hidden=true;MAP.open=false;if(typeof RUN!=='undefined'&&RUN.d)closeRun();if(typeof VEH!=='undefined'&&VEH.on)vehMode(false,true);document.body.style.overflow='';navMark()}
+function closeMap(){mapEl().hidden=true;MAP.open=false;if(typeof VEH!=='undefined')VEH.back=false;if(typeof RUN!=='undefined'&&RUN.d)closeRun();if(typeof VEH!=='undefined'&&VEH.on)vehMode(false,true);document.body.style.overflow='';navMark()}
 function proj(lat,lon){return [lon*Math.cos(54.45*Math.PI/180)*1000,-lat*1000]}
 function routeCoords(r){const g=MAP.data&&MAP.data.routes[r.id];return g?g.g:[]}
 function visRoutes(){return MAP.routes.filter(r=>(MAP.night||r.t!=='night')&&MAP.data.routes[r.id])}
@@ -3444,10 +3444,10 @@ const gdPhoneSrc=()=>store.get('ztm.gdSrc','veh')==='phone';
 const gdPhoneOk=()=>gdPhoneSrc()&&!GUIDE.fake&&GUIDE.pos&&GUIDE.posT&&Date.now()-GUIDE.posT<20000&&(GUIDE.acc==null||GUIDE.acc<80);
 // vehicles of the city near a place: [{id,label,line,head,lat,lon,start,tid,fk}]
 async function gdVehicles(){if(['gda','sop','gdy','all'].includes(city)){const V=await gpsVehicles();if(!V)return null;
-    return V.map(v=>({id:'z'+v.vehicleId,label:v.vehicleCode||'',line:String(v.routeShortName),head:v.headsign||'',lat:v.lat,lon:v.lon,ts:Date.parse(v.generated)||GPS.t,start:v.scheduledTripStartTime,trip:v}))}
+    return V.map(v=>({id:'z'+v.vehicleId,label:v.vehicleCode||'',line:String(v.routeShortName),head:v.headsign||'',lat:v.lat,lon:v.lon,brg:v.direction,ts:Date.parse(v.generated)||GPS.t,start:v.scheduledTripStartTime,trip:v}))}
   const area=RT_GTFS[city],feeds=VP_FEEDS[area];if(!feeds)return null;let IXa=null;try{IXa=await rtIndex(area)}catch(e){}
   const out=[];for(const [fk,url] of feeds){let ents;try{ents=await rtVehGet(url)}catch(e){continue}const ix=(IXa&&IXa.f[fk])||{};
-    ents.forEach(e=>{const x=ix[e.tid];if(!x||e.lat==null)return;out.push({id:fk+e.vid,label:e.label||e.vid,line:x[0],head:'',lat:e.lat,lon:e.lon,ts:e.ts?e.ts*1000:RV_CACHE[url]&&RV_CACHE[url].t,t0:x[1],seq0:x[2],tid:e.tid,
+    ents.forEach(e=>{const x=ix[e.tid];if(!x||e.lat==null)return;out.push({id:fk+e.vid,label:e.label||e.vid,line:x[0],head:'',lat:e.lat,lon:e.lon,brg:e.brg,ts:e.ts?e.ts*1000:RV_CACHE[url]&&RV_CACHE[url].t,t0:x[1],seq0:x[2],tid:e.tid,
       si:e.seq!=null&&x[2]!=null?e.seq-x[2]:null,at:e.stat===1})})}   // (si: the index of the stop it is at or heading for, by the feed; at: stopped there)
   return out}
 const RV_CACHE={};
@@ -3455,7 +3455,7 @@ async function rtVehGet(url){const c=RV_CACHE[url];if(c&&Date.now()-c.t<5000)ret
   const p=(async()=>{for(const w of [...(RT_PROXY?[RT_PROXY+'?url='+encodeURIComponent(url)]:[]),url]){try{const r=await fetch(w,{cache:'no-store'});if(!r.ok)continue;const buf=await r.arrayBuffer();const b=new Uint8Array(buf),dv=new DataView(buf),td=new TextDecoder(),out=[];
     pbEach(b,0,b.length,(f,w2,a,c2)=>{if(f!==2||w2!==2)return;let vp=null;pbEach(b,a,c2,(f2,w3,a2,c3)=>{if(f2===4&&w3===2)vp=[a2,c3]});if(!vp)return;const e={tid:'',vid:'',label:'',lat:null,lon:null,seq:null,stat:2};
       pbEach(b,vp[0],vp[1],(f3,w4,a3,c4)=>{if(f3===3&&w4===0)e.seq=a3;else if(f3===4&&w4===0)e.stat=a3;else if(f3===5&&w4===0)e.ts=a3;else if(f3===1&&w4===2)pbEach(b,a3,c4,(f5,w5,a5,c5)=>{if(f5===1&&w5===2)e.tid=td.decode(b.subarray(a5,c5))});
-        else if(f3===2&&w4===2)pbEach(b,a3,c4,(f5,w5,a5)=>{if(w5===5){if(f5===1)e.lat=dv.getFloat32(a5,true);else if(f5===2)e.lon=dv.getFloat32(a5,true)}});
+        else if(f3===2&&w4===2)pbEach(b,a3,c4,(f5,w5,a5)=>{if(w5===5){if(f5===1)e.lat=dv.getFloat32(a5,true);else if(f5===2)e.lon=dv.getFloat32(a5,true);else if(f5===3)e.brg=dv.getFloat32(a5,true)}});
         else if(f3===8&&w4===2)pbEach(b,a3,c4,(f5,w5,a5,c5)=>{if(w5!==2)return;const t=td.decode(b.subarray(a5,c5));if(f5===1)e.vid=t;else if(f5===2)e.label=t})});
       out.push(e)});return out}catch(e){}}throw new Error('vp')})();
   RV_CACHE[url]={t:Date.now(),p};p.catch(()=>{delete RV_CACHE[url]});return p}
@@ -3701,21 +3701,49 @@ async function vehTick(){if(!VEH.on)return;const info=document.getElementById('v
   if(!has){VEH.list=[];if(info)info.innerHTML=`<b>${esc(trS('Brak danych o pojazdach'))}</b><br>${esc(trS('Przewoźnicy w tym mieście nie udostępniają położenia pojazdów.'))}`;drawVehs();return}
   if(!V){if(info)info.textContent=trS('Nie udało się pobrać położenia pojazdów.');return}
   const base=new Date();base.setHours(0,0,0,0);
-  VEH.list=V.filter(v=>v.lat&&v.lon&&v.line).map(v=>{const r=IDX.routes.find(x=>x.n===v.line&&inCity(x))||{n:v.line,t:/^\d{1,2}$/.test(v.line)?'tram':/^N/.test(v.line)?'night':'bus',id:'v'+v.line};return {v,r}});
+  VEH.prev=VEH.prev||{};VEH.ang=VEH.ang||{};
+  VEH.list=V.filter(v=>v.lat&&v.lon&&v.line).map(v=>{const r=IDX.routes.find(x=>x.n===v.line&&inCity(x))||{n:v.line,t:/^\d{1,2}$/.test(v.line)?'tram':/^N/.test(v.line)?'night':'bus',id:'v'+v.line};
+    const xy=proj(v.lat,v.lon),pv=VEH.prev[v.id];
+    if(v.brg!=null&&isFinite(v.brg)&&!(v.brg===0&&!pv))VEH.ang[v.id]=v.brg-90;
+    else if(pv&&Math.hypot(xy[0]-pv[0],xy[1]-pv[1])>.15)VEH.ang[v.id]=Math.atan2(xy[1]-pv[1],xy[0]-pv[0])*180/Math.PI;
+    if(!pv||Math.hypot(xy[0]-pv[0],xy[1]-pv[1])>.15)VEH.prev[v.id]=xy;return {v,r,ang:VEH.ang[v.id]}});
   VEH.t=Date.now();if(info)info.textContent=VEH.list.length+' '+trS(VEH.list.length===1?'pojazd':'pojazdów')+' · '+trS('odświeżane co 10 s');drawVehs()}
 function drawVehs(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapVehs');
   if(!VEH.on||MAP.view==='schema'){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapVehs';g.style.pointerEvents='none'}svg.appendChild(g);
   const k=unitsPerPx(),v=MAP.vb,m=40*k;const sc=Math.min(1,Math.max(.55,.03/k*12))*.8;VEH.xy=[];const out=[];
   VEH.list.forEach(it=>{const [x,y]=proj(it.v.lat,it.v.lon);if(x<v.x-m||x>v.x+v.w+m||y<v.y-m||y>v.y+v.h+m)return;VEH.xy.push([x,y,it]);
-    const r=it.r,s0=depStyle(r),n=String(r.n);const kind=r.cat==='ferry'?'ferry':r.cat==='metro'?'metro':r.t==='trol'?'trol':r.t==='tram'?'tram':r.t==='rail'?'rail':'bus';
+    const r=it.r,s0=depStyle(r),n=String(r.n);const a=it.ang;const right=a!=null&&Math.cos(a*Math.PI/180)>0.3;
+    const arrow=a!=null?`<g transform="rotate(${a.toFixed(1)})"><path d="M31 0 L21 -8 L21 8 Z" fill="${pageLight()?'#14171a':'#f1f2f2'}" stroke="${pageLight()?'#fff':'#14171a'}" stroke-width="1.5"/></g>`:'';const kind=r.cat==='ferry'?'ferry':r.cat==='metro'?'metro':r.t==='trol'?'trol':r.t==='tram'?'tram':r.t==='rail'?'rail':'bus';
     const ic=(ICONS[kind]||ICONS.bus).replace('<svg ','<svg x="-12" y="-12" width="24" height="24" style="color:'+s0.bg+'" ');
-    const lab=s0.shape==='circle'?(()=>{const cr=Math.max(12,n.length*4.4+4);return `<circle cx="${20+cr}" cy="0" r="${cr}" fill="${s0.bg}"/><text x="${20+cr}" y="5" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text>`})()
-      :(()=>{const q=n.length<=3?26:n.length*8+10;return `<g transform="translate(21 -13)"><rect width="${q}" height="26" fill="${s0.bg}"/><text x="${q/2}" y="18" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`})();
-    out.push(`<g transform="translate(${x} ${y}) scale(${(k*sc).toFixed(5)})"><circle r="18" fill="#fff" stroke="${s0.bg}" stroke-width="3.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"/>${ic}${lab}</g>`)});
+    const lab=s0.shape==='circle'?(()=>{const cr=Math.max(12,n.length*4.4+4);const cx=right?-21-cr:21+cr;return `<circle cx="${cx}" cy="0" r="${cr}" fill="${s0.bg}"/><text x="${cx}" y="5" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text>`})()
+      :(()=>{const q=n.length<=3?26:n.length*8+10;return `<g transform="translate(${right?-22-q:22} -13)"><rect width="${q}" height="26" fill="${s0.bg}"/><text x="${q/2}" y="18" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`})();
+    out.push(`<g transform="translate(${x} ${y}) scale(${(k*sc).toFixed(5)})">${arrow}<circle r="18" fill="#fff" stroke="${s0.bg}" stroke-width="3.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"/>${ic}${lab}</g>`)});
   g.innerHTML=out.join('')}
 function vehHit(e){const svg=document.getElementById('mapSvg');const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return null;const q=pt.matrixTransform(ctm.inverse());
   const k=unitsPerPx();let best=null,bd=(24*k)**2;VEH.xy.forEach(([x,y,it])=>{const d=(x-q.x)**2+(y-q.y)**2;if(d<bd){bd=d;best=it}});return best}
+// a vehicle tapped: its run in the timetable (line, start time, way), shown as the reduced view of a run (its course, stops,
+// times, the vehicle's number and model); where the run cannot be found, a small window with what is known
+async function vehRun(it){const r=it.r,v=it.v;if(!r.id||r.id[0]==='v')return null;let L;try{L=await loadRoute(r.id)}catch(e){return null}
+  const base=new Date();base.setHours(0,0,0,0);const st=v.start?(Date.parse(v.start)-base)/60000:v.t0;if(st==null||!isFinite(st))return null;
+  const C=[];for(const [key,sh] of depDayKeys())L.dirs.forEach((d,di)=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(Math.abs(t0-st)>1.01)return;const [pat,off]=d.prof[pi];
+    C.push({r,di,ps:d.pats[pat].map(i=>d.stops[i][0]),off,t0,head:sName(d.stops[d.pats[pat][d.pats[pat].length-1]][0]),sch:true,t:t0})}));
+  // no run starting then (a tram's start time in the feed is sometimes that of its duty, not of the run): the run of the line
+  // going that way that by its timetable should be nearest to where the vehicle is now
+  if(!C.length){const nowM=(Date.now()-base)/60000;
+    for(const [key,sh] of depDayKeys())L.dirs.forEach((d,di)=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;const [pat,off]=d.prof[pi];if(t0>nowM+2||t0+off[off.length-1]<nowM-3)return;
+      const ps=d.pats[pat].map(i=>d.stops[i][0]);const head=sName(d.stops[d.pats[pat][d.pats[pat].length-1]][0]);if(v.head&&!gdSameHead(v.head,head))return;
+      const T=off.map(o=>t0+o);let j=T.findIndex(t=>t>nowM);if(j<=0)j=Math.max(1,j<0?T.length-1:1);const A=IDX.stops[ps[j-1]],B=IDX.stops[ps[j]];if(!A||!B)return;
+      const f=Math.max(0,Math.min(1,(nowM-T[j-1])/Math.max(.1,T[j]-T[j-1])));const dm=distM(A[2]+(B[2]-A[2])*f,A[3]+(B[3]-A[3])*f,v.lat,v.lon);
+      if(dm<1500)C.push({r,di,ps,off,t0,head,sch:true,t:t0,_d:dm})}));
+    if(!C.length)return null;C.sort((a,b)=>a._d-b._d);const d=C[0];delete d._d;if(v.start)d.trip=v.start;else d.veh=v.id;d.vlabel=v.label||'';d.byPos=true;return d}
+  const dist=c=>{const P=c.ps.map(id=>IDX.stops[id]).filter(Boolean);let b=1e18;P.forEach(X=>{const d=distM(X[2],X[3],v.lat,v.lon);if(d<b)b=d});return b};
+  C.sort((a,b)=>(gdSameHead(v.head,b.head)-gdSameHead(v.head,a.head))||Math.abs(a.t0-st)-Math.abs(b.t0-st)||dist(a)-dist(b));
+  const d=C[0];if(v.start)d.trip=v.start;else d.veh=v.id;d.vlabel=v.label||'';return d}
+async function ztmFleet(){if(!BG.fleet)BG.fleet=fetch('https://files.cloudgdansk.pl/d/otwarte-dane/ztm/baza-pojazdow.json?v=2').then(r=>r.json()).then(j=>{const m={};(j.results||[]).forEach(x=>m[x.vehicleCode]=x);return m}).catch(()=>({}));return BG.fleet}
+async function vehOpen(it,e){const d=await vehRun(it);if(!d){vehPop(it,e);return}
+  if(it.v.start){try{const F=await ztmFleet();const f=F[String(it.v.label)];if(f)d.vmodel=[f.brand,f.model].filter(Boolean).join(' ')}catch(_){}}
+  VEH.back=true;vehMode(false,true);document.getElementById('mapModal').classList.remove('vehs');await openRunOnMap(d,[])}
 function vehPop(it,e){const A=document.querySelector('.mapArea');const ar=A.getBoundingClientRect();const p=document.createElement('div');p.id='mapPop';p.className='mapPop';
   const s0=depStyle(it.r);const v=it.v;
   p.innerHTML=`<div class="mpH"><span class="mb ${s0.shape}${sqCls(it.r)}" style="background:${s0.bg};color:${s0.fg};height:28px;min-width:28px;display:inline-grid;place-items:center;font:600 .95rem 'Roboto Condensed',sans-serif;flex:none;${s0.shape==='circle'?'border-radius:50%;width:28px;':''}">${esc(it.r.n)}</span><span>${v.head?'→ '+esc(v.head):esc(trS('Linia')+' '+it.r.n)}</span><button type="button" class="mpX" aria-label="Zamknij">×</button></div><div style="padding:0 12px 10px;color:var(--muted)">${v.label?esc(trS('Pojazd'))+' <b style="color:var(--fg)">'+esc(v.label)+'</b>':''}</div>`;
@@ -3727,9 +3755,9 @@ function runAge(){const el=document.getElementById('rpAge');if(!el)return;if(!RU
 function runTitle(d,lab,cls){const h=document.getElementById('mapTitle');if(!h)return;const s0=depStyle(d.r);h.classList.add('rpT');
   h.innerHTML=`<span class="mb ${s0.shape}${sqCls(d.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(d.r.n)}</span><span class="rpD">→ ${esc(d.head)}</span>${lab?`<span class="rpL ${cls||''}">${esc(lab)}</span>`:''}`}
 function runVehHtml(d){const a=[];if(d.vlabel)a.push(`${esc(trS('Pojazd'))} <b>${esc(d.vlabel)}</b>`);if(d.brig)a.push(`${esc(trS('Brygada'))} <b>${esc(d.brig)}</b>`);
-  return `<span class="rpV">${a.length?a.join(' · '):`<small>${esc(trS('Brak danych o pojeździe'))}</small>`}</span>`}
+  return `<span class="rpV">${a.length?a.join(' · ')+(d.vmodel?'<small class="rpM">'+esc(d.vmodel)+'</small>':''):`<small>${esc(trS('Brak danych o pojeździe'))}</small>`}</span>`}
 // the run window's ×: back to the page the run was opened from (the guide, the departures, a stop), not to the full map
-function runExit(){const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
+function runExit(){if(VEH.back){VEH.back=false;closeRun();vehMode(true);return}const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
 function closeRun(){{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
 async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);return}
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;let dl=(d.delay||0)/60,gps=null;
@@ -3742,7 +3770,7 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
     let v=d.veh&&V&&V.find(x=>x.id===d.veh);
     if(!v&&V){const C=V.filter(x=>x.line===d.r.n&&Math.abs(x.t0-d.t0)<=3&&gdOnRun(R,x)).sort((a,b)=>Math.abs(a.t0-d.t0)-Math.abs(b.t0-d.t0));v=C[0];if(v)d.veh=v.id}
     if(v){gps=[v.lat,v.lon];rtOnly=true;RUN.fixT=v.ts||Date.now();d.vlabel=v.label||'';if(v.brig)d.brig=v.brig}}catch(e){}}
-  if(d.trip){try{const V=await gpsVehicles();const veh=V&&V.find(x=>String(x.routeShortName)===d.r.n&&x.scheduledTripStartTime===d.trip);if(veh){gps=[veh.lat,veh.lon];RUN.fixT=Date.parse(veh.generated)||GPS.t;d.vlabel=veh.vehicleCode!=null?String(veh.vehicleCode):'';d.brig=veh.vehicleService?String(veh.vehicleService).replace(/^(\d+)-0*(\d+)$/,'$1/$2'):'';const pd=await posDelay(d,veh);if(pd!=null)dl=pd/60}}catch(e){}}
+  if(d.trip){try{const V=await gpsVehicles();const veh=V&&V.find(x=>String(x.routeShortName)===d.r.n&&x.scheduledTripStartTime===d.trip);if(veh){gps=[veh.lat,veh.lon];RUN.fixT=Date.parse(veh.generated)||GPS.t;d.vlabel=veh.vehicleCode!=null?String(veh.vehicleCode):'';if(!d.vmodel&&d.vlabel){try{const F=await ztmFleet();const f=F[d.vlabel];if(f)d.vmodel=[f.brand,f.model].filter(Boolean).join(' ')}catch(_){}}d.brig=veh.vehicleService?String(veh.vehicleService).replace(/^(\d+)-(\d+)$/,(_,a,b)=>(+a)+'/'+(+b)):'';const pd=await posDelay(d,veh);if(pd!=null)dl=pd/60}}catch(e){}}
   // Bydgoszcz (no vehicle positions published): the delay from the boards at the stops (ZDMiKP's live departures) for the
   // next stops of the run; the vehicle's place by the timetable moved by it
   let bydLive=false;
@@ -3854,7 +3882,7 @@ function setupMap(){
   document.getElementById('mapNorth').onclick=()=>setMapRot(0);
   document.getElementById('mapMeBtn').onclick=toggleMe;
   svg.addEventListener('click',e=>{if(MAP.moved)return;
-    if(VEH.on){const v=vehHit(e);closeStopPop(true);if(v){vehPop(v,e);return}}
+    if(VEH.on){const v=vehHit(e);closeStopPop(true);if(v){vehOpen(v,e);return}}
     if(GUIDE.pick){const [x,y]=pt(e);GUIDE.pick=false;GUIDE.fake=[-y/1000,x/(Math.cos(54.45*Math.PI/180)*1000)];const st=document.getElementById('mapStatus');if(st)st.textContent='';openGuide();return}
     const ms=e.target.closest('.mss');if(ms){openStopPop(ms.dataset.sn,ms.dataset.sp,e,+ms.dataset.gi,ms.dataset.m==='1');return}
     if(MAP.find){MAP.find=null;drawFind()}
