@@ -3668,6 +3668,8 @@ function runTitle(d,lab,cls){const h=document.getElementById('mapTitle');if(!h)r
   h.innerHTML=`<span class="mb ${s0.shape}${sqCls(d.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(d.r.n)}</span><span class="rpD">→ ${esc(d.head)}</span>${lab?`<span class="rpL ${cls||''}">${esc(lab)}</span>`:''}`}
 function runVehHtml(d){const a=[];if(d.vlabel)a.push(`${esc(trS('Pojazd'))} <b>${esc(d.vlabel)}</b>`);if(d.brig)a.push(`${esc(trS('Brygada'))} <b>${esc(d.brig)}</b>`);
   return `<span class="rpV">${a.length?a.join(' · '):`<small>${esc(trS('Brak danych o pojeździe'))}</small>`}</span>`}
+// the run window's ×: back to the page the run was opened from (the guide, the departures, a stop), not to the full map
+function runExit(){const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
 function closeRun(){{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
 async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);return}
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;let dl=(d.delay||0)/60,gps=null;
@@ -3721,7 +3723,7 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   const sc0=pn.querySelector('.rpList');const keep=sc0?sc0.scrollTop:null;
   pn.innerHTML=`<div class="rpH">${runVehHtml(d)}<span class="rpAge" id="rpAge"></span><button type="button" class="mpX" aria-label="Zamknij">×</button></div><ol class="rpList">${rows}</ol>`;
   if(keep!=null)pn.querySelector('.rpList').scrollTop=keep;runAge();
-  pn.querySelector('.mpX').onclick=closeRun;
+  pn.querySelector('.mpX').onclick=runExit;
   pn.querySelectorAll('li[data-sid]').forEach(li=>li.onclick=()=>{const X=IDX.stops[li.dataset.sid];if(!X)return;const [x,y]=proj(X[2],X[3]);const v=MAP.vb;
     const f=Math.min(1,SYM_K1*.5/unitsPerPx());MAP.vb={x:x-v.w*f/2,y:y-v.h*f/2,w:v.w*f,h:v.h*f};applyVB();renderLabels();drawVeh()});
   if(!RUN.scrolled){RUN.scrolled=true;const e=pn.querySelector('li.nx');if(e)e.scrollIntoView({block:'center'})}}
