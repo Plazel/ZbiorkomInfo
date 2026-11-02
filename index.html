@@ -3681,6 +3681,14 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
     if(!v&&V){const C=V.filter(x=>x.line===d.r.n&&Math.abs(x.t0-d.t0)<=3&&gdOnRun(R,x)).sort((a,b)=>Math.abs(a.t0-d.t0)-Math.abs(b.t0-d.t0));v=C[0];if(v)d.veh=v.id}
     if(v){gps=[v.lat,v.lon];rtOnly=true;RUN.fixT=v.ts||Date.now();d.vlabel=v.label||'';if(v.brig)d.brig=v.brig}}catch(e){}}
   if(d.trip){try{const V=await gpsVehicles();const veh=V&&V.find(x=>String(x.routeShortName)===d.r.n&&x.scheduledTripStartTime===d.trip);if(veh){gps=[veh.lat,veh.lon];RUN.fixT=Date.parse(veh.generated)||GPS.t;d.vlabel=veh.vehicleCode!=null?String(veh.vehicleCode):'';d.brig=veh.vehicleService?String(veh.vehicleService).replace(/^(\d+)-0*(\d+)$/,'$1/$2'):'';const pd=await posDelay(d,veh);if(pd!=null)dl=pd/60}}catch(e){}}
+  // Bydgoszcz (no vehicle positions published): the delay from the boards at the stops (ZDMiKP's live departures) for the
+  // next stops of the run; the vehicle's place by the timetable moved by it
+  let bydLive=false;
+  if(city==='byd'&&!gps){try{const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const S=d.off.map(o=>d.t0+o);
+    let j=S.findIndex(t=>t+dl>nowM);if(j<0)j=S.length-1;
+    for(let q=j;q<Math.min(S.length,j+3);q++){const X=IDX.stops[d.ps[q]];if(!X)continue;
+      const L=await depLiveBYD({n:X[0],c:'byd',poles:X[1]?[X[1]]:[]});const m=L&&L.find(e=>e.r.n===d.r.n&&Math.abs(e.st-S[q])<=1.5);
+      if(m){dl=m.delay/60;bydLive=true;break}}}catch(e){}}
   const T=d.off.map(o=>d.t0+o+dl);const P=d.ps.map(id=>IDX.stops[id]);
   let pos=gps;if(!pos){let j=T.findIndex(t=>t>nowM);if(j<0)j=T.length;
     if(j===0)pos=[P[0][2],P[0][3]];else if(j>=T.length)pos=[P[T.length-1][2],P[T.length-1][3]];
@@ -3704,7 +3712,7 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   // the stops still ahead, with their times
   let pn=document.getElementById('runPanel');if(!pn){pn=document.createElement('div');pn.id='runPanel';pn.className='runPanel';const mb=document.querySelector('.mapBody');mb.insertBefore(pn,mb.querySelector('.mapArea'))}
   document.getElementById('mapModal').classList.add('run');
-  const s0=depStyle(d.r);const m=Math.round(dl);const live=(d.live||gps)&&(!rtOnly||rtDelay);
+  const s0=depStyle(d.r);const m=Math.round(dl);const live=(d.live||gps||bydLive)&&(!rtOnly||rtDelay);
   // as on the guide's display: the line of the route, the stops passed dimmed, the next one marked; times with the delay
   const nx=gps&&segJ!=null?segJ:Math.max(0,T.findIndex(t=>t>=nowM-.25));const last=d.ps.length-1;   // (the vehicle seen: the next stop by its position)
   const rows=d.ps.map((id,j)=>{const X=IDX.stops[id]||['',''];const pl=d.t0+d.off[j];const ch=Math.round(T[j])!==Math.round(pl);
