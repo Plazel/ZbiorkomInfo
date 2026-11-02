@@ -843,7 +843,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .tpBtn{font:inherit;font-size:.95rem;font-weight:600;color:var(--fg);background:var(--bg);border:1px solid var(--line);padding:6px 12px;min-width:72px;cursor:pointer;font-variant-numeric:tabular-nums}
 .tpPanel{position:absolute;right:0;top:calc(100% + 4px);z-index:40;background:var(--bg);border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.18);padding:8px;width:170px}
 .tpNow{display:block;width:100%;font:inherit;font-weight:700;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:7px;cursor:pointer;margin-bottom:6px}
-.tpCols{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tpCols ul{list-style:none;margin:0;padding:0;max-height:220px;overflow-y:auto;scrollbar-width:thin}
+.tpCols{display:grid;grid-template-columns:1fr 1fr;gap:6px}.tpCols ul{list-style:none;margin:0;padding:0;max-height:220px;overflow-y:auto}
 .tpCols li{padding:6px 0;text-align:center;cursor:pointer;font-variant-numeric:tabular-nums}.tpCols li:hover{background:var(--panel)}.tpCols li.on{background:var(--fg);color:var(--bg);font-weight:700}
 .jpWhen select,.jpWhen input{font:inherit;font-size:.9rem;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
 .jpPrefLine{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);margin:2px 0 12px}
@@ -991,7 +991,7 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
 /* the top bar always on screen: fixed, not sticky (on a phone the page could stay scrolled under a window that covers it, e.g. after the keyboard, and the bar went with it) */
 header.top{position:fixed;top:0;left:var(--rail-w);right:0}body{padding-top:var(--top-h)}
 /* no browser scrollbars anywhere (the page and its panels still scroll) */
-html,*{scrollbar-width:none;-ms-overflow-style:none}::-webkit-scrollbar{display:none;width:0;height:0}
+html,body,*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
 /* the buttons of a second row (under the top bar) as large as the top bar's and in line with them: same size, same gaps, same right edge */
 :root{--ib:38px;--ibg:8px}
 @media (max-width:460px){:root{--ib:34px;--ibg:6px}}
