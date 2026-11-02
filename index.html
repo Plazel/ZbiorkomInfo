@@ -4145,7 +4145,12 @@ async function posDelay(dep,veh){const r=dep.r;let L;try{L=await loadRoute(r.id)
   return Math.round((nowM-best.t)*60)}
 async function fixDelays(out){const lv=out.filter(d=>d.live&&d.trip&&d.sch!=null);if(!lv.length)return;
   let V=null;try{V=await gpsVehicles()}catch(e){}if(!V)return;
-  await Promise.all(lv.map(async d=>{const veh=V.find(v=>String(v.routeShortName)===d.r.n&&v.scheduledTripStartTime===d.trip);if(!veh||!d.r.id||String(d.r.id).startsWith('rt'))return;
+  // a run no vehicle is on yet (its vehicle still on the run before, maybe going the other way): the API still gives an
+  // "estimated" time, guessed from the timetable – shown as the timetable's time, not as a live one
+  const base0=new Date();base0.setHours(0,0,0,0);const nowM0=(Date.now()-base0)/60000;
+  await Promise.all(lv.map(async d=>{const veh=V.find(v=>String(v.routeShortName)===d.r.n&&v.scheduledTripStartTime===d.trip);
+    if(!veh){const t0=(Date.parse(d.trip)-base0)/60000;if(isFinite(t0)&&t0>nowM0-1){d.live=false;d.t=d.sch;d.delay=0;d.lastT=d.t}return}
+    if(!d.r.id||String(d.r.id).startsWith('rt'))return;
     const pd=await posDelay(d,veh);if(pd==null)return;d.delay=pd;d.t=d.sch+pd/60;d.lastT=d.t}))}
 // first the timetable (shown at once), then the live departures where they can be had (they replace it when they come)
 async function depLoadData(){const run=DEP.run=(DEP.run||0)+1;const sch=[[],[]];
