@@ -718,6 +718,23 @@ try:
     EXTRA_RAIL['waw'] += add_rail(P, _km, 'waw', 'q', 'Koleje Mazowieckie')
 except Exception as e: print('Koleje Mazowieckie: pominięto (%s)' % e)
 try:
+    # Poznań: Poznańska Kolej Metropolitalna, PKM1–PKM5 (Koleje Wielkopolskie and POLREGIO, whole runs), in their own colours
+    _pk = {}
+    for r in rd(P + '/routes.txt'):
+        m = re.match(r'(KW|PR)_(PKM\d+)$', r['route_id'])
+        if m and r['route_type'] == '2':
+            _pk[r['route_id']] = ('k' + m.group(2), m.group(2), '#' + (r.get('route_color') or '3A76C2'), None)
+    _ops = collections.defaultdict(set)
+    for rid, v in _pk.items(): _ops[v[0]].add('Koleje Wielkopolskie' if rid.startswith('KW_') else 'POLREGIO')
+    _pk = {rid: (v[0], v[1], v[2], ', '.join(sorted(_ops[v[0]]))) for rid, v in _pk.items()}
+    _txt = {r['route_id']: '#' + (r.get('route_text_color') or 'FFFFFF') for r in rd(P + '/routes.txt') if r['route_id'] in _pk}
+    _ids = add_rail(P, _pk, 'poz', 'q', 'Koleje Wielkopolskie')
+    for r in ROUTES_OUT:
+        if r['id'] in _ids:
+            r['kt'] = next((_txt[rid] for rid, v in _pk.items() if v[1] == r['n']), '#ffffff')
+    EXTRA_RAIL['poz'] += _ids
+except Exception as e: print('PKM Poznań: pominięto (%s)' % e)
+try:
     # Warszawa: WKD (Warszawska Kolej Dojazdowa, its own GTFS from mkuran.pl)
     _wz = os.path.join(SCR, 'wkd.zip'); fetch('https://mkuran.pl/gtfs/wkd.zip', _wz); zipfile.ZipFile(_wz).extractall(os.path.join(SCR, 'wkd')); os.remove(_wz)
     EXTRA_RAIL['waw'] += add_rail(os.path.join(SCR, 'wkd'), {'A': ('kWKD', 'WKD', '#990099', 'Warszawska Kolej Dojazdowa')}, 'waw', 'w', 'Warszawska Kolej Dojazdowa')
