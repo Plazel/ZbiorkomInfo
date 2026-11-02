@@ -1178,6 +1178,7 @@ function trS(t){
     else if(/^Rozkłady jazdy w /.test(c))r=W.tt+' – '+trS(CITIES[city][0]);
     else if(x=/^(jutro, )?([a-ząćęłńóśźż]+) (\d\d\.\d\d(?:\.\d{4})?)$/i.exec(c)){const i=wd(x[2].toLowerCase());if(i>=0){let n=I18N.wd[LANG][i];if(/^[A-ZŚŻ]/.test(x[2]))n=n[0].toUpperCase()+n.slice(1);r=(x[1]?W.tom+', ':'')+n+' '+x[3]}}
     else if(x=/^Kurs do: (.+?)(?: przez: (.+))?$/.exec(c))r=W.to+': '+x[1]+(x[2]?' '+W.via+': '+x[2]:'');
+    else if(x=/^Dalej jako linia (\S+) do: (.+)$/.exec(c))r=({en:'Continues as line $ to',de:'Weiter als Linie $ nach',sk:'Ďalej ako linka $ do',cs:'Dále jako linka $ do'})[LANG].replace('$',x[1])+': '+x[2];
     else if(x=/^Kurs przez: (.+)$/.exec(c))r=W.via[0].toUpperCase()+W.via.slice(1)+': '+x[1];
     else if(x=/^Nie kursuje przez: (.+)$/.exec(c))r=W.notvia+': '+x[1];
     else if(x=/^(<?\d+) min$/.exec(c))r=x[1]+' '+d['min'];

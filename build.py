@@ -491,6 +491,14 @@ for _rk, _seq in (('kS1', ORDERED[0]), ('kS22', ORDERED[-1])):
     if _seq and ENDS[_rk][0] in _nm and ENDS[_rk][1] in _nm:
         ORD[_rk] = _seq if _nm.index(ENDS[_rk][0]) < _nm.index(ENDS[_rk][1]) else _seq[::-1]
 print('rail corridors', {k: len(v) for k, v in CORR.items()})
+# the stations of line R (the regional trains Pruszcz Gdański – Wejherowo): an S2/S22 train that goes on there goes on as line R
+R_NAMES = set()
+for _t, _rows in rst.items():
+    if not is_pr(_t) or s2_trip(_t) or s22_trip(_t): continue
+    _ns = [sname(x[1]) for x in _rows]
+    if 'Pruszcz Gdański' in _ns and 'Wejherowo' in _ns:
+        _a, _b = sorted((_ns.index('Pruszcz Gdański'), _ns.index('Wejherowo'))); _seg = set(_ns[_a:_b + 1])
+        if len(_seg) > len(R_NAMES): R_NAMES = _seg
 for rk, allowed in CORR.items():
     rot = {tid: (rk, r['service_id']) for tid, r in rtrips.items() if TEST[rk](tid)}
     chosen, dates = choose(feed_days(P, rot), 'PKP SKM w Trójmieście' if rk == 'kS1' else 'POLREGIO (Pomorska Kolej Metropolitalna)')
@@ -529,7 +537,9 @@ for rk, allowed in CORR.items():
         if shp: SHAPE_OF.setdefault((rk, tuple(x[0] for x in rows2)), 'r' + shp + '|c')
         full = rst[_key[0]]
         origin = sname(full[0][1]) if full[0][1] in allowed else None
-        groups[rk].append((k, False, d, rows2, (origin, sname(full[-1][1]))))
+        after = full[full.index(run[-1]) + 1:]   # where the train goes after the line's part
+        cont = 'R' if rk in ('kS2', 'kS22') and after and all(sname(x[1]) in R_NAMES for x in after) else None
+        groups[rk].append((k, False, d, rows2, (origin, sname(full[-1][1]), cont)))
     meta = {'kS1': ('S1', 'PKP SKM w Trójmieście'), 'kS2': ('S2', 'POLREGIO (Pomorska Kolej Metropolitalna)'), 'kS22': ('S22', 'POLREGIO (Pomorska Kolej Metropolitalna)')}[rk]
     n0 = len(ROUTES_OUT)
     build_routes(groups, {rk: {'id': rk, 'n': meta[0], 't': 'rail', 'op': meta[1], 'dates': dates[rk],
@@ -614,7 +624,7 @@ except StopIteration:
 # stations. Stations get ids prefix + station + 'p' + platform; area: the area of the lines (a separate one is registered
 # in NEW_ROUTE_IDS for its map files), or a function of the station name.
 SKA_IDS = []; EXTRA_RAIL = collections.defaultdict(list)
-def add_rail(folder, sel, area, prefix, op_default, cut=None, skip_names=(), set_c=True):
+def add_rail(folder, sel, area, prefix, op_default, cut=None, skip_names=(), set_c=True, contig=False, cont=None):
     par, rs_, pl_ = {}, {}, {}
     for r in rd(folder + '/stops.txt'):
         par[r['stop_id']] = r.get('parent_station') or r['stop_id']
@@ -652,7 +662,14 @@ def add_rail(folder, sel, area, prefix, op_default, cut=None, skip_names=(), set
         runs = []
         for tid, lst in chosen.items():
             run = rows[tid]
-            if seq is not None: run = [x for x in run if x[1] in seq]
+            if seq is not None and contig:   # only an unbroken part inside the section (a train that leaves it and comes back: its longest part)
+                parts, cur = [], []
+                for x in run:
+                    if x[1] in seq: cur.append(x)
+                    elif cur: parts.append(cur); cur = []
+                if cur: parts.append(cur)
+                run = max(parts, key=len) if parts else []
+            elif seq is not None: run = [x for x in run if x[1] in seq]
             if len(run) < 2: continue
             runs.append((tid, lst, run))
         if not runs: continue
@@ -678,7 +695,8 @@ def add_rail(folder, sel, area, prefix, op_default, cut=None, skip_names=(), set
             shp = trips[tid].get('shape_id')
             if shp and folder == P: SHAPE_OF.setdefault((lid, tuple(x[0] for x in rows2)), 'r' + shp + '|c')
             full = rows[tid]
-            for _, k in lst: groups[lid].append((k, False, d, rows2, (nm_(run[0][1]) if seq is None or full[0][1] in seq else None, nm_(full[-1][1]))))
+            cl = cont(tid) if cont and full[-1] is not run[-1] else None   # goes on beyond the section as another line
+            for _, k in lst: groups[lid].append((k, False, d, rows2, (nm_(run[0][1]) if seq is None or full[0][1] in seq else None, nm_(full[-1][1]), cl)))
         n0 = len(ROUTES_OUT)
         build_routes(dict(groups), {lid: {'id': lid, 'n': num, 't': 'rail', 'op': op, 'dates': dates[lid], **({'main_ends': cut} if cut else {})}})
         for r in ROUTES_OUT[n0:]:
@@ -708,7 +726,9 @@ try:
     # the Tricity: line R, the regional trains between Pruszcz Gdański and Wejherowo (not those of PKM, S2 and S22)
     _rr = {r['route_id']: ('kR', 'R', '#7a3b8f', 'POLREGIO') for r in rd(P + '/routes.txt')
            if r['route_id'] in ('PR_REG', 'PR_RP') or (r['agency_id'] == 'SKMT' and r['route_id'] != 'SKMT_S1' and r['route_type'] == '2')}
-    add_rail(P, _rr, rail_city, 'k', 'POLREGIO', cut=('Pruszcz Gdański', 'Wejherowo'), skip_names=('Gdańsk Port Lotniczy', 'Gdańsk Kokoszki', 'Gdańsk Osowa'), set_c=False)
+    # (with the PKM trains, S2 and S22, on their part between Pruszcz Gdański and Wejherowo: "Dalej jako linia S2 do: …")
+    add_rail(P, _rr, rail_city, 'k', 'POLREGIO', cut=('Pruszcz Gdański', 'Wejherowo'), set_c=False, contig=True,
+             cont=lambda t: ('S2' if s2_trip(t) else 'S22' if s22_trip(t) else None) if t in rtrips else None)
 except Exception as e: print('Linia R: pominięto (%s)' % e)
 
 
@@ -1395,9 +1415,10 @@ for f, d in data_all.items():
         if any(x >= 0 for x in nl) and 'tends' not in dd: dd['nl'] = nl
         if 'tends' in dd:   # rail: describe each train by its real origin and destination
             texts = []
-            for o, e in dd.pop('tends'):
+            for o, e, *cl in dd.pop('tends'):
                 parts = []
-                if e != main[-1]: parts.append('Kurs do: ' + e)
+                if cl and cl[0]: parts.append('Dalej jako linia %s do: %s' % (cl[0], e))
+                elif e != main[-1]: parts.append('Kurs do: ' + e)
                 texts.append(', '.join(parts[:1] + [q[:1].lower() + q[1:] for q in parts[1:]]))
             dd['notes'] = [''] * len(notes)
             dd['tnotes'] = texts
