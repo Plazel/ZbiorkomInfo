@@ -3716,6 +3716,11 @@ function drawVehs(){const svg=document.getElementById('mapSvg');if(!svg)return;l
   const k=unitsPerPx(),v=MAP.vb,m=Math.max(v.w,v.h);const sc=Math.min(1,Math.max(.55,.03/k*12))*.8;VEH.xy=[];const out=[];
   VEH.list.forEach(it=>{const [x,y]=proj(it.v.lat,it.v.lon);if(x<v.x-m||x>v.x+v.w+m||y<v.y-m||y>v.y+v.h+m)return;VEH.xy.push([x,y,it]);
     const r=it.r,s0=depStyle(r),n=String(r.n);const a=it.ang;const right=a!=null&&Math.cos(a*Math.PI/180)>0.3;
+    // far out: a small dot in the line's colour; in between: the line's symbol (number) alone; close in: the full sign
+    if(k>.12){out.push(`<circle cx="${x}" cy="${y}" r="${(4.5*k).toFixed(4)}" fill="${s0.bg}" stroke="#fff" stroke-width="${(1.2*k).toFixed(4)}"/>`);return}
+    if(k>.03){const fs=n.length>2?11:12.5;const body=s0.shape==='circle'?`<circle r="${Math.max(10,n.length*3.8+3.5)}" fill="${s0.bg}" stroke="#fff" stroke-width="1.5"/>`
+        :(()=>{const q=n.length<=3?22:n.length*7+8;return `<rect x="${-q/2}" y="-11" width="${q}" height="22" fill="${s0.bg}" stroke="#fff" stroke-width="1.5"/>`})();
+      out.push(`<g transform="translate(${x} ${y}) scale(${k.toFixed(5)})">${body}<text y="4.3" text-anchor="middle" style="font:700 ${fs}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`);return}
     const arrow=a!=null?`<g transform="rotate(${a.toFixed(1)})"><path d="M31 0 L21 -8 L21 8 Z" fill="${pageLight()?'#14171a':'#f1f2f2'}" stroke="${pageLight()?'#fff':'#14171a'}" stroke-width="1.5"/></g>`:'';const kind=r.cat==='ferry'?'ferry':r.cat==='metro'?'metro':r.t==='trol'?'trol':r.t==='tram'?'tram':r.t==='rail'?'rail':'bus';
     const ic=(ICONS[kind]||ICONS.bus).replace('<svg ','<svg x="-12" y="-12" width="24" height="24" style="color:'+s0.bg+'" ');
     const lab=s0.shape==='circle'?(()=>{const cr=Math.max(12,n.length*4.4+4);const cx=right?-21-cr:21+cr;return `<circle cx="${cx}" cy="0" r="${cr}" fill="${s0.bg}"/><text x="${cx}" y="5" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text>`})()
