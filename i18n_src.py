@@ -375,6 +375,8 @@ ROWS = [
     ("Pozycja pojazdu", "Vehicle position", "Fahrzeugposition", "Poloha vozidla", "Poloha vozidla"),
     ("Pozycja telefonu", "Phone position", "Telefonposition", "Poloha telefónu", "Poloha telefonu"),
     ("pozycja telefonu: przystanki przełączają się bez opóźnienia danych przewoźnika, gdy jedziesz w pojeździe z włączoną lokalizacją; bez niej – pozycja pojazdu", "phone position: stops change without the delay of the operator's data while you ride in the vehicle with location on; without it – the vehicle's position", "Telefonposition: Haltestellen wechseln ohne die Verzögerung der Betreiberdaten, wenn Sie mit eingeschalteter Ortung im Fahrzeug fahren; ohne sie – Fahrzeugposition", "poloha telefónu: zastávky sa prepínajú bez oneskorenia údajov dopravcu, keď cestujete vo vozidle so zapnutou polohou; bez nej – poloha vozidla", "poloha telefonu: zastávky se přepínají bez zpoždění dat dopravce, když jedete ve vozidle se zapnutou polohou; bez ní – poloha vozidla"),
+    ("Bieżący", "Current", "Aktuell", "Aktuálny", "Aktuální"),
+    ("Eksport", "Export", "Export", "Export", "Export"),
 ]
 
 WEEKDAYS = {
