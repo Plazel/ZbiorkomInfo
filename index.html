@@ -4277,7 +4277,8 @@ app.addEventListener('click',e=>{const fm=e.target.closest('[data-focusn]');if(f
 /* ---------- search in the top bar: lines, combinations and stops of the city shown ---------- */
 // the towns of each stop name (a name in Gdańsk and in Gdynia: two different stops)
 function gdNameTowns(){if(GUIDE._nt&&GUIDE._ntC===city)return GUIDE._nt;const m=new Map();const names=new Set(depStopIndex(city).map(x=>x.n));
-  for(const X of Object.values(IDX.stops)){if(!names.has(X[0]))continue;if(!m.has(X[0]))m.set(X[0],new Set());m.get(X[0]).add(X[4])}
+  const A=CITY_AREAS();if(A.includes('gda'))A.push('oth');   // (only the stops of the chosen city: a „Dworcowa” in Bydgoszcz is no stop of the Tricity)
+  for(const X of Object.values(IDX.stops)){if(!names.has(X[0])||!A.includes(X[4]))continue;if(!m.has(X[0]))m.set(X[0],new Set());m.get(X[0]).add(X[4])}
   GUIDE._nt=m;GUIDE._ntC=city;return m}
 const gdTownName=a=>(CITIES[a]||[''])[0]||'';
 function gsItems(q){const out=[];const raw=q.trim();if(!raw)return out;const f=fold(raw);
