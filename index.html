@@ -3267,10 +3267,12 @@ async function openStopPop(name,pole,e,gi,merged){closeStopPop(true);MAP.popAt={
     const wp=showPl&&a.some(d=>d.pole);
     bx.innerHTML=a.length?a.map(d=>{const s=depStyle(d.r);const m=Math.round(d.t-now);
       const tm=m<=0?'<1 min':m<30?m+' min':String(Math.floor(d.t/60)%24).padStart(2,'0')+':'+String(Math.round(d.t)%60).padStart(2,'0');
-      return `<div class="mr${wp?' wpl':''}" data-rid="${esc(d.r.id)}" data-i="${a.indexOf(d)}" role="button" tabindex="0" title="Pokaż trasę linii ${esc(d.r.n)}"><div class="mb ${s.shape}${sqCls(d.r)}" style="background:${s.bg};color:${s.fg}">${esc(d.r.n)}</div><div>${esc(d.head)}</div>${wp?`<div class="mpl" title="Peron">${d.pole?POLE+esc(d.pole):''}</div>`:''}<div class="mt${d.live?' live':''}">${tm}</div></div>`}).join(''):'<p>Brak odjazdów w najbliższym czasie.</p>';
-    bx.querySelectorAll('.mr[data-rid]').forEach(row=>{const go=()=>{const id=row.dataset.rid;if(!MAP.data.routes[id])return;const dep=a[+row.dataset.i];closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([id]);applyHL();
-        // the line in the variant of this run (its letter, or the main route)
-        const v=runVariant(id,dep);if(v!=null){MAP.varOf[id]=v;updateVarPanel();renderLabels()}};
+      return `<div class="mr${wp?' wpl':''}" data-rid="${esc(d.r.id)}" data-i="${a.indexOf(d)}" role="button" tabindex="0" title="Pokaż kurs na mapie"><div class="mb ${s.shape}${sqCls(d.r)}" style="background:${s.bg};color:${s.fg}">${esc(d.r.n)}</div><div>${esc(d.head)}</div>${wp?`<div class="mpl" title="Peron">${d.pole?POLE+esc(d.pole):''}</div>`:''}<div class="mt${d.live?' live':''}">${tm}</div></div>`}).join(''):'<p>Brak odjazdów w najbliższym czasie.</p>';
+    bx.querySelectorAll('.mr[data-rid]').forEach(row=>{const go=async()=>{const id=row.dataset.rid;if(!MAP.data.routes[id])return;const dep=a[+row.dataset.i];closeStopPop(true);MAP.stopHL=null;
+        // the run itself, as from the guide: its own course, its stops and times, and the vehicle on it
+        RUN.fromMap=true;await openRunOnMap(dep,a);if(RUN.d)return;RUN.fromMap=false;
+        // (a run not found in the timetable: the line in the variant of this run, as before)
+        MAP.hl=new Set([id]);applyHL();const v=runVariant(id,dep);if(v!=null){MAP.varOf[id]=v;updateVarPanel();renderLabels()}};
       row.onclick=go;row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}}});
     trTree(bx)};
   const load=async()=>{let sch=[];for(const st of sts)for(const [k,sh] of depDayKeys())sch.push(...await depFor(st,k,sh));draw(sch,null);
@@ -3764,8 +3766,8 @@ function runTitle(d,lab,cls){const h=document.getElementById('mapTitle');if(!h)r
 function runVehHtml(d){const a=[];if(d.vlabel)a.push(`${esc(trS('Pojazd'))} <b>${esc(d.vlabel)}</b>`);if(d.brig)a.push(`${esc(trS('Brygada'))} <b>${esc(d.brig)}</b>`);
   return `<span class="rpV">${a.length?a.join(' · ')+(d.vmodel?'<small class="rpM">'+esc(d.vmodel)+'</small>':''):`<small>${esc(trS('Brak danych o pojeździe'))}</small>`}</span>`}
 // the run window's ×: back to the page the run was opened from (the guide, the departures, a stop), not to the full map
-function runExit(){if(VEH.back){VEH.back=false;closeRun();vehMode(true);return}const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
-function closeRun(){{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
+function runExit(){if(RUN.fromMap){RUN.fromMap=false;closeRun();return}if(VEH.back){VEH.back=false;closeRun();vehMode(true);return}const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
+function closeRun(){{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}RUN.fromMap=false;clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
 async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);return}
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;let dl=(d.delay||0)/60,gps=null;
   // ZTM Gdańsk: the vehicle's own position (a run from the guide's board: its vehicle found by line, start time and headsign)
