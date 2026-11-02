@@ -2442,7 +2442,9 @@ function updatePar(){if(!MAP.par||MAP.view==='schema'||MAP.drawn!=='geo')return;
     for(let i=0;i<L.pts.length;i++){const d=L.sl[i]*W;o.push((L.pts[i][0]+L.nx[i]*d).toFixed(2)+','+(L.pts[i][1]+L.ny[i]*d).toFixed(2))}
     pl.setAttribute('points',o.join(' '))})}
 function applyVB(){clearTimeout(MAP.cmt);MAP.cmt=0;const v=MAP.vb;MAP.vbC={...v};const svg=document.getElementById('mapSvg'),cv=document.getElementById('mapBase');
-  svg.style.transform=cv.style.transform='';svg.classList.remove('zooming');svg.setAttribute('viewBox',`${v.x} ${v.y} ${v.w} ${v.h}`);drawBase();updatePar()}
+  svg.style.transform=cv.style.transform='';svg.classList.remove('zooming');svg.setAttribute('viewBox',`${v.x} ${v.y} ${v.w} ${v.h}`);drawBase();updatePar();
+  // the vehicles at their size for the new view at once (not after the labels, a moment later: they would jump)
+  if(typeof VEH!=='undefined'&&VEH.on)drawVehs();if(typeof RUN!=='undefined'&&RUN.d)drawVeh()}
 // while dragging or zooming, the drawn map (lines and background) is only moved and scaled on screen – cheap for the browser;
 // it is drawn again for the new view (with its labels) when the movement stops
 function previewVB(){const C=MAP.vbC,v=MAP.vb;if(!C){applyVB();return}
@@ -3711,7 +3713,7 @@ async function vehTick(){if(!VEH.on)return;const info=document.getElementById('v
 function drawVehs(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapVehs');
   if(!VEH.on||MAP.view==='schema'){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapVehs';g.style.pointerEvents='none'}svg.appendChild(g);
-  const k=unitsPerPx(),v=MAP.vb,m=40*k;const sc=Math.min(1,Math.max(.55,.03/k*12))*.8;VEH.xy=[];const out=[];
+  const k=unitsPerPx(),v=MAP.vb,m=Math.max(v.w,v.h);const sc=Math.min(1,Math.max(.55,.03/k*12))*.8;VEH.xy=[];const out=[];
   VEH.list.forEach(it=>{const [x,y]=proj(it.v.lat,it.v.lon);if(x<v.x-m||x>v.x+v.w+m||y<v.y-m||y>v.y+v.h+m)return;VEH.xy.push([x,y,it]);
     const r=it.r,s0=depStyle(r),n=String(r.n);const a=it.ang;const right=a!=null&&Math.cos(a*Math.PI/180)>0.3;
     const arrow=a!=null?`<g transform="rotate(${a.toFixed(1)})"><path d="M31 0 L21 -8 L21 8 Z" fill="${pageLight()?'#14171a':'#f1f2f2'}" stroke="${pageLight()?'#fff':'#14171a'}" stroke-width="1.5"/></g>`:'';const kind=r.cat==='ferry'?'ferry':r.cat==='metro'?'metro':r.t==='trol'?'trol':r.t==='tram'?'tram':r.t==='rail'?'rail':'bus';
