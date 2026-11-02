@@ -994,6 +994,8 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
 
 /* the top bar always on screen: fixed, not sticky (on a phone the page could stay scrolled under a window that covers it, e.g. after the keyboard, and the bar went with it) */
 header.top{position:fixed;top:0;left:var(--rail-w);right:0}body{padding-top:var(--top-h)}
+/* no text can be selected anywhere (fields to type in still work as usual) */
+html,body,*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none}input,textarea,[contenteditable=true]{-webkit-user-select:text!important;user-select:text!important}
 /* no browser scrollbars anywhere (the page and its panels still scroll) */
 html,body,*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
 /* the buttons of a second row (under the top bar) as large as the top bar's and in line with them: same size, same gaps, same right edge */
