@@ -379,6 +379,15 @@ ROWS = [
     ("Eksport", "Export", "Export", "Export", "Export"),
     ("Nie znaleziono przystanku w pobliżu", "No stop nearby", "Keine Haltestelle in der Nähe", "V blízkosti sa nenašla zastávka", "V blízkosti nebyla nalezena zastávka"),
     ("W promieniu 400 m nie ma przystanku ani pojazdu. Wyszukaj przystanek lub pojazd w polu wyszukiwania u góry.", "There is no stop or vehicle within 400 m. Search for a stop or vehicle in the search box at the top.", "Im Umkreis von 400 m gibt es keine Haltestelle und kein Fahrzeug. Suchen Sie oben im Suchfeld nach einer Haltestelle oder einem Fahrzeug.", "V okruhu 400 m nie je zastávka ani vozidlo. Vyhľadajte zastávku alebo vozidlo v poli vyhľadávania hore.", "V okruhu 400 m není zastávka ani vozidlo. Vyhledejte zastávku nebo vozidlo v poli vyhledávání nahoře."),
+    ("Pojazdy", "Vehicles", "Fahrzeuge", "Vozidlá", "Vozidla"),
+    ("Pojazdy na mapie", "Vehicles on the map", "Fahrzeuge auf der Karte", "Vozidlá na mape", "Vozidla na mapě"),
+    ("Wczytywanie pojazdów…", "Loading vehicles…", "Fahrzeuge werden geladen…", "Načítavajú sa vozidlá…", "Načítají se vozidla…"),
+    ("Brak danych o pojazdach", "No vehicle data", "Keine Fahrzeugdaten", "Žiadne údaje o vozidlách", "Žádné údaje o vozidlech"),
+    ("Przewoźnicy w tym mieście nie udostępniają położenia pojazdów.", "The operators in this city do not publish vehicle positions.", "Die Verkehrsbetriebe dieser Stadt veröffentlichen keine Fahrzeugpositionen.", "Dopravcovia v tomto meste nezverejňujú polohu vozidiel.", "Dopravci v tomto městě nezveřejňují polohu vozidel."),
+    ("Nie udało się pobrać położenia pojazdów.", "Could not load vehicle positions.", "Fahrzeugpositionen konnten nicht geladen werden.", "Polohu vozidiel sa nepodarilo načítať.", "Polohu vozidel se nepodařilo načíst."),
+    ("pojazd", "vehicle", "Fahrzeug", "vozidlo", "vozidlo"),
+    ("pojazdów", "vehicles", "Fahrzeuge", "vozidiel", "vozidel"),
+    ("odświeżane co 10 s", "refreshed every 10 s", "alle 10 s aktualisiert", "obnovované každých 10 s", "obnovováno každých 10 s"),
 ]
 
 WEEKDAYS = {
