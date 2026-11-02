@@ -995,7 +995,7 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
 /* the top bar always on screen: fixed, not sticky (on a phone the page could stay scrolled under a window that covers it, e.g. after the keyboard, and the bar went with it) */
 header.top{position:fixed;top:0;left:var(--rail-w);right:0}body{padding-top:var(--top-h)}
 /* no text can be selected anywhere (fields to type in still work as usual) */
-html,body,*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none}input,textarea,[contenteditable=true]{-webkit-user-select:text!important;user-select:text!important}
+html,body,*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none}input,textarea,[contenteditable=true]{-webkit-user-select:text!important;user-select:text!important}a,img{-webkit-user-drag:none;user-drag:none}
 /* no browser scrollbars anywhere (the page and its panels still scroll) */
 html,body,*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
 /* the buttons of a second row (under the top bar) as large as the top bar's and in line with them: same size, same gaps, same right edge */
@@ -5144,6 +5144,9 @@ function langUI(){const b=document.getElementById('langBtn'),m=document.getEleme
  document.addEventListener('click',e=>{if(!m.hidden&&!e.target.closest('.langWrap')){m.hidden=true;b.setAttribute('aria-expanded','false')}});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!m.hidden){m.hidden=true;b.setAttribute('aria-expanded','false');b.focus()}})}
 trStart();
+
+document.addEventListener('contextmenu',e=>{if(!(e.target.closest&&e.target.closest('input,textarea,[contenteditable=true]')))e.preventDefault()});
+document.addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest('a,img'))e.preventDefault()});
 </script>
 
 </body>
