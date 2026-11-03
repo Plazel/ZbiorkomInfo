@@ -3395,11 +3395,14 @@ const GD_VOICES={pl:['pl-PL-ZofiaNeural','pl-PL-MarekNeural'],cs:['cs-CZ-VlastaN
 const gdMale=()=>store.get('ztm.gdVoice','f')==='m';
 const GD_VOICE=new Proxy({},{get:(o,l)=>GD_VOICES[l]&&GD_VOICES[l][gdMale()?1:0]});
 const GDV={ready:{},loading:{},cache:new Map()};
-const gdTtsUrl=(t,l)=>RT_PROXY?RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(GD_VOICE[l])+'&t='+encodeURIComponent(t):null;
+// each voice's speed (data/wymowa.json, _tempo; the worker reads the same file): put into the address, so that a speed changed
+// there is heard at once (the recordings are kept by the browser for a year under their address)
+let GD_TEMPO=null;const gdTempoP=()=>GD_TEMPO||(GD_TEMPO=fetch('data/wymowa.json',{cache:'no-cache'}).then(r=>r.ok?r.json():{}).then(j=>j._tempo||{}).catch(()=>({})));
+const gdTtsUrl=(t,l,tp)=>RT_PROXY?RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(GD_VOICE[l])+'&t='+encodeURIComponent(t)+(tp&&tp[GD_VOICE[l]]?'&r='+encodeURIComponent(tp[GD_VOICE[l]]):''):null;
 const GD_TQ={n:0,q:[]};
 function gdTtsQ(fn){return new Promise((res,rej)=>{const run=()=>{GD_TQ.n++;fn().then(res,rej).finally(()=>{GD_TQ.n--;const nx=GD_TQ.q.shift();if(nx)nx()})};GD_TQ.n<2?run():GD_TQ.q.push(run)})}
 function gdWav(text,l){const k=GD_VOICE[l]+'|'+text;
-  if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l);if(!u)throw new Error('no proxy');
+  if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l,await gdTempoP());if(!u)throw new Error('no proxy');
       // two at a time, a refused one (a service taking only so many at once) tried again a moment later
       for(let a=0;;a++){const r=await gdTtsQ(()=>fetch(u));
         if(r.ok&&/audio/.test(r.headers.get('content-type')||'')){GDV.by=r.headers.get('x-voice-by')||GDV.by;return URL.createObjectURL(await r.blob())}
