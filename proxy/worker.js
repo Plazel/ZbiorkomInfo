@@ -48,9 +48,15 @@ async function tts(req, env, ctx, cors) {
   let res = await cache.match(key);
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
   if (!res && env.ELEVEN_KEY) {   // ElevenLabs directly (Flash v2.5: Polish, Czech, Slovak, German, English; half a credit a character)
-    const r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE[MALE.test(voice) ? 'm' : 'f']}?output_format=mp3_44100_64`, {
-      method: 'POST', headers: { 'xi-api-key': env.ELEVEN_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
-      body: JSON.stringify({ text, model_id: 'eleven_flash_v2_5', language_code: VOICES[voice].slice(0, 2) }) });
+    // (the free plan takes 4 requests at once: one refused for that is tried again a moment later)
+    let r;
+    for (let a = 0; a < 4; a++) {
+      r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE[MALE.test(voice) ? 'm' : 'f']}?output_format=mp3_44100_64`, {
+        method: 'POST', headers: { 'xi-api-key': env.ELEVEN_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
+        body: JSON.stringify({ text, model_id: 'eleven_flash_v2_5', language_code: VOICES[voice].slice(0, 2) }) });
+      if (r.status !== 429) break;
+      await new Promise(z => setTimeout(z, 500 + 700 * a));
+    }
     if (r.ok) res = keep(await r.arrayBuffer(), 'ElevenLabs');
     else if (!env.AI && !env.AZURE_KEY) return new Response('elevenlabs: ' + r.status + ' ' + (await r.text()).slice(0, 300), { status: 502, headers: cors });
   }

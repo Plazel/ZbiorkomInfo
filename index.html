@@ -3369,9 +3369,14 @@ const gdMale=()=>store.get('ztm.gdVoice','f')==='m';
 const GD_VOICE=new Proxy({},{get:(o,l)=>GD_VOICES[l]&&GD_VOICES[l][gdMale()?1:0]});
 const GDV={ready:{},loading:{},cache:new Map()};
 const gdTtsUrl=(t,l)=>RT_PROXY?RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(GD_VOICE[l])+'&t='+encodeURIComponent(t):null;
+const GD_TQ={n:0,q:[]};
+function gdTtsQ(fn){return new Promise((res,rej)=>{const run=()=>{GD_TQ.n++;fn().then(res,rej).finally(()=>{GD_TQ.n--;const nx=GD_TQ.q.shift();if(nx)nx()})};GD_TQ.n<2?run():GD_TQ.q.push(run)})}
 function gdWav(text,l){const k=GD_VOICE[l]+'|'+text;
-  if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l);if(!u)throw new Error('no proxy');const r=await fetch(u);
-      if(!r.ok||!/audio/.test(r.headers.get('content-type')||''))throw new Error('tts '+r.status);GDV.by=r.headers.get('x-voice-by')||GDV.by;return URL.createObjectURL(await r.blob())})().catch(e=>{GDV.cache.delete(k);throw e}));
+  if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l);if(!u)throw new Error('no proxy');
+      // ElevenLabs' free plan takes only a few requests at once: two at a time, a refused one tried again a moment later
+      for(let a=0;;a++){const r=await gdTtsQ(()=>fetch(u));
+        if(r.ok&&/audio/.test(r.headers.get('content-type')||'')){GDV.by=r.headers.get('x-voice-by')||GDV.by;return URL.createObjectURL(await r.blob())}
+        if(a>=2||(r.status!==502&&r.status!==429&&r.status!==503))throw new Error('tts '+r.status);await new Promise(z=>setTimeout(z,700*(a+1)))}})().catch(e=>{GDV.cache.delete(k);throw e}));
     if(GDV.cache.size>80){const [k0,p0]=GDV.cache.entries().next().value;GDV.cache.delete(k0);p0.then(u=>URL.revokeObjectURL(u),()=>{})}}
   return GDV.cache.get(k)}
 // whether the common voice answers (tried once when the announcements are switched on)
@@ -3570,15 +3575,17 @@ async function gdRunPos(h){const R=GUIDE.run;if(GUIDE.fake)return {p:GUIDE.fake,
       const st0=x=>x.up?0:Math.abs(vehT0(x)-R.t0);
       if(C.length>1){const e=gdTtPos(R);C.sort((a,b)=>Math.round(st0(a))-Math.round(st0(b))||distM(a.lat,a.lon,e[0],e[1])-distM(b.lat,b.lon,e[0],e[1]))}
       v=C[0];if(v)R.veh=v.id}
-    if(v){if(v.label)R.vlabel=v.label;R.lastVeh={p:[v.lat,v.lon],t:Date.now(),si:v.si,at:v.at};if(gdPhoneOk())return {p:GUIDE.pos,src:'me'};if(h&&distM(h[0],h[1],v.lat,v.lon)<80)return {p:h,src:'me',si:v.si,at:v.at};return {p:[v.lat,v.lon],src:'veh',si:v.si,at:v.at}}}
+    if(v){if(v.label)R.vlabel=v.label;R.lastVeh={p:[v.lat,v.lon],t:Date.now(),si:v.si,at:v.at};if(phone)return {p:GUIDE.pos,src:'me'};return {p:[v.lat,v.lon],src:'veh',si:v.si,at:v.at}}}
   if(phone)return {p:GUIDE.pos,src:'me'};
   if(R.lastVeh&&Date.now()-R.lastVeh.t<90000)return {p:R.lastVeh.p,src:'veh',si:R.lastVeh.si,at:R.lastVeh.at};
-  if(h&&!R.fromStop)return {p:h,src:'me'};
+  // "Pozycja pojazdu" where vehicles are published: their position or (not found yet) the timetable, not the phone
+  const vehCity=['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city];
+  if(h&&!R.fromStop&&!vehCity)return {p:h,src:'me'};
   // the timetable: between the stops it should be between now
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);const P=R.ps.map(id=>IDX.stops[id]);
   let j=T.findIndex(t=>t>nowM);if(j<0)j=T.length-1;if(j===0)return {p:[P[0][2],P[0][3]],src:'tt'};
   const f=Math.max(0,Math.min(1,(nowM-T[j-1])/Math.max(.1,T[j]-T[j-1])));
-  if(h&&distM(h[0],h[1],P[j][2],P[j][3])<2000)return {p:h,src:'me'};
+  if(h&&!vehCity&&distM(h[0],h[1],P[j][2],P[j][3])<2000)return {p:h,src:'me'};
   return {p:[P[j-1][2]+(P[j][2]-P[j-1][2])*f,P[j-1][3]+(P[j][3]-P[j-1][3])*f],src:'tt'}}
 function gdProgress(h,src,q){const R=GUIDE.run,st=document.getElementById('gdStat'),sip=document.getElementById('gdSip');const P=R.ps.map(id=>IDX.stops[id]);
   const cs=Math.cos(h[0]*Math.PI/180);const xy=S=>[(S[3]-h[1])*cs*111320,(S[2]-h[0])*110540];
