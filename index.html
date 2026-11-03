@@ -278,7 +278,11 @@ span.chip{cursor:inherit}
 .miniBoard .mb.rect.sq{width:34px;min-width:0;padding:0;overflow:hidden}.miniBoard .mb.sq.len3{font-size:.86rem;letter-spacing:-.04em}
 .miniBoard .mr.wpl{grid-template-columns:minmax(48px,max-content) 1fr 46px 72px}
 .miniBoard .mb.rect:not(.sq){white-space:nowrap;padding:0 6px}.miniBoard .mr.wpl .mt{text-align:right;white-space:nowrap}.miniBoard .mpl{white-space:nowrap;text-align:left!important}.miniBoard .mpl{color:#9aa3ad;font-size:.85rem;min-width:22px;text-align:right}
-.miniBoard .mt{font-weight:700;font-size:1.1rem}.miniBoard .live{color:inherit}#spSrc:empty{display:none}
+.miniBoard .mt{font-weight:700;font-size:1.1rem}.miniBoard .live{color:inherit}.dArr,.miniBoard .dArr,.gbR .dArr{color:inherit}
+/* the board on the page: compact, its title and headings in the sizes of the page's other boards (full screen: by its rows) */
+.depModal:not(.kiosk) .dTitle{min-height:44px}.depModal:not(.kiosk) .dTitle b,.depModal:not(.kiosk) .dClock{font-size:1rem}
+.depModal:not(.kiosk) .dHead{height:34px}.depModal:not(.kiosk) .dHead .l,.depModal:not(.kiosk) .dHead .c{font-size:.85rem}
+.depModal:not(.kiosk) .dCode{font-size:.85rem}#spSrc:empty{display:none}
 .miniBoard p{margin:0;padding:8px 14px;font-size:.8rem;color:#9aa4ae}
 .gscroll{overflow-x:auto}
 /* each day as wide as its own longest hour; spare room (if any) is shared out, otherwise no gaps */
@@ -666,9 +670,9 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .dDest{font-size:calc(var(--rowh)*.46);white-space:nowrap;overflow:hidden;min-width:0;padding-top:.06em}
 .dRow.tap{cursor:pointer}.dDest .mq{display:inline-block;animation:mqS var(--mqd,8s) linear infinite alternate}@keyframes mqS{0%,18%{transform:translateX(0)}82%,100%{transform:translateX(var(--mq))}}
 .dTime{font-size:calc(var(--rowh)*.46);text-align:right;white-space:nowrap;padding-top:.06em}
-.dTime.now{color:var(--d-acc);font-weight:700}
+.dTime.now{font-weight:700}
 .dCode{font-size:calc(var(--rowh)*.28);font-weight:400;color:var(--d-dim);text-align:left;white-space:nowrap}.dHead .c{text-align:left}.dTime{font-weight:700}.dCode svg.pole{height:.95em;width:auto;vertical-align:-.12em;margin-right:.18em}
-.dArr{display:inline-flex;letter-spacing:-.04em;font-weight:800;color:var(--d-acc)}
+.dArr{display:inline-flex;letter-spacing:-.04em;font-weight:800;color:inherit}
 .dArr i{font-style:normal;animation:dArr 1.6s steps(1) infinite}
 .dArr i:nth-child(2){animation-name:dArr2}.dArr i:nth-child(3){animation-name:dArr3}
 @keyframes dArr{0%,24.9%{opacity:1}25%,100%{opacity:.12}}
@@ -4311,7 +4315,8 @@ function depLayout(){const m=depEl();if(m.hidden)return;
   const pe=document.getElementById('depPanels');const h=pe.clientHeight,w=pe.clientWidth/np;
   // the title and header take about 1.6 rows: the rows share the rest
   // narrow screens: the rows as large as the width allows (the boards then scroll), so the type stays readable
-  const rowh=pe.clientWidth<760?Math.max(40,Math.min(64,pe.clientWidth/7)):Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));
+  // on the page: compact, the size of the page's other boards; full screen: the rows filling the screen, to be read from afar
+  const rowh=!m.classList.contains('kiosk')?(pe.clientWidth<760?38:42):pe.clientWidth<760?Math.max(40,Math.min(64,pe.clientWidth/7)):Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));
   m.style.setProperty('--rowh',rowh+'px');m.style.setProperty('--nrows',depCfg.rows);
   m.style.setProperty('--c-badge',(rowh*1.15)+'px');m.style.setProperty('--c-time',(rowh*2.3)+'px');m.style.setProperty('--c-code',Math.max(rowh*.9,codeW(rowh))+'px')}
 // the platform column is as wide as its heading in the chosen language (e.g. "Nástupište")
@@ -4372,7 +4377,7 @@ function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('di
 // live data at all, its timetable runs as the minutes to go under an hour, then the clock time
 const LIVE_CITIES=['gda','sop','gdy','all','byd','poz','krk','waw','ldz','prg'];
 function brdTime(d,nowM,c){const left=d.t-nowM,mins=d.live||!LIVE_CITIES.includes(c||city);
-  if(mins&&left<1)return '&lt;1 min';if(mins&&left<60)return Math.floor(left)+' min';
+  if(mins&&left<1)return '<span class="dArr" aria-label="odjeżdża"><i>&gt;</i><i>&gt;</i><i>&gt;</i></span>';if(mins&&left<60)return Math.floor(left)+' min';
   const t=Math.floor(d.t+1e-6)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
 const DEP_AHEAD=24*60;   // (the board: the departures of the next 24 hours)
 // the platform column: shown where the board has more than one platform; with stops of several names it is the "Przystanek"
@@ -4429,7 +4434,7 @@ async function openDep(){if(!IDX)return;if(MAP.open)closeMap();if(typeof JP!=='u
     if(st)st.textContent='Ustalanie lokalizacji…';
     navigator.geolocation.getCurrentPosition(async p=>{try{await depNearest(p.coords.latitude,p.coords.longitude)}catch(e){fail('Nie udało się wyznaczyć najbliższego przystanku.')}},
       e=>fail(e.code===1?'Brak zgody na udostępnienie lokalizacji.':'Nie udało się ustalić lokalizacji.'),{enableHighAccuracy:true,timeout:10000,maximumAge:60000})}}
-function depKiosk(on){const m=depEl();m.classList.toggle('kiosk',on);
+function depKiosk(on){const m=depEl();m.classList.toggle('kiosk',on);setTimeout(()=>{depLayout();depRender()},60);
   if(on){if(m.requestFullscreen&&!document.fullscreenElement)m.requestFullscreen().catch(()=>{})}
   else if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});
   setTimeout(depLayout,60)}
