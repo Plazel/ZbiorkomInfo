@@ -2,5 +2,6 @@
  "_": "Wymowa nazw przystanków dla głosów Azure: nazwa → zapis IPA (bez nawiasów). Worker czyta ten plik sam (co 10 minut).",
  "Munketoft": "ˈmʊŋkəˌtɔft",
  "Sünderup": "ˈzʏndəʁʊp",
- "Adelby": "ˈaːdəlbyː"
+ "Adelby": "ˈaːdəlbyː",
+ "Hesttoft-Nord": "ˈhɛstˌtɔft ˈnɔʁt"
 }
