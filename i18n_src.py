@@ -412,6 +412,10 @@ ROWS = [
     ("TEST: położenie według rozkładu jazdy", "TEST: position by the timetable", "TEST: Position nach Fahrplan", "TEST: poloha podľa cestovného poriadku", "TEST: poloha podle jízdního řádu"),
     ("Wstecz", "Back", "Zurück", "Späť", "Zpět"),
     ("Dalej", "Forward", "Weiter", "Ďalej", "Dále"),
+    ("Monachium", "Munich", "München", "Mníchov", "Mnichov"),
+    ("Wiedeń", "Vienna", "Wien", "Viedeň", "Vídeň"),
+    ("Berlin", "Berlin", "Berlin", "Berlín", "Berlín"),
+    ("Bez gongu", "No gong", "Kein Gong", "Bez gongu", "Bez gongu"),
 ]
 
 WEEKDAYS = {
