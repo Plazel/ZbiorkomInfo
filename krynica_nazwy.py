@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
-"""Krynica-Zdrój's stops named without "-Zdrój" ("Krynica Czarny Potok Gondola", "Krynica"): there is only one Krynica in
-the area, so the shorter name is enough on the page and in the guide's announcements. Done on the data written by build.py
-(the names inside the build stay as in the sources); the operator's name (MPGK Krynica-Zdrój) and the area's name stay.
+"""Krynica-Zdrój's stops named without "-Zdrój" ("Krynica Czarny Potok Gondola"): there is only one Krynica in the area, so
+the shorter name is enough on the page and in the guide's announcements. The railway station and the stop at it keep the
+town's full name ("Krynica-Zdrój", "Krynica-Zdrój Dworzec PKP"), as do the operator (MPGK Krynica-Zdrój) and the area.
+Done on the data written by build.py (the names inside the build stay as in the sources).
 Usage: python3 krynica_nazwy.py [data folder]   (build.py calls apply())"""
 import json, os, re, sys
 
 OLD, NEW = 'Krynica-Zdrój', 'Krynica'
-RX = re.compile(r'Krynica-Zdrój(?=\s|$|\W)')
+RX = re.compile(r'Krynica-Zdrój (?!Dworzec PKP)(?=\w)')
 KEEP_KEYS = {'op'}   # (the operator: its own name)
 
 
 def fix(v, key=None):
-    if isinstance(v, str): return v if key in KEEP_KEYS or OLD not in v else RX.sub(NEW, v)
+    if isinstance(v, str): return v if key in KEEP_KEYS or OLD not in v else RX.sub(NEW + ' ', v)
     if isinstance(v, list): return [fix(x) for x in v]
-    if isinstance(v, dict): return {(RX.sub(NEW, k) if OLD in k else k): fix(x, k) for k, x in v.items()}
+    if isinstance(v, dict): return {(RX.sub(NEW + ' ', k) if OLD in k else k): fix(x, k) for k, x in v.items()}
     return v
 
 
