@@ -416,6 +416,7 @@ ROWS = [
     ("Wiedeń", "Vienna", "Wien", "Viedeň", "Vídeň"),
     ("Berlin", "Berlin", "Berlin", "Berlín", "Berlín"),
     ("Brak", "None", "Keiner", "Žiadny", "Žádný"),
+    ("Aktualizacja: {n} temu", "Updated {n} ago", "Aktualisiert vor {n}", "Aktualizácia: pred {n}", "Aktualizace: před {n}"),
 ]
 
 WEEKDAYS = {
