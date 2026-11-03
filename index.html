@@ -4581,7 +4581,7 @@ function depLinesTable(){const tb=document.getElementById('depLinesB');tb.replac
 /* ---------- header: the city list ---------- */
 let NAV_READY=false,NAV_LAST='tt',NAV_CUR='tt',NAV_POP=false,NAV_SILENT=false,NAV_T=0;
 function navMark(){const v=(typeof GUIDE!=='undefined'&&GUIDE.open)?'guide':MAP.open?'map':(typeof DEP!=='undefined'&&DEP.open)?'dep':(typeof JP!=='undefined'&&JP.open)?'jp':(typeof TD!=='undefined'&&TD.view)?TD.view:'tt';
-  if(NAV_READY)try{sessionStorage.setItem('ztm.nav',v)}catch(e){}
+  if(NAV_READY){try{sessionStorage.setItem('ztm.nav',v)}catch(e){}store.set('ztm.nav',[v,Date.now()])}
   // (one history step per change of section, taken when the change is complete: closing one view to open another is one step)
   NAV_CUR=v;if(NAV_READY&&!NAV_POP&&!NAV_SILENT){clearTimeout(NAV_T);NAV_T=setTimeout(()=>{if(!NAV_POP&&NAV_CUR!==NAV_LAST){try{history.pushState({ov:NAV_CUR},'',location.href)}catch(e){}NAV_LAST=NAV_CUR}},0)}else if(NAV_POP||NAV_SILENT){}else NAV_LAST=v;
   {const gi=document.getElementById('gsIn');if(gi){const ph=v==='map'?'Wyszukaj przystanek na mapie':v==='guide'?'Nazwa przystanku lub numer pojazdu':'Wyszukaj linię, łączenie linii lub przystanek';gi.placeholder=trS(ph);gi.setAttribute('aria-label',trS(ph))}}document.querySelectorAll('[data-nav]').forEach(b=>{if(b.dataset.nav===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
@@ -4852,8 +4852,9 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
       else if(!st.run&&RUN.d)closeRun()}
     if(want==='map'&&st.pop){await new Promise(r=>setTimeout(r,120));reopenStopPop(st.pop)}}
   finally{clearTimeout(NAV_T);NAV_POP=false;NAV_LAST=NAV_CUR=want}});
-// the section open before a reload (map, board, planner…) opens again
-const NAV0=(()=>{try{return sessionStorage.getItem('ztm.nav')||''}catch(e){return ''}})();
+// the section open before a reload (map, board, planner…) opens again (kept in the session, and for 12 hours in the browser's
+// storage: some browsers and embedded pages start every load with a new, empty session)
+const NAV0=(()=>{let v='';try{v=sessionStorage.getItem('ztm.nav')||''}catch(e){}if(!v){const k=store.get('ztm.nav',null);if(Array.isArray(k)&&Date.now()-k[1]<43200000)v=k[0]}return v})();
 (window.EMBEDDED_DATA?Promise.resolve(EMBEDDED_DATA.index):fetch('data/index.json').then(r=>r.json())).then(async j=>{IDX=j;hideRoutes();nightTrams();setByName();setCorridors();await route();
   NAV_READY=true;if(NAV0&&NAV0!=='tt'){const b=document.querySelector(`[data-nav="${NAV0}"]`);if(b&&!b.hidden)b.click()}})
  .catch(()=>{app.innerHTML='<p class="loading">Nie udało się wczytać rozkładów. Odśwież stronę.</p>'});
