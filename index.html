@@ -1781,11 +1781,11 @@ function setCorridor(area,lines,a,b){const ids=lines.map(n=>{const r=IDX.routes.
   if(ids.length===lines.length)CORRIDORS[ids.sort().join('_')]=[a,b]}
 function setCorridors(){
   const K='Krynica ';
-  setCorridor('km',['10','11','13','14','15','16','17','6','7','8','9'],[K+'Kraszewskiego Szpital'],[K+'Zdrojowa Bank']);
-  setCorridor('km',['6','7','8','9'],[K+'Dolna'],[K+'Zdrojowa Bank']);
-  setCorridor('km',['13','14','15'],['Tylicz Rynek'],[K+'Czarny Potok Gondola',K+'Czarny Potok Pętla',K+'Czarny Potok Osiedle']);
-  setCorridor('km',['11','16','17'],[K+'Zawodzie Pętla'],[K+'Zdrojowa Bank']);
-  setCorridor('km',['11','12','16'],[K+'Zawodzie Pętla'],[K+'Czarny Potok Pętla',K+'Czarny Potok Osiedle']);
+  setCorridor('km',['10','11','13','14','15','16','17','6','7','8','9'],[K+'Kraszewskiego - Szpital'],[K+'Zdrojowa - Bank']);
+  setCorridor('km',['6','7','8','9'],[K+'Dolna'],[K+'Zdrojowa - Bank']);
+  setCorridor('km',['13','14','15'],['Tylicz Rynek'],[K+'Czarny Potok - Gondola',K+'Czarny Potok - Pętla',K+'Czarny Potok - Osiedle']);
+  setCorridor('km',['11','16','17'],[K+'Zawodzie - Pętla'],[K+'Zdrojowa - Bank']);
+  setCorridor('km',['11','12','16'],[K+'Zawodzie - Pętla'],[K+'Czarny Potok - Pętla',K+'Czarny Potok - Osiedle']);
   setCorridor('tri',['8','9'],['Dworzec Główny'],['Głęboka']);
   setCorridor('poz',['12','14','15','16'],['Os. Sobieskiego'],['Most Teatralny']);   // PST   // 8 and 9 together only between these two
 }
@@ -3431,6 +3431,7 @@ function gdNameSaid(name,nl){let n=name;
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II)$/.test(rest)){n=p+', '+rest;break}}}
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
+  n=n.replace(/\s+[-–]\s+/g,', ');   // ("Kraszewskiego - Szpital", "Brzechwy - Szafirowa": a pause between)
   return /[.!?]$/.test(n)?n:n+'.'}
 function gdSegs0(kind,name,isLast,req,zc){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);out.push([gdNameSaid(name,nl),nl,1]);
