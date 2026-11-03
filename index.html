@@ -685,7 +685,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .depBtn[hidden]{display:none}
 .depBtn{font:600 14px Roboto,"Segoe UI",sans-serif;padding:9px 13px;border:1px solid var(--d-line);background:var(--d-panel);color:var(--d-fg);cursor:pointer}
 .depBtn.primary{background:var(--d-acc);border-color:var(--d-acc);color:var(--d-bar)}
-.depModal.light .depBtn.primary{color:#fff}
+.depModal.light .depBtn.primary{color:#fff}.dEmpty .depBtn.primary,.depModal.light .dEmpty .depBtn.primary{background:var(--brand,#d71920);border-color:var(--brand,#d71920);color:#fff}
 .depDlg{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px}
 .depDlg[hidden]{display:none}
 .depBox{width:min(760px,100%);max-height:min(88vh,820px);display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;background:var(--d-panel);color:var(--d-fg);border:1px solid var(--d-line);box-shadow:0 20px 60px rgba(0,0,0,.4);font-size:15px}
