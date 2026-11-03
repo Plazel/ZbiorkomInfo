@@ -3409,7 +3409,10 @@ const gdNameHtml=(name,ex)=>{const t=gdTrnText(name);return `<span>${esc(name)}$
 const GD_SAY=[[/Groddecka/g,'Grodeka'],[/Traugutta/g,'Trauguta'],[/Westerplatte/g,'Westerplate']];
 const gdSayFix=t=>GD_SAY.reduce((x,[a,b])=>x.replace(a,b),t);
 // (Czech: the line letter S said by its name, "es", not as a bare sound)
-function gdSegs(kind,name,isLast,req){return gdSegs0(kind,name,isLast,req).map(([t,l])=>[l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t,l])}
+// stop names a voice says wrongly: written for the voice as they are said (Flensburg: "Mun-ke-toft" in one go, not "Munk-e-toft")
+const GD_SAY_AS={Munketoft:'Mungketoft'};
+const gdSayAs=t=>t.replace(/[A-Za-zÀ-ž]+/g,w=>GD_SAY_AS[w]||w);
+function gdSegs(kind,name,isLast,req){return gdSegs0(kind,name,isLast,req).map(([t,l])=>[gdSayAs(l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t),l])}
 function gdSegs0(kind,name,isLast,req){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);out.push([name,nl,1]);
   const tr=l!=='pl'&&nl==='pl'&&store.get('ztm.gdTrans',false)&&!gdNoTrn(name,l)&&GD_TRN[name]&&GD_TRN[name][l];if(tr)tr.forEach(([t,x])=>out.push([t,x,2]));
