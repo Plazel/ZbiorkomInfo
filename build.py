@@ -1793,6 +1793,10 @@ print('Paczki tras:', len(os.listdir(OUT + '/rp')), 'plików')
 try:
     import krynica_nazwy; krynica_nazwy.apply(OUT)
 except Exception as e: print('Krynica bez „-Zdrój”: pominięto (%s)' % e)
+# the fare zones of the stops for the guide's announcement of a zone change (strefy.py)
+try:
+    import strefy; strefy.build(OUT, cache=SCR)
+except Exception as e: print('Strefy taryfowe: pominięto (%s)' % e)
 
 # ---------------- optional: single-file page with the data built in ----------------
 if EMBED:

@@ -3341,6 +3341,12 @@ function reopenStopPop(pa){if(!pa||!MAP.stopG)return;let gi=pa.gi;let G=MAP.stop
 // stands for the user's position ----
 const GUIDE={open:false,watch:null,pos:null,fake:null,run:null,voice:false,lastAnn:'',tm:0,pick:false,choice:null,j:0};
 // [next stop, end of the line] and the same for stations (rail and metro lines)
+// the fare zones (data/strefy.json, strefy.py): stops on a zone border (ZTM Gdańsk, Warszawa) and the zone of each stop
+// (Poznań, Kraków, Łódź); "next stop" said with a warning when the stop ahead is on a border or in another zone
+const GD_ZONE_TXT={pl:'Uwaga! Zmiana strefy taryfowej.',en:'Attention! Fare zone change.',de:'Achtung! Wechsel der Tarifzone.',cs:'Pozor! Změna tarifního pásma.',sk:'Pozor! Zmena tarifného pásma.'};
+let GD_ZONES=null;function gdZonesLoad(){if(!GD_ZONES){GD_ZONES={b:new Set(),z:{}};fetch('data/strefy.json').then(r=>r.ok?r.json():null).then(j=>{if(j){GD_ZONES.b=new Set(j.b||[]);GD_ZONES.z=j.z||{}}}).catch(()=>{})}return GD_ZONES}
+function gdZoneChange(j){const R=GUIDE.run,Z=gdZonesLoad();if(!R||!R.ps||j<1||j>=R.ps.length)return false;const s=R.ps[j];if(Z.b.has(s))return true;
+  const a=Z.z[R.ps[j-1]],b=Z.z[s];return !!(a&&b&&a!==b)}
 const GD_TXT={pl:['Następny przystanek','Przystanek końcowy','Następna stacja','Stacja końcowa','Przystanek na żądanie'],de:['Nächste Haltestelle','Endhaltestelle','Nächster Halt','Endstation','Halt auf Verlangen'],
   en:['Next stop','Last stop','Next station','Last station','Request stop'],cs:['Příští zastávka','Konečná zastávka','Příští stanice','Konečná stanice','Zastávka na znamení'],sk:['Nasledujúca zastávka','Konečná zastávka','Nasledujúca stanica','Konečná stanica','Zastávka na znamenie']};
 // the language of a town's stop names (spoken in it); the words around them in the language of the page
@@ -3413,7 +3419,7 @@ const gdSayFix=t=>GD_SAY.reduce((x,[a,b])=>x.replace(a,b),t);
 // IPA, there; Flensburg: [ˈmʊŋkəˌtɔft], not "Munk-e-toft")
 const GD_SAY_AS={Munketoft:'Mungketoft',ZOB:'Zentraler Omnibusbahnhof'};
 const gdSayAs=t=>t.replace(/[A-Za-zÀ-ž]+/g,w=>GD_SAY_AS[w]||w);
-function gdSegs(kind,name,isLast,req){return gdSegs0(kind,name,isLast,req).map(([t,l])=>[l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t,l])}
+function gdSegs(kind,name,isLast,req,zc){return gdSegs0(kind,name,isLast,req,zc).map(([t,l])=>[l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t,l])}
 // a stop's name as said: in Krynica and Muszyna the town apart from the place in it ("Muszyna, Granica", not "Muszynagranica";
 // a station, "… PKP", said in one go), the numbers I and II as words, and with the voice going down at its end (a full stop)
 const GD_TOWNS_X=['Krynica','Mochnaczka Niżna','Wierchomla Wielka','Wojkowa'];   // (Krynica: its stops are "Krynica …", the town's own stop "Krynica-Zdrój")
@@ -3426,13 +3432,14 @@ function gdNameSaid(name,nl){let n=name;
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II)$/.test(rest)){n=p+', '+rest;break}}}
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
   return /[.!?]$/.test(n)?n:n+'.'}
-function gdSegs0(kind,name,isLast,req){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
+function gdSegs0(kind,name,isLast,req,zc){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);out.push([gdNameSaid(name,nl),nl,1]);
   const tr=l!=='pl'&&nl==='pl'&&store.get('ztm.gdTrans',false)&&!gdNoTrn(name,l)&&GD_TRN[name]&&GD_TRN[name][l];if(tr)tr.forEach(([t,x])=>out.push([t,x,2]));
   const ex=store.get('ztm.gdExtra',true);
   // in the Tricity, in Czech: the change to the S lines (SKM), at the main stations also to the other trains
   if(ex&&l==='cs'&&gdTri()){if(gdSKM(name))out.push(['Přestup na linky S.','cs',3]);
     else if(/\bPKP\b|Dworzec G[łl]|^Dworzec PKS$/.test(name))out.push(['Přestup na linky S a další vlakové spoje.','cs',3])}
+  if(zc&&kind==='next'&&GD_ZONE_TXT[l])out.push([GD_ZONE_TXT[l],l,6]);
   if(isLast&&ex)out.push([T[st+1]+'.',l,4]);
   // a stop on request: always said (whatever the extra messages setting), so that the passenger signals in time
   if(req&&!isLast)out.push([T[4]+'.',l,5]);
@@ -3467,7 +3474,7 @@ async function gdNotify(text){const ms=navigator.mediaSession;
       actions:[{action:'mute',title:trS('Wycisz zapowiedzi')}],data:{url:location.href}})}catch(e){}}
 async function gdNotifyClose(){try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(!reg)return;(await reg.getNotifications({tag:'zbiorkom-guide'})).forEach(n=>n.close())}catch(e){}}
 if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',e=>{if(e.data==='gd-mute')gdMute();else if(e.data==='gd-open'&&!GUIDE.open)openGuide()});
-function gdPrepare(kind,name,isLast,req){if(!GUIDE.voice)return;gdSegs(kind,name,isLast,req).forEach(([t,l])=>{if(gdPiperOk(l))gdWav(t,l).catch(()=>{})})}
+function gdPrepare(kind,name,isLast,req,zc){if(!GUIDE.voice)return;gdSegs(kind,name,isLast,req,zc).forEach(([t,l])=>{if(gdPiperOk(l))gdWav(t,l).catch(()=>{})})}
 // at a stop: the gong, then the stop's name
 const GD_GONG=new Audio('dzwieki/gong.mp3');GD_GONG.preload='auto';
 const GD_AUD=new Audio();
@@ -3487,12 +3494,12 @@ async function gdSpeakLocal(text,l,queued){if(!queued)await gdVoicesReady();retu
   try{speechSynthesis.speak(u)}catch(e){res()}})}
 // the silence that keeps the page awake is paused while an announcement plays (two sounds at once: on Android, in Samsung
 // Internet, the announcement then came out muffled, as if over the phone), and goes on after it
-async function gdSay(kind,name,isLast,req){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
+async function gdSay(kind,name,isLast,req,zc){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
   try{GD_KEEP.pause()}catch(e){}
-  try{await gdSay0(kind,name,isLast,req,tok)}finally{if(tok===GUIDE.sayTok&&GUIDE.voice&&GUIDE.open){try{const p_=GD_KEEP.play();if(p_)p_.catch(()=>{})}catch(e){}}}}
-async function gdSay0(kind,name,isLast,req,tok){
+  try{await gdSay0(kind,name,isLast,req,tok,zc)}finally{if(tok===GUIDE.sayTok&&GUIDE.voice&&GUIDE.open){try{const p_=GD_KEEP.play();if(p_)p_.catch(()=>{})}catch(e){}}}}
+async function gdSay0(kind,name,isLast,req,tok,zc){
   try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
-  const segs=gdSegs(kind,name,isLast,req).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
+  const segs=gdSegs(kind,name,isLast,req,zc).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
   gdNotify(kind==='next'?segs.map(x=>x[0]).join(' '):name);
   if(kind==='at'){await gdPlay(GD_GONG);if(tok!==GUIDE.sayTok)return}
   const urls=await Promise.all(segs.map(x=>x[2]||null));if(tok!==GUIDE.sayTok)return;
@@ -3561,7 +3568,7 @@ const gdReq=j=>{const R=GUIDE.run;return !!(R&&R.req&&R.ps&&R.req.has(R.ps[j]))}
 async function gdReqLoad(R){if(!R||!R.r||!R.ps||R.req)return;R.ps.forEach(id=>{if(IDX.stops[id])gdTrLoad(id)});R.req=new Set();try{const D=await loadRoute(R.r.id);const ps=new Set(R.ps);let best=null,bn=-1;
     (D.dirs||[]).forEach(d=>{const n=d.stops.filter(x=>ps.has(x[0])).length;if(n>bn){bn=n;best=d}});
     if(best)best.stops.forEach(x=>{if(x[2]&&ps.has(x[0]))R.req.add(x[0])});if(R.req.size&&GUIDE.run===R)gdTick()}catch(e){}}
-function gdChoose(run){gdReqLoad(run);if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
+function gdChoose(run){gdReqLoad(run);gdZonesLoad();if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
 async function gdTick(){if(!GUIDE.open||GUIDE.busy)return;if(GUIDE.run&&!GUIDE.run.req)gdReqLoad(GUIDE.run);GUIDE.lastTick=Date.now();gdBackBtn();const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
   if(GUIDE.run){GUIDE.busy=true;try{const q=await gdRunPos(h);if(q)gdProgress(q.p,q.src,q);else gdInfo('Ustalanie położenia…')}finally{GUIDE.busy=false}return}
   if(GUIDE.stopSel)return;
@@ -3647,10 +3654,10 @@ function gdProgress(h,src,q){{const pk0=document.getElementById('gdPick');if(pk0
   if(q&&q.si!=null&&q.si>=0&&q.si<=last&&P[q.si]&&distM(h[0],h[1],P[q.si][2],P[q.si][3])<1500&&(fresh||q.si>=GUIDE.j)){if(fresh)GUIDE.j=0;
     if(q.at){cur=q.si;next=q.si+1}else{cur=dA<near&&bj===q.si-1?bj:null;next=q.si}GUIDE.j=Math.max(GUIDE.j,q.si-(q.at?0:1))}
   if(GUIDE.annMax==null)GUIDE.annMax=-1;
-  if(next<=last){gdPrepare('at',P[next][0],next===last);if(cur!=null)gdPrepare('next',P[next][0],next===last,gdReq(next))}
+  if(next<=last){gdPrepare('at',P[next][0],next===last);if(cur!=null)gdPrepare('next',P[next][0],next===last,gdReq(next),gdZoneChange(next))}
   // each stop said once and only forwards: "at" a stop not said yet, "next" for a stop beyond the last one said
   if(cur!=null&&cur>GUIDE.annMax){GUIDE.annMax=cur;GUIDE.lastAnn='at'+cur;gdSay('at',P[cur][0],cur===last)}
-  else if(cur==null&&next<=last&&next>GUIDE.annMax&&dA>=near&&GUIDE.lastAnn!=='nx'+next&&next>(GUIDE.nxMax||-1)){GUIDE.nxMax=next;GUIDE.lastAnn='nx'+next;gdSay('next',P[next][0],next===last,gdReq(next))}
+  else if(cur==null&&next<=last&&next>GUIDE.annMax&&dA>=near&&GUIDE.lastAnn!=='nx'+next&&next>(GUIDE.nxMax||-1)){GUIDE.nxMax=next;GUIDE.lastAnn='nx'+next;gdSay('next',P[next][0],next===last,gdReq(next),gdZoneChange(next))}
   // where the position comes from: shown under the display
   const tri=['gda','sop','gdy','all'].includes(city);
   R.src=bd>500?trS('Jesteś daleko od trasy tego kursu.'):trS(src==='veh'?(tri?'Położenie pojazdu na żywo (GPS pojazdu)':'Położenie pojazdu na żywo (GTFS-RT)'):src==='test'?'TEST: wskazane miejsce':src==='tt'?'Położenie według rozkładu jazdy':'Położenie według GPS telefonu');
