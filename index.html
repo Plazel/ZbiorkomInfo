@@ -499,9 +499,9 @@ span.chip{cursor:inherit}
 .ps .psbs{flex-wrap:nowrap;gap:1.5mm}
 .ps .psdir .arr{width:.8em;height:.64em;vertical-align:.05em}
 .ps .nw{white-space:nowrap}
-.ps .pshead.many{flex-wrap:wrap;row-gap:2mm}
-.ps .pshead.many .psbs{flex:1 1 auto;min-width:0}
-.ps .pshead.many .psdir{flex:1 1 60%;margin-left:0}
+.ps .pshead.many{flex-wrap:nowrap;row-gap:2mm}
+.ps .pshead.many .psbs{flex:0 1 auto;min-width:0;max-width:58%;flex-wrap:wrap;row-gap:1.5mm}
+.ps .pshead.many .psdir{flex:1 1 40%;margin-left:2mm}
 .ps .psb.tram{border-radius:50%;width:calc(var(--b) * 1mm);min-width:0}
 /* square as on the page (up to 4 characters): the number gets smaller instead of the badge wider */
 .ps .psb.sq{width:calc(var(--b) * 1mm);min-width:0;padding:0}.ps .psb.l3{font-size:calc(var(--b) * 1.75px)}.ps .psb.l4{font-size:calc(var(--b) * 1.35px)}
@@ -515,7 +515,7 @@ span.chip{cursor:inherit}
 .ps .psto{font-size:calc(var(--pf) * 1.3);font-weight:700}
 .ps .psto i{background:#222;width:.36em;height:.36em;margin-top:-.18em;left:.04em}
 .ps .pslk{position:absolute;left:.7mm;top:calc(50% + 1.2mm);height:calc(100% - .4mm);border-left:.3mm dotted #999}
-.ps .pshead.many .psroute{flex:1 1 60%;margin-left:0}
+.ps .pshead.many .psroute{flex:1 1 40%;margin-left:3mm}
 .ps .psstop{font-size:calc(var(--pf) * 1.2);color:#444;text-align:right;max-width:55mm}
 .ps .pscols{display:grid;grid-template-columns:repeat(var(--nc,3),1fr);gap:2mm;flex:1;min-height:0;align-items:stretch}
 .ps .psc{background:#fff;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -2011,8 +2011,8 @@ function sheetHTML(S){
   let days=Object.keys(S.cols).filter(k=>S.cols[k].length&&dayOn(k));if(!days.length)days=['w'];
   // badges: smaller when there are many lines (or long names), so that they all fit in the header
   const bw=S.rs.reduce((a,r)=>a+Math.max(1,String(r.n).length*.46+.3),0);
-  const many=S.rs.length>4;   // many lines: their badges get a row of their own above the direction
-  const W5=S.fmt==='a5'?.7:1;const bs=Math.max(5,Math.min((many?11:17)*W5,(many?175:118)*W5/bw-1.5));
+  const many=S.rs.length>4;   // many lines: smaller badges (wrapping onto a second row if need be), the route still beside them
+  const W5=S.fmt==='a5'?.7:1;const bs=Math.max(5,Math.min((many?11:17)*W5,(many?150:118)*W5/bw-1.5));
   const nb=t=>esc(t).split(' ').map(w=>`<span class="nw">${w}</span>`).join(' ');   // a name breaks only between words
   const badge=r=>`<span class="psb${r.t==='tram'||r.nt?' tram':''}${String(r.n).length<=4?' sq l'+String(r.n).length:''}" style="background:${sheetCol(r)};color:${(r.f||r.t==='rail')?txtOf(r):'#fff'};--bs:${bs.toFixed(2)}">${esc(r.n)}</span>`;
   const col=(k,dark)=>{const by={};S.cols[k].forEach(x=>{const h=Math.floor(x.t/60);(by[h]=by[h]||[]).push(x)});
