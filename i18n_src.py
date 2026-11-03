@@ -406,6 +406,14 @@ ROWS = [
     ("Linie na mapie", "Lines on the map", "Linien auf der Karte", "Linky na mape", "Linky na mapě"),
     ("Linie na schemacie", "Lines on the diagram", "Linien im Netzplan", "Linky na schéme", "Linky na schématu"),
     ("Linie nocne na schemacie", "Night lines on the diagram", "Nachtlinien im Netzplan", "Nočné linky na schéme", "Noční linky na schématu"),
+    ("Tryb testowy mSIP", "mPIS test mode", "mFIS-Testmodus", "Testovací režim mISC", "Testovací režim mISC"),
+    ("Wyszukaj przystanek w polu wyszukiwania u góry – pokażą się wszystkie kursy z całej doby, a po wybraniu kursu można przechodzić po jego przystankach według rozkładu.", "Search for a stop in the search box at the top – all runs of the whole day will be shown, and once you choose a run you can step through its stops by the timetable.", "Suchen Sie oben im Suchfeld eine Haltestelle – es werden alle Fahrten des ganzen Tages angezeigt, und nach der Wahl einer Fahrt können Sie deren Haltestellen nach Fahrplan durchgehen.", "Vyhľadajte zastávku vo vyhľadávacom poli hore – zobrazia sa všetky spoje z celého dňa a po výbere spoja môžete prechádzať jeho zastávkami podľa cestovného poriadku.", "Vyhledejte zastávku ve vyhledávacím poli nahoře – zobrazí se všechny spoje z celého dne a po výběru spoje můžete procházet jeho zastávkami podle jízdního řádu."),
+    ("TEST: wszystkie kursy z całej doby:", "TEST: all runs of the whole day:", "TEST: alle Fahrten des ganzen Tages:", "TEST: všetky spoje z celého dňa:", "TEST: všechny spoje z celého dne:"),
+    ("Brak kursów", "No runs", "Keine Fahrten", "Žiadne spoje", "Žádné spoje"),
+    ("Dziś nic stąd nie odjeżdża.", "Nothing departs from here today.", "Heute fährt von hier nichts ab.", "Dnes odtiaľto nič neodchádza.", "Dnes odsud nic neodjíždí."),
+    ("TEST: położenie według rozkładu jazdy", "TEST: position by the timetable", "TEST: Position nach Fahrplan", "TEST: poloha podľa cestovného poriadku", "TEST: poloha podle jízdního řádu"),
+    ("Wstecz", "Back", "Zurück", "Späť", "Zpět"),
+    ("Dalej", "Forward", "Weiter", "Ďalej", "Dále"),
 ]
 
 WEEKDAYS = {
