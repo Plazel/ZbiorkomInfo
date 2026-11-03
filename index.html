@@ -3350,7 +3350,7 @@ function reopenStopPop(pa){if(!pa||!MAP.stopG)return;let gi=pa.gi;let G=MAP.stop
 // by the user's position among the vehicles the city publishes; where none are published (e.g. Krynica-Zdrój and Muszyna)
 // the user's stop is found and the ride is chosen from its departures. TEST (with the tools): a place chosen on the map
 // stands for the user's position ----
-const GUIDE={open:false,watch:null,pos:null,run:null,voice:false,lastAnn:'',tm:0,choice:null,j:0};
+const GUIDE={tmode:!!(store.get('ztm.gdTMode',false)&&store.get('ztm.tools',false)),open:false,watch:null,pos:null,run:null,voice:false,lastAnn:'',tm:0,choice:null,j:0};
 // [next stop, end of the line] and the same for stations (rail and metro lines)
 // the fare zones (data/strefy.json, strefy.py): stops on a zone border (ZTM Gdańsk, Warszawa) and the zone of each stop
 // (Poznań, Kraków, Łódź); "next stop" said with a warning when the stop ahead is on a border or in another zone
@@ -3379,6 +3379,7 @@ function openGuide(){if(!IDX)return;if(MAP.open)closeMap();if(typeof DEP!=='unde
   if(!GUIDE.watch&&navigator.geolocation)GUIDE.watch=navigator.geolocation.watchPosition(p=>gotPos(p,true),
     e=>{if(GUIDE.run||GUIDE.stopSel)return;if(e.code===1)gdWarn('Brak zgody na udostępnienie lokalizacji','Zezwól stronie na dostęp do lokalizacji albo wyszukaj przystanek lub pojazd w polu wyszukiwania u góry.');
       else gdWarn('Nie udało się ustalić lokalizacji','Sprawdź, czy lokalizacja jest włączona, albo wyszukaj przystanek lub pojazd w polu wyszukiwania u góry.')},{enableHighAccuracy:true,maximumAge:3000,timeout:20000});
+  if(GUIDE.tmode&&!GUIDE.run&&!GUIDE.stopSel)gdTRestore();
   clearInterval(GUIDE.tm);gdTick();GUIDE.tm=setInterval(gdTick,4000)}
 function closeGuide(){document.getElementById('guideModal').hidden=true;GUIDE.open=false;GUIDE.ret=null;document.documentElement.classList.remove('gdOn');{const t=document.getElementById('gdTTop');if(t)t.hidden=true}{const t=document.getElementById('gdLocTop');if(t)t.hidden=true}clearInterval(GUIDE.tm);
   if(GUIDE.watch!=null&&!GUIDE.run){navigator.geolocation.clearWatch(GUIDE.watch);GUIDE.watch=null}try{speechSynthesis.cancel()}catch(e){}navMark()}
@@ -3598,7 +3599,7 @@ const gdReq=j=>{const R=GUIDE.run;return !!(R&&R.req&&R.ps&&R.req.has(R.ps[j]))}
 async function gdReqLoad(R){if(!R||!R.r||!R.ps||R.req)return;R.ps.forEach(id=>{if(IDX.stops[id])gdTrLoad(id)});R.req=new Set();try{const D=await loadRoute(R.r.id);const ps=new Set(R.ps);let best=null,bn=-1;
     (D.dirs||[]).forEach(d=>{const n=d.stops.filter(x=>ps.has(x[0])).length;if(n>bn){bn=n;best=d}});
     if(best)best.stops.forEach(x=>{if(x[2]&&ps.has(x[0]))R.req.add(x[0])});if(R.req.size&&GUIDE.run===R)gdTick()}catch(e){}}
-function gdChoose(run){document.getElementById('gdSip').classList.toggle('tst',!!run.tst);gdReqLoad(run);gdZonesLoad();if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
+function gdChoose(run){if(run.tst)gdTSave(run);else store.set('ztm.gdTRun',null);document.getElementById('gdSip').classList.toggle('tst',!!run.tst);gdReqLoad(run);gdZonesLoad();if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
 async function gdTick(){if(!GUIDE.open||GUIDE.busy)return;if(GUIDE.run&&!GUIDE.run.req)gdReqLoad(GUIDE.run);GUIDE.lastTick=Date.now();gdBackBtn();const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
   if(GUIDE.run&&GUIDE.run.tst){gdTstDraw();return}
   if(GUIDE.tmode&&!GUIDE.run){if(!GUIDE.stopSel)gdInfo('Tryb testowy mSIP','Wyszukaj przystanek w polu wyszukiwania u góry – pokażą się wszystkie kursy z całej doby, a po wybraniu kursu można przechodzić po jego przystankach według rozkładu.');return}
@@ -3634,7 +3635,7 @@ async function gdShowDeps(best0,msg){gdBackBtn();const st=document.getElementByI
   const best=typeof best0==='string'?best0:best0.n,area=typeof best0==='string'?null:best0.a;
   st.textContent=msg+' '+best+(area&&gdTownName(area)?' ('+gdTownName(area)+')':'');
   let sch=[];for(const [k,sh] of depDayKeys())sch.push(...await depFor({n:best,c:area&&CITIES[area]?area:city,poles:[]},k,sh));const now=todayType().min;
-  const tm=!!GUIDE.tmode;if(tm)st.textContent=trS('TEST: wszystkie kursy z całej doby:')+' '+best+(area&&gdTownName(area)?' ('+gdTownName(area)+')':'');
+  const tm=!!GUIDE.tmode;if(tm)store.set('ztm.gdTStop',{c:city,s:best0});if(tm)st.textContent=trS('TEST: wszystkie kursy z całej doby:')+' '+best+(area&&gdTownName(area)?' ('+gdTownName(area)+')':'');
   const L=tm?sch.filter(d=>d.t>=0&&d.t<1440&&d.ps&&(!area||(IDX.stops[d.sid]||[])[4]===area)).sort((a,b)=>a.t-b.t):sch.filter(d=>d.t>=now-3&&d.t<=now+60&&d.ps&&(!area||(IDX.stops[d.sid]||[])[4]===area)).sort((a,b)=>a.t-b.t).slice(0,10);
   if(!L.length&&tm){gdWarn('Brak kursów','Dziś nic stąd nie odjeżdża.');return}
   if(!L.length){gdWarn('Brak odjazdów w najbliższym czasie','W ciągu najbliższej godziny nic stąd nie odjeżdża. Wyszukaj inny przystanek lub pojazd w polu wyszukiwania u góry.');return}
@@ -3648,8 +3649,13 @@ async function gdShowDeps(best0,msg){gdBackBtn();const st=document.getElementByI
 // ---- the test mode (the T button on the top bar, with the tools switched on): a stop's runs of the whole day; the run chosen
 // shown by its timetable only, stop by stop with the buttons (or the arrow keys, or a stop clicked): at a stop, then on the
 // way to the next one; the announcements as on a real ride ----
+// (kept over a reload: the test mode, the stop whose runs are listed and the run open, at the stop it was left at)
+function gdTSave(R){store.set('ztm.gdTRun',{c:city,id:R.r.id,ps:R.ps,off:R.off,t0:R.t0,head:R.head,p:R.p|0,back:GUIDE.run?GUIDE.backStop:GUIDE.stopSel})}
+function gdTRestore(){const k=store.get('ztm.gdTRun',null),r=k&&k.c===city&&IDX.routes.find(x=>x.id===k.id);
+  if(r){GUIDE.stopSel=k.back||null;if(GUIDE.setLoc)GUIDE.setLoc(false);gdChoose({r,ps:k.ps,off:k.off,t0:k.t0,head:k.head,fromStop:true,tst:true,p:k.p});return}
+  const t=store.get('ztm.gdTStop',null);if(t&&t.c===city&&t.s){GUIDE.stopSel=t.s;if(GUIDE.setLoc)GUIDE.setLoc(false);gdShowDeps(t.s,trS('Wybierz kurs, którym jedziesz:'))}}
 function gdTBtn(){const t=document.getElementById('gdTTop');if(!t)return;t.hidden=!(GUIDE.open&&store.get('ztm.tools',false));t.setAttribute('aria-pressed',String(!!GUIDE.tmode))}
-function gdTSet(on){GUIDE.tmode=!!on;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.lastHd=null;try{speechSynthesis.cancel()}catch(e){}
+function gdTSet(on){GUIDE.tmode=!!on;store.set('ztm.gdTMode',GUIDE.tmode);store.set('ztm.gdTRun',null);if(!on)store.set('ztm.gdTStop',null);GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.lastHd=null;try{speechSynthesis.cancel()}catch(e){}
   document.getElementById('gdSip').hidden=true;document.getElementById('gdPick').innerHTML='';document.getElementById('gdPick').dataset.warn='';gdTBtn();gdBackBtn();
   if(GUIDE.stopSel)gdShowDeps(GUIDE.stopSel,trS('Wybierz kurs, którym jedziesz:'));else{if(!on&&GUIDE.setLoc)GUIDE.setLoc(true);gdTick()}}
 document.getElementById('gdTTop').onclick=()=>gdTSet(!GUIDE.tmode);
@@ -3662,7 +3668,7 @@ function gdTstDraw(){const R=GUIDE.run,sip=document.getElementById('gdSip'),pk=d
     if(b){gdTstGo(R.p+(+b.dataset.tn));return}const r=e.target.closest('.gsRow[data-j]');if(r&&!e.target.closest('.gsTr'))gdTstGo(2*(+r.dataset.j))})}
   for(let m=6;m>=1;m--){sip.innerHTML=gdSipHtml(R,P,S.cur,S.next,m);const b=sip.querySelector('.gsBody');if(!b||b.scrollHeight<=b.clientHeight+1)break}
   GUIDE.lastHd=hd;GUIDE.lastRun=R}
-function gdTstGo(p){const R=GUIDE.run;if(!R||!R.tst)return;const last=R.ps.length-1,q=Math.max(0,Math.min(2*last,p));if(q===R.p)return;R.p=q;gdTstDraw();
+function gdTstGo(p){const R=GUIDE.run;if(!R||!R.tst)return;const last=R.ps.length-1,q=Math.max(0,Math.min(2*last,p));if(q===R.p)return;R.p=q;gdTSave(R);gdTstDraw();
   if(!GUIDE.voice)return;const S=gdTstState(R),P=R.ps.map(id=>IDX.stops[id]);
   if(S.cur!=null)gdSay('at',P[S.cur][0],S.cur===last);else gdSay('next',P[S.next][0],S.next===last,gdReq(S.next),gdZoneChange(S.next));
   if(S.next<=last)gdPrepare(S.cur!=null?'next':'at',P[Math.min(S.next,last)][0],S.next===last,gdReq(S.next),gdZoneChange(S.next))}
@@ -3808,7 +3814,7 @@ document.getElementById('gdVoice').onclick=()=>{GUIDE.voice=!GUIDE.voice;if(GUID
   document.addEventListener('pointerdown',e=>{if(!box.hidden&&!box.contains(e.target)&&!fb.contains(e.target))pop(fb,box,false)});
   const setLoc=on=>{lb.setAttribute('aria-pressed',String(on));const t=document.getElementById('gdLocTop');if(t)t.setAttribute('aria-pressed',String(on))};GUIDE.setLoc=setLoc;
   // the stop of the user's own position (GPS), as at the start
-  lb.onclick=()=>{GUIDE.stopSel=null;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';setLoc(true);document.getElementById('gdPick').innerHTML='';document.getElementById('gdSip').hidden=true;gdTick()};
+  lb.onclick=()=>{store.set('ztm.gdTStop',null);store.set('ztm.gdTRun',null);GUIDE.stopSel=null;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';setLoc(true);document.getElementById('gdPick').innerHTML='';document.getElementById('gdSip').hidden=true;gdTick()};
   GUIDE.pickS=n=>pickS(n);GUIDE.pickV=v=>pickV(v);
   const pickS=n=>{pop(fb,box,false);GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.stopSel=n;setLoc(false);document.getElementById('gdPick').innerHTML='';gdShowDeps(n,trS('Wybierz kurs, którym jedziesz:'))};
   // a vehicle by its fleet number: its run, followed live
@@ -3833,7 +3839,7 @@ setInterval(()=>{if(!GUIDE.open||GUIDE.run&&GUIDE.run.tst)return;const e=documen
   bs.forEach(b=>b.onclick=()=>{store.set('ztm.gdVoice',b.dataset.gv);mark();if(GUIDE.voice&&GUIDE.run&&GUIDE.run.ps){const P=IDX.stops[GUIDE.run.ps[Math.min(GUIDE.j+1,GUIDE.run.ps.length-1)]];if(P)gdSay('at',P[0],false)}})})();
 // back to choosing the ride: the departures of the stop it was chosen from, else the user's own position; the browser's
 // back button does the same (a ride chosen is a step of the history)
-function gdBack(){document.getElementById('gdSip').classList.remove('tst');if(GUIDE.ret){gdReturn();return}const st=GUIDE.backStop;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.lastHd=null;document.getElementById('gdSip').hidden=true;document.getElementById('gdPick').innerHTML='';
+function gdBack(){document.getElementById('gdSip').classList.remove('tst');store.set('ztm.gdTRun',null);if(GUIDE.ret){gdReturn();return}const st=GUIDE.backStop;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.lastHd=null;document.getElementById('gdSip').hidden=true;document.getElementById('gdPick').innerHTML='';
   try{speechSynthesis.cancel()}catch(e){}gdBackBtn();
   if(st){GUIDE.stopSel=st;if(GUIDE.setLoc)GUIDE.setLoc(false);gdShowDeps(st,trS('Wybierz kurs, którym jedziesz:'))}else{GUIDE.stopSel=null;if(GUIDE.setLoc)GUIDE.setLoc(true);gdTick()}}
 function gdBackBtn(){const b=document.getElementById('gdBack');if(b)b.hidden=!GUIDE.run;const m=document.getElementById('gdOnMap');if(m)m.hidden=!GUIDE.run}
