@@ -2623,9 +2623,10 @@ function lineEnd(E,li,s,sign,p0){const p=p0||E.p,n=E.l.length;const d=(li-(n-1)/
 function schConnections(G,sign){   // per stroke (and per line inside a bundle): pairs of edge ends meeting at a node
   const out=[];let cost=0;const joined=new Set();
   G.n.forEach((N,ni)=>{const by={};
-    N.ends.forEach(([k,s])=>{const E=G.e[k];E.sl.forEach(([id,li])=>{const P=lineEnd(E,li,s,sign);P.key=k+'|'+s+'|'+id;(by[id]=by[id]||[]).push(P)})});
-    Object.entries(by).forEach(([id,ends])=>{if(ends.length>1)ends.forEach(P=>joined.add(P.key));
-      for(let i=1;i<ends.length;i++){const A=ends[0],B=ends[i];if(id[1]!==':')cost+=Math.hypot(A.x-B.x,A.y-B.y);out.push([id,A,B,ni])}})});
+    // (a line drawn on its own on one edge and inside the grey bundle ("m:<id>") on the next is still one line: joined)
+    N.ends.forEach(([k,s])=>{const E=G.e[k];E.sl.forEach(([id,li])=>{const P=lineEnd(E,li,s,sign);P.key=k+'|'+s+'|'+id;P.raw=id;const base=id.startsWith('m:')?id.slice(2):id;(by[base]=by[base]||[]).push(P)})});
+    Object.entries(by).forEach(([base,ends])=>{if(ends.length>1)ends.forEach(P=>joined.add(P.key));
+      for(let i=1;i<ends.length;i++){const A=ends[0],B=ends[i];const id=A.raw.startsWith('m:')&&B.raw.startsWith('m:')?A.raw:base;if(id[1]!==':')cost+=Math.hypot(A.x-B.x,A.y-B.y);out.push([id,A,B,ni])}})});
   return {out,cost,joined};
 }
 function schCurve(A,B){   // smooth link from end A to end B: each line keeps its own direction into the node, then bends over
@@ -3089,10 +3090,17 @@ function schVariant(){
     for(let i=1;i<seq.length;i++){const ks=route(seq[i-1],seq[i]);if(ks)ks.forEach(k=>used.add(k));else if(dst(seq[i-1],seq[i])<10)jumps.push([seq[i-1],seq[i]])}});
   const col=badgeColor(r),wd=(SG.w*2.3).toFixed(3),dash=`${(SG.w*2.6).toFixed(3)} ${(SG.w*2).toFixed(3)}`;
   const out=[];
-  used.forEach(k=>{const E=G.e[k];const own=E.all.includes(id);
-    let li=E.l.indexOf(id);if(li<0)li=E.l.findIndex(x=>E.m[x]&&E.m[x].includes(id));
-    const off=own&&li>=0?(li-(E.l.length-1)/2)*SG.gap*sign:0;
-    out.push(`<path d="M${offPl(E.p0,off).map(q=>q[0].toFixed(3)+','+q[1].toFixed(3)).join('L')}" style="stroke:${col};stroke-width:${wd}"${own?'':` stroke-dasharray="${dash}"`}/>`)});
+  // each edge on the line's own track, cut back where the variant goes on into another edge, and joined to it there by a
+  // curve (as the lines themselves are drawn), so the variant has no breaks or kinks where its track moves across a bundle
+  const offOf=k=>{const E=G.e[k];if(!E.all.includes(id))return 0;let li=E.l.indexOf(id);if(li<0)li=E.l.findIndex(x=>E.m[x]&&E.m[x].includes(id));return li>=0?(li-(E.l.length-1)/2)*SG.gap*sign:0};
+  const at={};used.forEach(k=>{const E=G.e[k];(at[E.a]=at[E.a]||[]).push([k,0]);(at[E.b]=at[E.b]||[]).push([k,1])});
+  const endAt=(E,s,off)=>{const p=E.p;const a=s?p[p.length-2]:p[1],b=s?p[p.length-1]:p[0];const nv=s?nrm(a,b):nrm(b,a);const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;
+    return {x:b[0]+nv[0]*off,y:b[1]+nv[1]*off,dx:dx/L,dy:dy/L}};
+  used.forEach(k=>{const E=G.e[k];const own=E.all.includes(id);const off=offOf(k);
+    const ja=(at[E.a]||[]).length>1,jb=(at[E.b]||[]).length>1;const geo=ja&&jb?E.p:cutPl(E.p0,ja?E.ra:0,jb?E.rb:0);
+    out.push(`<path d="M${offPl(geo,off).map(q=>q[0].toFixed(3)+','+q[1].toFixed(3)).join('L')}" style="stroke:${col};stroke-width:${wd}"${own?'':` stroke-dasharray="${dash}"`}/>`)});
+  Object.values(at).forEach(L=>{for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const [k1,s1]=L[i],[k2,s2]=L[j];
+    const A=endAt(G.e[k1],s1,offOf(k1)),B=endAt(G.e[k2],s2,offOf(k2));const d=schCurve(A,B);if(d)out.push(`<path d="${d}" style="stroke:${col};stroke-width:${wd}"/>`)}});
   jumps.forEach(([a,b])=>out.push(`<path d="M${G.n[a].x},${G.n[a].y}L${G.n[b].x},${G.n[b].y}" style="stroke:${col};stroke-width:${wd}" stroke-dasharray="${dash}"/>`));
   g.innerHTML=out.join('');
   nodes.forEach(n=>svg.querySelectorAll(`#schSt [data-n="${n}"]`).forEach(x=>x.classList.add('von')));
