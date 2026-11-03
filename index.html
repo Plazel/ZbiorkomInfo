@@ -1006,8 +1006,8 @@ header.top #gdLocTop{width:38px;height:38px;box-sizing:border-box;place-items:ce
 /* no blue flash when a button is tapped (phones) */
 *{-webkit-tap-highlight-color:transparent}
 /* the vehicles view: the whole width for the map */
-.mapModal.vehs #mapList,.mapModal.vehs #mlTog,.mapModal.vehs #mapVar,.mapModal.vehs #mlRes{display:none!important}.mapModal.vehs .mapBody{grid-template-columns:1fr}
-.vehInfo{position:absolute;left:12px;top:12px;z-index:3;background:var(--bg);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.08);padding:7px 10px;font-size:.85rem;max-width:calc(100% - 80px)}
+.mapModal:not(.run) #mapTitle{display:none}.mapModal:not(.run) .mapHead .mapViews{margin-right:auto}.mapModal.run .mapHead .mapViews{display:none}.mapViews button[hidden]{display:none}
+.vehInfo{position:absolute;left:12px;bottom:12px;z-index:3;background:var(--bg);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.08);padding:7px 10px;font-size:.85rem;max-width:calc(100% - 80px)}@media (max-width:760px){.vehInfo{top:12px;bottom:auto}}
 /* the black bar: more buttons than fit are scrolled with a finger, not squeezed */
 nav.rail{overflow-y:auto;overscroll-behavior:contain}
 @media (max-width:760px){nav.rail{overflow-x:auto;overflow-y:hidden;justify-content:flex-start}nav.rail button{flex:1 0 72px;min-width:72px}}
@@ -1048,11 +1048,9 @@ html,body,*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style
  <button type="button" data-nav="jp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><circle cx="5" cy="19" r="2.6"/><path d="M19 2.6a3.6 3.6 0 0 1 3.6 3.6c0 2.7-3.6 6.2-3.6 6.2s-3.6-3.5-3.6-6.2A3.6 3.6 0 0 1 19 2.6z"/><circle cx="19" cy="6.2" r="1.2" fill="currentColor" stroke="none"/><path d="M8.2 19H19v-4.4" stroke-dasharray="2.4 2.1"/></svg><span>Połączenia</span></button>
  <button type="button" data-nav="guide" class="railA11y" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 9h3l5-4v14l-5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span>Przewodnik</span></button><button type="button" data-nav="bryg" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M4 3.5h16v13H4z"/><path d="M4 11h16M8 16.5v3M16 16.5v3M8 7h8"/><path d="M7 13h2v2H7zM15 13h2v2h-2z" fill="currentColor" stroke="none"/></svg><span>Brygady</span></button>
  <button type="button" data-nav="takt" class="railTool" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M9 5h6l5 5v6l-5 5H9l-5-5v-6z"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg><span>Takty</span></button>
- <button type="button" data-nav="veh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><rect x="5" y="9" width="11" height="10" rx="1"/><path d="M5 14h11M7.5 19v2M13.5 19v2"/><circle cx="8" cy="16.5" r=".4" fill="currentColor"/><circle cx="13" cy="16.5" r=".4" fill="currentColor"/><path d="M17.5 7.5a4 4 0 0 1 0 5M19.8 5.2a7.3 7.3 0 0 1 0 9.6"/></svg><span>Pojazdy</span></button>
 </nav>
 <div class="mapModal" id="mapModal" hidden role="dialog" aria-modal="true" aria-labelledby="mapTitle">
- <div class="mapHead"><h2 id="mapTitle">Schemat sieci</h2><span id="mapStatus" class="hint"></span>
-  <div class="seg mapViews" role="group" aria-label="Widok"><button type="button" data-mv="osm">Mapa</button><button type="button" data-mv="schema">Schemat</button></div>
+ <div class="mapHead"><div class="seg mapViews" role="group" aria-label="Widok"><button type="button" data-mv="osm">Linie na mapie</button><button type="button" data-mv="schema">Linie na schemacie</button><button type="button" data-mv="veh">Pojazdy na mapie</button></div><h2 id="mapTitle">Schemat sieci</h2><span id="mapStatus" class="hint"></span>
   <label class="mapNightL" style="display:none"><input type="checkbox" id="mapNight"> linie nocne</label>
   <button class="btn mapErase" type="button" id="mapClear" disabled title="Wyczyść podświetlenie" aria-label="Wyczyść podświetlenie"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 20.5 3.6 15.6a1.5 1.5 0 0 1 0-2.1L13.4 3.7a1.5 1.5 0 0 1 2.1 0l4.8 4.8a1.5 1.5 0 0 1 0 2.1L10.6 20.5z"/><path d="M8.5 20.5H21M8.6 8.6l6.8 6.8"/></svg></button>
   <button class="btn" type="button" id="mapClose" aria-label="Zamknij schemat" style="display:none">✕ Zamknij</button></div>
@@ -2234,7 +2232,7 @@ async function openMap(){
   const secs=sections();MAP.routes=secs.flatMap(s=>s.lines);MAP.byId={};MAP.routes.forEach(r=>MAP.byId[r.id]=r);
   renderMapList(secs);
   // there is a diagram for the Tricity and for Krynica-Zdrój with Muszyna, not for Bydgoszcz
-  const sb=document.querySelector('[data-mv="schema"]');sb.hidden=NO_SCHEMA.includes(city);sb.parentNode.style.display=sb.hidden?'none':'';   // with no diagram there is nothing to switch betweennavMark();
+  const sb=document.querySelector('[data-mv="schema"]');sb.hidden=NO_SCHEMA.includes(city);   // with no diagram there is nothing to switch betweennavMark();
   let vw=store.get('ztm.mapView','osm');if(vw!=='schema'||sb.hidden)vw='osm';   // (the plain "Linie" view is gone: map or diagram)
   requestAnimationFrame(()=>{drawMap();setMapView(vw)});   // let the window paint first
 }
@@ -2804,19 +2802,21 @@ async function showSchema(){
   st.textContent='';drawMap();
 }
 function hideSchema(){if(MAP.drawn==='schema')drawMap()}
+// the map's views in its top bar: the lines on the map, the lines on the diagram, the vehicles on the map
+function mapViewsMark(){const cur=typeof VEH!=='undefined'&&VEH.on?'veh':MAP.view==='schema'?'schema':'osm';document.querySelectorAll('[data-mv]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mv===cur)))}
 async function setMapView(vw){
   if(vw==='schema'&&MAP.rot)setMapRot(0);
   const was=MAP.view==='schema'?'s':'g',now=vw==='schema'?'s':'g';
   if(was!==now&&MAP.vb){MAP.vbs=MAP.vbs||{};MAP.vbs[was]={vb:MAP.vb,base:MAP.base};const o=MAP.vbs[now];MAP.vb=o?o.vb:null;MAP.base=o?o.base:null}
   MAP.view=vw;store.set('ztm.mapView',vw);navMark();
-  document.querySelectorAll('[data-mv]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mv===vw)));
+  mapViewsMark();
   const area=document.querySelector('.mapArea');area.classList.toggle('osm',vw==='osm');area.classList.toggle('schema',vw==='schema');
   document.getElementById('mapAttr').hidden=vw!=='osm';document.getElementById('cartoAttr').hidden=!CARTO_KEY;
   if(vw==='osm'){try{await loadBase()}catch(e){document.getElementById('mapStatus').textContent='Nie udało się wczytać podkładu mapy.'}}
   if(vw==='schema'){await showSchema();return}
   hideSchema();drawBase();
 }
-function applyHL(){
+function applyHL(){if(typeof VEH!=='undefined'&&VEH.on)setTimeout(drawVehs,0);
   const svg=document.getElementById('mapSvg');const any=MAP.hl.size>0;updateVarPanel();if(MAP.view==='schema')schVariant();
   svg.querySelectorAll('#schLines path[data-id],#schOver path[data-id],#schLab .tb').forEach(pl=>{const on=MAP.hl.has(pl.dataset.id);pl.classList.toggle('dim',any&&!on);pl.classList.toggle('on',on)});
   svg.querySelectorAll('#schLines path.bun,#schOver path.bun').forEach(pl=>pl.classList.toggle('dim',any));
@@ -3697,11 +3697,10 @@ const VEH={on:false,tm:0,list:[],t:0,xy:[]};
 function vehMode(on,closing){VEH.on=on;const mm=document.getElementById('mapModal');mm.classList.toggle('vehs',on);clearInterval(VEH.tm);
   let info=document.getElementById('vehInfo');
   if(!on){VEH.list=[];VEH.xy=[];const g=document.querySelector('#mapVehs');if(g)g.remove();if(info)info.remove();
-    if(!closing){const h=document.getElementById('mapTitle');if(h)h.textContent=trS('Schemat sieci – '+CITIES[city][0]);renderLabels();navMark()}return}
-  closeStopPop();MAP.hl.clear();applyHL();if(MAP.view!=='osm')setMapView('osm');
-  const h=document.getElementById('mapTitle');if(h){h.classList.remove('rpT');h.textContent=trS('Pojazdy na mapie')+' – '+CITIES[city][0]}
+    if(!closing){renderLabels();mapViewsMark()}return}
+  closeStopPop();if(MAP.view!=='osm')setMapView('osm');mapViewsMark();
   if(!info){info=document.createElement('div');info.id='vehInfo';info.className='vehInfo';document.querySelector('.mapArea').appendChild(info)}
-  info.textContent=trS('Wczytywanie pojazdów…');vehTick();VEH.tm=setInterval(vehTick,10000);navMark()}
+  info.textContent=trS('Wczytywanie pojazdów…');vehTick();VEH.tm=setInterval(vehTick,10000)}
 async function vehTick(){if(!VEH.on)return;const info=document.getElementById('vehInfo');let V=null;
   const has=['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]];
   if(has){try{V=await gdVehicles()}catch(e){}}
@@ -3715,12 +3714,13 @@ async function vehTick(){if(!VEH.on)return;const info=document.getElementById('v
     if(v.brg!=null&&isFinite(v.brg)&&!(v.brg===0&&!pv))VEH.ang[v.id]=v.brg-90;
     else if(pv&&Math.hypot(xy[0]-pv[0],xy[1]-pv[1])>.15)VEH.ang[v.id]=Math.atan2(xy[1]-pv[1],xy[0]-pv[0])*180/Math.PI;
     if(!pv||Math.hypot(xy[0]-pv[0],xy[1]-pv[1])>.15)VEH.prev[v.id]=xy;return {v,r,ang:VEH.ang[v.id]}});
-  VEH.t=Date.now();if(info)info.textContent=VEH.list.length+' '+trS(VEH.list.length===1?'pojazd':'pojazdów')+' · '+trS('odświeżane co 10 s');drawVehs()}
+  VEH.t=Date.now();drawVehs()}
 function drawVehs(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapVehs');
   if(!VEH.on||MAP.view==='schema'){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapVehs';g.style.pointerEvents='none'}svg.appendChild(g);
   const k=unitsPerPx(),v=MAP.vb,m=Math.max(v.w,v.h);const sc=Math.min(1,Math.max(.55,.03/k*12))*.8;VEH.xy=[];const out=[];
-  VEH.list.forEach(it=>{const [x,y]=proj(it.v.lat,it.v.lon);if(x<v.x-m||x>v.x+v.w+m||y<v.y-m||y>v.y+v.h+m)return;VEH.xy.push([x,y,it]);
+  const flt=MAP.hl.size&&!MAP.stopHL?MAP.hl:null;let shown=0;   // lines chosen in the list: only their vehicles
+  VEH.list.forEach(it=>{if(flt&&!flt.has(it.r.id))return;shown++;const [x,y]=proj(it.v.lat,it.v.lon);if(x<v.x-m||x>v.x+v.w+m||y<v.y-m||y>v.y+v.h+m)return;VEH.xy.push([x,y,it]);
     const r=it.r,s0=depStyle(r),n=String(r.n);const a=it.ang;const right=a!=null&&Math.cos(a*Math.PI/180)>0.3;
     // far out: a small dot in the line's colour; in between: the line's symbol (number) alone; close in: the full sign
     if(k>.12){out.push(`<circle cx="${x}" cy="${y}" r="${(4.5*k).toFixed(4)}" fill="${s0.bg}" stroke="#fff" stroke-width="${(1.2*k).toFixed(4)}"/>`);return}
@@ -3732,7 +3732,8 @@ function drawVehs(){const svg=document.getElementById('mapSvg');if(!svg)return;l
     const lab=s0.shape==='circle'?(()=>{const cr=Math.max(12,n.length*4.4+4);const cx=right?-21-cr:21+cr;return `<circle cx="${cx}" cy="0" r="${cr}" fill="${s0.bg}"/><text x="${cx}" y="5" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text>`})()
       :(()=>{const q=n.length<=3?26:n.length*8+10;return `<g transform="translate(${right?-22-q:22} -13)"><rect width="${q}" height="26" fill="${s0.bg}"/><text x="${q/2}" y="18" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`})();
     out.push(`<g transform="translate(${x} ${y}) scale(${(k*sc).toFixed(5)})">${arrow}<circle r="18" fill="#fff" stroke="${s0.bg}" stroke-width="3.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"/>${ic}${lab}</g>`)});
-  g.innerHTML=out.join('')}
+  g.innerHTML=out.join('');
+  const info=document.getElementById('vehInfo');if(info&&VEH.t){const n=flt?VEH.list.filter(it=>flt.has(it.r.id)).length:VEH.list.length;info.textContent=n+' '+trS(n===1?'pojazd':'pojazdów')+' · '+trS('odświeżane co 10 s')}}
 function vehHit(e){const svg=document.getElementById('mapSvg');const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return null;const q=pt.matrixTransform(ctm.inverse());
   const k=unitsPerPx();let best=null,bd=(24*k)**2;VEH.xy.forEach(([x,y,it])=>{const d=(x-q.x)**2+(y-q.y)**2;if(d<bd){bd=d;best=it}});return best}
 // a vehicle tapped: its run in the timetable (line, start time, way), shown as the reduced view of a run (its course, stops,
@@ -3918,7 +3919,7 @@ function setupMap(){
       const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),v=MAP.vb;
       if(x0<v.x||x1>v.x+v.w||y0<v.y||y1>v.y+v.h){const w=Math.max(x1-x0,(y1-y0)*v.w/v.h)*1.25;const h=w*v.h/v.w;MAP.vb={x:(x0+x1)/2-w/2,y:(y0+y1)/2-h/2,w,h};applyVB();renderLabels()}}};
   document.getElementById('mapNight').onchange=e=>{MAP.night=e.target.checked;renderMapList(sections());if(MAP.view==='schema')MAP.vb=null;drawMap()};   // the diagram with night lines has its own layout
-  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>setMapView(b.dataset.mv));
+  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=async()=>{const v=b.dataset.mv;if(v==='veh'){if(MAP.view!=='osm')await setMapView('osm');vehMode(true)}else{if(VEH.on)vehMode(false);await setMapView(v)}mapViewsMark()});
   document.getElementById('schSetBtns').onclick=e=>{const b=e.target.closest('[data-set]');if(!b||b.dataset.set===MAP.schSet)return;
     MAP.schSet=b.dataset.set;store.set('ztm.schSet',MAP.schSet);MAP.vb=null;drawMap()};
   new MutationObserver(()=>{if(MAP.open)drawBase()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
@@ -3933,8 +3934,6 @@ function setupMap(){
     if(v==='tt'){if(DEP.open){closeDep();return}if(MAP.open)closeMap();else if(location.hash)location.hash='';return}
     if(v==='dep'){if(!DEP.open)openDep();return}
     if(DEP.open)closeDep();
-    if(v==='veh'){if(MAP.open&&RUN.d)closeRun();if(!MAP.open){if(MAP.city!==city){MAP.vb=null;MAP.vbs=null}await openMap()}vehMode(true);return}
-    if(v==='map'&&VEH.on){vehMode(false);return}
     if(v==='map'&&MAP.open&&typeof RUN!=='undefined'&&RUN.d){closeRun();return}   // the reduced view of a run: the ordinary map, at the same place
     if(!MAP.open){if(MAP.city!==city){MAP.vb=null;MAP.vbs=null}await openMap()}});   // the views (lines, map, diagram) are chosen in the map window
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&MAP.open&&document.getElementById('cityMenu').hidden)closeMap()});
@@ -4323,7 +4322,7 @@ function depLinesTable(){const tb=document.getElementById('depLinesB');tb.replac
 
 /* ---------- header: the city list ---------- */
 let NAV_READY=false,NAV_LAST='tt',NAV_CUR='tt',NAV_POP=false,NAV_SILENT=false,NAV_T=0;
-function navMark(){const v=(typeof GUIDE!=='undefined'&&GUIDE.open)?'guide':MAP.open?(typeof VEH!=='undefined'&&VEH.on?'veh':'map'):(typeof DEP!=='undefined'&&DEP.open)?'dep':(typeof JP!=='undefined'&&JP.open)?'jp':(typeof TD!=='undefined'&&TD.view)?TD.view:'tt';
+function navMark(){const v=(typeof GUIDE!=='undefined'&&GUIDE.open)?'guide':MAP.open?'map':(typeof DEP!=='undefined'&&DEP.open)?'dep':(typeof JP!=='undefined'&&JP.open)?'jp':(typeof TD!=='undefined'&&TD.view)?TD.view:'tt';
   if(NAV_READY)try{sessionStorage.setItem('ztm.nav',v)}catch(e){}
   // (one history step per change of section, taken when the change is complete: closing one view to open another is one step)
   NAV_CUR=v;if(NAV_READY&&!NAV_POP&&!NAV_SILENT){clearTimeout(NAV_T);NAV_T=setTimeout(()=>{if(!NAV_POP&&NAV_CUR!==NAV_LAST){try{history.pushState({ov:NAV_CUR},'',location.href)}catch(e){}NAV_LAST=NAV_CUR}},0)}else if(NAV_POP||NAV_SILENT){}else NAV_LAST=v;
@@ -4587,7 +4586,7 @@ window.addEventListener('hashchange',route);
 // back and forward between the sections (and to the stop window the map was left from)
 window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.ov||'tt';NAV_POP=true;
   try{const cur=NAV_LAST;
-    if(want!==cur){if(want!=='guide'&&GUIDE.open)closeGuide();if(want==='map'||want==='veh'){if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(!MAP.open)await openMap();if(want==='veh'&&!VEH.on)vehMode(true);else if(want==='map'&&VEH.on)vehMode(false)}
+    if(want!==cur){if(want!=='guide'&&GUIDE.open)closeGuide();if(want==='map'){if(typeof DEP!=='undefined'&&DEP.open)closeDep();await openMap()}
       else if(want==='dep')await openDep();else if(want==='jp')await openJP();else if(want==='guide')openGuide();else if(want==='takt'||want==='bryg')openTool(want);
       else{if(GUIDE.open)closeGuide();if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool()}}
     if(want==='guide'&&GUIDE.open&&GUIDE.run&&!st.gd)gdBack();
