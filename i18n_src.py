@@ -402,6 +402,7 @@ ROWS = [
     ("Otwórz w przewodniku", "Open in the guide", "Im Reisebegleiter öffnen", "Otvoriť v sprievodcovi", "Otevřít v průvodci"),
     ("Szczegóły na stronie przewoźnika", "Details on the operator's website", "Details auf der Website des Verkehrsunternehmens", "Podrobnosti na stránke dopravcu", "Podrobnosti na stránkách dopravce"),
     ("Rozkład", "Timetable", "Fahrplan", "Cestovný poriadok", "Jízdní řád"),
+    ("Brak odjazdów w ciągu 24 godz.", "No departures within 24 hours", "Keine Abfahrten in den nächsten 24 Stunden", "Žiadne odchody počas 24 hodín", "Žádné odjezdy během 24 hodin"),
 ]
 
 WEEKDAYS = {
