@@ -2239,7 +2239,13 @@ async function openMap(){
 function closeMap(){mapEl().hidden=true;MAP.open=false;if(typeof VEH!=='undefined')VEH.back=false;if(typeof RUN!=='undefined'&&RUN.d)closeRun();if(typeof VEH!=='undefined'&&VEH.on)vehMode(false,true);document.body.style.overflow='';navMark()}
 function proj(lat,lon){return [lon*Math.cos(54.45*Math.PI/180)*1000,-lat*1000]}
 function routeCoords(r){const g=MAP.data&&MAP.data.routes[r.id];return g?g.g:[]}
-function visRoutes(){return MAP.routes.filter(r=>(MAP.night||r.t!=='night')&&MAP.data.routes[r.id])}
+function visRoutes(){return MAP.routes.filter(r=>(MAP.night||r.t!=='night')&&(!MAP.nOnly||MAP.view!=='schema'||r.t==='night'||(MAP.nRail&&MAP.nRail.has(r.id)))&&MAP.data.routes[r.id])}
+// the trains of the city that run at night (through the night: from 1:00 to 3:00): drawn on the night diagram with the night lines
+async function nightRail(){const C=city;if(MAP.nRailC===C)return;const S=new Set();
+  await Promise.all(MAP.routes.filter(r=>r.t==='rail').map(async r=>{try{const L=await loadRoute(r.id);
+    const T=new Set();(L.dirs||[]).forEach(d=>(d.plans||[]).forEach(P=>P.forEach(([tt,pi])=>{const pr=d.prof[pi];if(pr)pr[1].forEach(o=>{const t=(tt+o)%1440;if(t>=60&&t<180)T.add(Math.round(t))})})));
+    if(T.size>=6)S.add(r.id)}catch(e){}}));
+  if(city===C){MAP.nRail=S;MAP.nRailC=C}}
 function drawMap(){
   const svg=document.getElementById('mapSvg');
   if(MAP.view==='schema'){if(schData()){MAP.drawn='schema';drawSchema()}return}
@@ -2536,12 +2542,14 @@ const schR=id=>MAP.byId[id]||IDX.routes.find(r=>r.id===id);
 function schSet(){const D=schData();if(MAP.schSet===undefined)MAP.schSet=store.get('ztm.schSet','');return D.sets.find(s=>s.id===MAP.schSet)||D.sets[0]}
 // edges: [from, to, points, strokes, grey lines, night lines]; the stroke 'G' is all grey lines drawn as one, 'N' the night lines
 function schGraph(set){
-  const night=!!(MAP.night&&set.gn);const key=city+'|'+set.id+'|'+night;
+  const night=!!(MAP.night&&set.gn);const nOnly=!!(night&&MAP.nOnly);const key=city+'|'+set.id+'|'+night+(nOnly?'|n'+[...(MAP.nRail||[])].join():'');
   if(SCH.G[key])return SCH.G[key];
+  // the night diagram: only the night lines (and the trains that run at night)
+  const keep=id=>id==='N'||id==='G'||!nOnly||(MAP.nRail&&MAP.nRail.has(id))||(MAP.byId[id]&&MAP.byId[id].t==='night');
   const src=night?set.gn:set.g;
   const n=src.n.map(([x,y,l,c])=>({x,y,l,c:c||[],ends:[]}));
   const e=src.e.map(([a,b,f,l,gm,nm])=>{const p=[];for(let i=0;i<f.length;i+=2)p.push([f[i],f[i+1]]);
-    const m={G:gm||[],N:MAP.night?(nm||[]):[]};const L=l.filter(x=>x!=='N'||MAP.night);
+    const m={G:nOnly?(gm||[]).filter(keep):gm||[],N:MAP.night?(nm||[]):[]};const L=l.filter(x=>(x!=='N'||MAP.night)&&keep(x)&&(x!=='G'||m.G.length));
     const sl=L.map((id,li)=>[id,li]);L.forEach((id,li)=>{if(m[id])m[id].forEach(x=>sl.push(['m:'+x,li]))});
     const all=L.filter(id=>!m[id]).concat(m.G,m.N);
     return {a,b,p,l:L,m,sl,all}}).filter(E=>E.p.length>1&&E.l.length);
@@ -2618,7 +2626,7 @@ const SCH_LOOPS=[['Nowy Port Zajezdnia','Władysława IV']];
 const BUN={G:{c:'var(--chip-grey)',f:'var(--chip-grey-fg)'},N:{c:'var(--night)',f:'var(--night-fg)'}};
 const numSort=(a,b)=>a.localeCompare(b,'pl',{numeric:true});
 function drawSchema(){
-  const svg=document.getElementById('mapSvg');const set=schSet();const G=schGraph(set);const gk=city+'|'+set.id+'|'+!!(MAP.night&&set.gn);
+  const svg=document.getElementById('mapSvg');const set=schSet();const G=schGraph(set);const gk=city+'|'+set.id+'|'+!!(MAP.night&&set.gn)+(MAP.night&&MAP.nOnly?'|n':'');
   SCH.k=SCH.k||1;SG.gap=SG0.gap*SCH.k;SG.w=SG0.w*SCH.k;
   svg.style.setProperty('--schsw',(.045*SCH.k).toFixed(4));svg.style.setProperty('--schsw2',(.055*SCH.k).toFixed(4));
   schTrim(G);
@@ -2691,7 +2699,7 @@ function drawSchema(){
     else{const r=schR(id);if(r)parts.push(`<path data-id="${r.id}" d="${d}" style="stroke:${colOf(r)}"/>`)}});
   parts.push('</g><g id="schLab"></g>');
   svg.innerHTML=parts.join('');svg.classList.add('sch');
-  const sb=document.getElementById('schSets');sb.hidden=schData().sets.length<2;
+  const sb=document.getElementById('schSets');sb.hidden=schData().sets.length<2||!!(MAP.night&&MAP.nOnly);   // (the night diagram: only the night lines, whatever the set)
   document.getElementById('schSetBtns').innerHTML=schData().sets.map(x=>`<button type="button" data-set="${x.id}" aria-pressed="${x.id===set.id}">${esc(x.name)}</button>`).join('');
   // obstacles for names: station markers and line segments, in a coarse grid
   const segs=[];G.e.forEach(E=>{const w=(E.l.length-1)/2*SG.gap+SG.w;for(let i=1;i<E.p.length;i++)segs.push([E.p[i-1],E.p[i],w])});
@@ -3203,6 +3211,7 @@ function renderLabels(){
   g.innerHTML=bl.join('')+out.reverse().join('');
 }
 function renderMapList(secs){
+  if(MAP.nOnly)secs=secs.map(s=>Object.assign({},s,{lines:s.lines.filter(r=>r.t==='night'||(MAP.nRail&&MAP.nRail.has(r.id)))})).filter(s=>s.lines.length);   // the night diagram: its lines only
   const box=document.getElementById('mapList');box.innerHTML='';
   // two ways to list the lines: tiles (numbers only) or a list with each line's main route
   const mode=store.get('ztm.mapListMode','tiles');
@@ -3277,7 +3286,7 @@ async function openStopPop(name,pole,e,gi,merged){closeStopPop(true);MAP.popAt={
       row.onclick=go;row.onkeydown=ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();go()}}});
     trTree(bx)};
   const load=async()=>{let sch=[];for(const st of sts)for(const [k,sh] of depDayKeys())sch.push(...await depFor(st,k,sh));draw(sch,null);
-    let live=[];for(const st of sts){try{const l=await depLive(st);if(l)live.push(...l)}catch(_){}}if(live.length)draw(sch,live)};
+    let live=[];for(const st of sts){try{const l=await depLive(st);if(l)live.push(...l)}catch(_){}}if(!live.length&&sts[0]){try{live=(await depGpsLive(sts[0],sch))||[]}catch(_){}}if(live.length)draw(sch,live)};
   load();MAP.popT=setInterval(load,30000)}
 // the map variant a run follows: the variant of its direction whose stops are the run's stops (by name), else the main route
 function runEdge(id,dep){const M=MAP.data&&MAP.data.routes[id];if(!M||!M.vr||!dep||!dep.ps)return null;const W=new Set(dep.ps);let e=null,bs=-1e9;
@@ -3448,14 +3457,32 @@ const gdHere=()=>GUIDE.fake||GUIDE.pos;
 const gdPhoneSrc=()=>store.get('ztm.gdSrc','veh')==='phone';
 const gdPhoneOk=()=>gdPhoneSrc()&&!GUIDE.fake&&GUIDE.pos&&GUIDE.posT&&Date.now()-GUIDE.posT<20000&&(GUIDE.acc==null||GUIDE.acc<80);
 // vehicles of the city near a place: [{id,label,line,head,lat,lon,start,tid,fk}]
-async function gdVehicles(){if(['gda','sop','gdy','all'].includes(city)){const V=await gpsVehicles();if(!V)return null;
-    return V.map(v=>({id:'z'+v.vehicleId,label:v.vehicleCode||'',line:String(v.routeShortName),head:v.headsign||'',lat:v.lat,lon:v.lon,brg:v.direction,ts:Date.parse(v.generated)||GPS.t,start:v.scheduledTripStartTime,trip:v}))}
+async function gdVehicles(){if(['gda','sop','gdy','all'].includes(city)){
+    // ZTM Gdańsk from its own feed; ZKM Gdynia (publishes none of its own) from zbiorkom.live's open API
+    const [V,G]=await Promise.all([gpsVehicles().catch(()=>null),zbVehicles('tricity','GDYNIA').catch(()=>null)]);if(!V&&!G)return null;
+    return [...(V||[]).map(v=>({id:'z'+v.vehicleId,label:v.vehicleCode||'',line:String(v.routeShortName),head:v.headsign||'',lat:v.lat,lon:v.lon,brg:v.direction,ts:Date.parse(v.generated)||GPS.t,start:v.scheduledTripStartTime,trip:v})),...(G||[])]}
+  if(ZB_OPEN[city])return zbVehicles(ZB_OPEN[city]);
   const area=RT_GTFS[city],feeds=VP_FEEDS[area];if(!feeds)return null;let IXa=null;try{IXa=await rtIndex(area)}catch(e){}
   const out=[];for(const [fk,url] of feeds){let ents;try{ents=await rtVehGet(url)}catch(e){continue}const ix=(IXa&&IXa.f[fk])||{};
     ents.forEach(e=>{const x=ix[e.tid];if(!x||e.lat==null)return;out.push({id:fk+e.vid,label:e.label||e.vid,line:x[0],head:'',lat:e.lat,lon:e.lon,brg:e.brg,ts:e.ts?e.ts*1000:RV_CACHE[url]&&RV_CACHE[url].t,t0:x[1],seq0:x[2],tid:e.tid,
       si:e.seq!=null&&x[2]!=null?e.seq-x[2]:null,at:e.stat===1})})}   // (si: the index of the stop it is at or heading for, by the feed; at: stopped there)
   return out}
 const RV_CACHE={};
+// zbiorkom.live's open API (api.zbiorkom.live/api6-open, CORS open): the vehicles of Warszawa and Łódź, and of ZKM Gdynia
+const ZB_OPEN={waw:'warsaw',ldz:'lodz'};
+const ZB_BOX={tricity:'18.1,54.25,18.9,54.8',warsaw:'20.3,51.85,21.75,52.65',lodz:'19.0,51.5,19.85,52.0'};
+const ZB_CACHE={};
+function zbVehicles(zc,ag){const key=zc+'|'+(ag||'');const c=ZB_CACHE[key];if(c&&Date.now()-c.t<5000)return c.p;
+  const p=fetch(`https://api.zbiorkom.live/api6-open/${zc}/positions/${ZB_BOX[zc]}`+(ag?'?agencies='+ag:''),{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('zb');return r.json()})
+    .then(j=>(j.positions||[]).filter(x=>x.location&&x.routeName).map(x=>({id:'zb'+x.vehicle.agency+':'+x.vehicle.type+':'+x.vehicle.id,label:String(x.vehicle.id||''),model:x.vehicle.model||'',
+      line:String(x.routeName),head:x.headsign||'',lat:x.location[1],lon:x.location[0],brg:x.bearing,ts:x.timestamp,delay:x.delay!=null?x.delay/1000:null,brig:x.brigade||'',
+      up:(x.upcomingStops||[]).map(u=>[u.name,u.scheduledDeparture,u.sequence])})));
+  ZB_CACHE[key]={t:Date.now(),p};p.catch(()=>{delete ZB_CACHE[key]});return p}
+// a zbiorkom.live vehicle on a run: one of its next stops (that place in the run, or that name) at the run's time there
+function zbOnRun(R,x){if(!x.up||!x.up.length||!R.off)return false;const base=new Date();base.setHours(0,0,0,0);
+  return x.up.some(([n,ms,sq])=>{const m=(ms-base)/60000,f=fold(n||'');
+    for(let j=0;j<R.ps.length;j++){if(Math.abs(R.t0+R.off[j]-m)>1.01)continue;if(j===sq||IDX.stops[R.ps[j]]&&fold(sName(R.ps[j]))===f)return true}return false})}
+const vehT0=x=>{const base=new Date();base.setHours(0,0,0,0);return x.start?(Date.parse(x.start)-base)/60000:x.t0};
 async function rtVehGet(url){const c=RV_CACHE[url];if(c&&Date.now()-c.t<5000)return c.p;
   const p=(async()=>{for(const w of [...(RT_PROXY?[RT_PROXY+'?url='+encodeURIComponent(url)]:[]),url]){try{const r=await fetch(w,{cache:'no-store'});if(!r.ok)continue;const buf=await r.arrayBuffer();const b=new Uint8Array(buf),dv=new DataView(buf),td=new TextDecoder(),out=[];
     pbEach(b,0,b.length,(f,w2,a,c2)=>{if(f!==2||w2!==2)return;let vp=null;pbEach(b,a,c2,(f2,w3,a2,c3)=>{if(f2===4&&w3===2)vp=[a2,c3]});if(!vp)return;const e={tid:'',vid:'',label:'',lat:null,lon:null,seq:null,stat:2};
@@ -3526,9 +3553,9 @@ async function gdRunPos(h){const R=GUIDE.run;if(GUIDE.fake)return {p:GUIDE.fake,
   if(V){let v=R.veh?V.find(x=>x.id===R.veh):null;
     if(!v){const base=new Date();base.setHours(0,0,0,0);
       // the run's vehicle: its line, its start time, going the run's way (its headsign) and on the run's course
-      const C=V.filter(x=>x.line===R.r.n&&Math.abs((x.start?(Date.parse(x.start)-base)/60000:x.t0)-R.t0)<=3&&gdSameHead(x.head,R.head)&&gdOnRun(R,x));
+      const C=V.filter(x=>x.line===R.r.n&&(x.up?zbOnRun(R,x):Math.abs(vehT0(x)-R.t0)<=3)&&gdSameHead(x.head,R.head)&&gdOnRun(R,x));
       // the start time first (the feeds give the run's own start time), the place where the timetable puts it to break a tie
-      const st0=x=>Math.abs((x.start?(Date.parse(x.start)-base)/60000:x.t0)-R.t0);
+      const st0=x=>x.up?0:Math.abs(vehT0(x)-R.t0);
       if(C.length>1){const e=gdTtPos(R);C.sort((a,b)=>Math.round(st0(a))-Math.round(st0(b))||distM(a.lat,a.lon,e[0],e[1])-distM(b.lat,b.lon,e[0],e[1]))}
       v=C[0];if(v)R.veh=v.id}
     if(v){if(v.label)R.vlabel=v.label;R.lastVeh={p:[v.lat,v.lon],t:Date.now(),si:v.si,at:v.at};if(gdPhoneOk())return {p:GUIDE.pos,src:'me'};if(h&&distM(h[0],h[1],v.lat,v.lon)<80)return {p:h,src:'me',si:v.si,at:v.at};return {p:[v.lat,v.lon],src:'veh',si:v.si,at:v.at}}}
@@ -3702,7 +3729,7 @@ function vehMode(on,closing){VEH.on=on;const mm=document.getElementById('mapModa
   if(!info){info=document.createElement('div');info.id='vehInfo';info.className='vehInfo';document.querySelector('.mapArea').appendChild(info)}
   info.textContent=trS('Wczytywanie pojazdów…');vehTick();VEH.tm=setInterval(vehTick,10000)}
 async function vehTick(){if(!VEH.on)return;const info=document.getElementById('vehInfo');let V=null;
-  const has=['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]];
+  const has=['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city];
   if(has){try{V=await gdVehicles()}catch(e){}}
   if(!VEH.on)return;
   if(!has){VEH.list=[];if(info)info.innerHTML=`<b>${esc(trS('Brak danych o pojazdach'))}</b><br>${esc(trS('Przewoźnicy w tym mieście nie udostępniają położenia pojazdów.'))}`;drawVehs();return}
@@ -3733,15 +3760,16 @@ function drawVehs(){const svg=document.getElementById('mapSvg');if(!svg)return;l
       :(()=>{const q=n.length<=3?26:n.length*8+10;return `<g transform="translate(${right?-22-q:22} -13)"><rect width="${q}" height="26" fill="${s0.bg}"/><text x="${q/2}" y="18" text-anchor="middle" style="font:700 ${n.length>2?12:14}px 'Roboto Condensed',Roboto,sans-serif;fill:${s0.fg}">${esc(n)}</text></g>`})();
     out.push(`<g transform="translate(${x} ${y}) scale(${(k*sc).toFixed(5)})">${arrow}<circle r="18" fill="#fff" stroke="${s0.bg}" stroke-width="3.5" style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))"/>${ic}${lab}</g>`)});
   g.innerHTML=out.join('');
-  const info=document.getElementById('vehInfo');if(info&&VEH.t){const n=flt?VEH.list.filter(it=>flt.has(it.r.id)).length:VEH.list.length;info.textContent=n+' '+trS(n===1?'pojazd':'pojazdów')+' · '+trS('odświeżane co 10 s')}}
+  const info=document.getElementById('vehInfo');if(info&&VEH.t){const n=flt?VEH.list.filter(it=>flt.has(it.r.id)).length:VEH.list.length;info.textContent=n+' '+trS(n===1?'pojazd':'pojazdów')+' · '+trS('odświeżane co 10 s')+(VEH.list.some(it=>String(it.v.id).startsWith('zb'))?' · zbiorkom.live':'')}}
 function vehHit(e){const svg=document.getElementById('mapSvg');const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return null;const q=pt.matrixTransform(ctm.inverse());
   const k=unitsPerPx();let best=null,bd=(24*k)**2;VEH.xy.forEach(([x,y,it])=>{const d=(x-q.x)**2+(y-q.y)**2;if(d<bd){bd=d;best=it}});return best}
 // a vehicle tapped: its run in the timetable (line, start time, way), shown as the reduced view of a run (its course, stops,
 // times, the vehicle's number and model); where the run cannot be found, a small window with what is known
 async function vehRun(it){const r=it.r,v=it.v;if(!r.id||r.id[0]==='v')return null;let L;try{L=await loadRoute(r.id)}catch(e){return null}
-  const base=new Date();base.setHours(0,0,0,0);const st=v.start?(Date.parse(v.start)-base)/60000:v.t0;if(st==null||!isFinite(st))return null;
-  const C=[];for(const [key,sh] of depDayKeys())L.dirs.forEach((d,di)=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(Math.abs(t0-st)>1.01)return;const [pat,off]=d.prof[pi];
-    C.push({r,di,ps:d.pats[pat].map(i=>d.stops[i][0]),off,t0,head:sName(d.stops[d.pats[pat][d.pats[pat].length-1]][0]),sch:true,t:t0})}));
+  const base=new Date();base.setHours(0,0,0,0);const st=v.start?(Date.parse(v.start)-base)/60000:v.t0;const byT=st!=null&&isFinite(st);
+  const C=[];for(const [key,sh] of depDayKeys())L.dirs.forEach((d,di)=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(byT&&Math.abs(t0-st)>1.01)return;const [pat,off]=d.prof[pi];
+    const ps=d.pats[pat].map(i=>d.stops[i][0]);if(!byT&&!zbOnRun({ps,off,t0},v))return;   // (zbiorkom.live: by its next stops' times)
+    C.push({r,di,ps,off,t0,head:sName(ps[ps.length-1]),sch:true,t:t0})}));
   // no run starting then (a tram's start time in the feed is sometimes that of its duty, not of the run): the run of the line
   // going that way that by its timetable should be nearest to where the vehicle is now
   if(!C.length){const nowM=(Date.now()-base)/60000;
@@ -3750,10 +3778,10 @@ async function vehRun(it){const r=it.r,v=it.v;if(!r.id||r.id[0]==='v')return nul
       const T=off.map(o=>t0+o);let j=T.findIndex(t=>t>nowM);if(j<=0)j=Math.max(1,j<0?T.length-1:1);const A=IDX.stops[ps[j-1]],B=IDX.stops[ps[j]];if(!A||!B)return;
       const f=Math.max(0,Math.min(1,(nowM-T[j-1])/Math.max(.1,T[j]-T[j-1])));const dm=distM(A[2]+(B[2]-A[2])*f,A[3]+(B[3]-A[3])*f,v.lat,v.lon);
       if(dm<1500)C.push({r,di,ps,off,t0,head,sch:true,t:t0,_d:dm})}));
-    if(!C.length)return null;C.sort((a,b)=>a._d-b._d);const d=C[0];delete d._d;if(v.start)d.trip=v.start;else d.veh=v.id;d.vlabel=v.label||'';d.byPos=true;return d}
+    if(!C.length)return null;C.sort((a,b)=>a._d-b._d);const d=C[0];delete d._d;if(v.start)d.trip=v.start;else d.veh=v.id;d.vlabel=v.label||'';if(v.brig)d.brig=v.brig;if(v.model)d.vmodel=v.model;d.byPos=true;return d}
   const dist=c=>{const P=c.ps.map(id=>IDX.stops[id]).filter(Boolean);let b=1e18;P.forEach(X=>{const d=distM(X[2],X[3],v.lat,v.lon);if(d<b)b=d});return b};
   C.sort((a,b)=>(gdSameHead(v.head,b.head)-gdSameHead(v.head,a.head))||Math.abs(a.t0-st)-Math.abs(b.t0-st)||dist(a)-dist(b));
-  const d=C[0];if(v.start)d.trip=v.start;else d.veh=v.id;d.vlabel=v.label||'';return d}
+  const d=C[0];if(v.start)d.trip=v.start;else d.veh=v.id;d.vlabel=v.label||'';if(v.brig)d.brig=v.brig;if(v.model)d.vmodel=v.model;return d}
 async function ztmFleet(){if(!BG.fleet)BG.fleet=fetch('https://files.cloudgdansk.pl/d/otwarte-dane/ztm/baza-pojazdow.json?v=2').then(r=>r.json()).then(j=>{const m={};(j.results||[]).forEach(x=>m[x.vehicleCode]=x);return m}).catch(()=>({}));return BG.fleet}
 async function vehOpen(it,e){const d=await vehRun(it);if(!d){vehPop(it,e);return}
   if(it.v.start){try{const F=await ztmFleet();const f=F[String(it.v.label)];if(f)d.vmodel=[f.brand,f.model].filter(Boolean).join(' ')}catch(_){}}
@@ -3781,10 +3809,11 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
     const veh=V&&V.find(x=>String(x.routeShortName)===d.r.n&&Math.abs((Date.parse(x.scheduledTripStartTime)-b0)/60000-d.t0)<=2&&gdSameHead(x.headsign,d.head));if(veh)d.trip=veh.scheduledTripStartTime}catch(e){}}
   // elsewhere (GTFS-RT vehicle positions: Poznań, Kraków, Praga): the run's vehicle by its id from the guide, or by line and start time
   let rtOnly=false;
-  if(!['gda','sop','gdy','all'].includes(city)&&VP_FEEDS[RT_GTFS[city]]){try{const V=await gdVehicles();const R={r:d.r,ps:d.ps,head:d.head,t0:d.t0};
+  const tri=['gda','sop','gdy','all'].includes(city);
+  if((!tri&&(VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city]))||(tri&&!d.trip)){try{const V=await gdVehicles();const R={r:d.r,ps:d.ps,off:d.off,head:d.head,t0:d.t0};
     let v=d.veh&&V&&V.find(x=>x.id===d.veh);
-    if(!v&&V){const C=V.filter(x=>x.line===d.r.n&&Math.abs(x.t0-d.t0)<=3&&gdOnRun(R,x)).sort((a,b)=>Math.abs(a.t0-d.t0)-Math.abs(b.t0-d.t0));v=C[0];if(v)d.veh=v.id}
-    if(v){gps=[v.lat,v.lon];rtOnly=true;RUN.fixT=v.ts||Date.now();d.vlabel=v.label||'';if(v.brig)d.brig=v.brig}}catch(e){}}
+    if(!v&&V){const C=V.filter(x=>x.line===d.r.n&&!x.start&&(x.up?zbOnRun(R,x)&&gdSameHead(x.head,d.head):Math.abs(x.t0-d.t0)<=3&&gdOnRun(R,x))).sort((a,b)=>(a.up?0:Math.abs(a.t0-d.t0))-(b.up?0:Math.abs(b.t0-d.t0)));v=C[0];if(v)d.veh=v.id}
+    if(v&&!v.start){gps=[v.lat,v.lon];rtOnly=true;RUN.fixT=v.ts||Date.now();d.vlabel=v.label||'';if(v.brig)d.brig=v.brig;if(v.model)d.vmodel=v.model;if(v.delay!=null)dl=v.delay/60}}catch(e){}}
   if(d.trip){try{const V=await gpsVehicles();const veh=V&&V.find(x=>String(x.routeShortName)===d.r.n&&x.scheduledTripStartTime===d.trip);if(veh){gps=[veh.lat,veh.lon];RUN.fixT=Date.parse(veh.generated)||GPS.t;d.vlabel=veh.vehicleCode!=null?String(veh.vehicleCode):'';if(!d.vmodel&&d.vlabel){try{const F=await ztmFleet();const f=F[d.vlabel];if(f)d.vmodel=[f.brand,f.model].filter(Boolean).join(' ')}catch(_){}}d.brig=veh.vehicleService?String(veh.vehicleService).replace(/^(\d+)-(\d+)$/,(_,a,b)=>(+a)+'/'+(+b)):'';const pd=await posDelay(d,veh);if(pd!=null)dl=pd/60}}catch(e){}}
   // Bydgoszcz (no vehicle positions published): the delay from the boards at the stops (ZDMiKP's live departures) for the
   // next stops of the run; the vehicle's place by the timetable moved by it
@@ -3920,7 +3949,7 @@ function setupMap(){
       if(x0<v.x||x1>v.x+v.w||y0<v.y||y1>v.y+v.h){const w=Math.max(x1-x0,(y1-y0)*v.w/v.h)*1.25;const h=w*v.h/v.w;MAP.vb={x:(x0+x1)/2-w/2,y:(y0+y1)/2-h/2,w,h};applyVB();renderLabels()}}};
   document.getElementById('mapNight').onchange=e=>{MAP.night=e.target.checked;renderMapList(sections());if(MAP.view==='schema')MAP.vb=null;drawMap()};   // the diagram with night lines has its own layout
   // night lines: always on the map (lines and vehicles); the diagram comes in two, the day's lines and the night's
-  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=async()=>{const v=b.dataset.mv;const night=v!=='schema';const ch=MAP.night!==night;
+  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=async()=>{const v=b.dataset.mv;const night=v!=='schema';const nOnly=v==='schemaN';if(nOnly)await nightRail();const ch=MAP.night!==night||!!MAP.nOnly!==nOnly;MAP.nOnly=nOnly;
     if(ch){MAP.night=night;document.getElementById('mapNight').checked=night;renderMapList(sections())}
     if(v==='veh'){if(MAP.view!=='osm')await setMapView('osm');else if(ch)drawMap();vehMode(true)}
     else{if(VEH.on)vehMode(false);const vw=v==='osm'?'osm':'schema';if(MAP.view!==vw)await setMapView(vw);else if(ch){if(vw==='schema')MAP.vb=null;drawMap()}}
@@ -4159,12 +4188,21 @@ async function fixDelays(out){const lv=out.filter(d=>d.live&&d.trip&&d.sch!=null
     if(!veh){const t0=(Date.parse(d.trip)-base0)/60000;if(isFinite(t0)&&t0>nowM0-1){d.live=false;d.t=d.sch;d.delay=0;d.lastT=d.t}return}
     if(!d.r.id||String(d.r.id).startsWith('rt'))return;
     const pd=await posDelay(d,veh);if(pd==null)return;d.delay=pd;d.t=d.sch+pd/60;d.lastT=d.t}))}
+// ZTM Gdańsk's live list empty at a stop (it sometimes is, at night above all) while its vehicles run: each run's delay
+// from its vehicle's own GPS position (the vehicle found by line, start time and headsign)
+async function depGpsLive(st,a){if(!['gda','sop','gdy','all'].includes(st.c||city)||!a||!a.length)return null;let V=null;try{V=await gpsVehicles()}catch(e){}if(!V||!V.length)return null;
+  const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const out=[];
+  await Promise.all(a.filter(d=>d.t0!=null&&d.r&&d.r.id&&d.t>=nowM-3&&d.t<=nowM+90).map(async d=>{
+    const veh=V.find(v=>String(v.routeShortName)===d.r.n&&Math.abs((Date.parse(v.scheduledTripStartTime)-base)/60000-d.t0)<=1.5&&gdSameHead(v.headsign,d.head));if(!veh)return;
+    const pd=await posDelay({r:d.r,stn:typeof d.st==='string'?d.st:st.n,pole:d.pole,sch:d.t},veh);if(pd==null)return;
+    const t=d.t+pd/60;if(t<nowM-.5)return;out.push(Object.assign({},d,{t,st:d.t,sch:d.t,live:true,delay:pd,lastT:t,trip:veh.scheduledTripStartTime}))}));
+  return out.length?out.sort((x,y)=>x.t-y.t):null}
 // first the timetable (shown at once), then the live departures where they can be had (they replace it when they come)
 async function depLoadData(){const run=DEP.run=(DEP.run||0)+1;const sch=[[],[]];
   for(let p=0;p<2;p++){for(const st of depStops(p)){const a=[];for(const [k,sh] of depDayKeys())a.push(...await depFor(st,k,sh));sch[p].push({st,a})}}
   if(run!==DEP.run)return;
   DEP.data=sch.map(L=>L.flatMap(x=>x.a).sort((a,b)=>a.t-b.t));DEP.schRaw=DEP.data.map(x=>x.slice());DEP.src=sch.flat().map(()=>'sch');depRender();
-  const lives=await Promise.all(sch.map(L=>Promise.all(L.map(x=>depLive(x.st)))));
+  const lives=await Promise.all(sch.map(L=>Promise.all(L.map(async x=>{const v=await depLive(x.st);return v&&v.length?v:(await depGpsLive(x.st,x.a))||v}))));
   if(run!==DEP.run)return;
   DEP.src=[];
   DEP.data=sch.map((L,p)=>L.flatMap((x,i)=>{const live=lives[p][i];
@@ -4561,7 +4599,7 @@ async function renderStopPage(name,pole){
   drawAll();
   // the timetable first (at once), then the live times where they can be had
   const draw=async()=>{let sch=[];for(const [k,sh] of depDayKeys())sch.push(...await depFor(st,k,sh));
-    lastSch=sch;lastLive=null;show(sch,null);let live=null;try{live=await depLive(st)}catch(e){}if(live&&live.length){lastLive=live;show(sch,live)}};
+    lastSch=sch;lastLive=null;show(sch,null);let live=null;try{live=await depLive(st)}catch(e){}if(!live||!live.length){try{live=await depGpsLive(st,sch)}catch(e){}}if(live&&live.length){lastLive=live;show(sch,live)}};
   const showPl=poles.length>1;   // platform column on the board whenever the stop has several (also with one chosen)
   const show=(sch,live)=>{const now=todayType().min;let a=sch;
     if(live&&live.length){if(live[0].st!==undefined)a=[...live,...sch.filter(d=>!live.some(l=>l.r.n===d.r.n&&Math.abs(l.st-d.t)<=1))];
