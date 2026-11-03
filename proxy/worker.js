@@ -4,10 +4,10 @@
 //    header, so a page on another site (e.g. GitHub Pages) cannot read them directly. ?url=… fetches one of the listed
 //    hosts and adds the header; the feeds are passed through unchanged (the page reads them itself).
 // 2. Announcements: /tts?v=<voice>&t=<text> returns the text spoken (MP3). Every text is synthesised once and then kept in
-//    Cloudflare's cache for a year, so each stop name costs the quota only once. The first way set up is used:
+//    Cloudflare's cache for a year, so each stop name costs the quota only once. The first way set up that answers is used:
+//    - Microsoft Azure neural voices (the voices Microsoft Edge reads with): AZURE_KEY and AZURE_REGION (the free tier F0 is never billed);
 //    - ElevenLabs, its free plan (no card; about 10 000 characters a month, the voices credited on the page): ELEVEN_KEY;
-//    - Cloudflare Workers AI (the ElevenLabs Multilingual v2 model), with no other account: a Workers AI binding named AI;
-//    - Microsoft Azure neural voices: AZURE_KEY and AZURE_REGION (the free tier F0 is never billed).
+//    - Cloudflare Workers AI (the ElevenLabs Multilingual v2 model), with no other account: a Workers AI binding named AI.
 //    Where neither answers (not set up, quota used up), the page uses the device's own voice.
 //
 // 3. Bydgoszcz: /byd?p=<stop number> returns the stop's live departures from ZDMiKP's passenger service (the boards at the
@@ -42,12 +42,26 @@ async function byd(req, cors) {
 async function tts(req, env, ctx, cors) {
   const u = new URL(req.url), voice = u.searchParams.get('v') || '', text = (u.searchParams.get('t') || '').trim();
   if (!VOICES[voice] || !text || text.length > 160) return new Response('bad request', { status: 400, headers: cors });
-  if (!env.ELEVEN_KEY && !env.AI && (!env.AZURE_KEY || !env.AZURE_REGION)) return new Response('voice not set up', { status: 503, headers: cors });
-  const key = new Request('https://tts.cache/' + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+  const azure = !!(env.AZURE_KEY && env.AZURE_REGION);
+  if (!env.ELEVEN_KEY && !env.AI && !azure) return new Response('voice not set up', { status: 503, headers: cors });
+  // (the cache is kept apart for each first choice of service, so that setting one up is heard at once)
+  const key = new Request('https://tts.cache/' + (azure ? 'az/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
   const cache = caches.default;
-  let res = await cache.match(key);
+  let res = await cache.match(key), err = '';
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
-  if (!res && env.ELEVEN_KEY) {   // ElevenLabs directly (Flash v2.5: Polish, Czech, Slovak, German, English; half a credit a character)
+  // 1. Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0
+  if (!res && azure) {
+    const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text)}</prosody></voice></speak>`;
+    try {
+      const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
+        method: 'POST', body: ssml,
+        headers: { 'Ocp-Apim-Subscription-Key': env.AZURE_KEY, 'Content-Type': 'application/ssml+xml',
+          'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3', 'User-Agent': 'ZbiorkomInfo' } });
+      if (r.ok) res = keep(await r.arrayBuffer(), 'Microsoft Azure'); else err += 'azure: ' + r.status + ' ' + (await r.text()).slice(0, 200) + '; ';
+    } catch (e) { err += 'azure: ' + e.message + '; '; }
+  }
+  // 2. ElevenLabs directly (Flash v2.5: Polish, Czech, Slovak, German, English; half a credit a character)
+  if (!res && env.ELEVEN_KEY) {
     // (the free plan takes 4 requests at once: one refused for that is tried again a moment later)
     let r;
     for (let a = 0; a < 4; a++) {
@@ -57,10 +71,10 @@ async function tts(req, env, ctx, cors) {
       if (r.status !== 429) break;
       await new Promise(z => setTimeout(z, 500 + 700 * a));
     }
-    if (r.ok) res = keep(await r.arrayBuffer(), 'ElevenLabs');
-    else if (!env.AI && !env.AZURE_KEY) return new Response('elevenlabs: ' + r.status + ' ' + (await r.text()).slice(0, 300), { status: 502, headers: cors });
+    if (r.ok) res = keep(await r.arrayBuffer(), 'ElevenLabs'); else err += 'elevenlabs: ' + r.status + ' ' + (await r.text()).slice(0, 200) + '; ';
   }
-  if (!res && env.AI) {   // Workers AI: ElevenLabs
+  // 3. Workers AI: ElevenLabs
+  if (!res && env.AI) {
     try {
       const out = await env.AI.run('elevenlabs/eleven-multilingual-v2', { text, voice_id: EL_VOICE[MALE.test(voice) ? 'm' : 'f'],
         language_code: VOICES[voice].slice(0, 2), output_format: 'mp3_44100_64' });
@@ -68,19 +82,10 @@ async function tts(req, env, ctx, cors) {
       let buf = null;
       if (typeof url === 'string' && url.startsWith('http')) { const a = await fetch(url); if (a.ok) buf = await a.arrayBuffer(); }
       else if (url instanceof ArrayBuffer || ArrayBuffer.isView(url)) buf = url;
-      if (buf) res = keep(buf, 'ElevenLabs');
-      else if (!env.AZURE_KEY) return new Response('workers ai: no audio ' + JSON.stringify(out).slice(0, 300), { status: 502, headers: cors });
-    } catch (e) { if (!env.AZURE_KEY) return new Response('workers ai: ' + e.message, { status: 502, headers: cors }); }
+      if (buf) res = keep(buf, 'ElevenLabs'); else err += 'workers ai: no audio; ';
+    } catch (e) { err += 'workers ai: ' + e.message + '; '; }
   }
-  if (!res) {
-    const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text)}</prosody></voice></speak>`;
-    const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
-      method: 'POST', body: ssml,
-      headers: { 'Ocp-Apim-Subscription-Key': env.AZURE_KEY, 'Content-Type': 'application/ssml+xml',
-        'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3', 'User-Agent': 'ZbiorkomInfo' } });
-    if (!r.ok) return new Response('voice error ' + r.status, { status: 502, headers: cors });
-    res = keep(await r.arrayBuffer(), 'Microsoft Azure');
-  }
+  if (!res) return new Response(err || 'voice error', { status: 502, headers: cors });
   const h = new Headers(res.headers); for (const [k, v] of Object.entries(cors)) h.set(k, v); h.set('Access-Control-Expose-Headers', 'X-Voice-By');
   return new Response(res.body, { status: 200, headers: h });
 }
