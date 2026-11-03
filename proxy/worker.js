@@ -45,18 +45,19 @@ async function tts(req, env, ctx, cors) {
   const azure = !!(env.AZURE_KEY && env.AZURE_REGION);
   if (!env.ELEVEN_KEY && !env.AI && !azure) return new Response('voice not set up', { status: 503, headers: cors });
   // (the cache is kept apart for each first choice of service, so that setting one up is heard at once)
-  const key = new Request('https://tts.cache/' + (azure ? 'az/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+  const key = new Request('https://tts.cache/' + (azure ? 'az2/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
   const cache = caches.default;
   let res = await cache.match(key), err = '';
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
-  // 1. Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0
+  // 1. Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0; at 48 kHz, 96 kbit/s
+  //    (at 24 kHz and 48 kbit/s it sounds muffled on a phone's speaker)
   if (!res && azure) {
     const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text)}</prosody></voice></speak>`;
     try {
       const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
         method: 'POST', body: ssml,
         headers: { 'Ocp-Apim-Subscription-Key': env.AZURE_KEY, 'Content-Type': 'application/ssml+xml',
-          'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3', 'User-Agent': 'ZbiorkomInfo' } });
+          'X-Microsoft-OutputFormat': 'audio-48khz-96kbitrate-mono-mp3', 'User-Agent': 'ZbiorkomInfo' } });
       if (r.ok) res = keep(await r.arrayBuffer(), 'Microsoft Azure'); else err += 'azure: ' + r.status + ' ' + (await r.text()).slice(0, 200) + '; ';
     } catch (e) { err += 'azure: ' + e.message + '; '; }
   }
