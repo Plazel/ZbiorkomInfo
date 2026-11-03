@@ -1793,6 +1793,10 @@ print('Paczki tras:', len(os.listdir(OUT + '/rp')), 'plików')
 try:
     import krynica_nazwy; krynica_nazwy.apply(OUT)
 except Exception as e: print('Krynica bez „-Zdrój”: pominięto (%s)' % e)
+# Warszawa's stops with "Dworzec" in full, not "Dw." (warszawa_nazwy.py)
+try:
+    import warszawa_nazwy; warszawa_nazwy.apply(OUT)
+except Exception as e: print('Warszawa „Dworzec”: pominięto (%s)' % e)
 # the fare zones of the stops for the guide's announcement of a zone change (strefy.py)
 try:
     import strefy; strefy.build(OUT, cache=SCR)

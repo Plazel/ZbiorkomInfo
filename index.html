@@ -3580,7 +3580,8 @@ async function rtVehGet(url){const c=RV_CACHE[url];if(c&&Date.now()-c.t<5000)ret
   RV_CACHE[url]={t:Date.now(),p};p.catch(()=>{delete RV_CACHE[url]});return p}
 // the run of a vehicle in the timetable: its line, the start time, the pattern it is on (nearest to it)
 // a vehicle's headsign and a run's terminus name the same place (written a little differently by the operator); no headsign: not known
-function gdSameHead(h,head){if(!h)return true;const a=fold(h).replace(/[^a-z0-9]/g,''),b=fold(head).replace(/[^a-z0-9]/g,'');if(!a||!b)return true;
+function gdSameHead(h,head){if(!h)return true;const nm=x=>fold(x).replace(/(^|[^a-z])dw\.\s*/g,'$1dworzec ').replace(/[^a-z0-9]/g,'');const a=nm(h),b=nm(head);   // ("Dw. Centralny" in a feed: "Dworzec Centralny")
+  if(!a||!b)return true;
   return a.includes(b.slice(0,8))||b.includes(a.slice(0,8))}
 // a vehicle on a run's course (within 300 m of it)
 function gdOnRun(R,v){const P=R.ps.map(id=>IDX.stops[id]).filter(Boolean);const cs=Math.cos(v.lat*Math.PI/180);const xy=S=>[(S[3]-v.lon)*cs*111320,(S[2]-v.lat)*110540];
