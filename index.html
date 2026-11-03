@@ -3456,7 +3456,12 @@ if(window.speechSynthesis)try{speechSynthesis.getVoices()}catch(e){}
 async function gdSpeakLocal(text,l,queued){if(!queued)await gdVoicesReady();return new Promise(res=>{if(!window.speechSynthesis)return res();const u=new SpeechSynthesisUtterance(text);u.lang=GD_LOC[l]||l;
   const v=gdLocalVoice(l);if(v)u.voice=v;u.rate=.95;u.onend=u.onerror=()=>res();setTimeout(res,15000);
   try{speechSynthesis.speak(u)}catch(e){res()}})}
+// the silence that keeps the page awake is paused while an announcement plays (two sounds at once: on Android, in Samsung
+// Internet, the announcement then came out muffled, as if over the phone), and goes on after it
 async function gdSay(kind,name,isLast,req){if(!GUIDE.voice)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
+  try{GD_KEEP.pause()}catch(e){}
+  try{await gdSay0(kind,name,isLast,req,tok)}finally{if(tok===GUIDE.sayTok&&GUIDE.voice&&GUIDE.open){try{const p_=GD_KEEP.play();if(p_)p_.catch(()=>{})}catch(e){}}}}
+async function gdSay0(kind,name,isLast,req,tok){
   try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
   const segs=gdSegs(kind,name,isLast,req).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
   gdNotify(kind==='next'?segs.map(x=>x[0]).join(' '):name);
