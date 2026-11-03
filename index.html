@@ -3386,7 +3386,7 @@ const GD_TQ={n:0,q:[]};
 function gdTtsQ(fn){return new Promise((res,rej)=>{const run=()=>{GD_TQ.n++;fn().then(res,rej).finally(()=>{GD_TQ.n--;const nx=GD_TQ.q.shift();if(nx)nx()})};GD_TQ.n<2?run():GD_TQ.q.push(run)})}
 function gdWav(text,l){const k=GD_VOICE[l]+'|'+text;
   if(!GDV.cache.has(k)){GDV.cache.set(k,(async()=>{const u=gdTtsUrl(text,l);if(!u)throw new Error('no proxy');
-      // ElevenLabs' free plan takes only a few requests at once: two at a time, a refused one tried again a moment later
+      // two at a time, a refused one (a service taking only so many at once) tried again a moment later
       for(let a=0;;a++){const r=await gdTtsQ(()=>fetch(u));
         if(r.ok&&/audio/.test(r.headers.get('content-type')||'')){GDV.by=r.headers.get('x-voice-by')||GDV.by;return URL.createObjectURL(await r.blob())}
         if(a>=2||(r.status!==502&&r.status!==429&&r.status!==503))throw new Error('tts '+r.status);await new Promise(z=>setTimeout(z,700*(a+1)))}})().catch(e=>{GDV.cache.delete(k);throw e}));

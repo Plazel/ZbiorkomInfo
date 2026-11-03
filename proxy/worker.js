@@ -4,11 +4,9 @@
 //    header, so a page on another site (e.g. GitHub Pages) cannot read them directly. ?url=… fetches one of the listed
 //    hosts and adds the header; the feeds are passed through unchanged (the page reads them itself).
 // 2. Announcements: /tts?v=<voice>&t=<text> returns the text spoken (MP3). Every text is synthesised once and then kept in
-//    Cloudflare's cache for a year, so each stop name costs the quota only once. The first way set up that answers is used:
-//    - Microsoft Azure neural voices (the voices Microsoft Edge reads with): AZURE_KEY and AZURE_REGION (the free tier F0 is never billed);
-//    - ElevenLabs, its free plan (no card; about 10 000 characters a month, the voices credited on the page): ELEVEN_KEY;
-//    - Cloudflare Workers AI (the ElevenLabs Multilingual v2 model), with no other account: a Workers AI binding named AI.
-//    Where neither answers (not set up, quota used up), the page uses the device's own voice.
+//    Cloudflare's cache for a year, so each stop name costs the quota only once. The voices are Microsoft Azure's neural
+//    voices (the voices Microsoft Edge reads with): AZURE_KEY and AZURE_REGION (the free tier F0 is never billed).
+//    Where they do not answer (not set up, quota used up), the page uses the device's own voice.
 //
 // 3. Bydgoszcz: /byd?p=<stop number> returns the stop's live departures from ZDMiKP's passenger service (the boards at the
 //    stops; odjazdy.zdmikp.bydgoszcz.pl, plain http and no CORS header), kept 15 seconds.
@@ -18,20 +16,14 @@
 //
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
-// For the voices, ElevenLabs: elevenlabs.io → sign up (free) → Developers → API Keys → Create (access to Text to Speech);
-// then in the worker's Settings → Variables and Secrets add ELEVEN_KEY (type Secret) with that key → Deploy.
-// For the voices, Workers AI (needs paid AI Gateway credits): the worker's Settings → Bindings → Add → Workers AI, variable name AI → Deploy.
 // For the voices, Azure: in the worker's Settings → Variables and Secrets add AZURE_KEY (type Secret: the key of an Azure
 // "Speech service" resource, pricing tier Free F0) and AZURE_REGION (type Text: the resource's region, e.g. westeurope).
 const ALLOWED = ['ckan2.multimediagdansk.pl', 'cdn.zbiorkom.live', 'www.ztm.poznan.pl', 'gtfs.ztp.krakow.pl', 'api.golemio.cz'];
 const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs-CZ-VlastaNeural': 'cs-CZ', 'cs-CZ-AntoninNeural': 'cs-CZ',
   'sk-SK-ViktoriaNeural': 'sk-SK', 'sk-SK-LukasNeural': 'sk-SK', 'de-DE-SeraphinaMultilingualNeural': 'de-DE', 'de-DE-FlorianMultilingualNeural': 'de-DE',
   'en-GB-AdaMultilingualNeural': 'en-GB', 'en-GB-OllieMultilingualNeural': 'en-GB' };
-// ElevenLabs voices (multilingual: the same voice speaks every language): a female and a male one
-const EL_VOICE = { f: 'EXAVITQu4vr4xnSDxMaL', m: 'JBFqnCBsd6RMkjVDRZzb' };   // Sarah, George
-const MALE = /Marek|Antonin|Lukas|Florian|Ollie/;
-// stop names the voices say wrongly: for Azure their sounds (IPA), for the others a spelling said right
-const SAY = { Munketoft: { ipa: 'ˈmʊŋkəˌtɔft', as: 'Mungketoft' } };
+// stop names the voices say wrongly: their sounds (IPA)
+const SAY = { Munketoft: { ipa: 'ˈmʊŋkəˌtɔft' } };
 const SAY_RE = new RegExp('\\b(' + Object.keys(SAY).join('|') + ')\\b', 'g');
 const xml = s => s.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 
@@ -69,17 +61,15 @@ async function alerts(cors) {
 async function tts(req, env, ctx, cors) {
   const u = new URL(req.url), voice = u.searchParams.get('v') || '', text = (u.searchParams.get('t') || '').trim();
   if (!VOICES[voice] || !text || text.length > 160) return new Response('bad request', { status: 400, headers: cors });
-  const azure = !!(env.AZURE_KEY && env.AZURE_REGION);
-  if (!env.ELEVEN_KEY && !env.AI && !azure) return new Response('voice not set up', { status: 503, headers: cors });
-  // (the cache is kept apart for each first choice of service, so that setting one up is heard at once)
+  if (!env.AZURE_KEY || !env.AZURE_REGION) return new Response('voice not set up', { status: 503, headers: cors });
   SAY_RE.lastIndex = 0; const said = SAY_RE.test(text);   // (a text with such a name: kept apart in the cache, so a new way to say it is heard)
-  const key = new Request('https://tts.cache/' + (azure ? 'az2/' : '') + (said ? 'say1/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+  const key = new Request('https://tts.cache/az2/' + (said ? 'say1/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
   const cache = caches.default;
   let res = await cache.match(key), err = '';
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
-  // 1. Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0; at 48 kHz, 96 kbit/s
+  // Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0; at 48 kHz, 96 kbit/s
   //    (at 24 kHz and 48 kbit/s it sounds muffled on a phone's speaker)
-  if (!res && azure) {
+  if (!res) {
     const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text).replace(SAY_RE, w => `<phoneme alphabet="ipa" ph="${SAY[w].ipa}">${w}</phoneme>`)}</prosody></voice></speak>`;
     try {
       const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
@@ -88,31 +78,6 @@ async function tts(req, env, ctx, cors) {
           'X-Microsoft-OutputFormat': 'audio-48khz-96kbitrate-mono-mp3', 'User-Agent': 'ZbiorkomInfo' } });
       if (r.ok) res = keep(await r.arrayBuffer(), 'Microsoft Azure'); else err += 'azure: ' + r.status + ' ' + (await r.text()).slice(0, 200) + '; ';
     } catch (e) { err += 'azure: ' + e.message + '; '; }
-  }
-  // 2. ElevenLabs directly (Flash v2.5: Polish, Czech, Slovak, German, English; half a credit a character)
-  if (!res && env.ELEVEN_KEY) {
-    // (the free plan takes 4 requests at once: one refused for that is tried again a moment later)
-    let r;
-    for (let a = 0; a < 4; a++) {
-      r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE[MALE.test(voice) ? 'm' : 'f']}?output_format=mp3_44100_64`, {
-        method: 'POST', headers: { 'xi-api-key': env.ELEVEN_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
-        body: JSON.stringify({ text: text.replace(SAY_RE, w => SAY[w].as), model_id: 'eleven_flash_v2_5', language_code: VOICES[voice].slice(0, 2) }) });
-      if (r.status !== 429) break;
-      await new Promise(z => setTimeout(z, 500 + 700 * a));
-    }
-    if (r.ok) res = keep(await r.arrayBuffer(), 'ElevenLabs'); else err += 'elevenlabs: ' + r.status + ' ' + (await r.text()).slice(0, 200) + '; ';
-  }
-  // 3. Workers AI: ElevenLabs
-  if (!res && env.AI) {
-    try {
-      const out = await env.AI.run('elevenlabs/eleven-multilingual-v2', { text: text.replace(SAY_RE, w => SAY[w].as), voice_id: EL_VOICE[MALE.test(voice) ? 'm' : 'f'],
-        language_code: VOICES[voice].slice(0, 2), output_format: 'mp3_44100_64' });
-      const url = (out && (out.result && out.result.audio || out.audio)) || '';
-      let buf = null;
-      if (typeof url === 'string' && url.startsWith('http')) { const a = await fetch(url); if (a.ok) buf = await a.arrayBuffer(); }
-      else if (url instanceof ArrayBuffer || ArrayBuffer.isView(url)) buf = url;
-      if (buf) res = keep(buf, 'ElevenLabs'); else err += 'workers ai: no audio; ';
-    } catch (e) { err += 'workers ai: ' + e.message + '; '; }
   }
   if (!res) return new Response(err || 'voice error', { status: 502, headers: cors });
   const h = new Headers(res.headers); for (const [k, v] of Object.entries(cors)) h.set(k, v); h.set('Access-Control-Expose-Headers', 'X-Voice-By');
