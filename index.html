@@ -17,7 +17,7 @@
 <title>ZbiorkomInfo</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#ffffff"><meta name="mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M3%206h15v3.6L8.2%2022.4H18V26H2.6v-3.6l9.8-12.8H3z%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2221.5%22%20y%3D%226%22%20width%3D%225%22%20height%3D%2220%22%20fill%3D%22%23d71920%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Condensed:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;900&family=Roboto+Condensed:wght@600&display=swap">
 <style>
 /* Layout: timetable board — section label + icon left, wrapping chip grid right; line and stop views follow the IMHD two-column pattern */
 :root{
@@ -42,7 +42,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size
 .alertWrap{max-width:1560px;margin:0 auto;padding:16px max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px))}.alertWrap[hidden]{display:none}
 .alertBar{display:flex;align-items:center;gap:14px;border:1.5px solid var(--alert);border-radius:0;padding:4px 18px;color:var(--alert);background:var(--bg)}
 .alertBar>svg{flex:none}.alertBar ul{list-style:none;margin:0;padding:0;min-width:0;flex:1}
-.alertBar button{display:block;width:100%;text-align:left;border:0;background:none;color:inherit;font:inherit;font-size:.95rem;line-height:1.35;padding:7px 0;cursor:pointer}@media (max-width:760px){.alertBar button{font-size:16px}}
+.alertBar button{display:block;width:100%;text-align:left;border:0;background:none;color:inherit;font:600 1.1rem/1.35 Roboto,system-ui,sans-serif;padding:8px 0;cursor:pointer}@media (max-width:760px){.alertBar button{font-size:17px}}
 .alertBar li+li button{border-top:1px solid color-mix(in srgb,var(--alert) 25%,transparent)}.alertBar button:hover{text-decoration:underline}
 :root{--alert:#c4161c}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--alert:#ff6b6b}}:root[data-theme="dark"]{--alert:#ff6b6b}
 .alertDlg .alertBox{width:min(640px,100%);grid-template-rows:auto minmax(0,1fr);background:var(--bg);color:var(--fg);border-color:var(--line);--d-line:var(--line)}.alertDlg .alertBox .depX{color:var(--muted)}.alertBox h3{margin:0 0 6px;color:var(--alert);font-size:1.1rem}.alertBox .aItem+.aItem{margin-top:20px;padding-top:16px;border-top:1px solid var(--d-line)}
@@ -4307,7 +4307,7 @@ function codeW(rowh){const c=codeW.c||(codeW.c=document.createElement('canvas').
   return c.measureText(T_('Peron')).width+rowh*.12}
 // ---- ZTM Gdańsk's notices of disruptions (the red "UWAGA" bar on ztm.gda.pl, through the proxy): a red bar over the
 // timetables and a line sliding along the bottom row of the departure board; tapped, their text
-const ALERT_IC='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M10.3 3.9L1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17v.01" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const ALERT_IC='<svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="M10.3 3.9L1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17v.01" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>';
 // where each city's notices come from: ZTM Gdańsk's bar on its site (the proxy), else the operators' GTFS-Realtime service
 // alerts (Warszawa and Łódź through zbiorkom.live's open API, Kraków from ZTP)
 const ALERT_SRC={tri:[['ztm']],waw:[['rt','https://api.zbiorkom.live/api6-open/warsaw/gtfsRealtime/default/serviceAlerts']],
