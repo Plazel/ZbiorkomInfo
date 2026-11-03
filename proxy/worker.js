@@ -30,6 +30,9 @@ const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs
 // ElevenLabs voices (multilingual: the same voice speaks every language): a female and a male one
 const EL_VOICE = { f: 'EXAVITQu4vr4xnSDxMaL', m: 'JBFqnCBsd6RMkjVDRZzb' };   // Sarah, George
 const MALE = /Marek|Antonin|Lukas|Florian|Ollie/;
+// stop names the voices say wrongly: for Azure their sounds (IPA), for the others a spelling said right
+const SAY = { Munketoft: { ipa: 'ˈmʊŋkəˌtɔft', as: 'Mungketoft' } };
+const SAY_RE = new RegExp('\\b(' + Object.keys(SAY).join('|') + ')\\b', 'g');
 const xml = s => s.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 
 async function byd(req, cors) {
@@ -69,14 +72,15 @@ async function tts(req, env, ctx, cors) {
   const azure = !!(env.AZURE_KEY && env.AZURE_REGION);
   if (!env.ELEVEN_KEY && !env.AI && !azure) return new Response('voice not set up', { status: 503, headers: cors });
   // (the cache is kept apart for each first choice of service, so that setting one up is heard at once)
-  const key = new Request('https://tts.cache/' + (azure ? 'az2/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+  SAY_RE.lastIndex = 0; const said = SAY_RE.test(text);   // (a text with such a name: kept apart in the cache, so a new way to say it is heard)
+  const key = new Request('https://tts.cache/' + (azure ? 'az2/' : '') + (said ? 'say1/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
   const cache = caches.default;
   let res = await cache.match(key), err = '';
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
   // 1. Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0; at 48 kHz, 96 kbit/s
   //    (at 24 kHz and 48 kbit/s it sounds muffled on a phone's speaker)
   if (!res && azure) {
-    const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text)}</prosody></voice></speak>`;
+    const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text).replace(SAY_RE, w => `<phoneme alphabet="ipa" ph="${SAY[w].ipa}">${w}</phoneme>`)}</prosody></voice></speak>`;
     try {
       const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
         method: 'POST', body: ssml,
@@ -92,7 +96,7 @@ async function tts(req, env, ctx, cors) {
     for (let a = 0; a < 4; a++) {
       r = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE[MALE.test(voice) ? 'm' : 'f']}?output_format=mp3_44100_64`, {
         method: 'POST', headers: { 'xi-api-key': env.ELEVEN_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
-        body: JSON.stringify({ text, model_id: 'eleven_flash_v2_5', language_code: VOICES[voice].slice(0, 2) }) });
+        body: JSON.stringify({ text: text.replace(SAY_RE, w => SAY[w].as), model_id: 'eleven_flash_v2_5', language_code: VOICES[voice].slice(0, 2) }) });
       if (r.status !== 429) break;
       await new Promise(z => setTimeout(z, 500 + 700 * a));
     }
@@ -101,7 +105,7 @@ async function tts(req, env, ctx, cors) {
   // 3. Workers AI: ElevenLabs
   if (!res && env.AI) {
     try {
-      const out = await env.AI.run('elevenlabs/eleven-multilingual-v2', { text, voice_id: EL_VOICE[MALE.test(voice) ? 'm' : 'f'],
+      const out = await env.AI.run('elevenlabs/eleven-multilingual-v2', { text: text.replace(SAY_RE, w => SAY[w].as), voice_id: EL_VOICE[MALE.test(voice) ? 'm' : 'f'],
         language_code: VOICES[voice].slice(0, 2), output_format: 'mp3_44100_64' });
       const url = (out && (out.result && out.result.audio || out.audio)) || '';
       let buf = null;
