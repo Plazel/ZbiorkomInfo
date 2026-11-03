@@ -1789,6 +1789,10 @@ for r in _idx['routes']:
     if r['id'] in _pk: r['rp'] = _pk[r['id']]
 json.dump(_idx, open(OUT + '/index.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 print('Paczki tras:', len(os.listdir(OUT + '/rp')), 'plików')
+# Krynica-Zdrój's stops named without "-Zdrój" (krynica_nazwy.py)
+try:
+    import krynica_nazwy; krynica_nazwy.apply(OUT)
+except Exception as e: print('Krynica bez „-Zdrój”: pominięto (%s)' % e)
 
 # ---------------- optional: single-file page with the data built in ----------------
 if EMBED:
