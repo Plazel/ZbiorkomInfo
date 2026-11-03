@@ -278,7 +278,7 @@ span.chip{cursor:inherit}
 .miniBoard .mb.rect.sq{width:34px;min-width:0;padding:0;overflow:hidden}.miniBoard .mb.sq.len3{font-size:.86rem;letter-spacing:-.04em}
 .miniBoard .mr.wpl{grid-template-columns:minmax(48px,max-content) 1fr 46px 72px}
 .miniBoard .mb.rect:not(.sq){white-space:nowrap;padding:0 6px}.miniBoard .mr.wpl .mt{text-align:right;white-space:nowrap}.miniBoard .mpl{white-space:nowrap;text-align:left!important}.miniBoard .mpl{color:#9aa3ad;font-size:.85rem;min-width:22px;text-align:right}
-.miniBoard .mt{font-weight:700;font-size:1.1rem}.miniBoard .live{color:#6fdc8c}
+.miniBoard .mt{font-weight:700;font-size:1.1rem}.miniBoard .live{color:inherit}#spSrc:empty{display:none}
 .miniBoard p{margin:0;padding:8px 14px;font-size:.8rem;color:#9aa4ae}
 .gscroll{overflow-x:auto}
 /* each day as wide as its own longest hour; spare room (if any) is shared out, otherwise no gaps */
@@ -626,7 +626,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 /* ---- departure board (Odjazdy): a stop's departures as on a stop display, from the timetables ---- */
 .depModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;display:grid;grid-template-rows:1fr auto;
   font-family:Roboto,"Segoe UI",Arial,sans-serif;font-variant-numeric:tabular-nums;background:var(--d-bg);color:var(--d-fg);--rowh:70px;
-  --d-bg:#0d0e0f;--d-bar:#000;--d-head:#232527;--d-row:#17191a;--d-row2:#1c1e20;--d-sep:#2c2f31;--d-fg:#f1f2f2;--d-dim:#9a9fa3;--d-acc:#ffcc00;--d-panel:#1b1d1f;--d-line:#34383b;--d-in:#101112}
+  --d-bg:#1d2126;--d-bar:#000;--d-head:#15181c;--d-row:#1d2126;--d-row2:#1d2126;--d-sep:#30363d;--d-fg:#f2f4f6;--d-dim:#9aa3ad;--d-acc:#ffcc00;--d-panel:#1b1d1f;--d-line:#34383b;--d-in:#101112}
 .depModal[hidden]{display:none}
 .depModal.light{--d-bg:#e9ecee;--d-bar:#fff;--d-head:#d5dade;--d-row:#fff;--d-row2:#f4f6f7;--d-sep:#d0d5d9;--d-fg:#14181b;--d-dim:#5c656c;--d-acc:#0a62c9;--d-panel:#fff;--d-line:#d5dade;--d-in:#f4f6f7}
 .depModal:fullscreen{left:0;top:0}
@@ -638,7 +638,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .dTitle .dClock{flex:none;min-width:var(--c-code);text-align:center;font-size:calc(var(--rowh)*.28)}
 .depModal.nocode .dTitle .dClock{min-width:0}
 .dTitle b{font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:calc(var(--rowh)*.28);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
-.dHead,.dRow{display:grid;grid-template-columns:var(--c-badge) minmax(0,1fr) auto var(--c-code);align-items:center;column-gap:calc(var(--rowh)*.22);padding:0 calc(var(--rowh)*.14)}
+.dHead,.dRow{display:grid;grid-template-columns:var(--c-badge) minmax(0,1fr) var(--c-code) var(--c-time,auto);align-items:center;column-gap:calc(var(--rowh)*.22);padding:0 calc(var(--rowh)*.14)}
 .dHead{background:var(--d-head);height:calc(var(--rowh)*.82)}
 .dHead .l{font-weight:700;font-size:calc(var(--rowh)*.34);line-height:1}
 .dHead .c{font-size:calc(var(--rowh)*.34);font-weight:700;text-align:center;line-height:1}
@@ -667,7 +667,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .dRow.tap{cursor:pointer}.dDest .mq{display:inline-block;animation:mqS var(--mqd,8s) linear infinite alternate}@keyframes mqS{0%,18%{transform:translateX(0)}82%,100%{transform:translateX(var(--mq))}}
 .dTime{font-size:calc(var(--rowh)*.46);text-align:right;white-space:nowrap;padding-top:.06em}
 .dTime.now{color:var(--d-acc);font-weight:700}
-.dCode{font-size:calc(var(--rowh)*.28);font-weight:800;text-align:center;white-space:nowrap}.dCode svg.pole{height:.95em;width:auto;vertical-align:-.12em;margin-right:.18em}
+.dCode{font-size:calc(var(--rowh)*.28);font-weight:400;color:var(--d-dim);text-align:left;white-space:nowrap}.dHead .c{text-align:left}.dTime{font-weight:700}.dCode svg.pole{height:.95em;width:auto;vertical-align:-.12em;margin-right:.18em}
 .dArr{display:inline-flex;letter-spacing:-.04em;font-weight:800;color:var(--d-acc)}
 .dArr i{font-style:normal;animation:dArr 1.6s steps(1) infinite}
 .dArr i:nth-child(2){animation-name:dArr2}.dArr i:nth-child(3){animation-name:dArr3}
@@ -3287,7 +3287,7 @@ async function openStopPop(name,pole,e,gi,merged){closeStopPop(true);MAP.popAt={
     a.forEach(d=>{if(d.ps)return;const m=sch.find(x=>x.r.n===d.r.n&&x.ps&&Math.abs(x.t-(d.sch!=null?d.sch:d.st!=null?d.st:d.t))<=1.5);if(m){d.di=m.di;d.ps=m.ps}});
     const wp=showPl&&a.some(d=>d.pole);
     bx.innerHTML=a.length?a.map(d=>{const s=depStyle(d.r);const m=Math.round(d.t-now);
-      const tm=m<=0?'<1 min':m<30?m+' min':String(Math.floor(d.t/60)%24).padStart(2,'0')+':'+String(Math.round(d.t)%60).padStart(2,'0');
+      const tm=brdTime(d,now,city);
       return `<div class="mr${wp?' wpl':''}" data-rid="${esc(d.r.id)}" data-i="${a.indexOf(d)}" role="button" tabindex="0" title="Pokaż kurs na mapie"><div class="mb ${s.shape}${sqCls(d.r)}" style="background:${s.bg};color:${s.fg}">${esc(d.r.n)}</div><div>${esc(d.head)}</div>${wp?`<div class="mpl" title="Peron">${d.pole?POLE+esc(d.pole):''}</div>`:''}<div class="mt${d.live?' live':''}">${tm}</div></div>`}).join(''):'<p>Brak odjazdów w najbliższym czasie.</p>';
     bx.querySelectorAll('.mr[data-rid]').forEach(row=>{const go=async()=>{const id=row.dataset.rid;if(!MAP.data.routes[id])return;const dep=a[+row.dataset.i];const back={pop:MAP.popAt&&{...MAP.popAt},vb:{...MAP.vb}};closeStopPop(true);MAP.stopHL=null;
         // the run itself, as from the guide: its own course, its stops and times, and the vehicle on it
@@ -3700,7 +3700,7 @@ function gdBoard(R,sid,tAt){const E=gdBoardLoad(sid);if(!E.list)return '';const 
   const L=E.list.filter(d=>d.r.n!==R.r.n&&d.t>=tAt+gdChangeMin(sid,d.sid)&&d.t<=tAt+45&&!seen.has(d.r.n+'|'+d.head+'|'+d.t)&&seen.add(d.r.n+'|'+d.head+'|'+d.t)).slice(0,8);
   if(!L.length)return '';
   return `<div class="gsDeps"><div class="gbT">${esc(trS('Przesiadki'))}</div>`+L.map(d=>{const m=Math.round(d.t-nowM);const tn=gdTrnText(d.head);
-    return `<div class="gbR" data-k="${E.list.indexOf(d)}" role="button" tabindex="0">${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="dc">${d.st!==here?`<span class="ds">${esc(d.st)}</span>`:''}${d.pole?`<span class="dpo">${POLE}${esc(d.pole)}</span>`:''}</span><span class="dt">${m<1?'&lt; <span>1 min</span>':m+' min'}</span></div>`}).join('')+'</div>'}
+    return `<div class="gbR" data-k="${E.list.indexOf(d)}" role="button" tabindex="0">${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="dc">${d.st!==here?`<span class="ds">${esc(d.st)}</span>`:''}${d.pole?`<span class="dpo">${POLE}${esc(d.pole)}</span>`:''}</span><span class="dt">${brdTime(d,nowM,city)}</span></div>`}).join('')+'</div>'}
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
@@ -4313,7 +4313,7 @@ function depLayout(){const m=depEl();if(m.hidden)return;
   // narrow screens: the rows as large as the width allows (the boards then scroll), so the type stays readable
   const rowh=pe.clientWidth<760?Math.max(40,Math.min(64,pe.clientWidth/7)):Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));
   m.style.setProperty('--rowh',rowh+'px');m.style.setProperty('--nrows',depCfg.rows);
-  m.style.setProperty('--c-badge',(rowh*1.15)+'px');m.style.setProperty('--c-code',Math.max(rowh*.9,codeW(rowh))+'px')}
+  m.style.setProperty('--c-badge',(rowh*1.15)+'px');m.style.setProperty('--c-time',(rowh*2.3)+'px');m.style.setProperty('--c-code',Math.max(rowh*.9,codeW(rowh))+'px')}
 // the platform column is as wide as its heading in the chosen language (e.g. "Nástupište")
 function codeW(rowh){const c=codeW.c||(codeW.c=document.createElement('canvas').getContext('2d'));c.font='700 '+(rowh*.34)+'px Roboto,"Segoe UI",Arial,sans-serif';
   return c.measureText(T_('Peron')).width+rowh*.12}
@@ -4367,6 +4367,13 @@ ztmAlerts();setInterval(()=>{if(alertCity(city))ztmAlerts()},120000);
 function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('div');row.className='dRow dAlert';row.title=trS('Utrudnienia');row.onclick=()=>alertShow(null,g);
   const txt=L.map(a=>a.title).join('   •   ');const dur=Math.max(12,txt.length*.28);const dl=-(((Date.now()-((ALERT_BY[g]||{}).t0||0))/1000)%dur);
   row.innerHTML=`${ALERT_IC}<div class="aMq"><span style="--d:${dur.toFixed(1)}s;--dl:${dl.toFixed(2)}s">${esc(txt)}</span></div>`;return row}
+// ---- every departure board on the page (the board, the stop's board, the map's stop popup, the guide's changes) gives a time
+// the same way: a live run as the minutes to go (under an hour), a timetable run as its clock time; where a city has no
+// live data at all, its timetable runs as the minutes to go under an hour, then the clock time
+const LIVE_CITIES=['gda','sop','gdy','all','byd','poz','krk','waw','ldz','prg'];
+function brdTime(d,nowM,c){const left=d.t-nowM,mins=d.live||!LIVE_CITIES.includes(c||city);
+  if(mins&&left<1)return '&lt;1 min';if(mins&&left<60)return Math.floor(left)+' min';
+  const t=Math.floor(d.t+1e-6)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
 const DEP_AHEAD=24*60;   // (the board: the departures of the next 24 hours)
 // the platform column: shown where the board has more than one platform; with stops of several names it is the "Przystanek"
 // column, the pole's number with the stop's name
@@ -4381,7 +4388,7 @@ function depRender(){const m=depEl();if(m.hidden)return;
   for(let p=0;p<np;p++){const sts=depStops(p);
     const P=document.createElement('div');P.className='dP';
     const title=(p===0?depCfg.title:depCfg.title2)||[...new Set(sts.map(s=>s.n))].join(' · ')||'Odjazdy';
-    P.innerHTML=`<div class="dTitle"><b></b><div class="dClock">${depClockHTML()}</div></div><div class="dHead"><div class="l">Linia</div><div class="l">Kierunek</div><div></div><div class="c">Peron</div></div><div class="dRows"></div>`;
+    P.innerHTML=`<div class="dTitle"><b></b><div class="dClock">${depClockHTML()}</div></div><div class="dHead"><div class="l">Linia</div><div class="l">Kierunek</div><div class="c">Peron</div><div></div></div><div class="dRows"></div>`;
     P.querySelector('.dTitle b').textContent=String(title||'').replace(/ → .*$/,'');   // (boards saved before kept a direction in the title)
     const pc=depPanelCode(p);P.classList.toggle('nocode',!pc.show);P.classList.toggle('mstop',pc.multi);P.querySelector('.dHead .c').textContent=T_(pc.multi?'Przystanek':'Peron');
     const rows=P.querySelector('.dRows');
@@ -4392,17 +4399,9 @@ function depRender(){const m=depEl();if(m.hidden)return;
       if(!list.length){const e=document.createElement('div');e.className='dEmpty';e.textContent=trS('Brak odjazdów w ciągu 24 godz.');rows.append(e)}
       list.forEach(d=>{const row=document.createElement('div');row.className='dRow';row.append(depBadge(d.r,'dBadge'));
         const de=document.createElement('div');de.className='dDest';de.textContent=d.head;
-        const tm=document.createElement('div');tm.className='dTime';const left=d.t-nowM;
-        const main=document.createElement('span');
-        if(left<1){tm.classList.add('now');main.innerHTML='<span class="dArr" aria-label="odjeżdża"><i>&gt;</i><i>&gt;</i><i>&gt;</i></span>'}
-        else{if(d.live){const dot=document.createElement('span');dot.className='dLive';dot.title='na żywo (GPS)';main.append(dot)}
-          if(d.live&&left<60)main.append(Math.floor(left)+' min');
-          else{const t=Math.floor(d.t+1e-6)%1440;main.append(String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'))}}
-        tm.append(main);
-        if(d.live&&Math.abs(d.delay||0)>=60){const dl=document.createElement('span');dl.className='dDelay '+(d.delay>0?'late':'early');
-          dl.textContent=(d.delay>0?'+':'−')+Math.round(Math.abs(d.delay)/60)+' min';dl.title=d.delay>0?'opóźnienie':'przed czasem';tm.append(dl)}
+        const tm=document.createElement('div');tm.className='dTime';tm.innerHTML=brdTime(d,nowM,(sts[0]&&sts[0].c)||city);
         const c=document.createElement('div');c.className='dCode';c.innerHTML=(d.pole?POLE+esc(d.pole):'')+(pc.multi&&d.stn?'<span class="dStn">'+esc(d.stn)+'</span>':'');
-        row.append(de,tm,c);row.classList.add('tap');row.onclick=()=>openRunOnMap(d,(DEP.schRaw||[])[p]);rows.append(row)});
+        row.append(de,c,tm);row.classList.add('tap');row.onclick=()=>openRunOnMap(d,(DEP.schRaw||[])[p]);rows.append(row)});
       if(al)rows.append(depAlertRow(ag))}
     box.append(P);
     if(pc.show&&pc.multi){let w=0;P.querySelectorAll('.dCode').forEach(c=>{w=Math.max(w,c.scrollWidth)});const hc=P.querySelector('.dHead .c');w=Math.max(w,hc?hc.scrollWidth:0);
@@ -4416,7 +4415,7 @@ function depRender(){const m=depEl();if(m.hidden)return;
   const live=DEP.src.includes('live'),sch=DEP.src.includes('sch');
   // the note: live where it is; in cities with live data that could not be had here, how to get it; elsewhere: timetables
   const cities_=[...depCfg.stops,...(depCfg.split?depCfg.stops2:[])].map(x=>x.c||city);const rtCity=cities_.some(c=>['gda','sop','gdy','all','poz','krk','waw','ldz','prg'].includes(c));
-  document.getElementById('depSrc').textContent=live&&!sch?'● na żywo; dalsze odjazdy wg rozkładu':live?'● na żywo; pozostałe odjazdy podawane wg rozkładów jazdy':rtCity?'Odjazdy w czasie rzeczywistym nie są dostępne w tej chwili':'Odjazdy podawane wg rozkładów jazdy';
+  document.getElementById('depSrc').textContent='';
   depLayout()}
 function depTickClock(){document.querySelectorAll('#depPanels .dClock').forEach(c=>c.innerHTML=depClockHTML())}
 async function openDep(){if(!IDX)return;if(MAP.open)closeMap();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool();depLoad();const m=depEl();m.hidden=false;DEP.open=true;navMark();
@@ -4742,9 +4741,9 @@ async function renderStopPage(name,pole){
       else{const last=Math.max(...live.map(d=>d.sch!=null?d.sch:d.t));a=[...live,...sch.filter(d=>d.t>last+1&&!live.some(l=>l.r.n===d.r.n&&l.sch!=null&&Math.abs(l.sch-d.t)<=1.5))]}}
     a=a.filter(d=>d.t>=now-.5&&pass(d)).sort((x,y)=>x.t-y.t).slice(0,8);const bx=document.getElementById('spBoard');if(!bx){clearInterval(SP_TIMER);return}
     bx.innerHTML=a.length?a.map(d=>{const s=depStyle(d.r);const m=Math.round(d.t-now);
-      const tm=m<=0?'<1 min':m<30?m+' min':String(Math.floor(d.t/60)%24).padStart(2,'0')+':'+String(Math.round(d.t)%60).padStart(2,'0');
+      const tm=brdTime(d,now,city);
       return `<div class="mr${showPl?' wpl':''}"><div class="mb ${s.shape}${sqCls(d.r)}" style="background:${s.bg};color:${s.fg}">${esc(d.r.n)}</div><div>${esc(d.head)}</div>${showPl?`<div class="mpl" title="Peron">${d.pole?POLE+esc(d.pole):''}</div>`:''}<div class="mt${d.live?' live':''}">${tm}</div></div>`}).join(''):'<p>Brak odjazdów w najbliższym czasie.</p>';
-    document.getElementById('spSrc').textContent=live&&live.length?'Odjazdy na żywo, dalsze wg rozkładu.':'Odjazdy według rozkładu jazdy.'};
+    document.getElementById('spSrc').textContent=''};
   let lastSch=[],lastLive=null;const show0=show;
   lastShow=()=>show0(lastSch,lastLive);
   draw();SP_TIMER=setInterval(draw,30000)}
