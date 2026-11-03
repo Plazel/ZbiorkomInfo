@@ -22,9 +22,21 @@ const ALLOWED = ['ckan2.multimediagdansk.pl', 'cdn.zbiorkom.live', 'www.ztm.pozn
 const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs-CZ-VlastaNeural': 'cs-CZ', 'cs-CZ-AntoninNeural': 'cs-CZ',
   'sk-SK-ViktoriaNeural': 'sk-SK', 'sk-SK-LukasNeural': 'sk-SK', 'de-DE-SeraphinaMultilingualNeural': 'de-DE', 'de-DE-FlorianMultilingualNeural': 'de-DE',
   'en-GB-AdaMultilingualNeural': 'en-GB', 'en-GB-OllieMultilingualNeural': 'en-GB' };
-// stop names the voices say wrongly: their sounds (IPA)
-const SAY = { Munketoft: { ipa: 'ˈmʊŋkəˌtɔft' } };
-const SAY_RE = new RegExp('\\b(' + Object.keys(SAY).join('|') + ')\\b', 'g');
+// stop names the voices say wrongly: their sounds (IPA), from the site's own file data/wymowa.json (read again every 10
+// minutes, so a name is put right there, with no change here)
+const SAY_URL = 'https://raw.githubusercontent.com/Plazel/ZbiorkomInfo/main/data/wymowa.json';
+let SAY = { t: 0, map: {}, re: null };
+async function sayDict() {
+  if (Date.now() - SAY.t < 600000) return SAY;
+  try {
+    const r = await fetch(SAY_URL, { cf: { cacheTtl: 600 } });
+    if (r.ok) { const j = await r.json(); const map = {}; for (const [k, v] of Object.entries(j)) if (k !== '_' && typeof v === 'string' && v) map[k] = v.replace(/^[\[\/]|[\]\/]$/g, '');
+      const ks = Object.keys(map).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      SAY = { t: Date.now(), map, re: ks.length ? new RegExp('(?<!\\p{L})(' + ks.join('|') + ')(?!\\p{L})', 'gu') : null }; }
+    else SAY.t = Date.now() - 540000;   // (not to be had: tried again in a minute)
+  } catch (e) { SAY.t = Date.now() - 540000; }
+  return SAY;
+}
 const xml = s => s.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 
 async function byd(req, cors) {
@@ -62,15 +74,16 @@ async function tts(req, env, ctx, cors) {
   const u = new URL(req.url), voice = u.searchParams.get('v') || '', text = (u.searchParams.get('t') || '').trim();
   if (!VOICES[voice] || !text || text.length > 160) return new Response('bad request', { status: 400, headers: cors });
   if (!env.AZURE_KEY || !env.AZURE_REGION) return new Response('voice not set up', { status: 503, headers: cors });
-  SAY_RE.lastIndex = 0; const said = SAY_RE.test(text);   // (a text with such a name: kept apart in the cache, so a new way to say it is heard)
-  const key = new Request('https://tts.cache/az2/' + (said ? 'say1/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+  // (a text with such a name: its sounds are part of its place in the cache, so a name put right is heard at once)
+  const D = await sayDict(); const said = D.re ? [...new Set(text.match(D.re) || [])].map(w => w + '=' + D.map[w]).join(',') : '';
+  const key = new Request('https://tts.cache/az2/' + (said ? 'say/' + encodeURIComponent(said) + '/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
   const cache = caches.default;
   let res = await cache.match(key), err = '';
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
   // Microsoft Azure: the voice itself (the same neural voices as Microsoft Edge reads with), free tier F0; at 48 kHz, 96 kbit/s
   //    (at 24 kHz and 48 kbit/s it sounds muffled on a phone's speaker)
   if (!res) {
-    const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${xml(text).replace(SAY_RE, w => `<phoneme alphabet="ipa" ph="${SAY[w].ipa}">${w}</phoneme>`)}</prosody></voice></speak>`;
+    const ssml = `<speak version="1.0" xml:lang="${VOICES[voice]}"><voice name="${voice}"><prosody rate="-5%">${said ? xml(text).replace(D.re, w => `<phoneme alphabet="ipa" ph="${xml(D.map[w])}">${w}</phoneme>`) : xml(text)}</prosody></voice></speak>`;
     try {
       const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
         method: 'POST', body: ssml,
