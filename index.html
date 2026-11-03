@@ -371,7 +371,7 @@ span.chip{cursor:inherit}
 .vdesc{flex-basis:100%;font-size:.85rem;color:var(--muted)}
 .vdesc b.k{color:var(--accent);margin-right:4px}
 .mapVar[hidden]{display:none}
-#mapHL polyline{stroke-width:6;opacity:1;pointer-events:none}
+#mapHL polyline{stroke-width:6;opacity:1;pointer-events:none}#mapHL polyline.runPast{stroke:#a3a9b0;stroke-width:4}
 #mapSvg polyline.on{opacity:1;stroke-width:6}
 #mapSvg .mstop circle{fill:var(--bg);stroke-width:2.5}
 #mapLabels{pointer-events:none;font-family:var(--font-body)}
@@ -3015,7 +3015,13 @@ function layoutHL(){
   curVariants().forEach(vs=>{
     if(vs.main){svg.querySelectorAll(`#mapLines polyline.var[data-id="${vs.id}"]`).forEach(p=>p.classList.add('nov'));return}
     svg.querySelectorAll(`#mapLines polyline[data-id="${vs.id}"]`).forEach(p=>p.classList.add('nov'));
-    vh+=vs.es.filter(e=>e.g.length>1).map(e=>{const f=vs.l!=='run'&&MAP.par&&MAP.drawn==='geo'&&MAP.par.fit(e.g,vs.id);   // (one run followed: on its own course, not moved aside)
+    vh+=vs.es.filter(e=>e.g.length>1).map(e=>{
+      // a run followed: the part behind the vehicle grey and under the part still ahead (a line going out and back along the
+      // same streets is then not drawn twice in black)
+      if(vs.l==='run'&&RUN.cut&&RUN.e===e&&RUN.d&&RUN.d.r.id===vs.id){const c=RUN.cut,ln=q=>q.map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(' ');
+        const past=[...e.g.slice(0,c.ci+1),c.pt],fut=[c.pt,...e.g.slice(c.ci+1)];
+        return (past.length>1?`<polyline class="runPast" points="${ln(past)}"/>`:'')+`<polyline points="${ln(fut)}" style="stroke:${lineColor(vs.r)}"/>`}
+      const f=vs.l!=='run'&&MAP.par&&MAP.drawn==='geo'&&MAP.par.fit(e.g,vs.id);   // (one run followed: on its own course, not moved aside)
       const pts=f?f.pts.map((q,i)=>(q[0]+f.nx[i]*f.sl[i]*W0).toFixed(2)+','+(q[1]+f.ny[i]*f.sl[i]*W0).toFixed(2)):e.g.map(q=>q[0]+','+q[1]);
       return `<polyline points="${pts.join(' ')}" style="stroke:${lineColor(vs.r)}"/>`}).join('')});
   const ids=[...MAP.hl].filter(id=>MAP.data.routes[id]&&MAP.byId[id]&&(MAP.night||MAP.byId[id].t!=='night'));
@@ -3712,7 +3718,7 @@ async function openRunOnMap(d,list){
     if(!pn){pn=document.createElement('div');pn.id='runPanel';pn.className='runPanel';const mb=document.querySelector('.mapBody');mb.insertBefore(pn,mb.querySelector('.mapArea'))}
     const s0=depStyle(d.r);pn.innerHTML=`<div class="rpH">${runVehHtml(d)}</div>`}
   if(typeof DEP!=='undefined'&&DEP.open)closeDep();await openMap();runTitle(d,'');await new Promise(r=>setTimeout(r,120));if(MAP.view!=='osm')await setMapView('osm');
-  RUN.d=d;RUN.first=true;RUN.scrolled=false;closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([d.r.id]);applyHL();
+  RUN.d=d;RUN.cut=null;RUN.first=true;RUN.scrolled=false;closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([d.r.id]);applyHL();
   RUN.e=runEdge(d.r.id,d);RUN.e=(await runShape(d,RUN.e))||RUN.e;   // (a variant: its own course, laid onto the streets in the data)
   const v=RUN.e?{run:RUN.e}:runVariant(d.r.id,d);if(v!=null){MAP.varOf[d.r.id]=v;updateVarPanel();renderLabels()}
   clearInterval(RUN.tm);try{await runTick()}finally{document.getElementById('mapModal').classList.remove('runInit')}RUN.tm=setInterval(runTick,5000);clearInterval(RUN.ageTm);RUN.ageTm=setInterval(runAge,1000);
@@ -3801,7 +3807,7 @@ function runVehHtml(d){const a=[];if(d.vlabel)a.push(`${esc(trS('Pojazd'))} <b>$
 // the run window's ×: back to the page the run was opened from (the guide, the departures, a stop), not to the full map
 function runExit(){if(RUN.fromMap){const b=RUN.fromMap;closeRun();   // back to the stop and its board, where the run was chosen
     if(b&&b.vb){MAP.vb=b.vb;applyVB();renderLabels()}if(b&&b.pop)setTimeout(()=>reopenStopPop(b.pop),60);return}if(VEH.back){VEH.back=false;closeRun();vehMode(true);return}const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
-function closeRun(){{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}RUN.fromMap=false;clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
+function closeRun(){{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}RUN.fromMap=false;clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.cut=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
 async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);return}
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;let dl=(d.delay||0)/60,gps=null;
   // ZTM Gdańsk: the vehicle's own position (a run from the guide's board: its vehicle found by line, start time and headsign)
@@ -3835,7 +3841,10 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   let rtDelay=false;if(rtOnly&&segJ!=null){const S=d.off.map(o=>d.t0+o);const est=S[segJ-1]+segU*(S[segJ]-S[segJ-1]);dl=Math.max(-5,nowM-est);S.forEach((t,k)=>T[k]=t+dl);rtDelay=true;RUN.pos&&(RUN.pos.dl=dl)}
   // on the line as drawn: the nearest point of the line's course (within about 300 m), the arrow along it
   const M=MAP.data&&MAP.data.routes[d.r.id];let sxy=xy;const CG=RUN.e?[RUN.e.g]:M&&M.g;
-  if(CG){let best=null,bd2=9;CG.forEach(c=>{for(let i=1;i<c.length;i++){const A=c[i-1],B=c[i],dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;if(!l2)continue;
+  const cut=RUN.e?runCut(d,xy,segJ):null;
+  if(cut){sxy=cut.pt;let a2=Math.atan2(cut.dy,cut.dx)*180/Math.PI;if(ang!=null&&Math.cos((a2-ang)*Math.PI/180)<0)a2+=180;if(ang!=null)ang=a2;
+    const ch=!RUN.cut||RUN.cut.ci!==cut.ci;RUN.cut=cut;if(ch)layoutHL()}
+  else if(CG){let best=null,bd2=9;CG.forEach(c=>{for(let i=1;i<c.length;i++){const A=c[i-1],B=c[i],dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;if(!l2)continue;
       const u=Math.max(0,Math.min(1,((xy[0]-A[0])*dx+(xy[1]-A[1])*dy)/l2));const px=A[0]+u*dx,py=A[1]+u*dy,dd=(px-xy[0])**2+(py-xy[1])**2;if(dd<bd2){bd2=dd;best=[px,py,dx,dy]}}});
     if(best){sxy=[best[0],best[1]];let a2=Math.atan2(best[3],best[2])*180/Math.PI;if(ang!=null&&Math.cos((a2-ang)*Math.PI/180)<0)a2+=180;if(ang!=null)ang=a2}}
   const old=RUN.pos;RUN.pos={xy:sxy,gps:!!gps,dl,ang};if(!gps)RUN.fixT=null;
@@ -3859,6 +3868,16 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   pn.querySelectorAll('li[data-sid]').forEach(li=>li.onclick=()=>{const X=IDX.stops[li.dataset.sid];if(!X)return;const [x,y]=proj(X[2],X[3]);const v=MAP.vb;
     const f=Math.min(1,SYM_K1*.5/unitsPerPx());MAP.vb={x:x-v.w*f/2,y:y-v.h*f/2,w:v.w*f,h:v.h*f};applyVB();renderLabels();drawVeh()});
   if(!RUN.scrolled){RUN.scrolled=true;const e=pn.querySelector('li.nx');if(e)e.scrollIntoView({block:'center'})}}
+// where the vehicle is on the run's drawn course: each stop's place on it in order (the first close pass, so a line coming back
+// along the same streets keeps its two passes apart), then the nearest point between the stop behind and the stop ahead
+function runCut(d,xy,segJ){const e=RUN.e;if(!e||!e.g||e.g.length<2||segJ==null)return null;const g=e.g;
+  if(!e._si||e._si.d!==d){let at=0;const si=d.ps.map(id=>{const X=IDX.stops[id];if(!X)return at;const q=proj(X[2],X[3]);let bi=at,bd=1e18;
+      for(let i=Math.max(1,at);i<g.length;i++){const A=g[i-1],B=g[i],dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,((q[0]-A[0])*dx+(q[1]-A[1])*dy)/l2)):0;
+        const dd=Math.hypot(A[0]+u*dx-q[0],A[1]+u*dy-q[1]);if(dd<bd){bd=dd;bi=u>.5?i:i-1}else if(bd<1&&dd>bd+3)break}at=bi;return bi});si.d=d;e._si=si}
+  const si=e._si,a=Math.max(0,(si[segJ-1]||0)-1),b=Math.min(g.length-1,(si[segJ]!=null?si[segJ]:g.length-1)+1);let best=null;
+  for(let i=Math.max(1,a+1);i<=b;i++){const A=g[i-1],B=g[i],dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy;if(!l2)continue;
+    const u=Math.max(0,Math.min(1,((xy[0]-A[0])*dx+(xy[1]-A[1])*dy)/l2));const px=A[0]+u*dx,py=A[1]+u*dy,dd=(px-xy[0])**2+(py-xy[1])**2;if(!best||dd<best.dd)best={dd,ci:i-1,pt:[px,py],dx,dy}}
+  return best&&best.dd<9?best:null}
 function drawVeh(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapVeh');
   if(!RUN.d||!RUN.pos||MAP.view==='schema'){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapVeh'}svg.appendChild(g);const k=unitsPerPx();const [x,y]=RUN.pos.xy;const s0=depStyle(RUN.d.r);
