@@ -3689,11 +3689,19 @@ function gdTransfers(sid,r,tAt){const E=gdTrLoad(sid);if(!E.ok)return '';const s
 // a small departure board under the next stop: the next departures of other lines from it and from the stops within 200 m of
 // it, after the ride gets there (a stop of another name: its name with the pole)
 const GD_BRD={};
-function gdBoardLoad(sid){const now=Date.now(),E=GD_BRD[sid];if(E&&now-E.t<60000)return E;
+// (the departures as on the boards: the live times where the city gives them – ZTM Gdańsk, GTFS-Realtime, Bydgoszcz's
+// boards –, the timetable's for the rest; asked again every half minute)
+function gdBoardLoad(sid){const now=Date.now(),E=GD_BRD[sid];if(E&&now-E.t<30000)return E;
   const S=IDX.stops[sid];const sids=new Set(),names=new Set();
   for(const [k,X] of Object.entries(IDX.stops))if(Math.abs(X[2]-S[2])<.003&&distM(X[2],X[3],S[2],S[3])<=200){sids.add(k);names.add(X[0])}
   const N=GD_BRD[sid]={t:now,list:E?E.list:null};
-  (async()=>{const out=[];for(const n of names)for(const [k,sh] of depDayKeys()){let L=[];try{L=await depFor({n,c:city,poles:[]},k,sh)}catch(e){}out.push(...L.filter(d=>sids.has(d.sid)))}
+  (async()=>{const out=[];for(const n of names){let sch=[];for(const [k,sh] of depDayKeys()){let L=[];try{L=await depFor({n,c:city,poles:[]},k,sh)}catch(e){}sch.push(...L.filter(d=>sids.has(d.sid)))}
+      sch.forEach(d=>{d.stn=n});let live=null;try{live=await depLive({n,c:city,poles:[]})}catch(e){}
+      if(live&&live.length){const sidOf=pl=>[...sids].find(k=>IDX.stops[k][0]===n&&(IDX.stops[k][1]||'')===(pl||''))||[...sids].find(k=>IDX.stops[k][0]===n);
+        live.forEach(d=>{d.stn=n;if(!d.sid)d.sid=sidOf(d.pole)});
+        if(live[0].st!==undefined)sch=[...live,...sch.filter(d=>!live.some(l=>l.r.n===d.r.n&&Math.abs(l.st-d.t)<=1))];
+        else{const last=Math.max(...live.map(d=>d.sch!=null?d.sch:d.t));sch=[...live,...sch.filter(d=>d.t>last+1&&!live.some(l=>l.r.n===d.r.n&&l.sch!=null&&Math.abs(l.sch-d.t)<=1.5))]}}
+      out.push(...sch.filter(d=>d.sid&&sids.has(d.sid)))}
     N.list=out.sort((a,b)=>a.t-b.t)})();
   return N}
 // time needed to change: the same platform half a minute; another one a minute plus the walk (about 70 m a minute, the
@@ -3704,7 +3712,7 @@ function gdBoard(R,sid,tAt){const E=gdBoardLoad(sid);if(!E.list)return '';const 
   const L=E.list.filter(d=>d.r.n!==R.r.n&&d.t>=tAt+gdChangeMin(sid,d.sid)&&d.t<=tAt+45&&!seen.has(d.r.n+'|'+d.head+'|'+d.t)&&seen.add(d.r.n+'|'+d.head+'|'+d.t)).slice(0,8);
   if(!L.length)return '';
   return `<div class="gsDeps"><div class="gbT">${esc(trS('Przesiadki'))}</div>`+L.map(d=>{const m=Math.round(d.t-nowM);const tn=gdTrnText(d.head);
-    return `<div class="gbR" data-k="${E.list.indexOf(d)}" role="button" tabindex="0">${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="dc">${d.st!==here?`<span class="ds">${esc(d.st)}</span>`:''}${d.pole?`<span class="dpo">${POLE}${esc(d.pole)}</span>`:''}</span><span class="dt">${brdTime(d,nowM,city)}</span></div>`}).join('')+'</div>'}
+    return `<div class="gbR" data-k="${E.list.indexOf(d)}" role="button" tabindex="0">${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="dc">${(d.stn||d.st)!==here?`<span class="ds">${esc(d.stn||d.st)}</span>`:''}${d.pole?`<span class="dpo">${POLE}${esc(d.pole)}</span>`:''}</span><span class="dt">${brdTime(d,nowM,city)}</span></div>`}).join('')+'</div>'}
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function gdSipHtml(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
