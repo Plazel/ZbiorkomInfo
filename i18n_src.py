@@ -400,6 +400,8 @@ ROWS = [
     ("Utrudnienia", "Disruptions", "Störungen", "Obmedzenia", "Omezení"),
     ("Szczegóły na stronie ZTM", "Details on the ZTM website", "Details auf der ZTM-Website", "Podrobnosti na stránke ZTM", "Podrobnosti na stránkách ZTM"),
     ("Otwórz w przewodniku", "Open in the guide", "Im Reisebegleiter öffnen", "Otvoriť v sprievodcovi", "Otevřít v průvodci"),
+    ("Szczegóły na stronie przewoźnika", "Details on the operator's website", "Details auf der Website des Verkehrsunternehmens", "Podrobnosti na stránke dopravcu", "Podrobnosti na stránkách dopravce"),
+    ("Rozkład", "Timetable", "Fahrplan", "Cestovný poriadok", "Jízdní řád"),
 ]
 
 WEEKDAYS = {
