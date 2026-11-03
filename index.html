@@ -3625,19 +3625,20 @@ function gdProgress(h,src,q){const R=GUIDE.run,st=document.getElementById('gdSta
       e.style.transform=`translateY(${d}px)`;e.style.transition='none';requestAnimationFrame(()=>requestAnimationFrame(()=>{e.style.transition='transform .6s cubic-bezier(.3,.7,.2,1)';e.style.transform=''}))});
     setTimeout(()=>{GUIDE.anim=false},700)},360)}
 // the lines one can change to at a stop: those with a stop of that name within 400 m (not a stop of the same name in another
-// town of the area), other than the ride's own line; a night line only when it calls there about the time the ride does
+// town of the area), other than the ride's own line; only those that call there about the time the ride does (from 5 minutes
+// before to 45 after: no day lines at night, no night lines by day)
 const GD_TR={};
 function gdTrLoad(sid){if(GD_TR[sid])return GD_TR[sid];const S=IDX.stops[sid];
   const cand=IDX.routes.filter(x=>(x.sn||[]).includes(S[0])&&inCityOf(x,city));GD_TR[sid]={ok:false,list:[]};
   (async()=>{const out=[];for(const r of cand){let L;try{L=await loadRoute(r.id)}catch(e){continue}const T=[];let near=false;
       (L.dirs||[]).forEach(d=>{const ks=new Set();d.stops.forEach((x,k)=>{const X=IDX.stops[x[0]];if(X&&X[0]===S[0]&&distM(X[2],X[3],S[2],S[3])<400)ks.add(k)});if(!ks.size)return;near=true;
-        if(r.t==='night')for(const [key,sh] of depDayKeys())planOf(d,key).forEach(([tt,pi])=>{const pr=d.prof[pi];if(!pr)return;const ps=d.pats[pr[0]];ps.forEach((k,q)=>{if(ks.has(k))T.push(tt+sh+pr[1][q])})})});
+        for(const [key,sh] of depDayKeys())planOf(d,key).forEach(([tt,pi])=>{const pr=d.prof[pi];if(!pr)return;const ps=d.pats[pr[0]];ps.forEach((k,q)=>{if(ks.has(k))T.push(tt+sh+pr[1][q])})})});
       if(near)out.push({r,T})}
     GD_TR[sid]={ok:true,list:out}})();
   return GD_TR[sid]}
 function gdTransfers(sid,r,tAt){const E=gdTrLoad(sid);if(!E.ok)return '';const seen=new Set();
   const grp=x=>x.t==='tram'?0:x.t==='rail'?1:/^\d/.test(x.n)?3:2;
-  return E.list.filter(({r:x,T})=>x.n!==r.n&&(x.t!=='night'||T.some(t=>t>=tAt-10&&t<=tAt+40))&&!seen.has(x.n)&&seen.add(x.n))
+  return E.list.filter(({r:x,T})=>x.n!==r.n&&T.some(t=>t>=tAt-5&&t<=tAt+45)&&!seen.has(x.n)&&seen.add(x.n))
     .sort((a,b)=>grp(a.r)-grp(b.r)||a.r.n.localeCompare(b.r.n,'pl',{numeric:true})).map(({r:x})=>chip(x,'small',true).outerHTML).join('')}
 // a small departure board under the next stop: the next departures of other lines from it and from the stops within 200 m of
 // it, after the ride gets there (a stop of another name: its name with the pole)
