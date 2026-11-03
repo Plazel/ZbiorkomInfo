@@ -3411,7 +3411,7 @@ const gdSayFix=t=>GD_SAY.reduce((x,[a,b])=>x.replace(a,b),t);
 // (Czech: the line letter S said by its name, "es", not as a bare sound)
 // stop names a voice says wrongly: for the device's own voice written as they are said (the proxy's voices get their sounds,
 // IPA, there; Flensburg: [ˈmʊŋkəˌtɔft], not "Munk-e-toft")
-const GD_SAY_AS={Munketoft:'Mungketoft'};
+const GD_SAY_AS={Munketoft:'Mungketoft',ZOB:'Zentraler Omnibusbahnhof'};
 const gdSayAs=t=>t.replace(/[A-Za-zÀ-ž]+/g,w=>GD_SAY_AS[w]||w);
 function gdSegs(kind,name,isLast,req){return gdSegs0(kind,name,isLast,req).map(([t,l])=>[l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t,l])}
 function gdSegs0(kind,name,isLast,req){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
