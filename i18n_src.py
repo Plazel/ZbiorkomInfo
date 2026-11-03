@@ -403,6 +403,9 @@ ROWS = [
     ("Szczegóły na stronie przewoźnika", "Details on the operator's website", "Details auf der Website des Verkehrsunternehmens", "Podrobnosti na stránke dopravcu", "Podrobnosti na stránkách dopravce"),
     ("Rozkład", "Timetable", "Fahrplan", "Cestovný poriadok", "Jízdní řád"),
     ("Brak odjazdów w ciągu 24 godz.", "No departures within 24 hours", "Keine Abfahrten in den nächsten 24 Stunden", "Žiadne odchody počas 24 hodín", "Žádné odjezdy během 24 hodin"),
+    ("Linie na mapie", "Lines on the map", "Linien auf der Karte", "Linky na mape", "Linky na mapě"),
+    ("Linie na schemacie", "Lines on the diagram", "Linien im Netzplan", "Linky na schéme", "Linky na schématu"),
+    ("Linie nocne na schemacie", "Night lines on the diagram", "Nachtlinien im Netzplan", "Nočné linky na schéme", "Noční linky na schématu"),
 ]
 
 WEEKDAYS = {
