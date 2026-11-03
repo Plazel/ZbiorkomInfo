@@ -2242,7 +2242,7 @@ async function openMap(){
   const secs=sections();MAP.routes=secs.flatMap(s=>s.lines);MAP.byId={};MAP.routes.forEach(r=>MAP.byId[r.id]=r);
   renderMapList(secs);
   // there is a diagram for the Tricity and for Krynica-Zdrój with Muszyna, not for Bydgoszcz
-  const sb=document.querySelector('[data-mv="schema"]');sb.hidden=NO_SCHEMA.includes(city);document.querySelector('[data-mv="schemaN"]').hidden=sb.hidden;{const vb=document.querySelector('[data-mv="veh"]');if(vb)vb.hidden=!(['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city])}   // (no vehicle positions published: no "Pojazdy na mapie")   // with no diagram there is nothing to switch betweennavMark();
+  const sb=document.querySelector('[data-mv="schema"]');sb.hidden=NO_SCHEMA.includes(city);document.querySelector('[data-mv="schemaN"]').hidden=sb.hidden||!MAP.routes.some(r=>r.t==='night'||r.nt);{const vb=document.querySelector('[data-mv="veh"]');if(vb)vb.hidden=!(['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city])}   // (no vehicle positions published: no "Pojazdy na mapie")   // with no diagram there is nothing to switch betweennavMark();
   let vw=store.get('ztm.mapView','osm');if(vw!=='schema'||sb.hidden)vw='osm';   // (the plain "Linie" view is gone: map or diagram)
   requestAnimationFrame(()=>{drawMap();setMapView(vw)});   // let the window paint first
 }
