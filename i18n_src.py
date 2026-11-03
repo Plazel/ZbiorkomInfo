@@ -397,6 +397,9 @@ ROWS = [
     ("Brak odjazdów w najbliższym czasie", "No departures soon", "Keine Abfahrten in nächster Zeit", "V najbližšom čase žiadne odchody", "V nejbližší době žádné odjezdy"),
     ("W ciągu najbliższej godziny nic stąd nie odjeżdża. Wyszukaj inny przystanek lub pojazd w polu wyszukiwania u góry.", "Nothing leaves from here within the next hour. Search for another stop or vehicle in the search field at the top.", "In der nächsten Stunde fährt von hier nichts ab. Suche oben im Suchfeld nach einer anderen Haltestelle oder einem Fahrzeug.", "V najbližšej hodine odtiaľto nič neodchádza. Vyhľadajte inú zastávku alebo vozidlo v poli vyhľadávania hore.", "V nejbližší hodině odsud nic neodjíždí. Vyhledejte jinou zastávku nebo vozidlo v poli vyhledávání nahoře."),
     ("Możesz też wyszukać przystanek lub pojazd w polu wyszukiwania u góry.", "You can also search for a stop or vehicle in the search field at the top.", "Du kannst auch oben im Suchfeld nach einer Haltestelle oder einem Fahrzeug suchen.", "Môžete aj vyhľadať zastávku alebo vozidlo v poli vyhľadávania hore.", "Můžete také vyhledat zastávku nebo vozidlo v poli vyhledávání nahoře."),
+    ("Utrudnienia", "Disruptions", "Störungen", "Obmedzenia", "Omezení"),
+    ("Szczegóły na stronie ZTM", "Details on the ZTM website", "Details auf der ZTM-Website", "Podrobnosti na stránke ZTM", "Podrobnosti na stránkách ZTM"),
+    ("Otwórz w przewodniku", "Open in the guide", "Im Reisebegleiter öffnen", "Otvoriť v sprievodcovi", "Otevřít v průvodci"),
 ]
 
 WEEKDAYS = {

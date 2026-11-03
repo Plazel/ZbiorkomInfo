@@ -13,6 +13,9 @@
 // 3. Bydgoszcz: /byd?p=<stop number> returns the stop's live departures from ZDMiKP's passenger service (the boards at the
 //    stops; odjazdy.zdmikp.bydgoszcz.pl, plain http and no CORS header), kept 15 seconds.
 //
+// 4. ZTM Gdańsk's notices of disruptions: /alerts returns the notices shown in the red "UWAGA" bar on ztm.gda.pl, each with
+//    its text from its own page (JSON: [{title, url, text}]), kept 2 minutes.
+//
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
 // For the voices, ElevenLabs: elevenlabs.io → sign up (free) → Developers → API Keys → Create (access to Text to Speech);
@@ -37,6 +40,27 @@ async function byd(req, cors) {
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'User-Agent': 'ZbiorkomInfo/1.0' }, cf: { cacheTtl: 15 } });
   const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8'); h.set('Cache-Control', 'max-age=15');
   return new Response(r.ok ? await r.text() : '{"d":null}', { status: r.ok ? 200 : 502, headers: h });
+}
+
+const ent = t => t.replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+  .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&amp;/g, '&');
+const strip = h => ent(h.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|li|h\d)>/gi, '\n').replace(/<li[^>]*>/gi, '• ').replace(/<[^>]+>/g, ''))
+  .split('\n').map(x => x.replace(/[ \t]+/g, ' ').trim()).filter(Boolean).join('\n');
+async function alerts(cors) {
+  const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8'); h.set('Cache-Control', 'max-age=120');
+  const get = async u => { const r = await fetch(u, { headers: { 'User-Agent': 'ZbiorkomInfo/1.0' }, cf: { cacheTtl: 120 } }); return r.ok ? r.text() : ''; };
+  let out = [];
+  try {
+    const home = await get('https://ztm.gda.pl/');
+    const box = (home.match(/class="[^"]*danger-box[^"]*"[\s\S]*?<\/ul>/) || [''])[0];
+    const items = [...box.matchAll(/<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(m => ({ url: m[1], title: strip(m[2]) })).filter(x => x.title).slice(0, 6);
+    out = await Promise.all(items.map(async x => {
+      let text = '';
+      if (/^https:\/\/ztm\.gda\.pl\//.test(x.url)) { try { const a = await get(x.url); const c = (a.match(/class="article-content[^"]*">([\s\S]*?)<div class="row">/) || ['', ''])[1]; text = strip(c).slice(0, 2000); } catch (e) {} }
+      return { title: x.title, url: x.url, text };
+    }));
+  } catch (e) {}
+  return new Response(JSON.stringify(out), { status: 200, headers: h });
 }
 
 async function tts(req, env, ctx, cors) {
@@ -97,6 +121,7 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (new URL(req.url).pathname === '/tts') return tts(req, env, ctx, cors);
     if (new URL(req.url).pathname === '/byd') return byd(req, cors);
+    if (new URL(req.url).pathname === '/alerts') return alerts(cors);
     const target = new URL(req.url).searchParams.get('url');
     let u; try { u = new URL(target); } catch (e) { return new Response('url?', { status: 400, headers: cors }); }
     if (u.protocol !== 'https:' || !ALLOWED.includes(u.hostname)) return new Response('host not allowed', { status: 403, headers: cors });
