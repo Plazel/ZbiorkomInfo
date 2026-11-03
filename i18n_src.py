@@ -415,7 +415,7 @@ ROWS = [
     ("Monachium", "Munich", "München", "Mníchov", "Mnichov"),
     ("Wiedeń", "Vienna", "Wien", "Viedeň", "Vídeň"),
     ("Berlin", "Berlin", "Berlin", "Berlín", "Berlín"),
-    ("Bez gongu", "No gong", "Kein Gong", "Bez gongu", "Bez gongu"),
+    ("Brak", "None", "Keiner", "Žiadny", "Žádný"),
 ]
 
 WEEKDAYS = {
