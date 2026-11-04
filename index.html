@@ -1522,6 +1522,15 @@ const base=n=>{const m=n.match(/^(\d)(\d\d)$/);return m?m[2]:null};
 // an automatic combination only of lines with at least 5 stops in common (none, or two to four, is no common route); the
 // combinations set by hand for Krynica and Muszyna stay as they are
 const MIN_SHARED=5;
+// ...and run them the same way: in one direction of all of them those stops in the same order (RE9 and RE91 in Warszawa
+// serve the same stations, one towards Warszawa, the other away from it: no common route). Found from the lines' routes once
+// (shown at first, taken away when they are not), kept in the browser until the timetables change.
+let COMBO_OK=null;
+const comboKey=g=>city+'|'+g.filter(n=>BYNAME[n]).map(n=>BYNAME[n].id).sort().join('_');
+function comboOkKnown(g){if(!COMBO_OK||COMBO_OK.gen!==IDX.generated){const c=store.get('ztm.comboOk',null);COMBO_OK=c&&c.gen===IDX.generated&&c.r?c:{gen:IDX.generated,r:{}}}return COMBO_OK.r[comboKey(g)]}
+async function comboOk(g){comboOkKnown(g);const k=comboKey(g);if(k in COMBO_OK.r)return COMBO_OK.r[k];let y=true;
+  try{const C=await buildCombo(k.split('|')[1]);const n=g.filter(x=>BYNAME[x]).length;y=C.dirs.some(d=>d.members.length>=n&&d.common.length>=MIN_SHARED)}catch(e){return true}
+  COMBO_OK.r[k]=y;store.set('ztm.comboOk',COMBO_OK);return y}
 function autoGroups(){
   const by={};IDX.routes.filter(inCity).forEach(r=>{const b=base(r.n);if(b&&r.t!=='night'){const k=r.op+'|'+b;(by[k]=by[k]||[]).push(r.n)}});
   const NOPAIR=new Set(['156+256','110+210','127+227']);   // automatic groups that are not shown
@@ -1596,7 +1605,7 @@ function renderGroups(){
   const rank=g=>{const r=BYNAME[g[0]];return r.t==='tram'?0:r.t==='rail'?1:/^[A-Z]/i.test(g[0])?3:2};
   const num=n=>parseInt(n.replace(/\D/g,''))||0;
   [...tr,...v].map(g=>[...g].sort(lineAsc)).sort((a,b)=>rank(a)-rank(b)||num(a[0])-num(b[0])||a[0].localeCompare(b[0],'pl'))
-    .forEach(g=>box.appendChild(groupEl(g)));
+    .forEach(g=>{const ok=comboOkKnown(g);if(ok===false)return;const el=groupEl(g);box.appendChild(el);if(ok===undefined)comboOk(g).then(y=>{if(!y)el.remove()})});
   const mine=custom.map((g,i)=>[g,i]).filter(([g])=>g.some(n=>BYNAME[n]&&inCity(BYNAME[n])));
   if(mine.length){h('Twoje łączenia');mine.forEach(([g])=>box.appendChild(groupEl(g)))}
 }
