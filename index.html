@@ -1519,12 +1519,15 @@ function openComboDlg(){let d=document.getElementById('coDlg');if(d)d.remove();
     b.onclick=()=>save(uniq,m2);row.appendChild(b);res.append(row,m2)};
   mine();inp.focus()}
 const base=n=>{const m=n.match(/^(\d)(\d\d)$/);return m?m[2]:null};
+// an automatic combination only of lines with at least 5 stops in common (none, or two to four, is no common route); the
+// combinations set by hand for Krynica and Muszyna stay as they are
+const MIN_SHARED=5;
 function autoGroups(){
   const by={};IDX.routes.filter(inCity).forEach(r=>{const b=base(r.n);if(b&&r.t!=='night'){const k=r.op+'|'+b;(by[k]=by[k]||[]).push(r.n)}});
   const NOPAIR=new Set(['156+256','110+210','127+227']);   // automatic groups that are not shown
   const DROP={'112+212+512':['512']};   // lines left out of an automatic group
   const v=Object.entries(by).filter(([,a])=>a.length>1).sort((a,b)=>a[0].localeCompare(b[0],'pl',{numeric:true})).map(([,a])=>a.sort())
-    .filter(g=>!NOPAIR.has(g.join('+'))).map(g=>g.filter(n=>!(DROP[g.join('+')]||[]).includes(n))).filter(g=>g.length>1&&sharedCount(g)>=2);
+    .filter(g=>!NOPAIR.has(g.join('+'))).map(g=>g.filter(n=>!(DROP[g.join('+')]||[]).includes(n))).filter(g=>g.length>1&&sharedCount(g)>=MIN_SHARED);
   // the big cities: their numbering does not group lines (102 and 202 in Warsaw have nothing in common); groups of lines with
   // long common sections are found instead
   if(BIG_AREAS.includes(city)){
@@ -1548,8 +1551,8 @@ function autoGroups(){
       ['69','83','89'],['61','71'],['71','77'],['81','82'],['62','90'],['52','59','60'],['57','80'],['95','97']]
     :BIG_AREAS.includes(city)?[]
     :[['3','6','7'],['2','4','11'],['2','3','4','6','7','11'],['10','12'],['8','9'],['7','10'],['S2','S22'],['M32','132'],['117','144'],['169','171','179'],['S','21','31'],['255','256'],['N4','N14'],['N6','N16']];
-  const tr=fixed.map(g=>g.filter(n=>BYNAME[n]&&inCity(BYNAME[n]))).filter(g=>g.length>1);
-  return {v,t,tr};
+  const tr=fixed.map(g=>g.filter(n=>BYNAME[n]&&inCity(BYNAME[n]))).filter(g=>g.length>1&&(city==='km'||sharedCount(g)>=MIN_SHARED));
+  return {v,t:t.filter(g=>sharedCount(g)>=MIN_SHARED),tr};
 }
 // Poznań, Kraków, Warszawa: lines of one kind (trams with trams, buses with buses) that share many stops of their main routes:
 // pairs, then threes whose three lines all share them; each line in at most two groups, the strongest first
