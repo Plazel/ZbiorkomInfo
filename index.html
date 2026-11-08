@@ -1804,11 +1804,6 @@ function colTabs(){const g=document.querySelector('#grid .gscroll'),c=g&&g.query
   const old=document.querySelector('#grid .colTabs');if(old)old.remove();c.classList.remove('tabbed');c.querySelectorAll('.col').forEach(x=>x.hidden=false);
   c.classList.remove('wrapm');c.querySelectorAll('tr').forEach(tr=>tr.style.height='');
   const C=[...c.querySelectorAll(':scope>.col')];if(C.length<2||c.scrollWidth<=g.clientWidth+2)return;
-  // too wide in one line an hour: the days side by side still, each hour's minutes in two lines at most
-  c.classList.add('wrapm');const lines=m=>new Set([...m.children].map(x=>x.offsetTop)).size;
-  const fit=c.scrollWidth<=g.clientWidth+2&&C.every(col=>[...col.querySelectorAll('.mins')].every(m=>lines(m)<=2&&m.scrollWidth<=m.clientWidth+1));
-  if(fit)return   // (the rows as high as their own minutes: the spacing as everywhere else, the hours not levelled across the days)
-  c.classList.remove('wrapm');
   c.classList.add('tabbed');const bar=document.createElement('div');bar.className='colTabs';bar.setAttribute('role','tablist');
   const td=todayType().day;let cur=C.findIndex(x=>x.dataset.day===(COLTAB.k||td));if(cur<0)cur=Math.max(0,C.findIndex(x=>x.dataset.day===td));
   const show=i=>{C.forEach((x,k)=>x.hidden=k!==i);bar.querySelectorAll('button').forEach((b,k)=>b.setAttribute('aria-selected',String(k===i)))};
@@ -1885,7 +1880,7 @@ async function renderStop(id,di,si){
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const L2=noteKey[tx];if(!used.includes(L2))used.push(L2);return L2};
   const now=todayType();let nextMarked=false;
-  const DAYS=DK(L.dirs),DEPS={};DAYS.forEach(day=>DEPS[day]=departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropEmptyDays(DAYS,DEPS);const HS=hourUnion(Object.values(DEPS));
+  const DAYS=DK(L.dirs),DEPS=nightShift(DAYS,day=>departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropEmptyDays(DAYS,DEPS);const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
     if(!deps.length)return `<div class="col ecol${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}</h3><div class="empty">${emptyMsg(day,[r.op],L.dirs.some(dd=>tripsOf(dd,day).length))}</div></div>`;
@@ -2095,11 +2090,11 @@ async function renderComboStop(key,ci,i){
   const letters='abcdefghijklmnoprstuwxyz';const noteKey={};const used=[];
   const letterFor=(r,d,x)=>{const n0=noteOf(d,x);if(!n0)return'';const tx=r.n+': '+n0;if(!(tx in noteKey))noteKey[tx]=letters[Object.keys(noteKey).length]||'*';const l=noteKey[tx];if(!used.includes(l))used.push(l);return l};
   const now=todayType();let nextMarked=false;const anyReq=[];
-  const DAYS=DK(C.Ls.flatMap(x=>x.dirs)),DEPS={};
-  DAYS.forEach(day=>{const deps=[];
+  const DAYS=DK(C.Ls.flatMap(x=>x.dirs));
+  const DEPS=nightShift(DAYS,day=>{const deps=[];
     cd.members.forEach(m=>{const r=C.rs[m.li],d=C.Ls[m.li].dirs[m.di];
       d.stops.forEach((s,k)=>{if(sName(s[0])===name&&s[2])anyReq.push(1)});comboDeps(d,m,name,day).forEach(x=>deps.push({...x,r,d}))});
-    deps.sort((a,b)=>a.t-b.t);DEPS[day]=deps});
+    return deps.sort((a,b)=>a.t-b.t)});
   dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));dropEmptyDays(DAYS,DEPS);
   const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
@@ -2143,7 +2138,7 @@ function lineSheet(r,L,di,si){
   const allD=DK(L.dirs).flatMap(day=>departures(d,si,day));const t0=allD.length?noteOf(d,allD[0]):'';
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const l=noteKey[tx];if(!used.includes(l))used.push(l);return l};
-  const cols={};DK(L.dirs).forEach(day=>cols[day]=departures(d,si,day).map(x=>({t:x.t,lt:letterFor(x)})));dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));
+  const cols={},DK0=DK(L.dirs),NS=nightShift(DK0,day=>departures(d,si,day));DK0.forEach(day=>cols[day]=NS[day].map(x=>({t:x.t,lt:letterFor(x)})));dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));
   // the route: the main run, or where the stop is off it, the run most of its departures take; minutes along it
   let pat=0;
   if(!d.pats[0].includes(si)){const c={};DK(L.dirs).forEach(day=>departures(d,si,day).forEach(x=>c[x.pat]=(c[x.pat]||0)+1));
@@ -3195,6 +3190,14 @@ function freqHours(r,deps){if(!(r&&r.cat==='metro'&&(r.c||[]).includes('waw'))||
 // the hours of the timetable columns: every hour any of the days has a departure in
 // days with no departures left out (a line that runs only on weekdays shows no Saturday/Sunday columns), at least one kept
 function dropEmptyDays(DAYS,DEPS){if(!DAYS.some(d=>DEPS[d].length))return;for(let i=DAYS.length-1;i>=0;i--)if(!DEPS[DAYS[i]].length){delete DEPS[DAYS[i]];DAYS.splice(i,1)}}
+// a day's column by the clock: its own runs before midnight, and at its top (0:xx, 1:xx) the runs after midnight of the day
+// before (a Friday's 24:05 – the night to Saturday – under Saturday's 0; Thursday's under Friday's)
+function prevDay(day,DAYS){if(day==='w'||day==='f')return day;if(day==='h')return 's';
+  if(day==='s')return DAYS.includes('x')&&XD_FRI?'x':'w';
+  if(day==='x'){const wd=XD_CUR?new Date(+XD_CUR.slice(0,4),+XD_CUR.slice(4,6)-1,+XD_CUR.slice(6)).getDay():3;return wd===1?'h':wd===0?'s':wd===6?'w':'w'}return day}
+function nightShift(DAYS,get){const memo={},g=k=>memo[k]||(memo[k]=get(k)),out={};
+  DAYS.forEach(day=>{const own=g(day).filter(x=>x.t<1440),pd=prevDay(day,DAYS);let prev=[];try{prev=g(pd).filter(x=>x.t>=1440).map(x=>Object.assign({},x,{t:x.t-1440}))}catch(e){}
+    out[day]=own.concat(prev).sort((a,b)=>a.t-b.t)});return out}
 function hourUnion(lists){const s=new Set();lists.forEach(l=>l.forEach(x=>s.add(Math.floor(x.t/60))));return [...s].sort((a,b)=>a-b)}
 // a line running round the clock: its hours 0, 1, 2 … 23 (those after midnight, 24 and on, with 0, 1 …), else as they come
 // every timetable from 0:00 to 23:59: the runs after midnight (24:15, 25:08) in the rows 0, 1 … at the top of their day
