@@ -1804,7 +1804,9 @@ function departures(d,si,day){
 function colTabs(){const g=document.querySelector('#grid .gscroll'),c=g&&g.querySelector('.cols');if(!c)return;
   const old=document.querySelector('#grid .colTabs');if(old)old.remove();c.classList.remove('tabbed');c.querySelectorAll('.col').forEach(x=>x.hidden=false);
   c.classList.remove('wrapm');c.querySelectorAll('tr').forEach(tr=>tr.style.height='');
-  const C=[...c.querySelectorAll(':scope>.col')];if(C.length<2||c.scrollWidth<=g.clientWidth+2)return;
+  // the days side by side only when every hour keeps to one line (rows level across the days); else the days as tabs
+  const C=[...c.querySelectorAll(':scope>.col')];const oneLine=()=>[...c.querySelectorAll('.mins')].every(m=>m.children.length<2||new Set([...m.children].map(x=>x.offsetTop)).size===1);
+  if(C.length<2||c.scrollWidth<=g.clientWidth+2&&oneLine())return;
   c.classList.add('tabbed');const bar=document.createElement('div');bar.className='colTabs';bar.setAttribute('role','tablist');
   const td=todayType().day;let cur=C.findIndex(x=>x.dataset.day===(COLTAB.k||td));if(cur<0)cur=Math.max(0,C.findIndex(x=>x.dataset.day===td));
   const show=i=>{C.forEach((x,k)=>x.hidden=k!==i);bar.querySelectorAll('button').forEach((b,k)=>b.setAttribute('aria-selected',String(k===i)))};
