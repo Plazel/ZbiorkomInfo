@@ -1446,7 +1446,7 @@ function chip(r,extra='',plain=false){
 
 /* ---------- board ---------- */
 // express bus lines: the Tricity's letter lines (A, B, N…), Hamburg's and Berlin's X lines
-const isExpLine=r=>['bus','repl'].includes(r.t)&&(['gda','sop','gdy','all'].includes(city)&&/^[A-Z]$/.test(r.n)||['ham','ber'].includes(city)&&/^X\d+$/.test(r.n));
+const isExpLine=r=>['bus','repl'].includes(r.t)&&(['gda','sop','gdy','all'].includes(city)&&/^[A-Z]$/.test(r.n)||['ham','ber'].includes(city)&&/^X\d+$/.test(r.n)||city==='waw'&&/^(E-?\d+|[45]\d\d)$/.test(r.n));
 const lineIco=r=>r.nt?'nighttram':isExpLine(r)?'exp':ICONS[r.t]?r.t:'bus';
 function sections(){
   const R=IDX.routes.filter(inCity), by=(f)=>R.filter(f).sort((a,b)=>(/^\d/.test(a.n)?1:a.n==='R'?.5:0)-(/^\d/.test(b.n)?1:b.n==='R'?.5:0)||a.n.localeCompare(b.n,'pl',{numeric:true}));   // lines starting with a letter first (C10 before T8), then the numbers, each in ascending order
@@ -1470,7 +1470,8 @@ function sections(){
   const tk=r=>{const n=r.n;if(ownSub.has(r.id))return 'sub';if(r.cat==='ferry')return 'ferry';if(/^C\d+$/.test(n)&&['bus','trol','repl','tram'].includes(r.t))return 'seas';
     if(!['bus','trol','repl'].includes(r.t))return r.t;
     if(city==='waw'&&/^L-?\d+$/.test(n))return 'local';
-    if((city==='ham'||city==='ber')&&/^X\d+$/.test(n))return 'exp';   // Hamburg: the X lines (Schnellbusse) are express lines   // Warszawa: the local lines L-1 … L52   // C lines (e.g. to the cemeteries around 1 November): every city
+    if((city==='ham'||city==='ber')&&/^X\d+$/.test(n))return 'exp';if(city==='waw'&&/^(E-?\d+|[45]\d\d)$/.test(n))return 'exp';   // Warszawa: E-1, E-2, the 4xx and 5xx lines
+       // Hamburg: the X lines (Schnellbusse) are express lines   // Warszawa: the local lines L-1 … L52   // C lines (e.g. to the cemeteries around 1 November): every city
     if(!tri)return r.t;
     if(/^[A-Z]$/.test(n))return 'exp';if(/^(C\d+|3\d\d|6\d|6\d\d)$/.test(n))return 'seas';if(/^9\d\d?$/.test(n))return 'repl';return r.t};
   return [
