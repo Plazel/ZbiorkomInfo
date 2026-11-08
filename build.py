@@ -31,6 +31,10 @@ SOURCES = {
     'wej':   'https://mkuran.pl/gtfs/wejherowo.zip',   # MZK Wejherowo
     'ldz':   'https://otwarte.miasto.lodz.pl/wp-content/uploads/2025/06/GTFS.zip',   # Łódź (ZDiT Łódź, MPK-Łódź), official open data
     'prg':   'https://data.pid.cz/PID_GTFS.zip',   # Praha (PID, ROPID open data; the city lines are kept)
+    # Berlin (VBB) and Hamburg (hvv): regional files, their city lines cut out by de_miasta.py; hvv's address changes with each
+    # timetable, so it is looked up on the Transparenzportal when the build starts
+    'ber':   'https://www.vbb.de/vbbgtfs',
+    'ham':   None,
 }
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
@@ -55,15 +59,17 @@ MISSING = {}
 SOURCES_ALT = {
     'zkm': 'https://files.mobilitydatabase.org/mdb-2094/latest.zip',
     'ztm': 'https://files.mobilitydatabase.org/mdb-1014/latest.zip',
+    'ber': 'https://files.mobilitydatabase.org/mdb-782/latest.zip',
+    'ham': 'https://files.mobilitydatabase.org/mdb-3362/latest.zip',
 }
 
 def fetch_src(key, dest):
     kept = os.path.join(SRC_CACHE, key)
-    for url in [SOURCES[key]] + ([SOURCES_ALT[key]] if key in SOURCES_ALT else []):
+    for url in [u for u in [SOURCES[key]] + ([SOURCES_ALT[key]] if key in SOURCES_ALT else []) if u]:
         try:
             fetch(url, dest)
             os.makedirs(SRC_CACHE, exist_ok=True); shutil.copyfile(dest, kept)
-            if url != SOURCES[key]: print('UWAGA: %s z kopii Mobility Database (%s)' % (key, url)); MISSING[key] = 'pobrane z Mobility Database'
+            if SOURCES[key] and url != SOURCES[key]: print('UWAGA: %s z kopii Mobility Database (%s)' % (key, url)); MISSING[key] = 'pobrane z Mobility Database'
             return True
         except Exception as e:
             err = e
@@ -88,6 +94,15 @@ for key, sub in (('ztm', 'gtfs/x'), ('zkm', 'gdy'), ('rail', 'tr'), ('byd', 'byd
     if not fetch_src(key, z): _lost.append(key); continue
     zipfile.ZipFile(z).extractall(os.path.join(SCR, sub)); os.remove(z)
 if not fetch_src('ztrips', os.path.join(SCR, 'ztrips.json')): _lost.append('ztrips')
+# Berlin and Hamburg: without their file (and no copy kept) those two cities are only left out, the rest is built
+import de_miasta
+try: SOURCES['ham'] = de_miasta.hvv_url()
+except Exception as e: print('hvv: adres pliku nieznany (%s), kopia Mobility Database' % e)
+for key in ('ber', 'ham'):
+    z = os.path.join(SCR, key + '.zip')
+    try:
+        if fetch_src(key, z): de_miasta.cut(z, os.path.join(SCR, key), key); os.remove(z)
+    except Exception as e: print('%s: pominięty (%s)' % (key, e))
 if _lost:
     print('BRAK DANYCH (i brak zachowanej kopii): %s – dane bez zmian, ponowna próba za godzinę' % ', '.join(_lost))
     os.makedirs(OUT, exist_ok=True); write_missing(); shutil.rmtree(SCR, ignore_errors=True); sys.exit(0)
@@ -1180,6 +1195,8 @@ NEW_AREAS = {
     'ldz': {'op': 'MPK Łódź', 'feeds': [('ldz', 'L')], 'rk': 'ld'},
     'fl': {'op': 'Aktiv Bus Flensburg', 'feeds': [('fl', 'F')], 'rk': 'fl'},
     'prg': {'op': 'PID Praha', 'feeds': [('prg', 'G')], 'rk': 'pg'},
+    'ber': {'op': 'VBB Berlin', 'feeds': [('ber', 'B')], 'rk': 'be'},
+    'ham': {'op': 'hvv Hamburg', 'feeds': [('ham', 'H')], 'rk': 'hh'},
 }
 def wej_name(n):
     """MZK Wejherowo writes the pole and the on-request mark into the name ("Bolszewo Słowackiego 01", "… n/ż")"""
@@ -1217,6 +1234,8 @@ def seq_pole(area, name, sid):
     return d[sid]
 def city_name(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[0]
+    if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
+        return re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', r['stop_name'].replace(' (Berlin)', ''))).strip()
     if area == 'fl': return fl_name(r['stop_name'])[0]
     return r['stop_name'].strip()
 def city_pole(area, r):
@@ -1224,6 +1243,10 @@ def city_pole(area, r):
     if area == 'fl': return fl_name(r['stop_name'])[1] or seq_pole(area, fl_name(r['stop_name'])[0], r['stop_id'])
     if area == 'ldz': return seq_pole(area, r['stop_name'].strip(), r['stop_id'])
     if area == 'prg': return (r.get('platform_code') or '').strip() or seq_pole(area, r['stop_name'].strip(), r['stop_id'])
+    if area in ('ber', 'ham'):   # the platform ("Pos. 5", "2", "A"), else the stop's own number; else numbered in order
+        v = re.sub(r'^(Pos\.|Gleis|Steig)\s*', '', (r.get('platform_code') or '').strip())
+        if not re.fullmatch(r'[0-9A-Za-z]{1,3}', v): v = (r.get('stop_code') or '').strip() if area == 'ber' else ''
+        return v if re.fullmatch(r'[0-9A-Za-z]{1,3}', v or '') else seq_pole(area, city_name(area, r), r['stop_id'])
     if area == 'krk':
         for v in (r.get('stop_desc'), r.get('platform_code'), (r.get('stop_code') or '').split('-')[-1]):
             if v and re.fullmatch(r'\d{1,2}', v.strip()): return '%02d' % int(v)
@@ -1232,7 +1255,7 @@ def city_pole(area, r):
     return m.group(1) if m else ''
 def city_kind(area, short, rtype):
     if area == 'prg' and rtype == '0' and re.fullmatch(r'9\d', short): return 'night'   # Prague night trams 91–99
-    if rtype in ('1', '2', '7', '100', '109', '400', '401'): return 'rail'
+    if rtype in ('1', '2', '7', '100', '109', '400', '401', '402'): return 'rail'
     if area == 'poz' and re.fullmatch(r'2\d\d', short): return 'night'   # night lines, trams among them
     if area == 'krk' and re.fullmatch(r'6\d\d', short): return 'night'
     if area == 'krk' and rtype in ('0', '900') and re.fullmatch(r'6\d', short): return 'night'   # night trams 62, 64, 69
@@ -1252,11 +1275,18 @@ def city_kind(area, short, rtype):
         if re.fullmatch(r'9\d\d', short): return 'night'
         if short.startswith('X'): return 'repl'
     if area == 'ldz' and short.startswith('Z'): return 'repl'
+    if area in ('ber', 'ham'):
+        if rtype in ('1000', '1200', '4'): return 'bus'   # ferries (their section: cat)
+        if short.startswith('N') or (area == 'ham' and re.fullmatch(r'6\d\d', short)): return 'night'   # Hamburg's night buses 6xx
+        if re.search(r'SEV|ERSATZ', short) or short in DE_RAIL_NAMES.get(area, ()) or re.match(r'[SU]\d', short): return 'repl'   # replacement buses (for S1, S46A, tram M10…)
     return 'bus'
+DE_RAIL_NAMES = {}   # Berlin, Hamburg: the names of the trains and trams, which their replacement buses bear too
 NEW_ROUTE_IDS = collections.defaultdict(list)
 for _a, _ids in EXTRA_RAIL.items(): NEW_ROUTE_IDS[_a].extend(_ids)   # the added trains belong to their area's files (map, schema)
 for area, A in NEW_AREAS.items():
     try:
+        if area in ('ber', 'ham'):
+            DE_RAIL_NAMES[area] = {r['route_short_name'].strip() for r in rd(SCR + '/' + area + '/routes.txt') if r['route_type'] not in ('3', '700', '702', '704', '715')}
         rot, tmeta, rmeta, tkey = {}, {}, {}, {}
         for fd, pre in A['feeds']:
             P = SCR + '/' + fd
@@ -1273,6 +1303,7 @@ for area, A in NEW_AREAS.items():
                 if area == 'ldz' and re.fullmatch(r'o?[PR]\d+', short): continue   # Łódź: staff and works lines, not for passengers
                 if area == 'prg' and not (rt['route_type'] == '2' and re.fullmatch(r'S\d+', short)) and (rt.get('is_regional') == '1' or rt['route_type'] == '2' or re.match(r'(MHD|BB\d|IKEA)', short)): continue   # Prague: the city lines and the Esko (S) trains
                 rk = A['rk'] + re.sub(r'\W', '', short)
+                if area in ('ber', 'ham') and rt['route_type'] in ('3', '700', '702') and short in DE_RAIL_NAMES[area]: rk += 'E'   # (bus S1 apart from train S1)
                 tid = pre + ':' + r['trip_id']
                 rot[tid] = (rk, pre + ':' + r['service_id']); tmeta[tid] = (r.get('direction_id') or '0',)
                 rmeta.setdefault(rk, (short, rt['route_type']))
@@ -1357,13 +1388,22 @@ for area, A in NEW_AREAS.items():
                    '12': ('#33b89a', '#fff'), '14': ('#f58220', '#fff')},
             'prg': {'A': ('#00a562', '#fff'), 'B': ('#f8b322', '#222'), 'C': ('#cf003d', '#fff')},
             'waw': {'M1': ('#1d58a6', '#fff'), 'M2': ('#e2001a', '#fff')},
+            # Hamburg: the U-Bahn and S-Bahn colours (hvv's network map; the feed has them as text colour too)
+            'ham': {'U1': ('#006ab3', '#fff'), 'U2': ('#e2001a', '#fff'), 'U3': ('#ffdd00', '#222'), 'U4': ('#0098a1', '#fff'),
+                    'S1': ('#1a962b', '#fff'), 'S2': ('#b51143', '#fff'), 'S3': ('#622181', '#fff'), 'S5': ('#0089bb', '#fff'), 'S7': ('#cc7720', '#fff')},
         }.get(area, {})
+        if area == 'ber':   # Berlin: the U-Bahn and S-Bahn in their colours, given in the feed
+            for r in rd(SCR + '/ber/routes.txt'):
+                c = (r.get('route_color') or '').strip()
+                if r['route_type'] in ('109', '400') and re.fullmatch(r'[0-9A-Fa-f]{6}', c):
+                    AREA_LINE_COLORS.setdefault(r['route_short_name'].strip(), ('#' + c.lower(), '#fff' if (r.get('route_text_color') or 'FFFFFF').upper() == 'FFFFFF' else '#222'))
         for r in ROUTES_OUT[n0:]:   # Prague: metro and the funicular in sections of their own
             if area == 'prg' and r['id'] in rmeta: r['cat'] = {'1': 'metro', '7': 'cable', '4': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))
             if area == 'waw' and r['id'] in rmeta and rmeta[r['id']][1] == '1': r['cat'] = 'metro'   # Warszawa: the metro (M1, M2) apart from the trains (S)
+            if area in ('ber', 'ham') and r['id'] in rmeta: r['cat'] = {'400': 'metro', '402': 'metro', '1000': 'ferry', '1200': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))   # U-Bahn, ferries
             if area == 'prg': r['f'] = bool(r.get('avg')) and r['avg'] <= 15   # Prague: colour only the lines running every 15 minutes or more often (7–18 h)
         for r in ROUTES_OUT[n0:]:
-            if r['n'] in AREA_LINE_COLORS: r['f'] = True; r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]
+            if r['n'] in AREA_LINE_COLORS and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True   # (Berlin, Hamburg: not the replacement bus S1); r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]
         print(A['op'] + ':', len(ROUTES_OUT) - n0, 'linii')
     except Exception as e:
         print(A['op'] + ': pominięty (%s)' % e)
@@ -1407,7 +1447,7 @@ for f in files:
             if x: need.add(x.split('|')[0]); SH_T.setdefault(x.split('|')[0], set()).add(_j.get('t'))
 SHAPES = collections.defaultdict(list); VSH = {}
 for pre, path in (('g', SCR + '/gtfs/x/shapes.txt'), ('y', SCR + '/gdy/shapes.txt'), ('r', SCR + '/tr/shapes.txt'),
-                  ('Ps', SCR + '/poz/shapes.txt'), ('KAs', SCR + '/krkA/shapes.txt'), ('KTs', SCR + '/krkT/shapes.txt'), ('Ws', SCR + '/waw/shapes.txt'), ('Js', SCR + '/wej/shapes.txt'), ('Ls', SCR + '/ldz/shapes.txt'), ('Fs', SCR + '/fl/shapes.txt'), ('Gs', SCR + '/prg/shapes.txt')):
+                  ('Ps', SCR + '/poz/shapes.txt'), ('KAs', SCR + '/krkA/shapes.txt'), ('KTs', SCR + '/krkT/shapes.txt'), ('Ws', SCR + '/waw/shapes.txt'), ('Js', SCR + '/wej/shapes.txt'), ('Ls', SCR + '/ldz/shapes.txt'), ('Fs', SCR + '/fl/shapes.txt'), ('Gs', SCR + '/prg/shapes.txt'), ('Bs', SCR + '/ber/shapes.txt'), ('Hs', SCR + '/ham/shapes.txt')):
     if not os.path.exists(path): continue
     for r in rd(path):
         k = pre + r['shape_id']
@@ -1783,7 +1823,7 @@ print('Schemat sieci:', len(MAPD), 'linii,', os.path.getsize(OUT + '/map.json') 
 # (base_ns.json), each loaded only when shown
 BASE = OUT + '/base.json'
 _st = list(json.load(open(OUT + '/index.json', encoding='utf-8'))['stops'].values())
-for path, sel, core in ((BASE, lambda v: v[4] not in ('km', 'kmx', 'byd', 'ns', 'poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg'), (54.30, 54.62, 18.35, 18.85)),
+for path, sel, core in ((BASE, lambda v: v[4] not in ('km', 'kmx', 'byd', 'ns', 'poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham'), (54.30, 54.62, 18.35, 18.85)),
                         # the big cities: their centres in detail, the suburbs coarser (a whole city in detail would be too big a file)
                         (OUT + '/base_poz.json', lambda v: v[4] == 'poz', (52.37, 52.45, 16.85, 16.99)),
                         (OUT + '/base_krk.json', lambda v: v[4] == 'krk', (50.025, 50.095, 19.88, 20.03)),
@@ -1793,6 +1833,8 @@ for path, sel, core in ((BASE, lambda v: v[4] not in ('km', 'kmx', 'byd', 'ns', 
                         (OUT + '/base_ldz.json', lambda v: v[4] == 'ldz', (51.72, 51.81, 19.40, 19.53)),
                         (OUT + '/base_fl.json', lambda v: v[4] == 'fl', (54.76, 54.81, 9.39, 9.48)),
                         (OUT + '/base_prg.json', lambda v: v[4] == 'prg', (50.05, 50.11, 14.38, 14.48)),
+                        (OUT + '/base_ber.json', lambda v: v[4] == 'ber', (52.48, 52.56, 13.30, 13.48)),
+                        (OUT + '/base_ham.json', lambda v: v[4] == 'ham', (53.53, 53.58, 9.93, 10.06)),
                         (OUT + '/base_ns.json', lambda v: v[4] == 'ns', (49.57, 49.67, 20.62, 20.76))):   # Nowy Sącz: the city in detail
     if not ('--podklad' in sys.argv or not os.path.exists(path) or (datetime.datetime.now().timestamp() - os.path.getmtime(path)) > 30 * 86400): continue
     pts = [v for v in _st if sel(v)]
@@ -1894,9 +1936,9 @@ if EMBED:
                'base_km': json.load(open(OUT + '/base_km.json', encoding='utf-8')) if os.path.exists(OUT + '/base_km.json') else None,
                'base_byd': json.load(open(OUT + '/base_byd.json', encoding='utf-8')) if os.path.exists(OUT + '/base_byd.json') else None,
                'base_ns': json.load(open(OUT + '/base_ns.json', encoding='utf-8')) if os.path.exists(OUT + '/base_ns.json') else None,
-               **{'base_' + a: json.load(open(OUT + '/base_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg') if os.path.exists(OUT + '/base_' + a + '.json')},
+               **{'base_' + a: json.load(open(OUT + '/base_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham') if os.path.exists(OUT + '/base_' + a + '.json')},
                # Poznań, Kraków, Warszawa: network maps and packed route files
-               'maps': {a: json.load(open(OUT + '/map_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg') if os.path.exists(OUT + '/map_' + a + '.json')},
+               'maps': {a: json.load(open(OUT + '/map_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham') if os.path.exists(OUT + '/map_' + a + '.json')},
                'rp': {f[:-5]: json.load(open(OUT + '/rp/' + f, encoding='utf-8')) for f in os.listdir(OUT + '/rp')} if os.path.isdir(OUT + '/rp') else {},
                'schema': {f[7:-5]: json.load(open(OUT + '/' + f, encoding='utf-8')) for f in sorted(os.listdir(OUT)) if f.startswith('schema_') and f.endswith('.json')} or None,
                'r': {f[:-5]: json.load(open(OUT + '/r/' + f, encoding='utf-8')) for f in os.listdir(OUT + '/r')},

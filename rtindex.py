@@ -15,6 +15,7 @@ AREAS = {   # area -> [(feed key used by the page, static GTFS: folder in the bu
     'poz': [('P', 'poz')],
     'krk': [('KA', 'krkA'), ('KT', 'krkT')],
     'prg': [('G', 'prg')],
+    'ber': [('B', 'ber')],
 }
 
 

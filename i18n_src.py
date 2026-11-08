@@ -451,6 +451,8 @@ ROWS = [
     ("nd", "Sun", "So", "ne", "ne"),
 ("Komunikacja Gminy Podegrodzie", "Podegrodzie municipal transport", "Gemeindeverkehr Podegrodzie", "Obecná doprava Podegrodzie", "Obecní doprava Podegrodzie"),
 ("Szczegóły na stronie ZTP", "Details on the ZTP website", "Details auf der ZTP-Website", "Podrobnosti na webe ZTP", "Podrobnosti na webu ZTP"),
+("Niemcy", "Germany", "Deutschland", "Nemecko", "Německo"),
+("Szczegóły na stronie VBB", "Details on the VBB website", "Details auf der VBB-Website", "Podrobnosti na webe VBB", "Podrobnosti na webu VBB"),
 ]
 
 WEEKDAYS = {
