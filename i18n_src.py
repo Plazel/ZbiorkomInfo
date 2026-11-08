@@ -480,6 +480,7 @@ ROWS = [
     ('Prostokąt', 'Rectangle', 'Rechteck', 'Obdĺžnik', 'Obdélník'),
     ('Przystanek na żądanie', 'Request stop', 'Bedarfshaltestelle', 'Zastávka na znamenie', 'Zastávka na znamení'),
     ('Tłumaczenia nazw przystanków', 'Translations of stop names', 'Übersetzungen der Haltestellennamen', 'Preklady názvov zastávok', 'Překlady názvů zastávek'),
+    ('Piątki', 'Fridays', 'Freitage', 'Piatky', 'Pátky'),
 ]
 
 WEEKDAYS = {
