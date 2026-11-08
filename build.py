@@ -1403,7 +1403,7 @@ for area, A in NEW_AREAS.items():
             if area in ('ber', 'ham') and r['id'] in rmeta: r['cat'] = {'400': 'metro', '402': 'metro', '1000': 'ferry', '1200': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))   # U-Bahn, ferries
             if area == 'prg': r['f'] = bool(r.get('avg')) and r['avg'] <= 15   # Prague: colour only the lines running every 15 minutes or more often (7–18 h)
         for r in ROUTES_OUT[n0:]:
-            if r['n'] in AREA_LINE_COLORS and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True   # (Berlin, Hamburg: not the replacement bus S1); r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]
+            if r['n'] in AREA_LINE_COLORS and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True; r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]   # (Berlin, Hamburg: not the replacement bus S1)
         print(A['op'] + ':', len(ROUTES_OUT) - n0, 'linii')
     except Exception as e:
         print(A['op'] + ': pominięty (%s)' % e)
