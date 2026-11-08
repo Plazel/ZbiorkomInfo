@@ -1266,9 +1266,10 @@ def city_name(area, r):
     return r['stop_name'].strip()
 def city_pole(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[1]
-    if area == 'fl': return fl_name(r['stop_name'])[1] or seq_pole(area, fl_name(r['stop_name'])[0], r['stop_id'])
-    if area == 'ldz': return seq_pole(area, r['stop_name'].strip(), r['stop_id'])
-    if area == 'prg': return (r.get('platform_code') or '').strip() or seq_pole(area, r['stop_name'].strip(), r['stop_id'])
+    # (only the markings the source gives, never numbers made up here)
+    if area == 'fl': return fl_name(r['stop_name'])[1]   # Flensburg: B1, B2… where the stop's name has it
+    if area == 'ldz': return (r.get('stop_code') or '').strip()   # Łódź: the stop's own four-digit number (0081)
+    if area == 'prg': return (r.get('platform_code') or '').strip()   # Praha: A, B, C… (rail: the platform)
     if area in ('ber', 'ham'):   # the platform as given ("Pos. 5" -> 5, "2", "A"), else the stop's own number; else none
         v = re.sub(r'^(Pos\.|Gleis|Steig)\s*', '', (r.get('platform_code') or '').strip())
         if not re.fullmatch(r'[0-9A-Za-z]{1,3}', v): v = (r.get('stop_code') or '').strip() if area == 'ber' else ''
