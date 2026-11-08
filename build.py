@@ -1269,11 +1269,10 @@ def city_pole(area, r):
     if area == 'fl': return fl_name(r['stop_name'])[1] or seq_pole(area, fl_name(r['stop_name'])[0], r['stop_id'])
     if area == 'ldz': return seq_pole(area, r['stop_name'].strip(), r['stop_id'])
     if area == 'prg': return (r.get('platform_code') or '').strip() or seq_pole(area, r['stop_name'].strip(), r['stop_id'])
-    if area in ('ber', 'ham'):   # the platform ("Pos. 5", "2", "A"), else the stop's own number; else numbered in order
+    if area in ('ber', 'ham'):   # the platform as given ("Pos. 5" -> 5, "2", "A"), else the stop's own number; else none
         v = re.sub(r'^(Pos\.|Gleis|Steig)\s*', '', (r.get('platform_code') or '').strip())
         if not re.fullmatch(r'[0-9A-Za-z]{1,3}', v): v = (r.get('stop_code') or '').strip() if area == 'ber' else ''
-        if re.fullmatch(r'\d{1,2}', v or ''): return '%02d' % int(v)   # (01, 02… as the numbers made up for the others)
-        return v if re.fullmatch(r'[0-9A-Za-z]{1,3}', v or '') else seq_pole(area, city_name(area, r), r['stop_id'])
+        return v if re.fullmatch(r'[0-9A-Za-z]{1,3}', v or '') else ''   # (never a number made up here)
     if area == 'krk':
         for v in (r.get('stop_desc'), r.get('platform_code'), (r.get('stop_code') or '').split('-')[-1]):
             if v and re.fullmatch(r'\d{1,2}', v.strip()): return '%02d' % int(v)
