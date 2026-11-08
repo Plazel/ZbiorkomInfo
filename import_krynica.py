@@ -112,6 +112,9 @@ def main(src):
                 K['stops'][nid] = [S[sid][0], p1.get('p') or '02', round(p1['lat'], 6), round(p1['lon'], 6), 'user']
                 plat[sid] = {'b': nid}
                 if sid in PLATFORM_TOK: plat[sid]['tok'] = PLATFORM_TOK[sid]
+                for D in F: D['stops'].pop(sid + 'c', None)
+                if len(ps) > 2:   # a third platform (e.g. Tylicz Skrzyżowanie): used by the runs PLATFORM_TOK sends there (index 2)
+                    p2 = ps[2]; K['stops'][sid + 'c'] = [S[sid][0], p2.get('p') or '03', round(p2['lat'], 6), round(p2['lon'], 6), 'user']; plat[sid]['c'] = sid + 'c'
                 n2 += 1
     for i, p in enumerate(PATHS):
         json.dump(F[i], open(p, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

@@ -39,14 +39,14 @@ li .n{flex:1;min-width:0}li .m{font-size:.75rem;color:var(--muted)}
 <div class="app">
  <div class="side">
   <div class="head"><h1>Przystanki Krynicy-Zdroju i Muszyny</h1>
-   <p>Wybierz przystanek z listy lub na mapie i przeciągnij jego znacznik w dokładne miejsce na zdjęciu. Przystanek po obu stronach ulicy: „Dodaj drugi peron” i ustaw oba. Postęp zapisuje się w tej przeglądarce; na koniec pobierz plik i prześlij go.</p></div>
+   <p>Wybierz przystanek z listy lub na mapie i przeciągnij jego znacznik w dokładne miejsce na zdjęciu. Przystanek po obu stronach ulicy: „Dodaj peron” i ustaw oba (najwyżej trzy perony). Postęp zapisuje się w tej przeglądarce; na koniec pobierz plik i prześlij go.</p></div>
   <div class="tools"><input id="q" type="search" placeholder="Szukaj przystanku"><select id="flt" class="btn"><option value="">Wszystkie</option><option value="todo">Do sprawdzenia</option><option value="done">Gotowe</option></select>
    <button class="btn" id="layer" type="button">Mapa / zdjęcie</button><button class="btn pri" id="exp" type="button">Pobierz plik</button><button class="btn" id="copy" type="button">Kopiuj</button></div>
   <ul id="list"></ul>
   <div class="edit" id="edit" hidden>
    <b id="eName"></b>
    <div class="row" id="ePoles"></div>
-   <div class="row"><button class="btn" id="addPole" type="button">Dodaj drugi peron</button><button class="btn" id="delPole" type="button">Usuń drugi peron</button><label><input type="checkbox" id="eDone"> gotowe</label></div>
+   <div class="row"><button class="btn" id="addPole" type="button">Dodaj peron</button><button class="btn" id="delPole" type="button">Usuń ostatni peron</button><label><input type="checkbox" id="eDone"> gotowe</label></div>
    <div class="dirs" id="eDirs"></div>
    <textarea id="eNote" placeholder="Uwagi (np. przystanek nie istnieje, inna nazwa, tylko w jednym kierunku)"></textarea>
   </div>
@@ -95,11 +95,11 @@ let STOPS=[],LINES={},SEL=null,DIRS={},ISTOPS={};const MK={};let ARROWS=[];
 const DCOL=['#d71920','#1f6fd1','#1f9a3e','#8e24aa','#e8a400','#00838f'];
 const icon=(t,cls)=>L.divIcon({className:'pm '+(cls||''),html:'<span>'+t+'</span>',iconSize:[30,30],iconAnchor:[15,15]});
 const st=id=>{if(S[id])return S[id];const e=STOPS.find(x=>x.id===id);const ps=[{p:'',lat:null,lon:null}];if(e&&e.p2)ps.push({p:e.p2.p,lat:e.p2.lat,lon:e.p2.lon});return S[id]={poles:ps,note:'',done:false}};
-function poles(s){const x=st(s.id);return x.poles.map((p,i)=>({p:p.p||(i===0&&s.pole)||(x.poles.length>1?['01','02'][i]:''),lat:p.lat!=null?p.lat:s.lat+(i?0.00012:0),lon:p.lon!=null?p.lon:s.lon+(i?0.00012:0)}))}
+function poles(s){const x=st(s.id);return x.poles.map((p,i)=>({p:p.p||(i===0&&s.pole)||(x.poles.length>1?['01','02','03'][i]:''),lat:p.lat!=null?p.lat:s.lat+i*0.00012,lon:p.lon!=null?p.lon:s.lon+i*0.00012}))}
 function drawMarkers(){Object.values(MK).flat().forEach(m=>map.removeLayer(m));for(const k in MK)delete MK[k];
   STOPS.forEach(s=>{const x=st(s.id);MK[s.id]=poles(s).map((P,i)=>{const m=L.marker([P.lat,P.lon],{icon:icon(P.p||'•',(SEL===s.id?'sel ':'')+(x.done?'done':'')),draggable:true,title:s.name+(P.p?' '+P.p:'')}).addTo(map);
     m.on('click',()=>select(s.id,false));
-    m.on('dragend',()=>{const ll=m.getLatLng();x.poles[i]=x.poles[i]||{p:''};x.poles[i].lat=+ll.lat.toFixed(6);x.poles[i].lon=+ll.lng.toFixed(6);if(!x.poles[i].p&&x.poles.length>1)x.poles[i].p=['01','02'][i];save();select(s.id,false)});
+    m.on('dragend',()=>{const ll=m.getLatLng();x.poles[i]=x.poles[i]||{p:''};x.poles[i].lat=+ll.lat.toFixed(6);x.poles[i].lon=+ll.lng.toFixed(6);if(!x.poles[i].p&&x.poles.length>1)x.poles[i].p=['01','02','03'][i];save();select(s.id,false)});
     return m})})}
 function list(){const q=document.getElementById('q').value.trim().toLowerCase(),f=document.getElementById('flt').value;const ul=document.getElementById('list');ul.innerHTML='';
   STOPS.filter(s=>(!q||s.name.toLowerCase().includes(q))&&(!f||(f==='done')===!!st(s.id).done)).forEach(s=>{const li=document.createElement('li');const x=st(s.id);
@@ -108,9 +108,9 @@ function list(){const q=document.getElementById('q').value.trim().toLowerCase(),
     li.querySelector('.n').append(n,m);li.onclick=()=>select(s.id,true);ul.appendChild(li)})}
 function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);const E=document.getElementById('edit');E.hidden=false;
   document.getElementById('eName').textContent=s.name+' ('+id+')';
-  const pr=document.getElementById('ePoles');pr.innerHTML='Numer peronu: ';poles(s).forEach((P,i)=>{const inp=document.createElement('input');inp.type='text';inp.value=P.p;inp.placeholder=i?'02':'01';
+  const pr=document.getElementById('ePoles');pr.innerHTML='Numer peronu: ';poles(s).forEach((P,i)=>{const inp=document.createElement('input');inp.type='text';inp.value=P.p;inp.placeholder=['01','02','03'][i];
     inp.onchange=()=>{x.poles[i]=x.poles[i]||{lat:null,lon:null};x.poles[i].p=inp.value.trim();save();drawMarkers()};pr.appendChild(inp)});
-  document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>1;
+  document.getElementById('delPole').hidden=x.poles.length<2;document.getElementById('addPole').hidden=x.poles.length>2;
   document.getElementById('eDone').checked=!!x.done;document.getElementById('eNote').value=x.note||'';
   // where the buses go from here: an arrow to the next stop for each direction, listed with its lines and terminus
   ARROWS.forEach(a=>map.removeLayer(a));ARROWS=[];const D=[];Object.values(DIRS['@'+id]||{}).forEach(d=>{if(d.next===s.name)return;const m=D.find(x=>x.next===d.next);if(!m){D.push({...d,heads:Object.fromEntries(Object.entries(d.heads).map(([h,l])=>[h,new Set(l)])),runs:{...d.runs}});return}Object.entries(d.heads).forEach(([h,l])=>{l.forEach(n=>(m.heads[h]=m.heads[h]||new Set()).add(n));m.runs[h]=(m.runs[h]||0)+(d.runs[h]||0)});Object.entries(d.prev||{}).forEach(([k,c])=>{m.prev=m.prev||{};m.prev[k]=(m.prev[k]||0)+c})});
@@ -122,9 +122,10 @@ function select(id,fly){SEL=id;const s=STOPS.find(x=>x.id===id);const x=st(id);c
     ARROWS.push(L.polyline([[P0.lat,P0.lon],[to.lat,to.lon]],{color:col,weight:2,opacity:.7,dashArray:'4 6',interactive:false}).addTo(map));
     ARROWS.push(L.circleMarker(end,{radius:5,color:col,fillColor:col,fillOpacity:1,interactive:false}).addTo(map))});
   drawMarkers();list();if(fly){const P=poles(s)[0];map.setView([P.lat,P.lon],Math.max(map.getZoom(),18))}}
-document.getElementById('addPole').onclick=()=>{if(!SEL)return;const s=STOPS.find(x=>x.id===SEL);const x=st(SEL);const P=poles(s)[0];
-  x.poles[0]={p:x.poles[0].p||'01',lat:P.lat,lon:P.lon};x.poles[1]={p:'02',lat:P.lat+0.00012,lon:P.lon+0.00012};save();select(SEL,false)};
-document.getElementById('delPole').onclick=()=>{if(!SEL)return;const x=st(SEL);x.poles=x.poles.slice(0,1);save();select(SEL,false)};
+document.getElementById('addPole').onclick=()=>{if(!SEL)return;const s=STOPS.find(x=>x.id===SEL);const x=st(SEL);const PP=poles(s),P=PP[0],n=Math.min(2,x.poles.length);
+  if(n>=3)return;x.poles[0]={p:x.poles[0].p||'01',lat:P.lat,lon:P.lon};for(let i=1;i<n;i++)x.poles[i]=Object.assign({p:['01','02','03'][i]},x.poles[i],{lat:PP[i].lat,lon:PP[i].lon});
+  x.poles[n]={p:['01','02','03'][n],lat:P.lat+n*0.00012,lon:P.lon+n*0.00012};save();select(SEL,false)};
+document.getElementById('delPole').onclick=()=>{if(!SEL)return;const x=st(SEL);x.poles=x.poles.slice(0,Math.max(1,x.poles.length-1));save();select(SEL,false)};
 document.getElementById('eDone').onchange=e=>{if(!SEL)return;st(SEL).done=e.target.checked;save();select(SEL,false)};
 document.getElementById('eNote').oninput=e=>{if(!SEL)return;st(SEL).note=e.target.value;save()};
 document.getElementById('q').oninput=list;document.getElementById('flt').onchange=list;

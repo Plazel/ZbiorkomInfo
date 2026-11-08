@@ -50,13 +50,25 @@ SRC_CACHE = os.path.join(HERE, 'cache', 'zrodla')
 MISSING_F = os.path.join(OUT, 'brak_zrodel.json')
 MISSING = {}
 
+# the same feeds as kept by the Mobility Database (MobilityData, its copy of each feed, refreshed daily): tried when the
+# source itself cannot be fetched, before the copy kept here
+SOURCES_ALT = {
+    'zkm': 'https://files.mobilitydatabase.org/mdb-2094/latest.zip',
+    'ztm': 'https://files.mobilitydatabase.org/mdb-1014/latest.zip',
+}
+
 def fetch_src(key, dest):
     kept = os.path.join(SRC_CACHE, key)
-    try:
-        fetch(SOURCES[key], dest)
-        os.makedirs(SRC_CACHE, exist_ok=True); shutil.copyfile(dest, kept)
-        return True
-    except Exception as e:
+    for url in [SOURCES[key]] + ([SOURCES_ALT[key]] if key in SOURCES_ALT else []):
+        try:
+            fetch(url, dest)
+            os.makedirs(SRC_CACHE, exist_ok=True); shutil.copyfile(dest, kept)
+            if url != SOURCES[key]: print('UWAGA: %s z kopii Mobility Database (%s)' % (key, url)); MISSING[key] = 'pobrane z Mobility Database'
+            return True
+        except Exception as e:
+            err = e
+    if True:
+        e = err
         MISSING[key] = '%s: %s' % (type(e).__name__, str(e)[:300])
         if not os.path.exists(kept): return False
         print('UWAGA: %s niedostępne (%s) – użyta ostatnia pobrana kopia z %s' % (key, MISSING[key],
@@ -508,11 +520,13 @@ AIR = '257530'
 names_of = lambda t: [sname(x[1]) for x in rst[t]]
 is_pr = lambda t: rtrips[t]['route_id'] == 'PR_REG'
 s1_trip = lambda t: rtrips[t]['route_id'] == 'SKMT_S1'
-s2_trip = lambda t: is_pr(t) and any(x[1] == AIR for x in rst[t])
+# S2: through the airport (Gdańsk – Osowa), and since the line was cut in two, also Osowa – Gdynia (changing trains in Osowa)
+s2b_trip = lambda t: is_pr(t) and 'Gdańsk Osowa' in names_of(t) and 'Gdynia Główna' in names_of(t) and 'Gdańsk Kokoszki' not in names_of(t) and not any(x[1] == AIR for x in rst[t])
+s2_trip = lambda t: is_pr(t) and (any(x[1] == AIR for x in rst[t]) or s2b_trip(t))
 s22_trip = lambda t: is_pr(t) and 'Gdańsk Kokoszki' in names_of(t) and 'Gdańsk Wrzeszcz' in names_of(t)
 CORR = {
     'kS1': corridor(s1_trip, 'Gdańsk Śródmieście', 'Lębork'),
-    'kS2': corridor(s2_trip, 'Gdańsk Wrzeszcz', 'Gdynia Główna') | corridor(s2_trip, 'Gdańsk Główny', 'Gdańsk Osowa'),
+    'kS2': corridor(s2_trip, 'Gdańsk Wrzeszcz', 'Gdynia Główna') | corridor(s2_trip, 'Gdańsk Główny', 'Gdańsk Osowa') | corridor(s2b_trip, 'Gdańsk Osowa', 'Gdynia Główna'),
     'kS22': corridor(lambda t: s22_trip(t) and not any(x[1] == AIR for x in rst[t]), 'Gdańsk Wrzeszcz', 'Somonino'),
 }
 ENDS = {'kS1': ('Gdańsk Wrzeszcz', 'Gdynia Główna'), 'kS2': ('Gdańsk Wrzeszcz', 'Gdańsk Osowa'), 'kS22': ('Gdańsk Wrzeszcz', 'Somonino')}
@@ -575,7 +589,7 @@ for rk, allowed in CORR.items():
     meta = {'kS1': ('S1', 'PKP SKM w Trójmieście'), 'kS2': ('S2', 'POLREGIO (Pomorska Kolej Metropolitalna)'), 'kS22': ('S22', 'POLREGIO (Pomorska Kolej Metropolitalna)')}[rk]
     n0 = len(ROUTES_OUT)
     build_routes(groups, {rk: {'id': rk, 'n': meta[0], 't': 'rail', 'op': meta[1], 'dates': dates[rk],
-                               **({'main_ends': ('Gdańsk Śródmieście', 'Lębork')} if rk == 'kS1' else {})}})
+                               **({'main_ends': ('Gdańsk Śródmieście', 'Lębork')} if rk == 'kS1' else {'main_ends': ('Gdańsk Wrzeszcz', 'Gdańsk Osowa')} if rk == 'kS2' else {})}})
     print('Rail', rk, len(ROUTES_OUT) - n0)
 
 
@@ -847,10 +861,20 @@ for r in rd(P + '/stop_times.txt'):
     if r['trip_id'] in chosen:
         st[r['trip_id']].append((int(r['stop_sequence']), 'b' + r['stop_id'], tmin(r['departure_time']), r.get('pickup_type') or '0', r.get('drop_off_type') or '0'))
 groups = collections.defaultdict(list); meta_of = {}
+# runs only as far as Toruńska / Kazimierza Wielkiego (the tram depot): runs to or from the depot, unless the line ends there anyway
+bsn = {'b' + r['stop_id']: r['stop_name'] for r in rd(P + '/stops.txt')}
+BYD_DEPOT = re.compile(r'Kazimierza Wielkiego|^Toruńska')
+_ends = collections.defaultdict(collections.Counter)
+for tid, rows in st.items():
+    rows.sort()
+    for rk, k in chosen[tid]: _ends[rk][bsn.get(rows[0][1], '')] += 1; _ends[rk][bsn.get(rows[-1][1], '')] += 1
 for tid, rows in st.items():
     rows.sort(); rows = [(x[1], x[2], x[3], x[4]) for x in rows if not (x[3] == '1' and x[4] == '1')]
     if len(rows) < 2: continue
-    for rk, k in chosen[tid]: groups[rk].append((k, tmeta[tid][1], tmeta[tid][0], rows))
+    for rk, k in chosen[tid]:
+        top = {n for n, _ in _ends[rk].most_common(2)}
+        dep = tmeta[tid][1] or any(BYD_DEPOT.search(bsn.get(x, '')) and bsn.get(x, '') not in top for x in (rows[0][0], rows[-1][0]))
+        groups[rk].append((k, dep, tmeta[tid][0], rows))
 for rk in list(groups): groups[rk] = fix_dirs(groups[rk])
 first_b = {}
 for rid, r in broutes.items(): first_b.setdefault('b' + re.sub(r'\W', '', r['route_short_name']), r)
@@ -984,7 +1008,7 @@ if os.path.exists(MANUAL):
             ahead = [KMD['stops'][x][0] for x, _ in st[k + 1:] if x in KMD['stops']]
             for nm in ahead:
                 hit = [int(i) for i, ws in tok.items() if any(w in nm for w in ws)]
-                if len(hit) == 1: return nid if hit[0] == 1 else sid
+                if len(hit) == 1: return P_['c'] if hit[0] == 2 and P_.get('c') else nid if hit[0] == 1 else sid
         a = st[k - 1][0] if k > 0 else None; b = st[k + 1][0] if k + 1 < len(st) else None
         a = a if a in KMD['stops'] else None; b = b if b in KMD['stops'] else None
         (x0, y0), (x1, y1) = _xy(sid), _xy(nid); cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
@@ -1049,7 +1073,8 @@ if os.path.exists(MANUAL):
         ln = rk[2:]
         meta[rk] = {'id': rk, 'n': KMD['lines'].get(ln, {}).get('name', ln), 't': 'bus', 'op': KMD['lines'].get(ln, {}).get('op', ''), 'dates': {k: v for k, v in DAYS.items()},
                     **({'cat': KMD['lines'][ln]['cat']} if KMD['lines'].get(ln, {}).get('cat') else {}),
-                    **({'main_not': KMD['lines'][ln]['main_not']} if KMD['lines'].get(ln, {}).get('main_not') else {})}
+                    **({'main_not': KMD['lines'][ln]['main_not']} if KMD['lines'].get(ln, {}).get('main_not') else {}),
+                    **({'main_ends': KMD['lines'][ln]['main_ends']} if KMD['lines'].get(ln, {}).get('main_ends') else {})}
     n0 = len(ROUTES_OUT); build_routes(groups, meta)
     # every line here has a colour of its own (set in the manual file), whatever its frequency
     for r in ROUTES_OUT[n0:]:

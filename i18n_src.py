@@ -418,6 +418,8 @@ ROWS = [
     ("Brak", "None", "Keiner", "Žiadny", "Žádný"),
     ("Aktualizacja: {n} temu", "Updated {n} ago", "Aktualisiert vor {n}", "Aktualizácia: pred {n}", "Aktualizace: před {n}"),
     ("Źródło", "Source", "Quelle", "Zdroj", "Zdroj"),
+    ("Przesiadka w Gdańsku Osowej", "Change trains at Gdańsk Osowa", "Umsteigen in Gdańsk Osowa", "Prestup v stanici Gdańsk Osowa", "Přestup ve stanici Gdańsk Osowa"),
+    ("Linia S2 kursuje w dwóch częściach: Gdańsk Główny – Gdańsk Osowa i Gdańsk Osowa – Gdynia Główna. Przesiadka w Gdańsku Osowej.", "Line S2 runs in two parts: Gdańsk Główny – Gdańsk Osowa and Gdańsk Osowa – Gdynia Główna. Change trains at Gdańsk Osowa.", "Die Linie S2 verkehrt in zwei Abschnitten: Gdańsk Główny – Gdańsk Osowa und Gdańsk Osowa – Gdynia Główna. Umsteigen in Gdańsk Osowa.", "Linka S2 premáva v dvoch častiach: Gdańsk Główny – Gdańsk Osowa a Gdańsk Osowa – Gdynia Główna. Prestup v stanici Gdańsk Osowa.", "Linka S2 jezdí ve dvou částech: Gdańsk Główny – Gdańsk Osowa a Gdańsk Osowa – Gdynia Główna. Přestup ve stanici Gdańsk Osowa."),
 ]
 
 WEEKDAYS = {

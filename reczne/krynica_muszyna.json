@@ -62,7 +62,11 @@
    "op": "Zapopradzie (Gmina Muszyna)",
    "desc": "",
    "name": "2",
-   "color": "#00695c"
+   "color": "#00695c",
+   "main_ends": [
+    "Szczawnik Stacja Narciarska",
+    "Dubne"
+   ]
   },
   "Z3": {
    "op": "Zapopradzie (Gmina Muszyna)",
