@@ -3628,6 +3628,9 @@ function gdNameSaid(name,nl){let n=name;
   // "Krusau, Dänemark", "Handelslehranstalt, Wirtschaftsschule")
   if(nl==='de')n=n.replace(/\bAbzw\./g,'Abzweigung').replace(/\bSt\.(-?)\s*/g,(m,h)=>'Sankt'+(h||' ')).replace(/\bP\+R\b/g,'Park and Ride')
     .replace(/\s*\(DK\)/g,', Dänemark').replace(/\s*\(TGZ\)/g,'').replace(/\bHLA\s*\/\s*/g,'Handelslehranstalt, ').replace(/\bStr\./g,'Straße');
+  // (Berlin, Hamburg: "U", "S", "S+U" before a name said as the station: "U-Bahnhof Alexanderplatz", "S- und U-Bahnhof …")
+  if(nl==='de')n=n.replace(/^U\s*\+\s*S\s+/,'U- und S-Bahnhof ').replace(/^S\s*\+\s*U\s+/,'S- und U-Bahnhof ').replace(/^U\s+/,'U-Bahnhof ').replace(/^S\s+/,'S-Bahnhof ');
+  if(nl==='de')n=/Bahnhof /.test(n)?n.replace(/\s+Bhf\b\.?/g,''):n.replace(/\bBhf\b\.?/g,'Bahnhof');   // ("S Westkreuz Bhf": the station said once)
   // (Łódź: "Bratysławska-Wróblewskiego" written without spaces, said as two names; not a double name such as Skłodowskiej-Curie)
   if(city==='ldz')n=n.replace(/(\p{Ll})-(\p{Lu})(?!urie)/gu,'$1 - $2');
   n=n.replace(/\s+[-–]\s+/g,', ');   // ("Kraszewskiego - Szpital", "Brzechwy - Szafirowa": a pause between)
