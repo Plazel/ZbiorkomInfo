@@ -1199,6 +1199,7 @@ html.app nav.rail{touch-action:pan-x pan-y!important}
 
 <script>
 const ICONS={
+ exp:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><g transform="translate(8 4) scale(.86)"><path d="M15 9h34c2 0 4 2 4 4v39H11V13c0-2 2-4 4-4z"/><path d="M20 13.5h24"/><path d="M14 18h36v15L16 38c-1 0-2-1-2-2z"/><path d="M11 19H7v9M53 19h4v9"/><path d="M15 45h6M43 45h6M27 47h10"/><path d="M15 52v4h6v-4M43 52v4h6v-4"/></g><path d="M2 24h8M0 33h10M3 42h7"/></svg>',   // express buses: the bus with lines of speed behind it
  ferry:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M8 37h48l-5 13c-1 2-2 3-4 3H17c-2 0-3-1-4-3z"/><path d="M16 37V27c0-2 1-3 3-3h26c2 0 3 1 3 3v10"/><path d="M25 24v-7c0-2 1-3 3-3h8c2 0 3 1 3 3v7"/><path d="M21 30h22"/><path d="M28 45h8"/><path d="M7 59c3 0 3-2 6-2s3 2 6 2 3-2 6-2 3 2 6 2 3-2 6-2 3 2 6 2 3-2 6-2 3 2 6 2"/></svg>',
  metro:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M15 10h34c3 0 5 2 5 5v37H10V15c0-3 2-5 5-5z"/><path d="M22 14.5h20"/><path d="M14 20h36v12c0 3-2 5-5 5H19c-3 0-5-2-5-5z"/><path d="M15 44h6M43 44h6M27 46h10"/><path d="M17 52v4h4v-4M43 52v4h4v-4"/></svg>',
  cable:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 8l56 10"/><path d="M32 13v9M26 22h12"/><path d="M19 26h26c3 0 5 2 5 5v21c0 3-2 5-5 5H19c-3 0-5-2-5-5V31c0-3 2-5 5-5z"/><path d="M18 31h28v12H18z"/><path d="M27 51h10"/></svg>',
@@ -1444,6 +1445,9 @@ function chip(r,extra='',plain=false){
 }
 
 /* ---------- board ---------- */
+// express bus lines: the Tricity's letter lines (A, B, N…), Hamburg's and Berlin's X lines
+const isExpLine=r=>['bus','repl'].includes(r.t)&&(['gda','sop','gdy','all'].includes(city)&&/^[A-Z]$/.test(r.n)||['ham','ber'].includes(city)&&/^X\d+$/.test(r.n));
+const lineIco=r=>r.nt?'nighttram':isExpLine(r)?'exp':ICONS[r.t]?r.t:'bus';
 function sections(){
   const R=IDX.routes.filter(inCity), by=(f)=>R.filter(f).sort((a,b)=>(/^\d/.test(a.n)?1:a.n==='R'?.5:0)-(/^\d/.test(b.n)?1:b.n==='R'?.5:0)||a.n.localeCompare(b.n,'pl',{numeric:true}));   // lines starting with a letter first (C10 before T8), then the numbers, each in ascending order
   if(city==='km')return [
@@ -1473,7 +1477,7 @@ function sections(){
    {name:'Tramwaje',icon:'tram',lines:by(r=>tk(r)==='tram')},
    {name:'Trolejbusy',icon:'trol',lines:by(r=>tk(r)==='trol')},
    {name:'Autobusy',icon:'bus',lines:by(r=>tk(r)==='bus')},
-   {name:'Linie autobusowe pospieszne',icon:'bus',lines:by(r=>tk(r)==='exp')},
+   {name:'Linie autobusowe pospieszne',icon:'exp',lines:by(r=>tk(r)==='exp')},
    {name:'Linie lokalne',icon:'bus',lines:by(r=>tk(r)==='local')},
    {name:'Linie zastępcze i specjalne',icon:'repl',lines:by(r=>tk(r)==='repl'||tk(r)==='seas')},   // seasonal and occasional lines among them
    {name:'Linie nocne',icon:R.some(r=>r.t==='night'&&r.nt)?'nightmix':'night',lines:by(r=>r.t==='night')},   // night trams among them (nt: Praha, Kraków, Poznań): tram and bus with the moon
@@ -1744,7 +1748,7 @@ function emptyMsg(day,ops,running){const ds=weekDate(day);
   return `${running?'Brak odjazdów w tym kierunku':'Linia nie kursuje'} ${dayLabel(ds)}.`}
 function headerHTML(r,line,extra,back){
   return `<button class="crumb" type="button" data-go="${back||''}">← ${back?'Trasa linii':'Wszystkie linie'}</button>
-  <div class="lhead">${ICONS[r.nt?'nighttram':ICONS[r.t]?r.t:'bus']}<span id="hc"></span>${withWeek(extra,r)}</div>`;   // (the operator: in the notes under the timetable, its source)
+  <div class="lhead">${ICONS[lineIco(r)]}<span id="hc"></span>${withWeek(extra,r)}</div>`;   // (the operator: in the notes under the timetable, its source)
 }
 async function renderLine(id){
   const r=IDX.routes.find(x=>x.id===id);if(!r)return renderBoard();
@@ -2186,7 +2190,7 @@ function sheetHTML(S){
   const ops=[...new Set(S.ops)].join(', ');
   return `<div class="ps${S.fmt==='a5'?' a5':''}${S.noRoute?' noroute':''}">
   <div class="psl">
-   <div class="pshead${many?' many':''}">${ICONS[S.rs[0].nt?'nighttram':ICONS[S.rs[0].t]?S.rs[0].t:'bus'].replace('<svg ','<svg width="46" height="46" ').replace('fill:var(--bg)','fill:#fff').replace(/currentColor/g,'#222')}<div class="psbs">${S.rs.map(badge).join('')}</div>
+   <div class="pshead${many?' many':''}">${ICONS[lineIco(S.rs[0])].replace('<svg ','<svg width="46" height="46" ').replace('fill:var(--bg)','fill:#fff').replace(/currentColor/g,'#222')}<div class="psbs">${S.rs.map(badge).join('')}</div>
     <div class="psroute"><div class="psfrom"><i></i><b class="pslk"></b><span>${nb(S.name)} ${esc(S.num)}</span></div><div class="psto"><i></i><span>${nb(S.head)}</span></div></div></div>
    <div class="pscols" style="--nc:${days.length}">${days.map(k=>col(k,k==='h')).join('')}</div>
    <div class="psfoot"><div>${S.req?'<p>'+HAND+' – przystanek na żądanie</p>':''}${S.noNotes?'':S.notes.map(([l,t])=>`<p><b class="k">${l}</b> – ${esc(t)}</p>`).join('')}</div>
