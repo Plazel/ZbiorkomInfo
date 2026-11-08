@@ -1879,11 +1879,11 @@ async function renderStop(id,di,si){
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
     if(!deps.length)return `<div class="col ecol${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}</h3><div class="empty">${emptyMsg(day,[r.op],L.dirs.some(dd=>tripsOf(dd,day).length))}</div></div>`;
-    const byH={};deps.forEach(x=>{const h=Math.floor(x.t/60);(byH[h]=byH[h]||[]).push(x)});
-    const hs=HS;   // the same hours in every day's column, so an hour sits on one line across the days
-    const fq=freqHours(r,deps);   // Warsaw metro: "co ok. N min" between the first and the last hour
+    const {hs,byH,all}=hourRows(HS,deps);   // the same hours in every day's column, so an hour sits on one line across the days
+    const fq0=freqHours(r,deps),fq=fq0&&all?Object.fromEntries(Object.entries(fq0).map(([h,v])=>[h%24,v])):fq0;   // Warsaw metro: "co ok. N min" between the first and the last hour
+    const nxT=weekDate(day)===now.ds?deps.find(x=>x.t>=now.min):null;   // (the next run by its time, not by its row: 0:21 after midnight is not before 21:37)
     const rows=hs.map(h=>`<tr class="h${byH[h]?'':' eh'}"><td class="hr">${h%24}</td><td><div class="mins">${fq&&fq[h]?`<span class="fq">co ok. ${fq[h]} min</span>`:(byH[h]||[]).map(x=>{
-      let nx='';if(weekDate(day)===now.ds&&!nextMarked&&x.t>=now.min){nx=' nx';nextMarked=true}
+      let nx='';if(x===nxT&&!nextMarked){nx=' nx';nextMarked=true}
       const lt=letterFor(x);return `<span data-k="${lt}" data-tr="${x.pi},${x.t0}" class="${nx}">${String(x.t%60).padStart(2,'0')}${lt?'<sup>'+lt+'</sup>':''}</span>`}).join('')}</div></td></tr>`).join('');
     return `<div class="col${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}${day==='x'?'<small class="xnote">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</small>':''}</h3><table><thead><tr><th style="text-align:right;padding-right:10px">godz.</th><th>min</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join('');
@@ -2095,10 +2095,10 @@ async function renderComboStop(key,ci,i){
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
     if(!deps.length)return `<div class="col ecol${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}</h3><div class="empty">${emptyMsg(day,C.rs.map(x=>x.op),false).replace('Linia nie kursuje','Linie nie kursują')}</div></div>`;
-    const byH={};deps.forEach(x=>{const h=Math.floor(x.t/60);(byH[h]=byH[h]||[]).push(x)});
-    const hs=HS;   // the same hours in every day's column, so an hour sits on one line across the days
+    const {hs,byH}=hourRows(HS,deps);   // the same hours in every day's column, so an hour sits on one line across the days
+    const nxT=weekDate(day)===now.ds?deps.find(x=>x.t>=now.min):null;
     const rows=hs.map(h=>`<tr class="h${byH[h]?'':' eh'}"><td class="hr">${h%24}</td><td><div class="mins">${(byH[h]||[]).map(x=>{
-      let nx='';if(weekDate(day)===now.ds&&!nextMarked&&x.t>=now.min){nx=' nx';nextMarked=true}
+      let nx='';if(x===nxT&&!nextMarked){nx=' nx';nextMarked=true}
       const lt=letterFor(x.r,x.d,x);
       return `<span data-k="${lt} L${esc(x.r.n)}" class="${nx}">${String(x.t%60).padStart(2,'0')}${lt?'<sup>'+lt+'</sup>':''}</span>`}).join('')}</div></td></tr>`).join('');
     return `<div class="col${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}${day==='x'?'<small class="xnote">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</small>':''}</h3><table><thead><tr><th style="text-align:right;padding-right:10px">godz.</th><th>min</th></tr></thead><tbody>${rows}</tbody></table></div>`;
@@ -3186,6 +3186,10 @@ function freqHours(r,deps){if(!(r&&r.cat==='metro'&&(r.c||[]).includes('waw'))||
 // days with no departures left out (a line that runs only on weekdays shows no Saturday/Sunday columns), at least one kept
 function dropEmptyDays(DAYS,DEPS){if(!DAYS.some(d=>DEPS[d].length))return;for(let i=DAYS.length-1;i>=0;i--)if(!DEPS[DAYS[i]].length){delete DEPS[DAYS[i]];DAYS.splice(i,1)}}
 function hourUnion(lists){const s=new Set();lists.forEach(l=>l.forEach(x=>s.add(Math.floor(x.t/60))));return [...s].sort((a,b)=>a-b)}
+// a line running round the clock: its hours 0, 1, 2 … 23 (those after midnight, 24 and on, with 0, 1 …), else as they come
+const roundClock=HS=>new Set(HS.map(h=>h%24)).size===24;
+function hourRows(HS,deps){const all=roundClock(HS),byH={};deps.forEach(x=>{const h=Math.floor(x.t/60)%(all?24:1e9);(byH[h]=byH[h]||[]).push(x)});
+  if(all)for(const h in byH)byH[h].sort((a,b)=>a.t%60-b.t%60);return {hs:all?Array.from({length:24},(_,k)=>k):HS,byH,all}}
 // rows of one hour as high as each other in every day's column
 function eqRows(){const cs=[...document.querySelectorAll('#grid .cols>.col:not(.ecol) tbody')];if(cs.length<2)return;
   cs.forEach(tb=>[...tb.rows].forEach(r=>r.style.height=''));const n=Math.max(...cs.map(tb=>tb.rows.length));
