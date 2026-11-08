@@ -38,7 +38,7 @@ select.sselN{display:none!important}
 .chip.sq{aspect-ratio:1/1;width:auto;padding:0;letter-spacing:-.03em;justify-content:center}
 
 /* a line's sign inside a sentence (the notices) */
-.chip.small.inl{display:inline-flex;justify-content:center;align-items:center;font-size:.66em;height:1.42em;min-width:1.42em;width:auto;padding:0 .3em;margin:0 .12em;vertical-align:-.32em;line-height:1;transform:none;box-shadow:none;letter-spacing:-.02em}.chip.small.inl.sq{aspect-ratio:auto;padding:0 .25em}.chip.small.inl.tram,.chip.small.inl.nt{width:auto;min-width:1.42em;height:1.42em;padding:0 .22em;border-radius:999px}.chip.small.inl.rail{padding:0 .5em;border-radius:999px}   /* (from the top of a capital to the bottom of a "y")*/
+.chip.small.inl.inl{--f:.56;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--f)*1em);height:calc(.95em / var(--f));width:calc(.95em / var(--f));min-width:0;padding:0;margin:0 .15em;vertical-align:middle;line-height:1;letter-spacing:-.03em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.04em}.chip.small.inl.inl.l3{--f:.45}.chip.small.inl.inl.l4{--f:.45;width:auto;padding:0 .35em}.chip.small.inl.inl.rail{width:auto;padding:0 .5em;border-radius:999px}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
 
 /* the notices' bar: one row at a time (rot), all of them when opened */
 .alertBar .abVp{flex:1 1 auto;width:100%;min-width:0}.alertBar.rot:not(.open) .abVp{height:41px;overflow:hidden}.alertBar.rot:not(.open) .abVp ul{display:block}.alertBar.rot:not(.open) li{height:41px}.alertBar.rot:not(.open) li button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:0!important;height:41px;padding:0;line-height:41px}.alertBar.open .abVp{max-height:50vh;overflow:auto}.alertBar .abExp{flex:none;width:auto;border:0;background:none;color:inherit;cursor:pointer;padding:6px;display:grid;place-items:center}.alertBar.open .abExp svg{transform:rotate(180deg)}
@@ -1858,7 +1858,7 @@ async function renderStop(id,di,si){
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const L2=noteKey[tx];if(!used.includes(L2))used.push(L2);return L2};
   const now=todayType();let nextMarked=false;
-  const DAYS=DK(L.dirs),DEPS={};DAYS.forEach(day=>DEPS[day]=departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));const HS=hourUnion(Object.values(DEPS));
+  const DAYS=DK(L.dirs),DEPS={};DAYS.forEach(day=>DEPS[day]=departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropEmptyDays(DAYS,DEPS);const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
     if(!deps.length)return `<div class="col ecol${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}</h3><div class="empty">${emptyMsg(day,[r.op],L.dirs.some(dd=>tripsOf(dd,day).length))}</div></div>`;
@@ -2073,7 +2073,7 @@ async function renderComboStop(key,ci,i){
     cd.members.forEach(m=>{const r=C.rs[m.li],d=C.Ls[m.li].dirs[m.di];
       d.stops.forEach((s,k)=>{if(sName(s[0])===name&&s[2])anyReq.push(1)});comboDeps(d,m,name,day).forEach(x=>deps.push({...x,r,d}))});
     deps.sort((a,b)=>a.t-b.t);DEPS[day]=deps});
-  dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));
+  dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));dropEmptyDays(DAYS,DEPS);
   const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
@@ -2152,7 +2152,8 @@ function comboSheet(C,ci,i){
 function sheetHTML(S){
   const dayOn=k=>!(S.noX&&k==='x')&&(!S.days||k==='x'||S.days.has(k));
   const hours=new Set();Object.keys(S.cols).filter(dayOn).forEach(k=>S.cols[k].forEach(x=>hours.add(Math.floor(x.t/60))));
-  const hs=[...hours].sort((a,b)=>a-b);const H=hs.length?Array.from({length:hs[hs.length-1]-hs[0]+1},(_,k)=>hs[0]+k):[];
+  const hs=[...hours].sort((a,b)=>a-b);const allDay=new Set(hs.map(h=>h%24)).size===24;   // (a line running round the clock: its hours 0, 1, 2 … 23, the ones after midnight with them)
+  const H=allDay?Array.from({length:24},(_,k)=>k):hs.length?Array.from({length:hs[hs.length-1]-hs[0]+1},(_,k)=>hs[0]+k):[];
   const wk=(IDX.weeks||[])[WEEK]||{};
   // only the days the line runs on (a line that does not run on Sundays gets no Sunday column)
   let days=Object.keys(S.cols).filter(k=>S.cols[k].length&&dayOn(k));if(!days.length)days=['w'];
@@ -2162,9 +2163,9 @@ function sheetHTML(S){
   const W5=S.fmt==='a5'?.7:1;const bs=Math.max(5,Math.min((many?11:17)*W5,(many?150:118)*W5/bw-1.5));
   const nb=t=>esc(t).split(' ').map(w=>`<span class="nw">${w}</span>`).join(' ');   // a name breaks only between words
   const badge=r=>`<span class="psb${r.t==='tram'||r.nt?' tram':''}${String(r.n).length<=4?' sq l'+String(r.n).length:''}" style="background:${sheetCol(r)};color:${(r.f||r.t==='rail')?txtOf(r):'#fff'};--bs:${bs.toFixed(2)}">${esc(r.n)}</span>`;
-  const col=(k,dark)=>{const by={};S.cols[k].forEach(x=>{const h=Math.floor(x.t/60);(by[h]=by[h]||[]).push(x)});
+  const col=(k,dark)=>{const by={};S.cols[k].forEach(x=>{const h=allDay?Math.floor(x.t/60)%24:Math.floor(x.t/60);(by[h]=by[h]||[]).push(x)});if(allDay)for(const h in by)by[h].sort((a,b)=>a.t%60-b.t%60);
     const fq=S.rs.length===1?freqHours(S.rs[0],S.cols[k]):null;
-    const rows=H.map(h=>`<tr><th>${String(h%24).padStart(2,'0')}</th><td>${fq&&fq[h]?`<span>co ok. ${fq[h]} min</span>`:(by[h]||[]).map(x=>`<span>${String(x.t%60).padStart(2,'0')}${x.lt&&!S.noNotes?'<sup>'+x.lt+'</sup>':''}${x.ln&&!S.noLines?`<sub style="color:${x.lc}">${esc(x.ln)}</sub>`:''}</span>`).join('')}</td></tr>`).join('');
+    const rows=H.map(h=>`<tr><th>${String(h%24).padStart(2,'0')}</th><td>${fq&&(fq[h]||allDay&&fq[h+24])?`<span>co ok. ${fq[h]||fq[h+24]} min</span>`:(by[h]||[]).map(x=>`<span>${String(x.t%60).padStart(2,'0')}${x.lt&&!S.noNotes?'<sup>'+x.lt+'</sup>':''}${x.ln&&!S.noLines?`<sub style="color:${x.lc}">${esc(x.ln)}</sub>`:''}</span>`).join('')}</td></tr>`).join('');
     const empty=!S.cols[k].length?`<tr><td colspan="2" class="psnone">${esc(emptyMsg(k,S.ops,false))}</td></tr>`:'';
     return `<div class="psc${dark?' dark':''}${k==='x'?' xcol':''}"><div class="psch">${CLOCK}<span>${DAYNAMES[k]}</span></div><table>${empty||rows}</table>${k==='x'?'<div class="psxn">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</div>':''}</div>`};
   // the stops still to come: minutes from this stop and a line down to the end of the route
@@ -3165,6 +3166,8 @@ function freqHours(r,deps){if(!(r&&r.cat==='metro'&&(r.c||[]).includes('waw'))||
     const m=g[Math.floor(g.length/2)];out[h]=String(m<10?Math.round(m*2)/2:Math.round(m)).replace('.',',')});
   return Object.keys(out).length?out:null}
 // the hours of the timetable columns: every hour any of the days has a departure in
+// days with no departures left out (a line that runs only on weekdays shows no Saturday/Sunday columns), at least one kept
+function dropEmptyDays(DAYS,DEPS){if(!DAYS.some(d=>DEPS[d].length))return;for(let i=DAYS.length-1;i>=0;i--)if(!DEPS[DAYS[i]].length){delete DEPS[DAYS[i]];DAYS.splice(i,1)}}
 function hourUnion(lists){const s=new Set();lists.forEach(l=>l.forEach(x=>s.add(Math.floor(x.t/60))));return [...s].sort((a,b)=>a-b)}
 // rows of one hour as high as each other in every day's column
 function eqRows(){const cs=[...document.querySelectorAll('#grid .cols>.col:not(.ecol) tbody')];if(cs.length<2)return;
@@ -4699,15 +4702,17 @@ function bvgSent(x,T){const nm=/^\(nachts\)\s*/.test(x);const y=x.replace(/^\(na
 // the line numbers in a notice as the lines' signs: the notice's own lines, and any line of the city right after a word for a
 // vehicle ("Tram M8 M17 18", "Bus 100, 200"); the word itself left out (the sign tells it). Not a number of a date or a time.
 const VEH_W='(?:Tram|Bus|U-Bahn|Fähre|Tramwaj|Autobus|Prom|Ferry|Přívoz|Prievoz|Ersatzverkehr|Komunikacja zastępcza|Replacement service|Náhradní doprava|Náhradná doprava)';
-const SEV_W=/Ersatz|zastępcza|Replacement|Náhrad/;   // (a replacement service: its lines are buses; the words kept)
+const SEV_W=/Ersatz|zastępcza|Replacement|Náhrad/;
+// words after which a number is a line's, kept in the sentence ("linii 6", "linky 9", "line 175")
+const KEEP_W='(?:linii|linie|linia|liniach|liniami|linią|nr|lines?|Linien?|linky|linka|lince|linek|linkami)';   // (a replacement service: its lines are buses; the words kept)
 function lineSigns(html,lines){const set=new Set(lines||[]);const here=IDX?IDX.routes.filter(r=>inCity(r)):[];
   const find=(n,kind)=>{const c=here.filter(r=>r.n===n);if(!c.length)return null;const want=kind&&/Tram/.test(kind)?['tram']:kind&&(/Bus|Autobus/.test(kind)||SEV_W.test(kind))?['repl','bus','night','exp']:null;
     return want?c.find(r=>want.includes(r.t))||null:c.find(r=>r.t!=='repl')||c[0]};   // (a bus 18 replacing tram 18 that the timetable lacks: the number, not the tram's sign)
   const tok='[A-Z]{0,2}\\d{1,3}[A-Z]?';
-  return html.replace(new RegExp('(?:\\b('+VEH_W+')\\s+)?(?<![\\w./:#&-])((?:'+tok+')(?:(?:,\\s*|\\s+)(?:'+tok+'))*)(?![\\d.:]\\d|:\\d|\\.\\d|-\\w)','g'),(m,veh,grp,off,all)=>{
-    const parts=grp.split(/(,\s*|\s+)/);let any=false;
-    const out=parts.map(p=>{if(/^(,\s*|\s+)$/.test(p))return p;const r=(veh||set.has(p))&&find(p,veh);if(!r)return p;any=true;return chip(r,'small inl',true).outerHTML}).join('');
-    return any?(veh&&SEV_W.test(veh)?veh+' ':'')+out:m})}
+  return html.replace(new RegExp('(?:\\b('+VEH_W+'|'+KEEP_W+')\\s+)?(?<![\\w./:#&-])((?:'+tok+')(?:(?:,\\s*|\\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\\.)\\s+|\\s+)(?:'+tok+'))*)(?![\\d.:]\\d|:\\d|\\.\\d|-\\w)','g'),(m,veh,grp,off,all)=>{
+    const parts=grp.split(/(,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)/);let any=false;
+    const out=parts.map(p=>{if(/^(,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)$/.test(p))return p;const kv=veh&&new RegExp('^'+KEEP_W+'$').test(veh)?null:veh;const r=(veh||set.has(p))&&find(p,kv);if(!r)return p;any=true;return chip(r,'small inl'+(r.n.length>=4?' l4':r.n.length===3?' l3':''),true).outerHTML}).join('');
+    return any?(veh&&(SEV_W.test(veh)||new RegExp('^'+KEEP_W+'$').test(veh))?veh+' ':'')+out:m})}
 const bvgTr=t=>{const T=BVG_T[LANG];if(!T)return String(t||'');
   return String(t||'').split('\n').map(line=>{const b=line.match(/^(•\s*)?(.*)$/),pre=b[1]||'',body=b[2];
     const h=body.match(/^\[(.+)\]$/);if(h)return '['+(T.hd[h[1]]||h[1])+']';
@@ -4757,7 +4762,7 @@ function alertBar(){const el=document.getElementById('alertBar');if(!el)return;c
   if(!L.length){el.hidden=true;el.innerHTML='';return}el.hidden=false;
   // (several notices: one at a time, the next scrolled in every 6 s; the button on the right shows them all)
   clearInterval(AB_ROT.t);const many=L.length>1,open=many&&AB_ROT.open;
-  const li=(a,i)=>`<li><button type="button" data-i="${i}">${a.lines?lineSigns(esc(a.title),a.lines):esc(a.title)}</button></li>`;
+  const li=(a,i)=>`<li><button type="button" data-i="${i}">${lineSigns(esc(a.title),a.lines||[])}</button></li>`;
   el.innerHTML=`<div class="alertBar${many?' rot':''}${open?' open':''}" role="region" aria-label="${esc(trS('Zmiany w ruchu'))}">${ALERT_IC}<div class="abVp"><ul>${L.map(li).join('')}${many&&!open?li(L[0],0):''}</ul></div>${many?`<button type="button" class="abExp" aria-expanded="${open}" title="${esc(trS(open?'Zwiń':'Rozwiń'))}" aria-label="${esc(trS(open?'Zwiń':'Rozwiń'))}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>`:''}</div>`;
   el.querySelectorAll('button[data-i]').forEach(b=>b.onclick=()=>alertShow(+b.dataset.i));
   const ex=el.querySelector('.abExp');if(ex)ex.onclick=()=>{AB_ROT.open=!AB_ROT.open;AB_ROT.k=0;alertBar()};
@@ -4765,7 +4770,7 @@ function alertBar(){const el=document.getElementById('alertBar');if(!el)return;c
     AB_ROT.t=setInterval(()=>{if(document.hidden)return;k++;go(true);AB_ROT.k=k%L.length;if(k===L.length)setTimeout(()=>{k=0;go(false)},600)},6000)}}
 const AB_ROT={t:0,k:0,open:false};
 function alertShow(i,g){const d=document.getElementById('alertDlg'),L=alertsOf(g||alertGrp(city));if(!L.length)return;const order=i==null?L.map((_,k)=>k):[i,...L.map((_,k)=>k).filter(k=>k!==i)];
-  const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map(k=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>(a.lines?lineSigns(esc(t),a.lines):esc(t)).replace(/^\[(.+)\]$/gm,'<b>$1</b>');return `<div class="aItem"><h3>${sg(a.title)}</h3>${a.text?`<p>${sg(a.text)}</p>`:''}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</div>`}).join('');
+  const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map(k=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>');return `<div class="aItem"><h3>${sg(a.title)}</h3>${a.text?`<p>${sg(a.text)}</p>`:''}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</div>`}).join('');
   d.hidden=false;document.getElementById('alertClose').focus()}
 document.body.appendChild(document.getElementById('alertDlg'));document.getElementById('alertDlg').style.zIndex=200;
 document.getElementById('alertClose').onclick=()=>{document.getElementById('alertDlg').hidden=true};
@@ -4773,9 +4778,9 @@ document.getElementById('alertDlg').addEventListener('click',e=>{if(e.target.id=
 addEventListener('keydown',e=>{if(e.key==='Escape'){const d=document.getElementById('alertDlg');if(d&&!d.hidden){d.hidden=true;e.stopPropagation()}}},true);
 ztmAlerts();setInterval(()=>{if(alertCity(city))ztmAlerts()},120000);
 // the board's bottom row: the notices one after another, sliding across (going on from where it was at each redraw)
-function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('div');row.className='dRow dAlert';row.title=trS('Utrudnienia');row.onclick=()=>alertShow(null,g);
+function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('div');row.className='dRow dAlert';row.title=trS('Zmiany w ruchu');row.onclick=()=>alertShow(null,g);
   const txt=L.map(a=>a.title).join('   •   ');const dur=Math.max(12,txt.length*.28);const dl=-(((Date.now()-((ALERT_BY[g]||{}).t0||0))/1000)%dur);
-  row.innerHTML=`${ALERT_IC}<div class="aMq"><span style="--d:${dur.toFixed(1)}s;--dl:${dl.toFixed(2)}s">${esc(txt)}</span></div>`;return row}
+  row.innerHTML=`${ALERT_IC}<div class="aMq"><span style="--d:${dur.toFixed(1)}s;--dl:${dl.toFixed(2)}s">${L.map(a=>lineSigns(esc(a.title),a.lines||[])).join(esc('   •   '))}</span></div>`;return row}
 // ---- every departure board on the page (the board, the stop's board, the map's stop popup, the guide's changes) gives a time
 // the same way: a live run as the minutes to go (under an hour), a timetable run as its clock time; where a city has no
 // live data at all, its timetable runs as the minutes to go under an hour, then the clock time
