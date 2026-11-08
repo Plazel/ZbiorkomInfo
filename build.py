@@ -773,7 +773,7 @@ try:
 except Exception as e: print('WKD: pominięto (%s)' % e)
 try:
     # the Tricity: line R, the regional trains between Pruszcz Gdański and Wejherowo (not those of PKM, S2 and S22)
-    _rr = {r['route_id']: ('kR', 'R', '#7a3b8f', 'POLREGIO') for r in rd(P + '/routes.txt')
+    _rr = {r['route_id']: ('kR', 'R', '#8b1a1a', 'POLREGIO') for r in rd(P + '/routes.txt')
            if r['route_id'] in ('PR_REG', 'PR_RP') or (r['agency_id'] == 'SKMT' and r['route_id'] != 'SKMT_S1' and r['route_type'] == '2')}
     # (with the PKM trains, S2 and S22, on their part between Pruszcz Gdański and Wejherowo: "Dalej jako linia S2 do: …")
     add_rail(P, _rr, rail_city, 'k', 'POLREGIO', cut=('Pruszcz Gdański', 'Wejherowo'), set_c=False, contig=True,

@@ -1,8482 +1,7844 @@
 {
-"Akademia Marynarki Wojennej": {
-"en": [
-[
-"Naval Academy",
-"en"
-]
-],
-"de": [
-[
-"Marineakademie",
-"de"
-]
-],
-"cs": [
-[
-"Námořní akademie",
-"cs"
-]
-],
-"sk": [
-[
-"Námorná akadémia",
-"sk"
-]
-]
-},
-"Akademia Muzyczna": {
-"en": [
-[
-"Academy of Music",
-"en"
-]
-],
-"de": [
-[
-"Musikakademie",
-"de"
-]
-],
-"cs": [
-[
-"Hudební akademie",
-"cs"
-]
-],
-"sk": [
-[
-"Hudobná akadémia",
-"sk"
-]
-]
-},
-"Aleja Batorego - Dw. PKP": {
-"en": [
-[
-"Aleja Batorego - Dw.",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Aleja Batorego - Dw.",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Aleja Batorego - Dw.",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Aleja Batorego - Dw.",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Antoninek PKM": {
-"en": [
-[
-"Antoninek PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Antoninek",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Antoninek",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Antoninek",
-"pl"
-]
-]
-},
-"Bolechowo-Os./PKM": {
-"en": [
-[
-"Bolechowo-Os. PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Bolechowo-Os.",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Bolechowo-Os.",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Bolechowo-Os.",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Brzeźnica Dworzec": {
-"en": [
-[
-"Brzeźnica",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Brzeźnica",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Brzeźnica",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Brzeźnica",
-"pl"
-],
-[
-"stanica",
-"sk"
-]
-]
-},
-"Brętowo PKM": {
-"en": [
-[
-"Brętowo PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Brętowo",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Brętowo",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Brętowo",
-"pl"
-]
-]
-},
-"Chludowo/PKM": {
-"en": [
-[
-"Chludowo PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Chludowo",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Chludowo",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Chludowo",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Chylonia Dworzec PKP": {
-"en": [
-[
-"Chylonia",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Chylonia",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Chylonia",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Chylonia",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Chylonia Dworzec PKP - os. Meksyk": {
-"en": [
-[
-"Chylonia",
-"pl"
-],
-[
-"railway station –",
-"en"
-],
-[
-"os. Meksyk",
-"pl"
-]
-],
-"de": [
-[
-"Chylonia",
-"pl"
-],
-[
-"Bahnhof –",
-"de"
-],
-[
-"os. Meksyk",
-"pl"
-]
-],
-"cs": [
-[
-"Chylonia",
-"pl"
-],
-[
-"nádraží –",
-"cs"
-],
-[
-"os. Meksyk",
-"pl"
-]
-],
-"sk": [
-[
-"Chylonia",
-"pl"
-],
-[
-"železničná stanica –",
-"sk"
-],
-[
-"os. Meksyk",
-"pl"
-]
-]
-},
-"Cisowa SKM": {
-"en": [
-[
-"Cisowa SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Cisowa",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Cisowa",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Cisowa",
-"pl"
-]
-]
-},
-"Czerwonak/Os. Przylesie PKM": {
-"en": [
-[
-"Czerwonak/Os. Przylesie PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Czerwonak/Os. Przylesie",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Czerwonak/Os. Przylesie",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Czerwonak/Os. Przylesie",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Czerwonak/PKM": {
-"en": [
-[
-"Czerwonak PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Czerwonak",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Czerwonak",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Czerwonak",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Czyżyny Dworzec": {
-"en": [
-[
-"Czyżyny",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Czyżyny",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Czyżyny",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Czyżyny",
-"pl"
-],
-[
-"stanica",
-"sk"
-]
-]
-},
-"Dopiewo/Dworzec Kolejowy": {
-"en": [
-[
-"Dopiewo",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Dopiewo",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Dopiewo",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Dopiewo",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Dworzec Autobusowy": {
-"en": [
-[
-"Bus Station",
-"en"
-]
-],
-"de": [
-[
-"Busbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Autobusové nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Autobusová stanica",
-"sk"
-]
-]
-},
-"Dworzec Główny": {
-"en": [
-[
-"Main Station",
-"en"
-]
-],
-"de": [
-[
-"Hauptbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Hlavní nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Hlavná stanica",
-"sk"
-]
-]
-},
-"Dworzec Główny Tunel": {
-"en": [
-[
-"Main Station Tunnel",
-"en"
-]
-],
-"de": [
-[
-"Hauptbahnhof Tunnel",
-"de"
-]
-],
-"cs": [
-[
-"Hlavní nádraží tunel",
-"cs"
-]
-],
-"sk": [
-[
-"Hlavná stanica tunel",
-"sk"
-]
-]
-},
-"Dworzec Główny Wschód": {
-"en": [
-[
-"Main Station East",
-"en"
-]
-],
-"de": [
-[
-"Hauptbahnhof Ost",
-"de"
-]
-],
-"cs": [
-[
-"Hlavní nádraží východ",
-"cs"
-]
-],
-"sk": [
-[
-"Hlavná stanica východ",
-"sk"
-]
-]
-},
-"Dworzec Główny Zachód": {
-"en": [
-[
-"Main Station West",
-"en"
-]
-],
-"de": [
-[
-"Hauptbahnhof West",
-"de"
-]
-],
-"cs": [
-[
-"Hlavní nádraží západ",
-"cs"
-]
-],
-"sk": [
-[
-"Hlavná stanica západ",
-"sk"
-]
-]
-},
-"Dworzec Morski - Muzeum Emigracji": {
-"en": [
-[
-"Maritime Station – Emigration Museum",
-"en"
-]
-],
-"de": [
-[
-"Seebahnhof – Emigrationsmuseum",
-"de"
-]
-],
-"cs": [
-[
-"Námořní nádraží –",
-"cs"
-],
-[
-"Muzeum",
-"pl"
-],
-[
-"emigrace",
-"cs"
-]
-],
-"sk": [
-[
-"Námorná stanica – Múzeum emigrácie",
-"sk"
-]
-]
-},
-"Dworzec PKS": {
-"en": [
-[
-"Bus Station",
-"en"
-]
-],
-"de": [
-[
-"Busbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Autobusové nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Autobusová stanica",
-"sk"
-]
-]
-},
-"Dworzec Zachodni": {
-"en": [
-[
-"West Station",
-"en"
-]
-],
-"de": [
-[
-"Westbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Západní nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Západná stanica",
-"sk"
-]
-]
-},
-"Dębiec PKM": {
-"en": [
-[
-"Dębiec PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Dębiec",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Dębiec",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Dębiec",
-"pl"
-]
-]
-},
-"Dębiec Tunel PKM": {
-"en": [
-[
-"Dębiec Tunel PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Dębiec Tunel",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Dębiec Tunel",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Dębiec Tunel",
-"pl"
-]
-]
-},
-"Elektrowozownia SKM": {
-"en": [
-[
-"Elektrowozownia SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Elektrowozownia",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Elektrowozownia",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Elektrowozownia",
-"pl"
-]
-]
-},
-"Firoga PKM": {
-"en": [
-[
-"Firoga PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Firoga",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Firoga",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Firoga",
-"pl"
-]
-]
-},
-"Garbary PKM": {
-"en": [
-[
-"Garbary PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Garbary",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Garbary",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Garbary",
-"pl"
-]
-]
-},
-"Gdańsk Politechnika": {
-"en": [
-[
-"Gdańsk",
-"pl"
-],
-[
-"University of Technology",
-"en"
-]
-],
-"de": [
-[
-"Technische Universität",
-"de"
-],
-[
-"Gdańsk",
-"pl"
-]
-],
-"cs": [
-[
-"Gdaňská technická univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Gdanská technická univerzita",
-"sk"
-]
-]
-},
-"Gdańsk Port Lotniczy": {
-"en": [
-[
-"Gdańsk",
-"pl"
-],
-[
-"Airport",
-"en"
-]
-],
-"de": [
-[
-"Flughafen",
-"de"
-],
-[
-"Gdańsk",
-"pl"
-]
-],
-"cs": [
-[
-"Letiště",
-"cs"
-],
-[
-"Gdańsk",
-"pl"
-]
-],
-"sk": [
-[
-"Letisko",
-"sk"
-],
-[
-"Gdańsk",
-"pl"
-]
-]
-},
-"Gdynia Dworzec Gł. PKP": {
-"en": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Main Station",
-"en"
-]
-],
-"de": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Hauptbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavní nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavná stanica",
-"sk"
-]
-]
-},
-"Gdynia Dworzec Gł. PKP - Dworcowa": {
-"en": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Main Station –",
-"en"
-],
-[
-"Dworcowa",
-"pl"
-]
-],
-"de": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Hauptbahnhof –",
-"de"
-],
-[
-"Dworcowa",
-"pl"
-]
-],
-"cs": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavní nádraží –",
-"cs"
-],
-[
-"Dworcowa",
-"pl"
-]
-],
-"sk": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavná stanica –",
-"sk"
-],
-[
-"Dworcowa",
-"pl"
-]
-]
-},
-"Gdynia Dworzec Gł. PKP - Hala": {
-"en": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Main Station –",
-"en"
-],
-[
-"Hala",
-"pl"
-]
-],
-"de": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Hauptbahnhof –",
-"de"
-],
-[
-"Hala",
-"pl"
-]
-],
-"cs": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavní nádraží –",
-"cs"
-],
-[
-"Hala",
-"pl"
-]
-],
-"sk": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavná stanica –",
-"sk"
-],
-[
-"Hala",
-"pl"
-]
-]
-},
-"Gdynia Dworzec Gł. PKP - Morska": {
-"en": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Main Station –",
-"en"
-],
-[
-"Morska",
-"pl"
-]
-],
-"de": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Hauptbahnhof –",
-"de"
-],
-[
-"Morska",
-"pl"
-]
-],
-"cs": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavní nádraží –",
-"cs"
-],
-[
-"Morska",
-"pl"
-]
-],
-"sk": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavná stanica –",
-"sk"
-],
-[
-"Morska",
-"pl"
-]
-]
-},
-"Gdynia Dworzec Gł. PKP - Wolności": {
-"en": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Main Station –",
-"en"
-],
-[
-"Wolności",
-"pl"
-]
-],
-"de": [
-[
-"Gdynia",
-"pl"
-],
-[
-"Hauptbahnhof –",
-"de"
-],
-[
-"Wolności",
-"pl"
-]
-],
-"cs": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavní nádraží –",
-"cs"
-],
-[
-"Wolności",
-"pl"
-]
-],
-"sk": [
-[
-"Gdynia",
-"pl"
-],
-[
-"hlavná stanica –",
-"sk"
-],
-[
-"Wolności",
-"pl"
-]
-]
-},
-"Golęczewo/PKM": {
-"en": [
-[
-"Golęczewo PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Golęczewo",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Golęczewo",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Golęczewo",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Gościcino PKP": {
-"en": [
-[
-"Gościcino",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Gościcino",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Gościcino",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Gościcino",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Gościcino PKP - Fabryczna": {
-"en": [
-[
-"Gościcino",
-"pl"
-],
-[
-"railway station –",
-"en"
-],
-[
-"Fabryczna",
-"pl"
-]
-],
-"de": [
-[
-"Gościcino",
-"pl"
-],
-[
-"Bahnhof –",
-"de"
-],
-[
-"Fabryczna",
-"pl"
-]
-],
-"cs": [
-[
-"Gościcino",
-"pl"
-],
-[
-"nádraží –",
-"cs"
-],
-[
-"Fabryczna",
-"pl"
-]
-],
-"sk": [
-[
-"Gościcino",
-"pl"
-],
-[
-"železničná stanica –",
-"sk"
-],
-[
-"Fabryczna",
-"pl"
-]
-]
-},
-"Grabówek SKM": {
-"en": [
-[
-"Grabówek SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Grabówek",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Grabówek",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Grabówek",
-"pl"
-]
-]
-},
-"Górczyn PKM": {
-"en": [
-[
-"Górczyn PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Górczyn",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Górczyn",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Górczyn",
-"pl"
-]
-]
-},
-"Gądki/PKM": {
-"en": [
-[
-"Gądki PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Gądki",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Gądki",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Gądki",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Janowo SKM - Sobieskiego": {
-"en": [
-[
-"Janowo SKM",
-"pl"
-],
-[
-"station –",
-"en"
-],
-[
-"Sobieskiego",
-"pl"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Janowo – Sobieskiego",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Janowo – Sobieskiego",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Janowo – Sobieskiego",
-"pl"
-]
-]
-},
-"Jasień PKM": {
-"en": [
-[
-"Jasień PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Jasień",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Jasień",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Jasień",
-"pl"
-]
-]
-},
-"Jaśkowice PKP": {
-"en": [
-[
-"Jaśkowice",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Jaśkowice",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Jaśkowice",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Jaśkowice",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Junikowo PKM": {
-"en": [
-[
-"Junikowo PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Junikowo",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Junikowo",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Junikowo",
-"pl"
-]
-]
-},
-"Kamienny Potok SKM": {
-"en": [
-[
-"Kamienny Potok SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Kamienny Potok",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Kamienny Potok",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Kamienny Potok",
-"pl"
-]
-]
-},
-"Kamienny Potok SKM - Niepodległości": {
-"en": [
-[
-"Kamienny Potok SKM",
-"pl"
-],
-[
-"station –",
-"en"
-],
-[
-"Niepodległości",
-"pl"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Kamienny Potok – Niepodległości",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Kamienny Potok – Niepodległości",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Kamienny Potok – Niepodległości",
-"pl"
-]
-]
-},
-"Karolin PKM": {
-"en": [
-[
-"Karolin PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Karolin",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Karolin",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Karolin",
-"pl"
-]
-]
-},
-"Karwiny PKM": {
-"en": [
-[
-"Karwiny PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Karwiny",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Karwiny",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Karwiny",
-"pl"
-]
-]
-},
-"Kiekrz PKM": {
-"en": [
-[
-"Kiekrz PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Kiekrz",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Kiekrz",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Kiekrz",
-"pl"
-]
-]
-},
-"Kiełpinek PKM": {
-"en": [
-[
-"Kiełpinek PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Kiełpinek",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Kiełpinek",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Kiełpinek",
-"pl"
-]
-]
-},
-"Kokoszki PKP": {
-"en": [
-[
-"Kokoszki",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Kokoszki",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Kokoszki",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Kokoszki",
-"pl"
-]
-]
-},
-"Kraków Airport": {
-"en": [
-[
-"Kraków Airport",
-"pl"
-]
-],
-"de": [
-[
-"Flughafen",
-"de"
-],
-[
-"Kraków",
-"pl"
-]
-],
-"cs": [
-[
-"Letiště Krakov",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko Krakov",
-"sk"
-]
-]
-},
-"Kraków Lotnisko": {
-"en": [
-[
-"Kraków",
-"pl"
-],
-[
-"Airport",
-"en"
-]
-],
-"de": [
-[
-"Flughafen",
-"de"
-],
-[
-"Kraków",
-"pl"
-]
-],
-"cs": [
-[
-"Letiště Krakov",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko Krakov",
-"sk"
-]
-]
-},
-"Krynica-Zdrój Dworzec PKP": {
-"en": [
-[
-"Krynica-Zdrój",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Krynica-Zdrój",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Krynica-Zdrój",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Krynica-Zdrój",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Leszczynki SKM": {
-"en": [
-[
-"Leszczynki SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Leszczynki",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Leszczynki",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Leszczynki",
-"pl"
-]
-]
-},
-"Lotnisko": {
-"en": [
-[
-"Airport",
-"en"
-]
-],
-"de": [
-[
-"Flughafen",
-"de"
-]
-],
-"cs": [
-[
-"Letiště",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko",
-"sk"
-]
-]
-},
-"Lotnisko Chopina - Odloty": {
-"en": [
-[
-"Chopin Airport – Departures",
-"en"
-]
-],
-"de": [
-[
-"Flughafen Chopin – Abflug",
-"de"
-]
-],
-"cs": [
-[
-"Letiště",
-"cs"
-],
-[
-"Chopina –",
-"pl"
-],
-[
-"odlety",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko",
-"sk"
-],
-[
-"Chopina –",
-"pl"
-],
-[
-"odlety",
-"sk"
-]
-]
-},
-"Lotnisko Chopina - Przyloty": {
-"en": [
-[
-"Chopin Airport – Arrivals",
-"en"
-]
-],
-"de": [
-[
-"Flughafen Chopin – Ankunft",
-"de"
-]
-],
-"cs": [
-[
-"Letiště",
-"cs"
-],
-[
-"Chopina –",
-"pl"
-],
-[
-"přílety",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko",
-"sk"
-],
-[
-"Chopina –",
-"pl"
-],
-[
-"prílety",
-"sk"
-]
-]
-},
-"Luboń/PKM": {
-"en": [
-[
-"Luboń PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Luboń",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Luboń",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Luboń",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"M. Goślina/PKM": {
-"en": [
-[
-"M. Goślina PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"M. Goślina",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"M. Goślina",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"M. Goślina",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Matarnia PKM": {
-"en": [
-[
-"Matarnia PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Matarnia",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Matarnia",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Matarnia",
-"pl"
-]
-]
-},
-"Milik PKP": {
-"en": [
-[
-"Milik",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Milik",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Milik",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Milik",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Mosina/Dworzec Kolejowy": {
-"en": [
-[
-"Mosina",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Mosina",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Mosina",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Mosina",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Muszyna PKP": {
-"en": [
-[
-"Muszyna",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Muszyna",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Muszyna",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Muszyna",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Muzeum Westerplatte – Terminal Promowy": {
-"en": [
-[
-"Westerplatte",
-"pl"
-],
-[
-"Museum – Ferry",
-"en"
-],
-[
-"Terminal",
-"pl"
-]
-],
-"de": [
-[
-"Westerplatte-Museum – Fährterminal",
-"de"
-]
-],
-"cs": [
-[
-"Muzeum Westerplatte –",
-"pl"
-],
-[
-"trajektový terminál",
-"cs"
-]
-],
-"sk": [
-[
-"Múzeum",
-"sk"
-],
-[
-"Westerplatte –",
-"pl"
-],
-[
-"trajektový terminál",
-"sk"
-]
-]
-},
-"Niedźwiednik PKM": {
-"en": [
-[
-"Niedźwiednik PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Niedźwiednik",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Niedźwiednik",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Niedźwiednik",
-"pl"
-]
-]
-},
-"Niedźwiedź PKP": {
-"en": [
-[
-"Niedźwiedź",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Niedźwiedź",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Niedźwiedź",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Niedźwiedź",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Niepołomice Dworzec": {
-"en": [
-[
-"Niepołomice",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Niepołomice",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Niepołomice",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Niepołomice",
-"pl"
-],
-[
-"stanica",
-"sk"
-]
-]
-},
-"Nowy Sącz Dworzec Autobusowy": {
-"en": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"Bus Station",
-"en"
-]
-],
-"de": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"Busbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"autobusové nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"autobusová stanica",
-"sk"
-]
-]
-},
-"Nowy Sącz Dworzec PKP": {
-"en": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Nowy Sącz",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Oliwa PKP": {
-"en": [
-[
-"Oliwa",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Oliwa",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Oliwa",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Oliwa",
-"pl"
-]
-]
-},
-"Orłowo SKM - \"Klif\"": {
-"en": [
-[
-"Orłowo SKM",
-"pl"
-],
-[
-"station –",
-"en"
-],
-[
-"Klif",
-"pl"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Orłowo – Klif",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Orłowo – Klif",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Orłowo – Klif",
-"pl"
-]
-]
-},
-"Orłowo SKM - Orłowska": {
-"en": [
-[
-"Orłowo SKM",
-"pl"
-],
-[
-"station –",
-"en"
-],
-[
-"Orłowska",
-"pl"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Orłowo – Orłowska",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Orłowo – Orłowska",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Orłowo – Orłowska",
-"pl"
-]
-]
-},
-"Osowa PKP": {
-"en": [
-[
-"Osowa",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Osowa",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Osowa",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Osowa",
-"pl"
-]
-]
-},
-"Owińska/PKM": {
-"en": [
-[
-"Owińska PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Owińska",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Owińska",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Owińska",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"PKP Anin": {
-"en": [
-[
-"Anin",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Anin",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Anin",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Anin",
-"pl"
-]
-]
-},
-"PKP Dawidy": {
-"en": [
-[
-"Dawidy",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Dawidy",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Dawidy",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Dawidy",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Dąbkowizna": {
-"en": [
-[
-"Dąbkowizna",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Dąbkowizna",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Dąbkowizna",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Dąbkowizna",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Falenica": {
-"en": [
-[
-"Falenica",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Falenica",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Falenica",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Falenica",
-"pl"
-]
-]
-},
-"PKP Falenica (Bystrzycka)": {
-"en": [
-[
-"Falenica (Bystrzycka)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Falenica (Bystrzycka)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Falenica (Bystrzycka)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Falenica (Bystrzycka)",
-"pl"
-]
-]
-},
-"PKP Gocławek": {
-"en": [
-[
-"Gocławek",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Gocławek",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Gocławek",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Gocławek",
-"pl"
-]
-]
-},
-"PKP Gołąbki": {
-"en": [
-[
-"Gołąbki",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Gołąbki",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Gołąbki",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Gołąbki",
-"pl"
-]
-]
-},
-"PKP Halinów": {
-"en": [
-[
-"Halinów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Halinów",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Halinów",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Halinów",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Jeziorki": {
-"en": [
-[
-"Jeziorki",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Jeziorki",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Jeziorki",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Jeziorki",
-"pl"
-]
-]
-},
-"PKP Józefów": {
-"en": [
-[
-"Józefów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Józefów",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Józefów",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Józefów",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Kobyłka": {
-"en": [
-[
-"Kobyłka",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Kobyłka",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Kobyłka",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Kobyłka",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Kobyłka Ossów": {
-"en": [
-[
-"Kobyłka Ossów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Kobyłka Ossów",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Kobyłka Ossów",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Kobyłka Ossów",
-"pl"
-]
-]
-},
-"PKP Koło": {
-"en": [
-[
-"Koło",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Koło",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Koło",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Koło",
-"pl"
-]
-]
-},
-"PKP Legionowo": {
-"en": [
-[
-"Legionowo",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Legionowo",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Legionowo",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Legionowo",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Legionowo Piaski": {
-"en": [
-[
-"Legionowo Piaski",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Legionowo Piaski",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Legionowo Piaski",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Legionowo Piaski",
-"pl"
-]
-]
-},
-"PKP Legionowo Przystanek": {
-"en": [
-[
-"Legionowo Przystanek",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Legionowo Przystanek",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Legionowo Przystanek",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Legionowo Przystanek",
-"pl"
-]
-]
-},
-"PKP Michalin": {
-"en": [
-[
-"Michalin",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Michalin",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Michalin",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Michalin",
-"pl"
-]
-]
-},
-"PKP Michałów-Reginów": {
-"en": [
-[
-"Michałów-Reginów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Michałów-Reginów",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Michałów-Reginów",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Michałów-Reginów",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Miedzeszyn": {
-"en": [
-[
-"Miedzeszyn",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Miedzeszyn",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Miedzeszyn",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Miedzeszyn",
-"pl"
-]
-]
-},
-"PKP Międzylesie": {
-"en": [
-[
-"Międzylesie",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Międzylesie",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Międzylesie",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Międzylesie",
-"pl"
-]
-]
-},
-"PKP Mokry Ług": {
-"en": [
-[
-"Mokry Ług",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Mokry Ług",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Mokry Ług",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Mokry Ług",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Nieporęt": {
-"en": [
-[
-"Nieporęt",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Nieporęt",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Nieporęt",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Nieporęt",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Nowa Iwiczna": {
-"en": [
-[
-"Nowa Iwiczna",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Nowa Iwiczna",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Nowa Iwiczna",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Nowa Iwiczna",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Nowy Dwór Mazowiecki": {
-"en": [
-[
-"Nowy Dwór Mazowiecki",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Nowy Dwór Mazowiecki",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Nowy Dwór Mazowiecki",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Nowy Dwór Mazowiecki",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Okęcie": {
-"en": [
-[
-"Okęcie",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Okęcie",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Okęcie",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Okęcie",
-"pl"
-]
-]
-},
-"PKP Olszynka Grochowska": {
-"en": [
-[
-"Olszynka Grochowska",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Olszynka Grochowska",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Olszynka Grochowska",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Olszynka Grochowska",
-"pl"
-]
-]
-},
-"PKP Piaseczno": {
-"en": [
-[
-"Piaseczno",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Piaseczno",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Piaseczno",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Piaseczno",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Powiśle": {
-"en": [
-[
-"Powiśle",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Powiśle",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Powiśle",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Powiśle",
-"pl"
-]
-]
-},
-"PKP Powązki": {
-"en": [
-[
-"Powązki",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Powązki",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Powązki",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Powązki",
-"pl"
-]
-]
-},
-"PKP Płudy": {
-"en": [
-[
-"Płudy",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Płudy",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Płudy",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Płudy",
-"pl"
-]
-]
-},
-"PKP Radość": {
-"en": [
-[
-"Radość",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Radość",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Radość",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Radość",
-"pl"
-]
-]
-},
-"PKP Radość (Izbicka)": {
-"en": [
-[
-"Radość (Izbicka)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Radość (Izbicka)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Radość (Izbicka)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Radość (Izbicka)",
-"pl"
-]
-]
-},
-"PKP Rakowiec": {
-"en": [
-[
-"Rakowiec",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Rakowiec",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Rakowiec",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Rakowiec",
-"pl"
-]
-]
-},
-"PKP Rembertów": {
-"en": [
-[
-"Rembertów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Rembertów",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Rembertów",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Rembertów",
-"pl"
-]
-]
-},
-"PKP Rembertów (Strażacka)": {
-"en": [
-[
-"Rembertów (Strażacka)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Rembertów (Strażacka)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Rembertów (Strażacka)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Rembertów (Strażacka)",
-"pl"
-]
-]
-},
-"PKP Służewiec": {
-"en": [
-[
-"Służewiec",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Służewiec",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Służewiec",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Służewiec",
-"pl"
-]
-]
-},
-"PKP Targówek": {
-"en": [
-[
-"Targówek",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Targówek",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Targówek",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Targówek",
-"pl"
-]
-]
-},
-"PKP Toruńska": {
-"en": [
-[
-"Toruńska",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Toruńska",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Toruńska",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Toruńska",
-"pl"
-]
-]
-},
-"PKP Ursus": {
-"en": [
-[
-"Ursus",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Ursus",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Ursus",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Ursus",
-"pl"
-]
-]
-},
-"PKP Ursus Płn.": {
-"en": [
-[
-"Ursus Płn.",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Ursus Płn.",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Ursus Płn.",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Ursus Płn.",
-"pl"
-]
-]
-},
-"PKP Ursus-Niedźwiadek": {
-"en": [
-[
-"Ursus-Niedźwiadek",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Ursus-Niedźwiadek",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Ursus-Niedźwiadek",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Ursus-Niedźwiadek",
-"pl"
-]
-]
-},
-"PKP Wawer": {
-"en": [
-[
-"Wawer",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wawer",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wawer",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wawer",
-"pl"
-]
-]
-},
-"PKP Wesoła": {
-"en": [
-[
-"Wesoła",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wesoła",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wesoła",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wesoła",
-"pl"
-]
-]
-},
-"PKP Wola (Kasprzaka)": {
-"en": [
-[
-"Wola (Kasprzaka)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wola (Kasprzaka)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wola (Kasprzaka)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wola (Kasprzaka)",
-"pl"
-]
-]
-},
-"PKP Wola (Wolska)": {
-"en": [
-[
-"Wola (Wolska)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wola (Wolska)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wola (Wolska)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wola (Wolska)",
-"pl"
-]
-]
-},
-"PKP Wołomin": {
-"en": [
-[
-"Wołomin",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Wołomin",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Wołomin",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Wołomin",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Wołomin (Laskowa)": {
-"en": [
-[
-"Wołomin (Laskowa)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wołomin (Laskowa)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wołomin (Laskowa)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wołomin (Laskowa)",
-"pl"
-]
-]
-},
-"PKP Wołomin Słoneczna": {
-"en": [
-[
-"Wołomin Słoneczna",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wołomin Słoneczna",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wołomin Słoneczna",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wołomin Słoneczna",
-"pl"
-]
-]
-},
-"PKP Włochy": {
-"en": [
-[
-"Włochy",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Włochy",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Włochy",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Włochy",
-"pl"
-]
-]
-},
-"PKP Zacisze-Wilno": {
-"en": [
-[
-"Zacisze-Wilno",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Zacisze-Wilno",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Zacisze-Wilno",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Zacisze-Wilno",
-"pl"
-]
-]
-},
-"PKP Zagościniec": {
-"en": [
-[
-"Zagościniec",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Zagościniec",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Zagościniec",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Zagościniec",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Zalesie Górne": {
-"en": [
-[
-"Zalesie Górne",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Zalesie Górne",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Zalesie Górne",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Zalesie Górne",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Zielonka": {
-"en": [
-[
-"Zielonka",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Zielonka",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Zielonka",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Zielonka",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"PKP Zielonka (Zosinek)": {
-"en": [
-[
-"Zielonka (Zosinek)",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Zielonka (Zosinek)",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Zielonka (Zosinek)",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Zielonka (Zosinek)",
-"pl"
-]
-]
-},
-"PKP Zielonka Bankowa": {
-"en": [
-[
-"Zielonka Bankowa",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Zielonka Bankowa",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Zielonka Bankowa",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Zielonka Bankowa",
-"pl"
-]
-]
-},
-"PKP Żerań": {
-"en": [
-[
-"Żerań",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Żerań",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Żerań",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Żerań",
-"pl"
-]
-]
-},
-"PKP Żwirki i Wigury": {
-"en": [
-[
-"Żwirki i Wigury",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Żwirki i Wigury",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Żwirki i Wigury",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Żwirki i Wigury",
-"pl"
-]
-]
-},
-"Paczkowo/PKM": {
-"en": [
-[
-"Paczkowo PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Paczkowo",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Paczkowo",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Paczkowo",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Palędzie/Dworzec Kolejowy": {
-"en": [
-[
-"Palędzie",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Palędzie",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Palędzie",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Palędzie",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Politechnika": {
-"en": [
-[
-"University of Technology",
-"en"
-]
-],
-"de": [
-[
-"Technische Universität",
-"de"
-]
-],
-"cs": [
-[
-"Technická univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Technická univerzita",
-"sk"
-]
-]
-},
-"Politechnika SKM": {
-"en": [
-[
-"Politechnika SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Politechnika",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Politechnika",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"SKM",
-"pl"
-]
-],
-"sk": [
-[
-"Politechnika",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"SKM",
-"pl"
-]
-]
-},
-"Port Lotniczy": {
-"en": [
-[
-"Airport",
-"en"
-]
-],
-"de": [
-[
-"Flughafen",
-"de"
-]
-],
-"cs": [
-[
-"Letiště",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko",
-"sk"
-]
-]
-},
-"Port Lotniczy Ławica": {
-"en": [
-[
-"Ławica",
-"pl"
-],
-[
-"Airport",
-"en"
-]
-],
-"de": [
-[
-"Flughafen",
-"de"
-],
-[
-"Ławica",
-"pl"
-]
-],
-"cs": [
-[
-"Letiště",
-"cs"
-],
-[
-"Ławica",
-"pl"
-]
-],
-"sk": [
-[
-"Letisko",
-"sk"
-],
-[
-"Ławica",
-"pl"
-]
-]
-},
-"Powroźnik PKP": {
-"en": [
-[
-"Powroźnik",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Powroźnik",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Powroźnik",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Powroźnik",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Pruszcz Gdański Pruszcz Gdański Dworzec": {
-"en": [
-[
-"Pruszcz Gdański Pruszcz Gdański",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Pruszcz Gdański Pruszcz Gdański",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Pruszcz Gdański Pruszcz Gdański",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Pruszcz Gdański Pruszcz Gdański",
-"pl"
-],
-[
-"stanica",
-"sk"
-]
-]
-},
-"Pruszków WKD": {
-"en": [
-[
-"Pruszków WKD",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Pruszków",
-"pl"
-],
-[
-"WKD-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Pruszków",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"WKD",
-"pl"
-]
-],
-"sk": [
-[
-"Pruszków",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"WKD",
-"pl"
-]
-]
-},
-"Przymorze SKM": {
-"en": [
-[
-"Przymorze SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Przymorze",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Przymorze",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Przymorze",
-"pl"
-]
-]
-},
-"Przystań Żeglugi": {
-"en": [
-[
-"Ferry Pier",
-"en"
-]
-],
-"de": [
-[
-"Schiffsanleger",
-"de"
-]
-],
-"cs": [
-[
-"Přístaviště lodní dopravy",
-"cs"
-]
-],
-"sk": [
-[
-"Prístavisko lodnej dopravy",
-"sk"
-]
-]
-},
-"Publiczny Terminal Promowy": {
-"en": [
-[
-"Public Ferry",
-"en"
-],
-[
-"Terminal",
-"pl"
-]
-],
-"de": [
-[
-"Öffentliches Fährterminal",
-"de"
-]
-],
-"cs": [
-[
-"Veřejný trajektový terminál",
-"cs"
-]
-],
-"sk": [
-[
-"Verejný trajektový terminál",
-"sk"
-]
-]
-},
-"Puszczykowo/PKM": {
-"en": [
-[
-"Puszczykowo PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Puszczykowo",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Puszczykowo",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Puszczykowo",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Puszczykowo/Puszczykówko PKM": {
-"en": [
-[
-"Puszczykowo/Puszczykówko PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Puszczykowo/Puszczykówko",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Puszczykowo/Puszczykówko",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Puszczykowo/Puszczykówko",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Radziszów PKP": {
-"en": [
-[
-"Radziszów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Radziszów",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Radziszów",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Radziszów",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Reda Dworzec PKP": {
-"en": [
-[
-"Reda",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Reda",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Reda",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Reda",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Redłowo SKM": {
-"en": [
-[
-"Redłowo SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Redłowo",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Redłowo",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Redłowo",
-"pl"
-]
-]
-},
-"Redłowo SKM - Park Technologiczny": {
-"en": [
-[
-"Redłowo SKM",
-"pl"
-],
-[
-"station –",
-"en"
-],
-[
-"Park Technologiczny",
-"pl"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Redłowo – Park Technologiczny",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Redłowo – Park Technologiczny",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Redłowo – Park Technologiczny",
-"pl"
-]
-]
-},
-"Rosnówko/PKM": {
-"en": [
-[
-"Rosnówko PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Rosnówko",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Rosnówko",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Rosnówko",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Rudawa PKP": {
-"en": [
-[
-"Rudawa",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Rudawa",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Rudawa",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Rudawa",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Rumia Dworzec PKP": {
-"en": [
-[
-"Rumia",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Rumia",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Rumia",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Rumia",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Rębiechowo Rębiechowo PKP": {
-"en": [
-[
-"Rębiechowo Rębiechowo",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Rębiechowo Rębiechowo",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Rębiechowo Rębiechowo",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Rębiechowo Rębiechowo",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Sopot PKP": {
-"en": [
-[
-"Sopot",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Sopot",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Sopot",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Sopot",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Sopot PKP - Marynarzy": {
-"en": [
-[
-"Sopot",
-"pl"
-],
-[
-"railway station –",
-"en"
-],
-[
-"Marynarzy",
-"pl"
-]
-],
-"de": [
-[
-"Sopot",
-"pl"
-],
-[
-"Bahnhof –",
-"de"
-],
-[
-"Marynarzy",
-"pl"
-]
-],
-"cs": [
-[
-"Sopot",
-"pl"
-],
-[
-"nádraží –",
-"cs"
-],
-[
-"Marynarzy",
-"pl"
-]
-],
-"sk": [
-[
-"Sopot",
-"pl"
-],
-[
-"železničná stanica –",
-"sk"
-],
-[
-"Marynarzy",
-"pl"
-]
-]
-},
-"Sopot PKP - Niepodległości": {
-"en": [
-[
-"Sopot",
-"pl"
-],
-[
-"railway station –",
-"en"
-],
-[
-"Niepodległości",
-"pl"
-]
-],
-"de": [
-[
-"Sopot",
-"pl"
-],
-[
-"Bahnhof –",
-"de"
-],
-[
-"Niepodległości",
-"pl"
-]
-],
-"cs": [
-[
-"Sopot",
-"pl"
-],
-[
-"nádraží –",
-"cs"
-],
-[
-"Niepodległości",
-"pl"
-]
-],
-"sk": [
-[
-"Sopot",
-"pl"
-],
-[
-"železničná stanica –",
-"sk"
-],
-[
-"Niepodległości",
-"pl"
-]
-]
-},
-"Stadion Miejski": {
-"en": [
-[
-"Municipal Stadium",
-"en"
-]
-],
-"de": [
-[
-"Städtisches",
-"de"
-],
-[
-"Stadion",
-"pl"
-]
-],
-"cs": [
-[
-"Městský stadion",
-"cs"
-]
-],
-"sk": [
-[
-"Mestský štadión",
-"sk"
-]
-]
-},
-"Stadion Narodowy": {
-"en": [
-[
-"National Stadium",
-"en"
-]
-],
-"de": [
-[
-"Nationalstadion",
-"de"
-]
-],
-"cs": [
-[
-"Národní stadion",
-"cs"
-]
-],
-"sk": [
-[
-"Národný štadión",
-"sk"
-]
-]
-},
-"Stadion PKM": {
-"en": [
-[
-"Stadion PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Stadion",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Stadion",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Stadion",
-"pl"
-]
-]
-},
-"Stare Zoo": {
-"en": [
-[
-"Old Zoo",
-"en"
-]
-],
-"de": [
-[
-"Alter Zoo",
-"de"
-]
-],
-"cs": [
-[
-"Stará zoo",
-"cs"
-]
-],
-"sk": [
-[
-"Stará zoo",
-"sk"
-]
-]
-},
-"Starołęka PKM": {
-"en": [
-[
-"Starołęka PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Starołęka",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Starołęka",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Starołęka",
-"pl"
-]
-]
-},
-"Stocznia SKM": {
-"en": [
-[
-"Stocznia SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Stocznia",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Stocznia",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Stocznia",
-"pl"
-]
-]
-},
-"Stocznia SKM - Morska": {
-"en": [
-[
-"Stocznia SKM",
-"pl"
-],
-[
-"station –",
-"en"
-],
-[
-"Morska",
-"pl"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Stocznia – Morska",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Stocznia – Morska",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Stocznia – Morska",
-"pl"
-]
-]
-},
-"Stryków Dworzec PKP": {
-"en": [
-[
-"Stryków",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Stryków",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Stryków",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Stryków",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Strzeszyn PKM": {
-"en": [
-[
-"Strzeszyn PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Strzeszyn",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Strzeszyn",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Strzeszyn",
-"pl"
-]
-]
-},
-"Strzyża PKM": {
-"en": [
-[
-"Strzyża PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Strzyża",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"PKM Strzyża",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"PKM Strzyża",
-"pl"
-]
-]
-},
-"Sucharskiego - PKP": {
-"en": [
-[
-"Sucharskiego -",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Sucharskiego -",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Sucharskiego -",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Sucharskiego -",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Swarzędz/Dworzec Kolejowy": {
-"en": [
-[
-"Swarzędz",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Swarzędz",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Swarzędz",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Swarzędz",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Szczodrzykowo/Kórnik PKM": {
-"en": [
-[
-"Szczodrzykowo/Kórnik PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Szczodrzykowo/Kórnik",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Szczodrzykowo/Kórnik",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Szczodrzykowo/Kórnik",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Szpital Marynarki Wojennej": {
-"en": [
-[
-"Naval Hospital",
-"en"
-]
-],
-"de": [
-[
-"Marinekrankenhaus",
-"de"
-]
-],
-"cs": [
-[
-"Námořní nemocnice",
-"cs"
-]
-],
-"sk": [
-[
-"Námorná nemocnica",
-"sk"
-]
-]
-},
-"Szpital Okulistyczny": {
-"en": [
-[
-"Eye Hospital",
-"en"
-]
-],
-"de": [
-[
-"Augenklinik",
-"de"
-]
-],
-"cs": [
-[
-"Oční nemocnice",
-"cs"
-]
-],
-"sk": [
-[
-"Očná nemocnica",
-"sk"
-]
-]
-},
-"Szpital Zakaźny": {
-"en": [
-[
-"Infectious Diseases Hospital",
-"en"
-]
-],
-"de": [
-[
-"Infektionskrankenhaus",
-"de"
-]
-],
-"cs": [
-[
-"Infekční nemocnice",
-"cs"
-]
-],
-"sk": [
-[
-"Infekčná nemocnica",
-"sk"
-]
-]
-},
-"Terminal - Cargo": {
-"en": [
-[
-"Cargo Terminal",
-"pl"
-]
-],
-"de": [
-[
-"Frachtterminal",
-"de"
-]
-],
-"cs": [
-[
-"Nákladní terminál",
-"cs"
-]
-],
-"sk": [
-[
-"Nákladný terminál",
-"sk"
-]
-]
-},
-"Terminal Autokarowy": {
-"en": [
-[
-"Coach",
-"en"
-],
-[
-"Terminal",
-"pl"
-]
-],
-"de": [
-[
-"Fernbusterminal",
-"de"
-]
-],
-"cs": [
-[
-"Autobusový terminál",
-"cs"
-]
-],
-"sk": [
-[
-"Autobusový terminál",
-"sk"
-]
-]
-},
-"Terminal Cargo": {
-"en": [
-[
-"Cargo Terminal",
-"pl"
-]
-],
-"de": [
-[
-"Frachtterminal",
-"de"
-]
-],
-"cs": [
-[
-"Nákladní terminál",
-"cs"
-]
-],
-"sk": [
-[
-"Nákladný terminál",
-"sk"
-]
-]
-},
-"Terminal Kontenerowy": {
-"en": [
-[
-"Container",
-"en"
-],
-[
-"Terminal",
-"pl"
-]
-],
-"de": [
-[
-"Containerterminal",
-"de"
-]
-],
-"cs": [
-[
-"Kontejnerový terminál",
-"cs"
-]
-],
-"sk": [
-[
-"Kontajnerový terminál",
-"sk"
-]
-]
-},
-"Uniwersytet": {
-"en": [
-[
-"University",
-"en"
-]
-],
-"de": [
-[
-"Universität",
-"de"
-]
-],
-"cs": [
-[
-"Univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Univerzita",
-"sk"
-]
-]
-},
-"Uniwersytet Ekonomiczny": {
-"en": [
-[
-"University of Economics",
-"en"
-]
-],
-"de": [
-[
-"Wirtschaftsuniversität",
-"de"
-]
-],
-"cs": [
-[
-"Ekonomická univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Ekonomická univerzita",
-"sk"
-]
-]
-},
-"Uniwersytet Gdański": {
-"en": [
-[
-"University of Gdańsk",
-"en"
-]
-],
-"de": [
-[
-"Universität Gdańsk",
-"de"
-]
-],
-"cs": [
-[
-"Gdaňská univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Gdanská univerzita",
-"sk"
-]
-]
-},
-"Uniwersytet Medyczny": {
-"en": [
-[
-"Medical University",
-"en"
-]
-],
-"de": [
-[
-"Medizinische Universität",
-"de"
-]
-],
-"cs": [
-[
-"Lékařská univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Lekárska univerzita",
-"sk"
-]
-]
-},
-"Uniwersytet Morski": {
-"en": [
-[
-"Maritime University",
-"en"
-]
-],
-"de": [
-[
-"Maritime Universität",
-"de"
-]
-],
-"cs": [
-[
-"Námořní univerzita",
-"cs"
-]
-],
-"sk": [
-[
-"Námorná univerzita",
-"sk"
-]
-]
-},
-"Uniwersytet Przyrodniczy": {
-"en": [
-[
-"University of Life Sciences",
-"en"
-]
-],
-"de": [
-[
-"Universität für Naturwissenschaften",
-"de"
-]
-],
-"cs": [
-[
-"Univerzita přírodních věd",
-"cs"
-]
-],
-"sk": [
-[
-"Univerzita prírodných vied",
-"sk"
-]
-]
-},
-"WKD Opacz": {
-"en": [
-[
-"Opacz WKD",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"WKD-Bahnhof",
-"de"
-],
-[
-"Opacz",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"WKD Opacz",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"WKD Opacz",
-"pl"
-]
-]
-},
-"WKD Raków": {
-"en": [
-[
-"Raków WKD",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"WKD-Bahnhof",
-"de"
-],
-[
-"Raków",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"WKD Raków",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"WKD Raków",
-"pl"
-]
-]
-},
-"Warszawa Lotnisko Chopina": {
-"en": [
-[
-"Warsaw Chopin Airport",
-"en"
-]
-],
-"de": [
-[
-"Flughafen Warschau-Chopin",
-"de"
-]
-],
-"cs": [
-[
-"Letiště Varšava-Chopin",
-"cs"
-]
-],
-"sk": [
-[
-"Letisko Varšava-Chopin",
-"sk"
-]
-]
-},
-"Warszawa Ochota WKD": {
-"en": [
-[
-"Warszawa Ochota WKD",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"WKD-Bahnhof",
-"de"
-],
-[
-"Warszawa Ochota",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"WKD Warszawa Ochota",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"WKD Warszawa Ochota",
-"pl"
-]
-]
-},
-"Warszawa ZOO": {
-"en": [
-[
-"Warsaw Zoo",
-"en"
-]
-],
-"de": [
-[
-"Zoo Warschau",
-"de"
-]
-],
-"cs": [
-[
-"Zoo Varšava",
-"cs"
-]
-],
-"sk": [
-[
-"Zoo Varšava",
-"sk"
-]
-]
-},
-"Warszawa Zachodnia WKD": {
-"en": [
-[
-"Warszawa Zachodnia WKD",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"WKD-Bahnhof",
-"de"
-],
-[
-"Warszawa Zachodnia",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"WKD Warszawa Zachodnia",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"WKD Warszawa Zachodnia",
-"pl"
-]
-]
-},
-"Warszawa Zoo": {
-"en": [
-[
-"Warsaw Zoo",
-"en"
-]
-],
-"de": [
-[
-"Zoo Warschau",
-"de"
-]
-],
-"cs": [
-[
-"Zoo Varšava",
-"cs"
-]
-],
-"sk": [
-[
-"Zoo Varšava",
-"sk"
-]
-]
-},
-"Warszawa Śródmieście WKD": {
-"en": [
-[
-"Warszawa Śródmieście WKD",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"WKD-Bahnhof",
-"de"
-],
-[
-"Warszawa Śródmieście",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"WKD Warszawa Śródmieście",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"WKD Warszawa Śródmieście",
-"pl"
-]
-]
-},
-"Wejherowo Broniewskiego - Dworzec PKP": {
-"en": [
-[
-"Wejherowo Broniewskiego -",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Wejherowo Broniewskiego -",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Wejherowo Broniewskiego -",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Wejherowo Broniewskiego -",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Wejherowo Dworzec PKP": {
-"en": [
-[
-"Wejherowo",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Wejherowo",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Wejherowo",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Wejherowo",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Wielkie Drogi PKP": {
-"en": [
-[
-"Wielkie Drogi",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Wielkie Drogi",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Wielkie Drogi",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Wielkie Drogi",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Wrzeszcz PKP": {
-"en": [
-[
-"Wrzeszcz",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Bahnhof",
-"de"
-],
-[
-"Wrzeszcz",
-"pl"
-]
-],
-"cs": [
-[
-"Nádraží",
-"cs"
-],
-[
-"Wrzeszcz",
-"pl"
-]
-],
-"sk": [
-[
-"Železničná stanica",
-"sk"
-],
-[
-"Wrzeszcz",
-"pl"
-]
-]
-},
-"Wzgórze Św. Maksymiliana SKM": {
-"en": [
-[
-"Wzgórze Św. Maksymiliana SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Wzgórze Św. Maksymiliana",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Wzgórze Św. Maksymiliana",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Wzgórze Św. Maksymiliana",
-"pl"
-]
-]
-},
-"ZOO": {
-"en": [
-[
-"Zoo",
-"en"
-]
-],
-"de": [
-[
-"Zoo",
-"de"
-]
-],
-"cs": [
-[
-"Zoo",
-"cs"
-]
-],
-"sk": [
-[
-"Zoo",
-"sk"
-]
-]
-},
-"Zabierzów PKP": {
-"en": [
-[
-"Zabierzów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Zabierzów",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Zabierzów",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Zabierzów",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Zaspa SKM": {
-"en": [
-[
-"Zaspa SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Zaspa",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Zaspa",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Zaspa",
-"pl"
-]
-]
-},
-"Zelczyna PKP": {
-"en": [
-[
-"Zelczyna",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Zelczyna",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Zelczyna",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Zelczyna",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-},
-"Złotniki/Os. Grzybowe PKM": {
-"en": [
-[
-"Złotniki/Os. Grzybowe PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Złotniki/Os. Grzybowe",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Złotniki/Os. Grzybowe",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Złotniki/Os. Grzybowe",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Złotniki/PKM": {
-"en": [
-[
-"Złotniki PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Złotniki",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Złotniki",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Złotniki",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Łopuchowo/Osiedle PKM": {
-"en": [
-[
-"Łopuchowo/Osiedle PKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"Łopuchowo/Osiedle",
-"pl"
-],
-[
-"S-Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Łopuchowo/Osiedle",
-"pl"
-],
-[
-"stanice",
-"cs"
-],
-[
-"PKM",
-"pl"
-]
-],
-"sk": [
-[
-"Łopuchowo/Osiedle",
-"pl"
-],
-[
-"stanica",
-"sk"
-],
-[
-"PKM",
-"pl"
-]
-]
-},
-"Środa Wielkopolska/Dworzec PKS": {
-"en": [
-[
-"Środa Wielkopolska",
-"pl"
-],
-[
-"Bus Station",
-"en"
-]
-],
-"de": [
-[
-"Środa Wielkopolska",
-"pl"
-],
-[
-"Busbahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Środa Wielkopolska",
-"pl"
-],
-[
-"autobusové nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Środa Wielkopolska",
-"pl"
-],
-[
-"autobusová stanica",
-"sk"
-]
-]
-},
-"Śródmieście SKM": {
-"en": [
-[
-"Śródmieście SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Śródmieście",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Śródmieście",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Śródmieście",
-"pl"
-]
-]
-},
-"Żabianka SKM": {
-"en": [
-[
-"Żabianka SKM",
-"pl"
-],
-[
-"station",
-"en"
-]
-],
-"de": [
-[
-"S-Bahnhof",
-"de"
-],
-[
-"Żabianka",
-"pl"
-]
-],
-"cs": [
-[
-"Stanice",
-"cs"
-],
-[
-"SKM Żabianka",
-"pl"
-]
-],
-"sk": [
-[
-"Stanica",
-"sk"
-],
-[
-"SKM Żabianka",
-"pl"
-]
-]
-},
-"Żegiestów PKP": {
-"en": [
-[
-"Żegiestów",
-"pl"
-],
-[
-"railway station",
-"en"
-]
-],
-"de": [
-[
-"Żegiestów",
-"pl"
-],
-[
-"Bahnhof",
-"de"
-]
-],
-"cs": [
-[
-"Żegiestów",
-"pl"
-],
-[
-"nádraží",
-"cs"
-]
-],
-"sk": [
-[
-"Żegiestów",
-"pl"
-],
-[
-"železničná stanica",
-"sk"
-]
-]
-}
+ "Akademia Marynarki Wojennej": {
+  "en": [
+   [
+    "Naval Academy",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Marineakademie",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Námořní akademie",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Námorná akadémia",
+    "sk"
+   ]
+  ]
+ },
+ "Akademia Muzyczna": {
+  "en": [
+   [
+    "Academy of Music",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Musikakademie",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Hudební akademie",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Hudobná akadémia",
+    "sk"
+   ]
+  ]
+ },
+ "Aleja Batorego - Dworzec PKP": {
+  "en": [
+   [
+    "Aleja Batorego - Dw.",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Aleja Batorego - Dw.",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Aleja Batorego - Dw.",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Aleja Batorego - Dw.",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Antoninek PKM": {
+  "en": [
+   [
+    "Antoninek PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Antoninek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Bolechowo-Os./PKM": {
+  "en": [
+   [
+    "Bolechowo-Os. PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bolechowo-Os.",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Brzeźnica Dworzec": {
+  "en": [
+   [
+    "Brzeźnica",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Brzeźnica",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Brzeźnica",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Brzeźnica",
+    "pl"
+   ],
+   [
+    "stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Brętowo PKM": {
+  "en": [
+   [
+    "Brętowo PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Brętowo",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Chludowo/PKM": {
+  "en": [
+   [
+    "Chludowo PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Chludowo",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Chylonia Dworzec PKP": {
+  "en": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Chylonia Dworzec PKP - os. Meksyk": {
+  "en": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "railway station –",
+    "en"
+   ],
+   [
+    "os. Meksyk",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "Bahnhof –",
+    "de"
+   ],
+   [
+    "os. Meksyk",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "nádraží –",
+    "cs"
+   ],
+   [
+    "os. Meksyk",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Chylonia",
+    "pl"
+   ],
+   [
+    "železničná stanica –",
+    "sk"
+   ],
+   [
+    "os. Meksyk",
+    "pl"
+   ]
+  ]
+ },
+ "Cisowa SKM": {
+  "en": [
+   [
+    "Cisowa SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Cisowa",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Czerwonak/Os. Przylesie PKM": {
+  "en": [
+   [
+    "Czerwonak/Os. Przylesie PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Czerwonak/Os. Przylesie",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Czerwonak/PKM": {
+  "en": [
+   [
+    "Czerwonak PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Czerwonak",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Czyżyny Dworzec": {
+  "en": [
+   [
+    "Czyżyny",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Czyżyny",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Czyżyny",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Czyżyny",
+    "pl"
+   ],
+   [
+    "stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Dopiewo/Dworzec Kolejowy": {
+  "en": [
+   [
+    "Dopiewo",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Dopiewo",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Dopiewo",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Dopiewo",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Autobusowy": {
+  "en": [
+   [
+    "Bus Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Busbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Autobusové nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Autobusová stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Główny": {
+  "en": [
+   [
+    "Main Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Hauptbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Hlavní nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Hlavná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Główny Tunel": {
+  "en": [
+   [
+    "Main Station Tunnel",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Hauptbahnhof Tunnel",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Hlavní nádraží tunel",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Hlavná stanica tunel",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Główny Wschód": {
+  "en": [
+   [
+    "Main Station East",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Hauptbahnhof Ost",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Hlavní nádraží východ",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Hlavná stanica východ",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Główny Zachód": {
+  "en": [
+   [
+    "Main Station West",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Hauptbahnhof West",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Hlavní nádraží západ",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Hlavná stanica západ",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Morski - Muzeum Emigracji": {
+  "en": [
+   [
+    "Maritime Station – Emigration Museum",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Seebahnhof – Emigrationsmuseum",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Námořní nádraží –",
+    "cs"
+   ],
+   [
+    "Muzeum",
+    "pl"
+   ],
+   [
+    "emigrace",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Námorná stanica – Múzeum emigrácie",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec PKS": {
+  "en": [
+   [
+    "Bus Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Busbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Autobusové nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Autobusová stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Dworzec Zachodni": {
+  "en": [
+   [
+    "West Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Westbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Západní nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Západná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Dębiec PKM": {
+  "en": [
+   [
+    "Dębiec PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Dębiec",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Dębiec Tunel PKM": {
+  "en": [
+   [
+    "Dębiec Tunel PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Dębiec Tunel",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Elektrowozownia SKM": {
+  "en": [
+   [
+    "Elektrowozownia SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Elektrowozownia",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Firoga PKM": {
+  "en": [
+   [
+    "Firoga PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Firoga",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Garbary PKM": {
+  "en": [
+   [
+    "Garbary PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Garbary",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Gdańsk Politechnika": {
+  "en": [
+   [
+    "Gdańsk",
+    "pl"
+   ],
+   [
+    "University of Technology",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Technische Universität",
+    "de"
+   ],
+   [
+    "Gdańsk",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdaňská technická univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdanská technická univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Gdańsk Port Lotniczy": {
+  "en": [
+   [
+    "Gdańsk",
+    "pl"
+   ],
+   [
+    "Airport",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen",
+    "de"
+   ],
+   [
+    "Gdańsk",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště",
+    "cs"
+   ],
+   [
+    "Gdańsk",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko",
+    "sk"
+   ],
+   [
+    "Gdańsk",
+    "pl"
+   ]
+  ]
+ },
+ "Gdynia Dworzec Gł. PKP": {
+  "en": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Main Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Hauptbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavní nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Gdynia Dworzec Gł. PKP - Dworcowa": {
+  "en": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Main Station –",
+    "en"
+   ],
+   [
+    "Dworcowa",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Hauptbahnhof –",
+    "de"
+   ],
+   [
+    "Dworcowa",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavní nádraží –",
+    "cs"
+   ],
+   [
+    "Dworcowa",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavná stanica –",
+    "sk"
+   ],
+   [
+    "Dworcowa",
+    "pl"
+   ]
+  ]
+ },
+ "Gdynia Dworzec Gł. PKP - Hala": {
+  "en": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Main Station –",
+    "en"
+   ],
+   [
+    "Hala",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Hauptbahnhof –",
+    "de"
+   ],
+   [
+    "Hala",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavní nádraží –",
+    "cs"
+   ],
+   [
+    "Hala",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavná stanica –",
+    "sk"
+   ],
+   [
+    "Hala",
+    "pl"
+   ]
+  ]
+ },
+ "Gdynia Dworzec Gł. PKP - Morska": {
+  "en": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Main Station –",
+    "en"
+   ],
+   [
+    "Morska",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Hauptbahnhof –",
+    "de"
+   ],
+   [
+    "Morska",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavní nádraží –",
+    "cs"
+   ],
+   [
+    "Morska",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavná stanica –",
+    "sk"
+   ],
+   [
+    "Morska",
+    "pl"
+   ]
+  ]
+ },
+ "Gdynia Dworzec Gł. PKP - Wolności": {
+  "en": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Main Station –",
+    "en"
+   ],
+   [
+    "Wolności",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "Hauptbahnhof –",
+    "de"
+   ],
+   [
+    "Wolności",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavní nádraží –",
+    "cs"
+   ],
+   [
+    "Wolności",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdynia",
+    "pl"
+   ],
+   [
+    "hlavná stanica –",
+    "sk"
+   ],
+   [
+    "Wolności",
+    "pl"
+   ]
+  ]
+ },
+ "Golęczewo/PKM": {
+  "en": [
+   [
+    "Golęczewo PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Golęczewo",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Gościcino PKP": {
+  "en": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Gościcino PKP - Fabryczna": {
+  "en": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "railway station –",
+    "en"
+   ],
+   [
+    "Fabryczna",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "Bahnhof –",
+    "de"
+   ],
+   [
+    "Fabryczna",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "nádraží –",
+    "cs"
+   ],
+   [
+    "Fabryczna",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Gościcino",
+    "pl"
+   ],
+   [
+    "železničná stanica –",
+    "sk"
+   ],
+   [
+    "Fabryczna",
+    "pl"
+   ]
+  ]
+ },
+ "Grabówek SKM": {
+  "en": [
+   [
+    "Grabówek SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Grabówek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Górczyn PKM": {
+  "en": [
+   [
+    "Górczyn PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Górczyn",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Gądki/PKM": {
+  "en": [
+   [
+    "Gądki PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Gądki",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Janowo SKM - Sobieskiego": {
+  "en": [
+   [
+    "Janowo SKM",
+    "pl"
+   ],
+   [
+    "station –",
+    "en"
+   ],
+   [
+    "Sobieskiego",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Janowo – Sobieskiego",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Jasień PKM": {
+  "en": [
+   [
+    "Jasień PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Jasień",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Jaśkowice PKP": {
+  "en": [
+   [
+    "Jaśkowice",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Jaśkowice",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Jaśkowice",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Jaśkowice",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Junikowo PKM": {
+  "en": [
+   [
+    "Junikowo PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Junikowo",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Kamienny Potok SKM": {
+  "en": [
+   [
+    "Kamienny Potok SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Kamienny Potok",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Kamienny Potok SKM - Niepodległości": {
+  "en": [
+   [
+    "Kamienny Potok SKM",
+    "pl"
+   ],
+   [
+    "station –",
+    "en"
+   ],
+   [
+    "Niepodległości",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Kamienny Potok – Niepodległości",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Karolin PKM": {
+  "en": [
+   [
+    "Karolin PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Karolin",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Karwiny PKM": {
+  "en": [
+   [
+    "Karwiny PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Karwiny",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Kiekrz PKM": {
+  "en": [
+   [
+    "Kiekrz PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Kiekrz",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Kiełpinek PKM": {
+  "en": [
+   [
+    "Kiełpinek PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Kiełpinek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Kokoszki PKP": {
+  "en": [
+   [
+    "Kokoszki",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Kokoszki",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Kokoszki",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Kokoszki",
+    "pl"
+   ]
+  ]
+ },
+ "Kraków Airport": {
+  "en": [
+   [
+    "Kraków Airport",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen",
+    "de"
+   ],
+   [
+    "Kraków",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště Krakov",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko Krakov",
+    "sk"
+   ]
+  ]
+ },
+ "Kraków Lotnisko": {
+  "en": [
+   [
+    "Kraków",
+    "pl"
+   ],
+   [
+    "Airport",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen",
+    "de"
+   ],
+   [
+    "Kraków",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště Krakov",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko Krakov",
+    "sk"
+   ]
+  ]
+ },
+ "Krynica-Zdrój Dworzec PKP": {
+  "en": [
+   [
+    "Krynica-Zdrój",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Krynica-Zdrój",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Krynica-Zdrój",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Krynica-Zdrój",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Leszczynki SKM": {
+  "en": [
+   [
+    "Leszczynki SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Leszczynki",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Lotnisko": {
+  "en": [
+   [
+    "Airport",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko",
+    "sk"
+   ]
+  ]
+ },
+ "Lotnisko Chopina - Odloty": {
+  "en": [
+   [
+    "Chopin Airport – Departures",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen Chopin – Abflug",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště",
+    "cs"
+   ],
+   [
+    "Chopina –",
+    "pl"
+   ],
+   [
+    "odlety",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko",
+    "sk"
+   ],
+   [
+    "Chopina –",
+    "pl"
+   ],
+   [
+    "odlety",
+    "sk"
+   ]
+  ]
+ },
+ "Lotnisko Chopina - Przyloty": {
+  "en": [
+   [
+    "Chopin Airport – Arrivals",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen Chopin – Ankunft",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště",
+    "cs"
+   ],
+   [
+    "Chopina –",
+    "pl"
+   ],
+   [
+    "přílety",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko",
+    "sk"
+   ],
+   [
+    "Chopina –",
+    "pl"
+   ],
+   [
+    "prílety",
+    "sk"
+   ]
+  ]
+ },
+ "Luboń/PKM": {
+  "en": [
+   [
+    "Luboń PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Luboń",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "M. Goślina/PKM": {
+  "en": [
+   [
+    "M. Goślina PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "M. Goślina",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Matarnia PKM": {
+  "en": [
+   [
+    "Matarnia PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Matarnia",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Milik PKP": {
+  "en": [
+   [
+    "Milik",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Milik",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Milik",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Milik",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Mosina/Dworzec Kolejowy": {
+  "en": [
+   [
+    "Mosina",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Mosina",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Mosina",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Mosina",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Muszyna PKP": {
+  "en": [
+   [
+    "Muszyna",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Muszyna",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Muszyna",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Muszyna",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Muzeum Westerplatte – Terminal Promowy": {
+  "en": [
+   [
+    "Westerplatte",
+    "pl"
+   ],
+   [
+    "Museum – Ferry",
+    "en"
+   ],
+   [
+    "Terminal",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Westerplatte-Museum – Fährterminal",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Muzeum Westerplatte – trajektový terminál",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Múzeum Westerplatte – trajektový terminál",
+    "sk"
+   ]
+  ]
+ },
+ "Niedźwiednik PKM": {
+  "en": [
+   [
+    "Niedźwiednik PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Niedźwiednik",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Niedźwiedź PKP": {
+  "en": [
+   [
+    "Niedźwiedź",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Niedźwiedź",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Niedźwiedź",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Niedźwiedź",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Niepołomice Dworzec": {
+  "en": [
+   [
+    "Niepołomice",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Niepołomice",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Niepołomice",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Niepołomice",
+    "pl"
+   ],
+   [
+    "stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Nowy Sącz Dworzec Autobusowy": {
+  "en": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "Bus Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "Busbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "autobusové nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "autobusová stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Nowy Sącz Dworzec PKP": {
+  "en": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nowy Sącz",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Oliwa PKP": {
+  "en": [
+   [
+    "Oliwa",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Oliwa",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Oliwa",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Oliwa",
+    "pl"
+   ]
+  ]
+ },
+ "Orłowo SKM - \"Klif\"": {
+  "en": [
+   [
+    "Orłowo SKM",
+    "pl"
+   ],
+   [
+    "station –",
+    "en"
+   ],
+   [
+    "Klif",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Orłowo – Klif",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Orłowo SKM - Orłowska": {
+  "en": [
+   [
+    "Orłowo SKM",
+    "pl"
+   ],
+   [
+    "station –",
+    "en"
+   ],
+   [
+    "Orłowska",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Orłowo – Orłowska",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Osowa PKP": {
+  "en": [
+   [
+    "Osowa",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Osowa",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Osowa",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Osowa",
+    "pl"
+   ]
+  ]
+ },
+ "Owińska/PKM": {
+  "en": [
+   [
+    "Owińska PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Owińska",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Anin": {
+  "en": [
+   [
+    "Anin",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Anin",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Anin",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Anin",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Dawidy": {
+  "en": [
+   [
+    "Dawidy",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Dawidy",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Dawidy",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Dawidy",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Dąbkowizna": {
+  "en": [
+   [
+    "Dąbkowizna",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Dąbkowizna",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Dąbkowizna",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Dąbkowizna",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Falenica": {
+  "en": [
+   [
+    "Falenica",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Falenica",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Falenica",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Falenica",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Falenica (Bystrzycka)": {
+  "en": [
+   [
+    "Falenica (Bystrzycka)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Falenica (Bystrzycka)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Falenica (Bystrzycka)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Falenica (Bystrzycka)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Gocławek": {
+  "en": [
+   [
+    "Gocławek",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Gocławek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Gocławek",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Gocławek",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Gołąbki": {
+  "en": [
+   [
+    "Gołąbki",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Gołąbki",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Gołąbki",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Gołąbki",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Halinów": {
+  "en": [
+   [
+    "Halinów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Halinów",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Halinów",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Halinów",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Jeziorki": {
+  "en": [
+   [
+    "Jeziorki",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Jeziorki",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Jeziorki",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Jeziorki",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Józefów": {
+  "en": [
+   [
+    "Józefów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Józefów",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Józefów",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Józefów",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Kobyłka": {
+  "en": [
+   [
+    "Kobyłka",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Kobyłka",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Kobyłka",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Kobyłka",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Kobyłka Ossów": {
+  "en": [
+   [
+    "Kobyłka Ossów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Kobyłka Ossów",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Kobyłka Ossów",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Kobyłka Ossów",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Koło": {
+  "en": [
+   [
+    "Koło",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Koło",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Koło",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Koło",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Legionowo": {
+  "en": [
+   [
+    "Legionowo",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Legionowo",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Legionowo",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Legionowo",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Legionowo Piaski": {
+  "en": [
+   [
+    "Legionowo Piaski",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Legionowo Piaski",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Legionowo Piaski",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Legionowo Piaski",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Legionowo Przystanek": {
+  "en": [
+   [
+    "Legionowo Przystanek",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Legionowo Przystanek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Legionowo Przystanek",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Legionowo Przystanek",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Michalin": {
+  "en": [
+   [
+    "Michalin",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Michalin",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Michalin",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Michalin",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Michałów-Reginów": {
+  "en": [
+   [
+    "Michałów-Reginów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Michałów-Reginów",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Michałów-Reginów",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Michałów-Reginów",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Miedzeszyn": {
+  "en": [
+   [
+    "Miedzeszyn",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Miedzeszyn",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Miedzeszyn",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Miedzeszyn",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Międzylesie": {
+  "en": [
+   [
+    "Międzylesie",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Międzylesie",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Międzylesie",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Międzylesie",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Mokry Ług": {
+  "en": [
+   [
+    "Mokry Ług",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Mokry Ług",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Mokry Ług",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Mokry Ług",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Nieporęt": {
+  "en": [
+   [
+    "Nieporęt",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Nieporęt",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nieporęt",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nieporęt",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Nowa Iwiczna": {
+  "en": [
+   [
+    "Nowa Iwiczna",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Nowa Iwiczna",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nowa Iwiczna",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nowa Iwiczna",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Nowy Dwór Mazowiecki": {
+  "en": [
+   [
+    "Nowy Dwór Mazowiecki",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Nowy Dwór Mazowiecki",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nowy Dwór Mazowiecki",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nowy Dwór Mazowiecki",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Okęcie": {
+  "en": [
+   [
+    "Okęcie",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Okęcie",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Okęcie",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Okęcie",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Olszynka Grochowska": {
+  "en": [
+   [
+    "Olszynka Grochowska",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Olszynka Grochowska",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Olszynka Grochowska",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Olszynka Grochowska",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Piaseczno": {
+  "en": [
+   [
+    "Piaseczno",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Piaseczno",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Piaseczno",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Piaseczno",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Powiśle": {
+  "en": [
+   [
+    "Powiśle",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Powiśle",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Powiśle",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Powiśle",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Powązki": {
+  "en": [
+   [
+    "Powązki",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Powązki",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Powązki",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Powązki",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Płudy": {
+  "en": [
+   [
+    "Płudy",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Płudy",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Płudy",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Płudy",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Radość": {
+  "en": [
+   [
+    "Radość",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Radość",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Radość",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Radość",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Radość (Izbicka)": {
+  "en": [
+   [
+    "Radość (Izbicka)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Radość (Izbicka)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Radość (Izbicka)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Radość (Izbicka)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Rakowiec": {
+  "en": [
+   [
+    "Rakowiec",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Rakowiec",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Rakowiec",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Rakowiec",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Rembertów": {
+  "en": [
+   [
+    "Rembertów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Rembertów",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Rembertów",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Rembertów",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Rembertów (Strażacka)": {
+  "en": [
+   [
+    "Rembertów (Strażacka)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Rembertów (Strażacka)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Rembertów (Strażacka)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Rembertów (Strażacka)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Służewiec": {
+  "en": [
+   [
+    "Służewiec",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Służewiec",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Służewiec",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Służewiec",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Targówek": {
+  "en": [
+   [
+    "Targówek",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Targówek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Targówek",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Targówek",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Toruńska": {
+  "en": [
+   [
+    "Toruńska",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Toruńska",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Toruńska",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Toruńska",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Ursus": {
+  "en": [
+   [
+    "Ursus",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Ursus",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Ursus",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Ursus",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Ursus Płn.": {
+  "en": [
+   [
+    "Ursus Płn.",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Ursus Płn.",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Ursus Płn.",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Ursus Płn.",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Ursus-Niedźwiadek": {
+  "en": [
+   [
+    "Ursus-Niedźwiadek",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Ursus-Niedźwiadek",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Ursus-Niedźwiadek",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Ursus-Niedźwiadek",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Wawer": {
+  "en": [
+   [
+    "Wawer",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wawer",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wawer",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wawer",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Wesoła": {
+  "en": [
+   [
+    "Wesoła",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wesoła",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wesoła",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wesoła",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Wola (Kasprzaka)": {
+  "en": [
+   [
+    "Wola (Kasprzaka)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wola (Kasprzaka)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wola (Kasprzaka)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wola (Kasprzaka)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Wola (Wolska)": {
+  "en": [
+   [
+    "Wola (Wolska)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wola (Wolska)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wola (Wolska)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wola (Wolska)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Wołomin": {
+  "en": [
+   [
+    "Wołomin",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Wołomin",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Wołomin",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Wołomin",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Wołomin (Laskowa)": {
+  "en": [
+   [
+    "Wołomin (Laskowa)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wołomin (Laskowa)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wołomin (Laskowa)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wołomin (Laskowa)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Wołomin Słoneczna": {
+  "en": [
+   [
+    "Wołomin Słoneczna",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wołomin Słoneczna",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wołomin Słoneczna",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wołomin Słoneczna",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Włochy": {
+  "en": [
+   [
+    "Włochy",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Włochy",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Włochy",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Włochy",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Zacisze-Wilno": {
+  "en": [
+   [
+    "Zacisze-Wilno",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Zacisze-Wilno",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Zacisze-Wilno",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Zacisze-Wilno",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Zagościniec": {
+  "en": [
+   [
+    "Zagościniec",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zagościniec",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zagościniec",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zagościniec",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Zalesie Górne": {
+  "en": [
+   [
+    "Zalesie Górne",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zalesie Górne",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zalesie Górne",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zalesie Górne",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Zielonka": {
+  "en": [
+   [
+    "Zielonka",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zielonka",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zielonka",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zielonka",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "PKP Zielonka (Zosinek)": {
+  "en": [
+   [
+    "Zielonka (Zosinek)",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Zielonka (Zosinek)",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Zielonka (Zosinek)",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Zielonka (Zosinek)",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Zielonka Bankowa": {
+  "en": [
+   [
+    "Zielonka Bankowa",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Zielonka Bankowa",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Zielonka Bankowa",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Zielonka Bankowa",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Żerań": {
+  "en": [
+   [
+    "Żerań",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Żerań",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Żerań",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Żerań",
+    "pl"
+   ]
+  ]
+ },
+ "PKP Żwirki i Wigury": {
+  "en": [
+   [
+    "Żwirki i Wigury",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Żwirki i Wigury",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Żwirki i Wigury",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Żwirki i Wigury",
+    "pl"
+   ]
+  ]
+ },
+ "Paczkowo/PKM": {
+  "en": [
+   [
+    "Paczkowo PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Paczkowo",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Palędzie/Dworzec Kolejowy": {
+  "en": [
+   [
+    "Palędzie",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Palędzie",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Palędzie",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Palędzie",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Politechnika": {
+  "en": [
+   [
+    "University of Technology",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Technische Universität",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Technická univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Technická univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Politechnika SKM": {
+  "en": [
+   [
+    "Politechnika SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Politechnika",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Port Lotniczy": {
+  "en": [
+   [
+    "Airport",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko",
+    "sk"
+   ]
+  ]
+ },
+ "Port Lotniczy Ławica": {
+  "en": [
+   [
+    "Ławica",
+    "pl"
+   ],
+   [
+    "Airport",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen",
+    "de"
+   ],
+   [
+    "Ławica",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště",
+    "cs"
+   ],
+   [
+    "Ławica",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko",
+    "sk"
+   ],
+   [
+    "Ławica",
+    "pl"
+   ]
+  ]
+ },
+ "Powroźnik PKP": {
+  "en": [
+   [
+    "Powroźnik",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Powroźnik",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Powroźnik",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Powroźnik",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Pruszcz Gdański Pruszcz Gdański Dworzec": {
+  "en": [
+   [
+    "Pruszcz Gdański Pruszcz Gdański",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Pruszcz Gdański Pruszcz Gdański",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Pruszcz Gdański Pruszcz Gdański",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Pruszcz Gdański Pruszcz Gdański",
+    "pl"
+   ],
+   [
+    "stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Pruszków WKD": {
+  "en": [
+   [
+    "Pruszków WKD",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Pruszków",
+    "pl"
+   ],
+   [
+    "WKD-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Pruszków",
+    "pl"
+   ],
+   [
+    "stanice",
+    "cs"
+   ],
+   [
+    "WKD",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Pruszków",
+    "pl"
+   ],
+   [
+    "stanica",
+    "sk"
+   ],
+   [
+    "WKD",
+    "pl"
+   ]
+  ]
+ },
+ "Przymorze SKM": {
+  "en": [
+   [
+    "Przymorze SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Przymorze",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Przystań Żeglugi": {
+  "en": [
+   [
+    "Ferry Pier",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Schiffsanleger",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Přístaviště lodní dopravy",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Prístavisko lodnej dopravy",
+    "sk"
+   ]
+  ]
+ },
+ "Publiczny Terminal Promowy": {
+  "en": [
+   [
+    "Public Ferry",
+    "en"
+   ],
+   [
+    "Terminal",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Öffentliches Fährterminal",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Veřejný trajektový terminál",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Verejný trajektový terminál",
+    "sk"
+   ]
+  ]
+ },
+ "Puszczykowo/PKM": {
+  "en": [
+   [
+    "Puszczykowo PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Puszczykowo",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Puszczykowo/Puszczykówko PKM": {
+  "en": [
+   [
+    "Puszczykowo/Puszczykówko PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Puszczykowo/Puszczykówko",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Radziszów PKP": {
+  "en": [
+   [
+    "Radziszów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Radziszów",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Radziszów",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Radziszów",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Reda Dworzec PKP": {
+  "en": [
+   [
+    "Reda",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Reda",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Reda",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Reda",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Redłowo SKM": {
+  "en": [
+   [
+    "Redłowo SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Redłowo",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Redłowo SKM - Park Technologiczny": {
+  "en": [
+   [
+    "Redłowo SKM",
+    "pl"
+   ],
+   [
+    "station –",
+    "en"
+   ],
+   [
+    "Park Technologiczny",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Redłowo – Park Technologiczny",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Rosnówko/PKM": {
+  "en": [
+   [
+    "Rosnówko PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Rosnówko",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Rudawa PKP": {
+  "en": [
+   [
+    "Rudawa",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Rudawa",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Rudawa",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Rudawa",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Rumia Dworzec PKP": {
+  "en": [
+   [
+    "Rumia",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Rumia",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Rumia",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Rumia",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Rębiechowo Rębiechowo PKP": {
+  "en": [
+   [
+    "Rębiechowo Rębiechowo",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Rębiechowo Rębiechowo",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Rębiechowo Rębiechowo",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Rębiechowo Rębiechowo",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Sopot PKP": {
+  "en": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Sopot PKP - Marynarzy": {
+  "en": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "railway station –",
+    "en"
+   ],
+   [
+    "Marynarzy",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "Bahnhof –",
+    "de"
+   ],
+   [
+    "Marynarzy",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "nádraží –",
+    "cs"
+   ],
+   [
+    "Marynarzy",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "železničná stanica –",
+    "sk"
+   ],
+   [
+    "Marynarzy",
+    "pl"
+   ]
+  ]
+ },
+ "Sopot PKP - Niepodległości": {
+  "en": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "railway station –",
+    "en"
+   ],
+   [
+    "Niepodległości",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "Bahnhof –",
+    "de"
+   ],
+   [
+    "Niepodległości",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "nádraží –",
+    "cs"
+   ],
+   [
+    "Niepodległości",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Sopot",
+    "pl"
+   ],
+   [
+    "železničná stanica –",
+    "sk"
+   ],
+   [
+    "Niepodległości",
+    "pl"
+   ]
+  ]
+ },
+ "Stadion Miejski": {
+  "en": [
+   [
+    "Municipal Stadium",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Städtisches",
+    "de"
+   ],
+   [
+    "Stadion",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Městský stadion",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Mestský štadión",
+    "sk"
+   ]
+  ]
+ },
+ "Stadion Narodowy": {
+  "en": [
+   [
+    "National Stadium",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Nationalstadion",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Národní stadion",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Národný štadión",
+    "sk"
+   ]
+  ]
+ },
+ "Stadion PKM": {
+  "en": [
+   [
+    "Stadion PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Stadion",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Stare Zoo": {
+  "en": [
+   [
+    "Old Zoo",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Alter Zoo",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Stará zoo",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Stará zoo",
+    "sk"
+   ]
+  ]
+ },
+ "Starołęka PKM": {
+  "en": [
+   [
+    "Starołęka PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Starołęka",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Stocznia SKM": {
+  "en": [
+   [
+    "Stocznia SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Stocznia",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Stocznia SKM - Morska": {
+  "en": [
+   [
+    "Stocznia SKM",
+    "pl"
+   ],
+   [
+    "station –",
+    "en"
+   ],
+   [
+    "Morska",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Stocznia – Morska",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Stryków Dworzec PKP": {
+  "en": [
+   [
+    "Stryków",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Stryków",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Stryków",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Stryków",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Strzeszyn PKM": {
+  "en": [
+   [
+    "Strzeszyn PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Strzeszyn",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Strzyża PKM": {
+  "en": [
+   [
+    "Strzyża PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Strzyża",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Swarzędz/Dworzec Kolejowy": {
+  "en": [
+   [
+    "Swarzędz",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Swarzędz",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Swarzędz",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Swarzędz",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Szczodrzykowo/Kórnik PKM": {
+  "en": [
+   [
+    "Szczodrzykowo/Kórnik PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Szczodrzykowo/Kórnik",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Szpital Marynarki Wojennej": {
+  "en": [
+   [
+    "Naval Hospital",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Marinekrankenhaus",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Námořní nemocnice",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Námorná nemocnica",
+    "sk"
+   ]
+  ]
+ },
+ "Szpital Okulistyczny": {
+  "en": [
+   [
+    "Eye Hospital",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Augenklinik",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Oční nemocnice",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Očná nemocnica",
+    "sk"
+   ]
+  ]
+ },
+ "Szpital Zakaźny": {
+  "en": [
+   [
+    "Infectious Diseases Hospital",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Infektionskrankenhaus",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Infekční nemocnice",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Infekčná nemocnica",
+    "sk"
+   ]
+  ]
+ },
+ "Terminal - Cargo": {
+  "en": [
+   [
+    "Cargo Terminal",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Frachtterminal",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nákladní terminál",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nákladný terminál",
+    "sk"
+   ]
+  ]
+ },
+ "Terminal Autokarowy": {
+  "en": [
+   [
+    "Coach",
+    "en"
+   ],
+   [
+    "Terminal",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Fernbusterminal",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Autobusový terminál",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Autobusový terminál",
+    "sk"
+   ]
+  ]
+ },
+ "Terminal Cargo": {
+  "en": [
+   [
+    "Cargo Terminal",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Frachtterminal",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Nákladní terminál",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Nákladný terminál",
+    "sk"
+   ]
+  ]
+ },
+ "Terminal Kontenerowy": {
+  "en": [
+   [
+    "Container",
+    "en"
+   ],
+   [
+    "Terminal",
+    "pl"
+   ]
+  ],
+  "de": [
+   [
+    "Containerterminal",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Kontejnerový terminál",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Kontajnerový terminál",
+    "sk"
+   ]
+  ]
+ },
+ "Uniwersytet": {
+  "en": [
+   [
+    "University",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Universität",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Uniwersytet Ekonomiczny": {
+  "en": [
+   [
+    "University of Economics",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Wirtschaftsuniversität",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Ekonomická univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Ekonomická univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Uniwersytet Gdański": {
+  "en": [
+   [
+    "University of Gdańsk",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Universität Gdańsk",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Gdaňská univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Gdanská univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Uniwersytet Medyczny": {
+  "en": [
+   [
+    "Medical University",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Medizinische Universität",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Lékařská univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Lekárska univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Uniwersytet Morski": {
+  "en": [
+   [
+    "Maritime University",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Maritime Universität",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Námořní univerzita",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Námorná univerzita",
+    "sk"
+   ]
+  ]
+ },
+ "Uniwersytet Przyrodniczy": {
+  "en": [
+   [
+    "University of Life Sciences",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Universität für Naturwissenschaften",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Univerzita přírodních věd",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Univerzita prírodných vied",
+    "sk"
+   ]
+  ]
+ },
+ "WKD Opacz": {
+  "en": [
+   [
+    "Opacz WKD",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "WKD-Bahnhof",
+    "de"
+   ],
+   [
+    "Opacz",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Stanice",
+    "cs"
+   ],
+   [
+    "WKD Opacz",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Stanica",
+    "sk"
+   ],
+   [
+    "WKD Opacz",
+    "pl"
+   ]
+  ]
+ },
+ "WKD Raków": {
+  "en": [
+   [
+    "Raków WKD",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "WKD-Bahnhof",
+    "de"
+   ],
+   [
+    "Raków",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Stanice",
+    "cs"
+   ],
+   [
+    "WKD Raków",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Stanica",
+    "sk"
+   ],
+   [
+    "WKD Raków",
+    "pl"
+   ]
+  ]
+ },
+ "Warszawa Lotnisko Chopina": {
+  "en": [
+   [
+    "Warsaw Chopin Airport",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Flughafen Warschau-Chopin",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Letiště Varšava-Chopin",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Letisko Varšava-Chopin",
+    "sk"
+   ]
+  ]
+ },
+ "Warszawa Ochota WKD": {
+  "en": [
+   [
+    "Warszawa Ochota WKD",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "WKD-Bahnhof",
+    "de"
+   ],
+   [
+    "Warszawa Ochota",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Stanice",
+    "cs"
+   ],
+   [
+    "WKD Warszawa Ochota",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Stanica",
+    "sk"
+   ],
+   [
+    "WKD Warszawa Ochota",
+    "pl"
+   ]
+  ]
+ },
+ "Warszawa ZOO": {
+  "en": [
+   [
+    "Warsaw Zoo",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zoo Warschau",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zoo Varšava",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zoo Varšava",
+    "sk"
+   ]
+  ]
+ },
+ "Warszawa Zachodnia WKD": {
+  "en": [
+   [
+    "Warszawa Zachodnia WKD",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "WKD-Bahnhof",
+    "de"
+   ],
+   [
+    "Warszawa Zachodnia",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Stanice",
+    "cs"
+   ],
+   [
+    "WKD Warszawa Zachodnia",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Stanica",
+    "sk"
+   ],
+   [
+    "WKD Warszawa Zachodnia",
+    "pl"
+   ]
+  ]
+ },
+ "Warszawa Zoo": {
+  "en": [
+   [
+    "Warsaw Zoo",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zoo Warschau",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zoo Varšava",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zoo Varšava",
+    "sk"
+   ]
+  ]
+ },
+ "Warszawa Śródmieście WKD": {
+  "en": [
+   [
+    "Warszawa Śródmieście WKD",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "WKD-Bahnhof",
+    "de"
+   ],
+   [
+    "Warszawa Śródmieście",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Stanice",
+    "cs"
+   ],
+   [
+    "WKD Warszawa Śródmieście",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Stanica",
+    "sk"
+   ],
+   [
+    "WKD Warszawa Śródmieście",
+    "pl"
+   ]
+  ]
+ },
+ "Wejherowo Broniewskiego - Dworzec PKP": {
+  "en": [
+   [
+    "Wejherowo Broniewskiego -",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Wejherowo Broniewskiego -",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Wejherowo Broniewskiego -",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Wejherowo Broniewskiego -",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Wejherowo Dworzec PKP": {
+  "en": [
+   [
+    "Wejherowo",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Wejherowo",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Wejherowo",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Wejherowo",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Wielkie Drogi PKP": {
+  "en": [
+   [
+    "Wielkie Drogi",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Wielkie Drogi",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Wielkie Drogi",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Wielkie Drogi",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Wrzeszcz PKP": {
+  "en": [
+   [
+    "Wrzeszcz",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Bahnhof",
+    "de"
+   ],
+   [
+    "Wrzeszcz",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Nádraží",
+    "cs"
+   ],
+   [
+    "Wrzeszcz",
+    "pl"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná stanica",
+    "sk"
+   ],
+   [
+    "Wrzeszcz",
+    "pl"
+   ]
+  ]
+ },
+ "Wzgórze Św. Maksymiliana SKM": {
+  "en": [
+   [
+    "Wzgórze Św. Maksymiliana SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Wzgórze Św. Maksymiliana",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "ZOO": {
+  "en": [
+   [
+    "Zoo",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zoo",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zoo",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zoo",
+    "sk"
+   ]
+  ]
+ },
+ "Zabierzów PKP": {
+  "en": [
+   [
+    "Zabierzów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zabierzów",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zabierzów",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zabierzów",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Zaspa SKM": {
+  "en": [
+   [
+    "Zaspa SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Zaspa",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Zelczyna PKP": {
+  "en": [
+   [
+    "Zelczyna",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Zelczyna",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Zelczyna",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Zelczyna",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Złotniki/Os. Grzybowe PKM": {
+  "en": [
+   [
+    "Złotniki/Os. Grzybowe PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Złotniki/Os. Grzybowe",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Złotniki/PKM": {
+  "en": [
+   [
+    "Złotniki PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Złotniki",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Łopuchowo/Osiedle PKM": {
+  "en": [
+   [
+    "Łopuchowo/Osiedle PKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Łopuchowo/Osiedle",
+    "pl"
+   ],
+   [
+    "S-Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Środa Wielkopolska/Dworzec PKS": {
+  "en": [
+   [
+    "Środa Wielkopolska",
+    "pl"
+   ],
+   [
+    "Bus Station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Środa Wielkopolska",
+    "pl"
+   ],
+   [
+    "Busbahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Środa Wielkopolska",
+    "pl"
+   ],
+   [
+    "autobusové nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Środa Wielkopolska",
+    "pl"
+   ],
+   [
+    "autobusová stanica",
+    "sk"
+   ]
+  ]
+ },
+ "Śródmieście SKM": {
+  "en": [
+   [
+    "Śródmieście SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Śródmieście",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Żabianka SKM": {
+  "en": [
+   [
+    "Żabianka SKM",
+    "pl"
+   ],
+   [
+    "station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "S-Bahnhof",
+    "de"
+   ],
+   [
+    "Żabianka",
+    "pl"
+   ]
+  ],
+  "cs": [
+   [
+    "Železniční zastávka",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Železničná zastávka",
+    "sk"
+   ]
+  ]
+ },
+ "Żegiestów PKP": {
+  "en": [
+   [
+    "Żegiestów",
+    "pl"
+   ],
+   [
+    "railway station",
+    "en"
+   ]
+  ],
+  "de": [
+   [
+    "Żegiestów",
+    "pl"
+   ],
+   [
+    "Bahnhof",
+    "de"
+   ]
+  ],
+  "cs": [
+   [
+    "Żegiestów",
+    "pl"
+   ],
+   [
+    "nádraží",
+    "cs"
+   ]
+  ],
+  "sk": [
+   [
+    "Żegiestów",
+    "pl"
+   ],
+   [
+    "železničná stanica",
+    "sk"
+   ]
+  ]
+ }
 }

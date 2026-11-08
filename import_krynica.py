@@ -26,22 +26,31 @@ MERGE = {
     'km93': 'km128',   # Pułaskiego Raj = Pułaskiego Szpital Wojskowy
     'km107': 'km91',   # Muszyna Folwark Szkoła = Muszyna Kościuszki Szkoła
     'km32': 'km23',    # Muszyna Rynek Obwodnica = Muszyna Obwodnica
+    # notes of 2026-11-08
+    'km96': 'km135',   # Pomnik Pułaskiego = Pułaskiego Kopiec
+    'km94': 'km129',   # Pułaskiego (lines RX11, 8) = Pułaskiego Mielec
 }
+# stops of the file left out for now (their note says so)
+SKIP = {'km100'}   # Tylicz Skrzyżowanie
 # platforms given by the destinations: the platform (0 = first, 1 = second) whose word comes first among the stops still ahead
 PLATFORM_TOK = {
     'km75': {0: ['Piłsudskiego Szkoła', 'Jastrzębia ZAiKS', 'Stara Droga', 'Nowy Sącz', 'Słotwin'],
              1: ['Piłsudskiego Hawana', 'Zdrojowa Bank', 'Muszyna', 'Szpital']},
     'km23': {0: ['Powroźnik', 'Wojkowa', 'Krynica', 'Nowy Sącz'],
              1: ['Dubne', 'Złockie', 'Szczawnik', 'Kościuszki']},
+    # Nowy Sącz Nawojowska - Grunwaldzka: 01 towards the bus station, 02 towards Szczawnik (2026-11-08)
+    'kmr18': {0: ['Graniczna', 'Traugutta', 'Dworzec', 'Batorego'],
+              1: ['Zawada', 'Nawojowa', 'Łabowa', 'Krynica', 'Muszyna', 'Szczawnik']},
 }
 # served in one direction only: stop -> the stop the runs that call there go on to (later in the run)
-ONE_WAY = {'km126': 'km127'}   # Stara Droga Ziarenko: only towards Stara Droga Gazownia
+ONE_WAY = {'km126': 'km127',   # Stara Droga Ziarenko: only towards Stara Droga Gazownia
+           'kmx9': 'kmx11'}   # Nowy Sącz Dworzec PKP: only towards the bus station (not towards Krynica)
 
 
 def main(src):
     F = [json.load(open(p, encoding='utf-8')) for p in PATHS]
     K = F[0]
-    U = json.load(open(src, encoding='utf-8'))['stops']
+    U = {k: v for k, v in json.load(open(src, encoding='utf-8'))['stops'].items() if k not in SKIP}
     stop_of = lambda sid: next((D['stops'] for D in F if sid in D['stops']), None)
     merge = dict(MERGE)
     for e in U.values():   # the ids the tool showed as one stop
