@@ -4815,11 +4815,17 @@ function alertShow(i,g,redraw){const d=document.getElementById('alertDlg'),L=ale
   if(!redraw&&LANG!==(L[0].de!=null?'de':'pl'))mtAlerts(AL_CUR.g,true);   // (a click: the translator may be downloaded now)
   const order=i==null?L.map((_,k)=>k):[i,...L.map((_,k)=>k).filter(k=>k!==i)];
   const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map((k,o)=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>');return `<details class="aItem"${(was?was[o]:!o)?' open':''}><summary><h3>${sg(a.title)}</h3></summary>${a.text?`<p>${sg(a.text)}</p>`:''}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</details>`}).join('');   // (only the notice chosen open, the others by their headings: a click opens them)
+  if(!redraw&&d.hidden){try{history.pushState(Object.assign({},history.state||{},{alertDlg:1}),'',location.href)}catch(e){}}   // (the phone's back button: the window closed, the page stays)
   d.hidden=false;if(!redraw)document.getElementById('alertClose').focus()}
+let AL_BACK=false;
+function alertClose(){const d=document.getElementById('alertDlg');if(!d||d.hidden)return;d.hidden=true;if(history.state&&history.state.alertDlg){AL_BACK=true;history.back()}}
+window.addEventListener('popstate',e=>{const d=document.getElementById('alertDlg');
+  if(AL_BACK){AL_BACK=false;e.stopImmediatePropagation();return}
+  if(d&&!d.hidden){d.hidden=true;e.stopImmediatePropagation()}});
 document.body.appendChild(document.getElementById('alertDlg'));document.getElementById('alertDlg').style.zIndex=200;
-document.getElementById('alertClose').onclick=()=>{document.getElementById('alertDlg').hidden=true};
-document.getElementById('alertDlg').addEventListener('click',e=>{if(e.target.id==='alertDlg')e.currentTarget.hidden=true});
-addEventListener('keydown',e=>{if(e.key==='Escape'){const d=document.getElementById('alertDlg');if(d&&!d.hidden){d.hidden=true;e.stopPropagation()}}},true);
+document.getElementById('alertClose').onclick=alertClose;
+document.getElementById('alertDlg').addEventListener('click',e=>{if(e.target.id==='alertDlg')alertClose()});
+addEventListener('keydown',e=>{if(e.key==='Escape'){const d=document.getElementById('alertDlg');if(d&&!d.hidden){alertClose();e.stopPropagation()}}},true);
 ztmAlerts();setInterval(()=>{if(alertCity(city))ztmAlerts()},120000);
 // the board's bottom row: the notices one after another, sliding across (going on from where it was at each redraw)
 function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('div');row.className='dRow dAlert';row.title=trS('Zmiany w ruchu');row.onclick=()=>alertShow(null,g);
