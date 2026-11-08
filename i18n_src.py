@@ -462,6 +462,8 @@ ROWS = [
 ("Wszystkie komunikaty", "All notices", "Alle Meldungen", "Všetky oznámenia", "Všechna oznámení"),
 ("Szczegóły na stronie BVG", "Details on the BVG website", "Details auf der BVG-Website", "Podrobnosti na webe BVG", "Podrobnosti na webu BVG"),
 ("Zmiany w ruchu", "Service changes", "Änderungen im Verkehr", "Zmeny v doprave", "Změny v dopravě"),
+("Rozwiń", "Expand", "Aufklappen", "Rozbaliť", "Rozbalit"),
+("Zwiń", "Collapse", "Zuklappen", "Zbaliť", "Sbalit"),
 ]
 
 WEEKDAYS = {
