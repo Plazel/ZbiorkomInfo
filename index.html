@@ -1192,6 +1192,7 @@ const ICONS={
  cable:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M4 8l56 10"/><path d="M32 13v9M26 22h12"/><path d="M19 26h26c3 0 5 2 5 5v21c0 3-2 5-5 5H19c-3 0-5-2-5-5V31c0-3 2-5 5-5z"/><path d="M18 31h28v12H18z"/><path d="M27 51h10"/></svg>',
  tram:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M19 13h26c4 0 6 3 6 6v32c0 2-1 3-3 3H16c-2 0-3-1-3-3V19c0-3 2-6 6-6z"/><path d="M22 4h20M32 4v9"/><path d="M24 17h16"/><path d="M16 22h32v13c0 2-2 4-4 4H20c-2 0-4-2-4-4z"/><path d="M18 45l5 1M46 45l-5 1M25 49h14"/><path d="M18 54v4h4v-4M42 54v4h4v-4"/></svg>',
  bus:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M15 9h34c2 0 4 2 4 4v39H11V13c0-2 2-4 4-4z"/><path d="M20 13.5h24"/><path d="M14 18h36v15L16 38c-1 0-2-1-2-2z"/><path d="M11 19H7v9M53 19h4v9"/><path d="M15 45h6M43 45h6M27 47h10"/><path d="M15 52v4h6v-4M43 52v4h6v-4"/></svg>',
+ nighttram:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><g transform="translate(-2 4) scale(.86)"><path d="M19 13h26c4 0 6 3 6 6v32c0 2-1 3-3 3H16c-2 0-3-1-3-3V19c0-3 2-6 6-6z"/><path d="M22 4h20M32 4v9"/><path d="M24 17h16"/><path d="M16 22h32v13c0 2-2 4-4 4H20c-2 0-4-2-4-4z"/><path d="M18 45l5 1M46 45l-5 1M25 49h14"/><path d="M18 54v4h4v-4M42 54v4h4v-4"/></g><path d="M58 4a7 7 0 1 0 4 12a6 6 0 0 1-4-12z" fill="currentColor" stroke="none"/></svg>',
  night:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><g transform="translate(-2 4) scale(.86)"><path d="M15 9h34c2 0 4 2 4 4v39H11V13c0-2 2-4 4-4z"/><path d="M20 13.5h24"/><path d="M14 18h36v15L16 38c-1 0-2-1-2-2z"/><path d="M11 19H7v9M53 19h4v9"/><path d="M15 45h6M43 45h6M27 47h10"/><path d="M15 52v4h6v-4M43 52v4h6v-4"/></g><path d="M58 4a7 7 0 1 0 4 12a6 6 0 0 1-4-12z" fill="currentColor" stroke="none"/></svg>',
  repl:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M15 9h34c2 0 4 2 4 4v39H11V13c0-2 2-4 4-4z" stroke-dasharray="6 4.5"/><path d="M20 13.5h24"/><path d="M14 18h36v15L16 38c-1 0-2-1-2-2z"/><path d="M15 45h6M43 45h6M27 47h10"/><path d="M15 52v4h6v-4M43 52v4h6v-4"/></svg>',
  trol:'<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M27 9l8-7M35 9l8-7"/><path d="M15 9h34c2 0 4 2 4 4v39H11V13c0-2 2-4 4-4z"/><path d="M20 13.5h24"/><path d="M14 18h36v15L16 38c-1 0-2-1-2-2z"/><path d="M11 19H7v9M53 19h4v9"/><path d="M15 45h6M43 45h6M27 47h10"/><path d="M15 52v4h6v-4M43 52v4h6v-4"/></svg>',
@@ -1458,7 +1459,7 @@ function sections(){
    {name:'Linie autobusowe pospieszne',icon:'bus',lines:by(r=>tk(r)==='exp')},
    {name:'Linie lokalne',icon:'bus',lines:by(r=>tk(r)==='local')},
    {name:'Linie zastępcze i specjalne',icon:'repl',lines:by(r=>tk(r)==='repl'||tk(r)==='seas')},   // seasonal and occasional lines among them
-   {name:'Linie nocne',icon:(city==='poz'||city==='krk')?'nightmix':'night',lines:by(r=>r.t==='night')},
+   {name:'Linie nocne',icon:R.some(r=>r.t==='night'&&r.nt)?'nightmix':'night',lines:by(r=>r.t==='night')},   // night trams among them (nt: Praha, Kraków, Poznań): tram and bus with the moon
    {name:'Promy',icon:'ferry',lines:by(r=>r.cat==='ferry')},
    {name:'Metro',icon:'metro',lines:by(r=>r.cat==='metro')},
    {name:'Kolej linowa',icon:'cable',lines:by(r=>r.cat==='cable')},
@@ -1726,7 +1727,7 @@ function emptyMsg(day,ops,running){const ds=weekDate(day);
   return `${running?'Brak odjazdów w tym kierunku':'Linia nie kursuje'} ${dayLabel(ds)}.`}
 function headerHTML(r,line,extra,back){
   return `<button class="crumb" type="button" data-go="${back||''}">← ${back?'Trasa linii':'Wszystkie linie'}</button>
-  <div class="lhead">${ICONS[r.nt?'nightmix':ICONS[r.t]?r.t:'bus']}<span id="hc"></span>${withWeek(extra,r)}</div>`;   // (the operator: in the notes under the timetable, its source)
+  <div class="lhead">${ICONS[r.nt?'nighttram':ICONS[r.t]?r.t:'bus']}<span id="hc"></span>${withWeek(extra,r)}</div>`;   // (the operator: in the notes under the timetable, its source)
 }
 async function renderLine(id){
   const r=IDX.routes.find(x=>x.id===id);if(!r)return renderBoard();
@@ -2132,7 +2133,7 @@ function sheetHTML(S){
   const ops=[...new Set(S.ops)].join(', ');
   return `<div class="ps${S.fmt==='a5'?' a5':''}${S.noRoute?' noroute':''}">
   <div class="psl">
-   <div class="pshead${many?' many':''}">${ICONS[S.rs[0].nt?'nightmix':ICONS[S.rs[0].t]?S.rs[0].t:'bus'].replace('<svg ','<svg width="46" height="46" ').replace('fill:var(--bg)','fill:#fff').replace(/currentColor/g,'#222')}<div class="psbs">${S.rs.map(badge).join('')}</div>
+   <div class="pshead${many?' many':''}">${ICONS[S.rs[0].nt?'nighttram':ICONS[S.rs[0].t]?S.rs[0].t:'bus'].replace('<svg ','<svg width="46" height="46" ').replace('fill:var(--bg)','fill:#fff').replace(/currentColor/g,'#222')}<div class="psbs">${S.rs.map(badge).join('')}</div>
     <div class="psroute"><div class="psfrom"><i></i><b class="pslk"></b><span>${nb(S.name)} ${esc(S.num)}</span></div><div class="psto"><i></i><span>${nb(S.head)}</span></div></div></div>
    <div class="pscols" style="--nc:${days.length}">${days.map(k=>col(k,k==='h')).join('')}</div>
    <div class="psfoot"><div>${S.req?'<p>'+HAND+' – przystanek na żądanie</p>':''}${S.noNotes?'':S.notes.map(([l,t])=>`<p><b class="k">${l}</b> – ${esc(t)}</p>`).join('')}</div>
@@ -3741,6 +3742,9 @@ async function gdReqLoad(R){if(!R||!R.r||!R.ps||R.req)return;R.ps.forEach(id=>{i
     (D.dirs||[]).forEach(d=>{const n=d.stops.filter(x=>ps.has(x[0])).length;if(n>bn){bn=n;best=d}});
     if(best)best.stops.forEach(x=>{if(x[2]&&ps.has(x[0]))R.req.add(x[0])});if(R.req.size&&GUIDE.run===R)gdTick()}catch(e){}}
 function gdChoose(run){if(run.tst)gdTSave(run);else store.set('ztm.gdTRun',null);document.getElementById('gdSip').classList.toggle('tst',!!run.tst);gdReqLoad(run);gdZonesLoad();if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
+// the areas of the stops that belong to a city (the Tricity's cities and their suburbs together; Krynica with the stops of its
+// lines outside it; Nowy Sącz with those of RX1)
+const gdCityAreas=c=>new Set(['gda','sop','gdy','wej','all'].includes(c)?['gda','sop','gdy','wej','oth']:c==='km'?['km','kmx']:c==='ns'?['ns','kmx','km']:[c]);
 async function gdTick(){if(!(GUIDE.open||GUIDE.bg)||GUIDE.busy)return;if(GUIDE.run&&!GUIDE.run.req)gdReqLoad(GUIDE.run);GUIDE.lastTick=Date.now();gdBackBtn();const st=document.getElementById('gdStat'),sip=document.getElementById('gdSip'),pk=document.getElementById('gdPick');const h=gdHere();
   if(GUIDE.run&&GUIDE.run.tst){gdTstDraw();return}
   if(GUIDE.tmode&&!GUIDE.run){if(!GUIDE.stopSel)gdInfo('Tryb testowy mSIP','Wyszukaj przystanek w polu wyszukiwania.');return}
@@ -3754,10 +3758,11 @@ async function gdTick(){if(!(GUIDE.open||GUIDE.bg)||GUIDE.busy)return;if(GUIDE.r
   // no vehicle known here: the nearest stop and its next departures, to choose the ride from
   if(GUIDE.stopSel)return;
   let best=null,bd=1e9;const names=new Set();IDX.routes.filter(r=>inCityOf(r,city)).forEach(r=>(r.sn||[]).forEach(n=>names.add(n)));
-  for(const X of Object.values(IDX.stops)){if(!names.has(X[0]))continue;const d=dm(h[0],h[1],X[2],X[3]);if(d<bd){bd=d;best=X[0];GUIDE.nearA=X[4]}}
+  const okA=gdCityAreas(city);   // only the chosen city's stops: a stop of the same name elsewhere (Chałubińskiego in Gdańsk and in Kraków) is not this one
+  for(const X of Object.values(IDX.stops)){if(!names.has(X[0])||!okA.has(X[4]))continue;const d=dm(h[0],h[1],X[2],X[3]);if(d<bd){bd=d;best=X[0];GUIDE.nearA=X[4]}}
   if(!best||bd>400){gdWarn('Nie znaleziono przystanku w pobliżu','');return}
   if(GUIDE.choice===best&&pk.innerHTML)return;GUIDE.choice=best;
-  const oth=[];for(const X of Object.values(IDX.stops)){if(X[0]===best||!names.has(X[0])||oth.some(o=>o[0]===X[0]))continue;const d=dm(h[0],h[1],X[2],X[3]);if(d<=300)oth.push([X[0],d])}
+  const oth=[];for(const X of Object.values(IDX.stops)){if(X[0]===best||!names.has(X[0])||!okA.has(X[4])||oth.some(o=>o[0]===X[0]))continue;const d=dm(h[0],h[1],X[2],X[3]);if(d<=300)oth.push([X[0],d])}
   oth.sort((a,b)=>a[1]-b[1]);
   gdShowDeps((gdNameTowns().get(best)||new Set()).size>1?{n:best,a:GUIDE.nearA}:best,trS('Wybierz kurs, którego trasę chcesz wyświetlić'),oth.slice(0,3).map(o=>o[0]))}
 // a problem (no stop near, no location, no trip found): centred, with a warning sign, as for the brigade timetables
@@ -4805,6 +4810,9 @@ addEventListener('resize',fitGs);
 if(window.ResizeObserver){const ro=new ResizeObserver(()=>fitGs());document.querySelectorAll('header.top > *').forEach(e=>{if(!e.classList.contains('gsWrap'))ro.observe(e)})}
 function setCity(c){if(!CITIES[c])return;city=c;store.set('ztm.city',city);try{alertBar();if(alertCity(c))ztmAlerts().then(alertBar);gdSrcLabel()}catch(e){}if(IDX)setByName();markCity();
   if(typeof DEP!=='undefined'&&DEP.open){if(DEP.loc){DEP.loc=false;document.getElementById('topLoc').setAttribute('aria-pressed','false')}depLoad();if(!document.getElementById('depDlg').hidden)depFill();depLoadData();if(IDX)renderBoard();return}
+  // mSIP stays open: the nearest stop and its departures are looked for again among the new city's stops
+  if(typeof GUIDE!=='undefined'&&GUIDE.open){if(IDX)renderBoard();if(GUIDE.run&&!GUIDE.run.tst&&GUIDE.run.r&&!inCityOf(GUIDE.run.r,c))GUIDE.run=null;
+    if(!GUIDE.run){GUIDE.stopSel=null;GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';document.getElementById('gdSip').hidden=true;if(GUIDE.setLoc)GUIDE.setLoc(true);if(GUIDE.tmode)gdTRestore()}gdBackBtn();gdTick();return}
   if(typeof TD!=='undefined'&&TD.view){if(IDX)renderBoard();openTool(TD.view);return}if(typeof JP!=='undefined'&&JP.open){if(IDX)renderBoard();openJP();return}
   // the page under the map follows too, so the other tabs show the new city
   if(MAP.open){if(location.hash)history.replaceState(null,'',location.pathname+location.search);if(IDX)renderBoard();MAP.vb=null;MAP.vbs=null;openMap();return}
