@@ -325,7 +325,7 @@ span.chip{cursor:inherit}
 .col:first-child{border-left:0}
 .col h3{margin:0;background:var(--head);color:var(--head-fg);font-family:var(--font-display);font-weight:500;font-size:.98rem;padding:10px 16px;min-height:0;box-sizing:border-box}
 .cols{grid-template-rows:auto auto}.cols>.col{display:grid;grid-row:span 2;grid-template-rows:subgrid;align-content:start}.cols>.col>h3{height:100%}
-.cols>.col[hidden]{display:none}.cols.tabbed{grid-template-columns:1fr;width:100%}.cols.tabbed>.col>h3{display:none}
+.cols>.col[hidden]{display:none}.cols.tabbed{grid-template-columns:1fr;width:100%}.cols.wrapm{grid-template-columns:repeat(var(--nc,3),minmax(0,1fr));width:100%}.cols.wrapm .mins{flex-wrap:wrap}.cols.tabbed tr.eh{display:none}.cols.tabbed>.col>h3{display:none}
 .colTabs{display:flex;background:var(--head);overflow-x:auto}.colTabs button{flex:1;font:inherit;font-family:var(--font-display);font-weight:500;font-size:.92rem;color:var(--head-fg);background:none;border:0;border-bottom:3px solid transparent;padding:10px 8px;cursor:pointer;opacity:.7;white-space:nowrap}
 .colTabs button[aria-selected="true"]{opacity:1;border-bottom-color:var(--accent)}   /* the day headings in one row of equal height (a special day has a note under its name) */
 .col table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
@@ -1798,7 +1798,14 @@ function departures(d,si,day){
 // (today's at first)
 function colTabs(){const g=document.querySelector('#grid .gscroll'),c=g&&g.querySelector('.cols');if(!c)return;
   const old=document.querySelector('#grid .colTabs');if(old)old.remove();c.classList.remove('tabbed');c.querySelectorAll('.col').forEach(x=>x.hidden=false);
+  c.classList.remove('wrapm');c.querySelectorAll('tr').forEach(tr=>tr.style.height='');
   const C=[...c.querySelectorAll(':scope>.col')];if(C.length<2||c.scrollWidth<=g.clientWidth+2)return;
+  // too wide in one line an hour: the days side by side still, each hour's minutes in two lines at most (rows kept level)
+  c.classList.add('wrapm');const lines=m=>new Set([...m.children].map(x=>x.offsetTop)).size;
+  const fit=c.scrollWidth<=g.clientWidth+2&&C.every(col=>[...col.querySelectorAll('.mins')].every(m=>lines(m)<=2&&m.scrollWidth<=m.clientWidth+1));
+  if(fit){const T=C.map(col=>[...col.querySelectorAll('tr')]);const n=Math.min(...T.map(t=>t.length));
+    for(let i=0;i<n;i++){const h=Math.max(...T.map(t=>t[i].offsetHeight));T.forEach(t=>{if(t[i].offsetHeight<h)t[i].style.height=h+'px'})}return}
+  c.classList.remove('wrapm');
   c.classList.add('tabbed');const bar=document.createElement('div');bar.className='colTabs';bar.setAttribute('role','tablist');
   const td=todayType().day;let cur=C.findIndex(x=>x.dataset.day===(COLTAB.k||td));if(cur<0)cur=Math.max(0,C.findIndex(x=>x.dataset.day===td));
   const show=i=>{C.forEach((x,k)=>x.hidden=k!==i);bar.querySelectorAll('button').forEach((b,k)=>b.setAttribute('aria-selected',String(k===i)))};
