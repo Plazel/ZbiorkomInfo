@@ -3,7 +3,7 @@
  "_tempo": {
   "_": "Tempo głosów (domyślnie -5%): nazwa głosu → np. +5%. Strona dopisuje tempo do adresu zapowiedzi, więc po zmianie telefon nie odtwarza starych nagrań z pamięci.",
   "de-DE-SeraphinaMultilingualNeural": "+15%",
-  "cs-CZ-AntoninNeural": "-20%",
+  "cs-CZ-AntoninNeural": "-30%",
   "pl-PL-ZofiaNeural": "+0%"
  },
  "Munketoft": "ˈmʊŋkəˌtɔft",
