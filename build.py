@@ -191,6 +191,19 @@ def build_routes(groups, meta_of):
         m = meta_of[key]; rid_key = key
         # special days: of the candidate weekdays of a week (keys X<week>:<date>) the first whose departures differ from
         # the week's weekday timetable becomes column x<week>; the others are dropped
+        # Fridays (choose(fri=True)): column p<week> when its trips differ from the weekday's
+        if any(str(it[0]).startswith('P') for it in tl_all):
+            sig = lambda items: sorted((it[2], tuple(x[0] for x in it[3]), it[3][0][1]) for it in items)
+            fr = collections.defaultdict(lambda: collections.defaultdict(list))
+            for it in tl_all:
+                if str(it[0]).startswith('P'): wi, dd = it[0][1:].split(':'); fr[wi][dd].append(it)
+            tl_all = [it for it in tl_all if not str(it[0]).startswith('P')]
+            m['dates'] = dict(m.get('dates') or {})
+            for wi, by_d in fr.items():
+                base = sig([it for it in tl_all if it[0] == 'w' + wi])
+                for dd in sorted(by_d):
+                    if sig(by_d[dd]) != base:
+                        tl_all += [('p' + wi,) + tuple(it[1:]) for it in by_d[dd]]; m['dates']['p' + wi] = dd; break
         if any(str(it[0]).startswith('X') for it in tl_all):
             sig = lambda items: sorted((it[2], tuple(x[0] for x in it[3]), it[3][0][1]) for it in items)
             keep = [it for it in tl_all if not str(it[0]).startswith('X')]
@@ -387,8 +400,10 @@ def feed_days(path, route_of_trip):
             if d in window: by[(rk, d)].append(tid)
     return by
 
-def choose(by, op=None):
-    """pick one date per route & day type -> {tid: (rk, daytype)}, dates"""
+def choose(by, op=None, fri=False):
+    """pick one date per route & day type -> {tid: (rk, daytype)}, dates
+    fri: each week's Friday kept too when its trips differ from the weekday's (Warszawa: the metro through the night to
+    Saturday, shown by the page at the top of Saturday's column)"""
     chosen = {}; dates = collections.defaultdict(dict)
     if op and by: OPEND[op] = max(OPEND.get(op, ''), max(d for (_, d) in by))
     rks = {k[0] for k in by}
@@ -415,6 +430,8 @@ def choose(by, op=None):
                 if dd == rep or dtype(dd) != 'w' or (rk, dd) not in by: continue
                 if set(by[(rk, dd)]) != reps:
                     for tid in by[(rk, dd)]: chosen.setdefault(tid, []).append((rk, 'X%d:%s' % (wi, dd)))
+                    if fri and datetime.datetime.strptime(dd, '%Y%m%d').weekday() == 4:
+                        for tid in by[(rk, dd)]: chosen.setdefault(tid, []).append((rk, 'P%d:%s' % (wi, dd)))
     return chosen, dates
 
 # ---------------- ZTM Gdańsk ----------------
@@ -1357,7 +1374,7 @@ for area, A in NEW_AREAS.items():
         for tid, (rk, sv) in rot.items():
             for d in svc.get(sv, ()):
                 if d in window: by[(rk, d)].append(tid)
-        chosen, dates = choose(by, A['op'])
+        chosen, dates = choose(by, A['op'], fri=area == 'waw')
         st = collections.defaultdict(list)
         for fd, pre in A['feeds']:
             P = SCR + '/' + fd

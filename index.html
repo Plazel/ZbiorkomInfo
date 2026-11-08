@@ -1223,9 +1223,9 @@ const AREA_COLORS={ns:{'7':'#ef6c00','23':'#ef6c00','41':'#2a6fdb'}};
 const colOf=r=>r.k||(AREA_COLORS[areaOf(r)]||{})[r.n]||colorFor(r.n);
 // the text on a coloured symbol: white, or the operator's own (MPK Poznań: dark digits on light colours)
 const txtOf=r=>(r.kt&&(r.f||r.t==='rail'))?r.kt:'#fff';
-const DAYNAMES={w:'Dni robocze',f:'Dni robocze wolne od szkoły',s:'Soboty',h:'Niedziele i święta'};
+const DAYNAMES={w:'Dni robocze',f:'Dni robocze wolne od szkoły',p:'Piątki',s:'Soboty',h:'Niedziele i święta'};
 // a special day (x): one weekday with a timetable of its own, shown as a yellow column with its date
-let XD_CUR=null,XD_FRI=false;
+let XD_CUR=null,XD_FRI=false,XP_CUR=null;
 // the special day a Friday in every week the data holds (Berlin, Hamburg: the night to Saturday runs through): Fridays as a
 // day of their own, not a special timetable
 const xFri=Ls=>{const W=(IDX.weeks||[]).length;if(W<2)return false;const isFri=d=>d&&new Date(+d.slice(0,4),+d.slice(4,6)-1,+d.slice(6)).getDay()===5;
@@ -1237,8 +1237,9 @@ const xdOf=Ls=>{for(const L of Ls){const d=L&&L.dates&&L.dates['x'+WEEK];if(d)re
 let hideX=false;   // read from the browser's storage with the other settings (store is defined further on)
 // a special day whose departures at this stop are those of an ordinary day (the special timetable differs elsewhere on the
 // line, or not at all here): no column of its own
+function dropSameP(days,deps,sig){if(!deps.p)return;const w=deps.w;if(!w||sig(w)===sig(deps.p)){const i=days.indexOf('p');if(i>=0)days.splice(i,1);delete deps.p}}   // (Fridays the same as the weekdays once their night is under Saturday: no column)
 function dropSameX(days,deps,sig){if(!deps.x)return;const s=sig(deps.x);if(days.some(k=>k!=='x'&&deps[k]&&sig(deps[k])===s)){const i=days.indexOf('x');if(i>=0)days.splice(i,1);delete deps.x}}
-const DK=ds=>{if(hideX){const b0=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return b0}const b=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return ds.some(dd=>dd.tp&&dd.tp['x'+WEEK]!==undefined)?[...b.filter(k=>k==='w'||k==='f'),'x','s','h']:b};   // a special weekday sits between the weekdays and Saturdays
+const DK=ds=>{if(hideX){const b0=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];return b0}const b=ds.some(dd=>dd.tp&&Object.keys(dd.tp).some(k=>k[0]==='f'))?['w','f','s','h']:['w','s','h'];const hasP=ds.some(dd=>dd.tp&&dd.tp['p'+WEEK]!==undefined);const b1=hasP?[...b.filter(k=>k==='w'||k==='f'),'p','s','h']:b;return ds.some(dd=>dd.tp&&dd.tp['x'+WEEK]!==undefined)?[...b1.filter(k=>k==='w'||k==='f'||k==='p'),'x','s','h']:b1};   // (Warszawa's Fridays, p: between the weekdays and the special day)   // a special weekday sits between the weekdays and Saturdays
 const HOLIDAYS=['2026-11-01','2026-11-11','2026-12-25','2026-12-26','2027-01-01','2027-01-06'];
 // settings are kept in the browser's storage and, for the small ones (city, the departure board's stops…), also in a cookie,
 // so they stay where the storage is cleared or not kept
@@ -1732,7 +1733,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   if(li){WEEK=+li.dataset.wk;route();return}
   if(L&&!L.hidden){L.hidden=true;const bb=document.getElementById('weekSel');if(bb)bb.setAttribute('aria-expanded','false')}});
 function tripsOf(d,day){const k=day+WEEK;if(d.plans)return d.tp&&d.tp[k]!==undefined?d.plans[d.tp[k]]:[];return (d.trips&&d.trips[day])||[]}
-function weekDate(day){if(day==='x')return XD_CUR;const w=(IDX.weeks||[])[WEEK];return w?w[day]:(IDX.days||{})[day]}   // no date for f (school-free weekdays)
+function weekDate(day){if(day==='x')return XD_CUR;if(day==='p')return XP_CUR;const w=(IDX.weeks||[])[WEEK];return w?w[day]:(IDX.days||{})[day]}   // no date for f (school-free weekdays)
 // where the timetable comes from, for the note under it
 // the note under a timetable; the MPGK Krynica-Zdrój lines get a note of their own (their timetables are copied from PDFs)
 // the note under a timetable: only where it comes from, "Źródło: ZTM Gdańsk", the name a link to the source's page
@@ -1849,7 +1850,7 @@ function todayType(){
 }
 async function renderStop(id,di,si){
   const r=IDX.routes.find(x=>x.id===id);if(!r)return renderBoard();
-  const L=await loadRoute(id);const d=L.dirs[di];if(!d||!d.stops[si])return renderLine(id);XD_CUR=xdOf([L]);XD_FRI=xFri([L]);
+  const L=await loadRoute(id);const d=L.dirs[di];if(!d||!d.stops[si])return renderLine(id);XD_CUR=xdOf([L]);XD_FRI=xFri([L]);XP_CUR=(([L]).find(L=>L&&L.dates&&L.dates['p'+WEEK])||{dates:{}}).dates['p'+WEEK]||null;
   const st=IDX.stops[d.stops[si][0]];
   document.title=st[0]+' – linia '+r.n;
   const mp=d.pats[0];
@@ -1880,7 +1881,7 @@ async function renderStop(id,di,si){
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const L2=noteKey[tx];if(!used.includes(L2))used.push(L2);return L2};
   const now=todayType();let nextMarked=false;
-  const DAYS=DK(L.dirs),DEPS=nightShift(DAYS,day=>departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropEmptyDays(DAYS,DEPS);const HS=hourUnion(Object.values(DEPS));
+  const DAYS=DK(L.dirs),DEPS=nightShift(DAYS,day=>departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropSameP(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropEmptyDays(DAYS,DEPS);const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
     if(!deps.length)return `<div class="col ecol${day==='x'?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}</h3><div class="empty">${emptyMsg(day,[r.op],L.dirs.some(dd=>tripsOf(dd,day).length))}</div></div>`;
@@ -2064,7 +2065,7 @@ async function renderCombo(key){
 async function renderComboStop(key,ci,i){
   const C=await buildCombo(key);const cd=C.dirs[ci];
   if(!cd||!cd.common[i])return renderCombo(key);
-  const name=cd.common[i];XD_CUR=xdOf(C.Ls);XD_FRI=xFri(C.Ls);
+  const name=cd.common[i];XD_CUR=xdOf(C.Ls);XD_FRI=xFri(C.Ls);XP_CUR=((C.Ls).find(L=>L&&L.dates&&L.dates['p'+WEEK])||{dates:{}}).dates['p'+WEEK]||null;
   document.title=name+' – linie '+C.rs.map(r=>r.n).join(' + ');
   const extra=`<div class="fromto2"><div class="ff"><i></i><s></s>${esc(name)}</div><div class="ft"><i></i>${esc(cd.common[cd.common.length-1])}</div></div>
    <div class="tools">${C.dirs.length>1?'<button class="btn ibtn" type="button" id="swap" title="Zmień kierunek" aria-label="Zmień kierunek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V5M3.5 8.5 7 5l3.5 3.5M17 4v15M13.5 15.5 17 19l3.5-3.5"/></svg></button>':''}${PRINT_BTNS}</div>`;
@@ -2095,7 +2096,7 @@ async function renderComboStop(key,ci,i){
     cd.members.forEach(m=>{const r=C.rs[m.li],d=C.Ls[m.li].dirs[m.di];
       d.stops.forEach((s,k)=>{if(sName(s[0])===name&&s[2])anyReq.push(1)});comboDeps(d,m,name,day).forEach(x=>deps.push({...x,r,d}))});
     return deps.sort((a,b)=>a.t-b.t)});
-  dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));dropEmptyDays(DAYS,DEPS);
+  dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));dropSameP(DAYS,DEPS,a=>a.map(x=>x.t+':'+x.r.n).join(','));dropEmptyDays(DAYS,DEPS);
   const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
     const deps=DEPS[day];
@@ -2131,14 +2132,14 @@ const fmtDay=s=>s?s.slice(6)+'.'+s.slice(4,6)+'.'+s.slice(0,4):'';
 const sheetCol=r=>(r.f||r.t==='rail')?colOf(r):r.t==='night'?'#22262b':'#8a929b';
 // data of one line's stop: {rs, head, name, num, list [{n, m, cur, before, req}], cols {w,s,h: [{t, lt}]}, notes [[letter, text]], req}
 function lineSheet(r,L,di,si){
-  XD_CUR=xdOf([L]);XD_FRI=xFri([L]);
+  XD_CUR=xdOf([L]);XD_FRI=xFri([L]);XP_CUR=(([L]).find(L=>L&&L.dates&&L.dates['p'+WEEK])||{dates:{}}).dates['p'+WEEK]||null;
   const d=L.dirs[di];const st=IDX.stops[d.stops[si][0]];const off=mainOffsets(d);
   // letters as in the stop timetable
   const letters='abcdefghijklmnoprstuwxyz';const noteKey={};const used=[];
   const allD=DK(L.dirs).flatMap(day=>departures(d,si,day));const t0=allD.length?noteOf(d,allD[0]):'';
   const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
   const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const l=noteKey[tx];if(!used.includes(l))used.push(l);return l};
-  const cols={},DK0=DK(L.dirs),NS=nightShift(DK0,day=>departures(d,si,day));DK0.forEach(day=>cols[day]=NS[day].map(x=>({t:x.t,lt:letterFor(x)})));dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));
+  const cols={},DK0=DK(L.dirs),NS=nightShift(DK0,day=>departures(d,si,day));DK0.forEach(day=>cols[day]=NS[day].map(x=>({t:x.t,lt:letterFor(x)})));dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));dropSameP(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));
   // the route: the main run, or where the stop is off it, the run most of its departures take; minutes along it
   let pat=0;
   if(!d.pats[0].includes(si)){const c={};DK(L.dirs).forEach(day=>departures(d,si,day).forEach(x=>c[x.pat]=(c[x.pat]||0)+1));
@@ -3192,8 +3193,8 @@ function freqHours(r,deps){if(!(r&&r.cat==='metro'&&(r.c||[]).includes('waw'))||
 function dropEmptyDays(DAYS,DEPS){if(!DAYS.some(d=>DEPS[d].length))return;for(let i=DAYS.length-1;i>=0;i--)if(!DEPS[DAYS[i]].length){delete DEPS[DAYS[i]];DAYS.splice(i,1)}}
 // a day's column by the clock: its own runs before midnight, and at its top (0:xx, 1:xx) the runs after midnight of the day
 // before (a Friday's 24:05 – the night to Saturday – under Saturday's 0; Thursday's under Friday's)
-function prevDay(day,DAYS){if(day==='w'||day==='f')return day;if(day==='h')return 's';
-  if(day==='s')return DAYS.includes('x')&&XD_FRI?'x':'w';
+function prevDay(day,DAYS){if(day==='w'||day==='f')return day;if(day==='h')return 's';if(day==='p')return 'w';
+  if(day==='s')return DAYS.includes('x')&&XD_FRI?'x':DAYS.includes('p')?'p':'w';
   if(day==='x'){const wd=XD_CUR?new Date(+XD_CUR.slice(0,4),+XD_CUR.slice(4,6)-1,+XD_CUR.slice(6)).getDay():3;return wd===1?'h':wd===0?'s':wd===6?'w':'w'}return day}
 function nightShift(DAYS,get){const memo={},g=k=>memo[k]||(memo[k]=get(k)),out={};
   DAYS.forEach(day=>{const own=g(day).filter(x=>x.t<1440),pd=prevDay(day,DAYS);let prev=[];try{prev=g(pd).filter(x=>x.t>=1440).map(x=>Object.assign({},x,{t:x.t-1440}))}catch(e){}
