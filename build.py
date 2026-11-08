@@ -1269,6 +1269,7 @@ def city_pole(area, r):
     # (only the markings the source gives, never numbers made up here)
     if area == 'fl': return fl_name(r['stop_name'])[1]   # Flensburg: B1, B2… where the stop's name has it
     if area == 'ldz': return (r.get('stop_code') or '').strip()   # Łódź: the stop's own four-digit number (0081)
+    if area == 'poz': return (r.get('stop_code') or '').strip()   # Poznań: the stop's whole code (RKAP71), as on its poles
     if area == 'prg': return (r.get('platform_code') or '').strip()   # Praha: A, B, C… (rail: the platform)
     if area in ('ber', 'ham'):   # the platform as given ("Pos. 5" -> 5, "2", "A"), else the stop's own number; else none
         v = re.sub(r'^(Pos\.|Gleis|Steig)\s*', '', (r.get('platform_code') or '').strip())

@@ -464,6 +464,7 @@ ROWS = [
 ("Zmiany w ruchu", "Service changes", "Änderungen im Verkehr", "Zmeny v doprave", "Změny v dopravě"),
 ("Rozwiń", "Expand", "Aufklappen", "Rozbaliť", "Rozbalit"),
 ("Zwiń", "Collapse", "Zuklappen", "Zbaliť", "Sbalit"),
+("Kursuje komunikacja zastępcza", "A replacement service runs", "Es fährt Ersatzverkehr", "Premáva náhradná doprava", "Jezdí náhradní doprava"),
 ]
 
 WEEKDAYS = {
