@@ -38,12 +38,13 @@ select.sselN{display:none!important}
 .chip.sq{aspect-ratio:1/1;width:auto;padding:0;letter-spacing:-.03em;justify-content:center}
 
 /* a line's sign inside a sentence (the notices) */
-.chip.small.inl.inl{--f:.74;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--f)*1em);font-weight:700;height:calc(1.3em / var(--f));width:calc(1.3em / var(--f));min-width:0;padding:0;margin:0 .15em;vertical-align:middle;line-height:1;letter-spacing:-.03em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.04em}.chip.small.inl.inl.l3{--f:.74;width:auto;min-width:calc(1.3em / var(--f));padding:0 .14em}.chip.small.inl.inl.l4{--f:.74;width:auto;padding:0 .3em}.chip.small.inl.inl.rail{width:auto;padding:0 .5em;border-radius:999px}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
+.chip.small.inl.inl{--f:.74;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--f)*1em);font-weight:700;height:calc(1.3em / var(--f));width:calc(1.3em / var(--f));min-width:0;padding:0;margin:0 .15em;vertical-align:middle;line-height:1;letter-spacing:-.03em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.04em}.chip.small.inl.inl.l3{--f:.6}.chip.small.inl.inl.l4{--f:.74;width:auto;padding:0 .3em}.chip.small.inl.inl.rail{border-radius:50%}.chip.small.inl.inl.rail.l3,.chip.small.inl.inl.rail.l4{--f:.74;width:auto;min-width:calc(1.3em / var(--f));padding:0 .45em;border-radius:999px}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%;width:calc(1.3em / var(--f));min-width:0;padding:0}.chip.small.inl.inl.tram.l3,.chip.small.inl.inl.nt.l3,.chip.small.inl.inl.rail.circle.l3{--f:.56;width:calc(1.3em / var(--f));padding:0;border-radius:50%}.chip.small.inl.inl.tram.l4,.chip.small.inl.inl.nt.l4{--f:.46;width:calc(1.3em / var(--f));padding:0}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
 
 /* the notices' bar: one row at a time (rot), all of them when opened */
 .alertBar .abVp{flex:1 1 auto;width:100%;min-width:0}.alertBar.rot:not(.open) .abVp{height:41px;overflow:hidden}.alertBar.rot:not(.open) .abVp ul{display:block}.alertBar.rot:not(.open) li{height:41px}.alertBar.rot:not(.open) li button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:0!important;height:41px;padding:0;line-height:41px}.alertBar.open .abVp{max-height:50vh;overflow:auto}.alertBar .abExp{flex:none;width:auto;border:0;background:none;color:inherit;cursor:pointer;padding:6px;display:grid;place-items:center}.alertBar.open .abExp svg{transform:rotate(180deg)}
 .alertBox details.aItem>summary{list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:8px}.alertBox details.aItem>summary::-webkit-details-marker{display:none}.alertBox details.aItem>summary h3{flex:1}.alertBox details.aItem>summary::after{content:'';flex:none;width:9px;height:9px;margin-top:6px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg);color:var(--muted);transition:transform .2s}.alertBox details.aItem[open]>summary::after{transform:rotate(-135deg);margin-top:10px}.alertBox details.aItem:not([open]) h3{margin-bottom:0}
 @media (max-width:700px){.lineWarn>div{max-height:9.8em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.lineWarn.lwRep>div{max-height:none;-webkit-mask-image:none;mask-image:none}}
+.chip.rail.r2{padding:0;letter-spacing:-.02em}   /* (M1, U2, S9: round, the wide letters not stretching it) */
 </style>
 <title>ZbiorkomInfo</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#ffffff"><meta name="mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M3%206h15v3.6L8.2%2022.4H18V26H2.6v-3.6l9.8-12.8H3z%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2221.5%22%20y%3D%226%22%20width%3D%225%22%20height%3D%2220%22%20fill%3D%22%23d71920%22%2F%3E%3C%2Fsvg%3E">
@@ -1436,7 +1437,7 @@ async function loadRoute(id){
 }
 function chip(r,extra='',plain=false){
   if(typeof r==='string')r=BYNAME[r];
-  const a=document.createElement(plain?'span':'a');if(!plain)a.href='#l'+r.id;a.className='chip '+r.t+(r.nt?' nt':'')+(r.n.length>4&&r.t!=='tram'&&r.t!=='rail'&&!r.nt?' wide':'')+(r.n.length<=3&&r.t!=='tram'&&r.t!=='rail'&&!r.nt&&r.n!=='S22'?' sq':'')+(r.n==='S22'?' circle':'')+(r.f?' freq':'')+(extra?' '+extra:'');a.textContent=r.n;
+  const a=document.createElement(plain?'span':'a');if(!plain)a.href='#l'+r.id;a.className='chip '+r.t+(r.nt?' nt':'')+(r.n.length>4&&r.t!=='tram'&&r.t!=='rail'&&!r.nt?' wide':'')+(r.n.length<=3&&r.t!=='tram'&&r.t!=='rail'&&!r.nt&&r.n!=='S22'?' sq':'')+(r.n==='S22'?' circle':'')+(r.t==='rail'&&r.n.length<=2?' r2':'')+(r.f?' freq':'')+(extra?' '+extra:'');a.textContent=r.n;
   if(r.f||r.t==='rail'){a.style.setProperty('--c',colOf(r));a.style.setProperty('--t',txtOf(r))}
   a.title='Linia '+r.n+': '+r.ends.join(' – ');
   return a;
@@ -1465,7 +1466,7 @@ function sections(){
   const tk=r=>{const n=r.n;if(ownSub.has(r.id))return 'sub';if(r.cat==='ferry')return 'ferry';if(/^C\d+$/.test(n)&&['bus','trol','repl','tram'].includes(r.t))return 'seas';
     if(!['bus','trol','repl'].includes(r.t))return r.t;
     if(city==='waw'&&/^L-?\d+$/.test(n))return 'local';
-    if(city==='ham'&&/^X\d+$/.test(n))return 'exp';   // Hamburg: the X lines (Schnellbusse) are express lines   // Warszawa: the local lines L-1 … L52   // C lines (e.g. to the cemeteries around 1 November): every city
+    if((city==='ham'||city==='ber')&&/^X\d+$/.test(n))return 'exp';   // Hamburg: the X lines (Schnellbusse) are express lines   // Warszawa: the local lines L-1 … L52   // C lines (e.g. to the cemeteries around 1 November): every city
     if(!tri)return r.t;
     if(/^[A-Z]$/.test(n))return 'exp';if(/^(C\d+|3\d\d|6\d|6\d\d)$/.test(n))return 'seas';if(/^9\d\d?$/.test(n))return 'repl';return r.t};
   return [
