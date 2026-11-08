@@ -481,6 +481,8 @@ ROWS = [
     ('Przystanek na żądanie', 'Request stop', 'Bedarfshaltestelle', 'Zastávka na znamenie', 'Zastávka na znamení'),
     ('Tłumaczenia nazw przystanków', 'Translations of stop names', 'Übersetzungen der Haltestellennamen', 'Preklady názvov zastávok', 'Překlady názvů zastávek'),
     ('Piątki', 'Fridays', 'Freitage', 'Piatky', 'Pátky'),
+    ('Dane rozkładowe', 'Timetable data', 'Fahrplandaten', 'Údaje z cestovného poriadku', 'Údaje z jízdního řádu'),
+    ('Dane rozkładowe z opóźnieniami z tablic', 'Timetable data with delays from the stop displays', 'Fahrplandaten mit Verspätungen der Haltestellenanzeigen', 'Údaje z cestovného poriadku s meškaniami z tabúľ', 'Údaje z jízdního řádu se zpožděními z tabulí'),
 ]
 
 WEEKDAYS = {
