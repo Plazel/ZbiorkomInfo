@@ -1263,7 +1263,7 @@ def city_name(area, r):
     if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
         return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', re.sub(r'\s*\(Berlin,?\s*\)', '', r['stop_name']))).strip())
     if area == 'fl': return fl_name(r['stop_name'])[0]
-    return r['stop_name'].strip()
+    return re.sub(r'\s+', ' ', r['stop_name']).strip()   # ("Kaliskiego  - Akademicka": one space)
 def city_pole(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[1]
     # (only the markings the source gives, never numbers made up here)

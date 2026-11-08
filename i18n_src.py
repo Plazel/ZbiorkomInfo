@@ -465,6 +465,21 @@ ROWS = [
 ("Rozwiń", "Expand", "Aufklappen", "Rozbaliť", "Rozbalit"),
 ("Zwiń", "Collapse", "Zuklappen", "Zbaliť", "Sbalit"),
 ("Kursuje komunikacja zastępcza", "A replacement service runs", "Es fährt Ersatzverkehr", "Premáva náhradná doprava", "Jezdí náhradní doprava"),
+    ('Głos', 'Voice', 'Stimme', 'Hlas', 'Hlas'),
+    ('Pojazd', 'Vehicle', 'Fahrzeug', 'Vozidlo', 'Vozidlo'),
+    ('Wycisz zapowiedzi', 'Mute announcements', 'Ansagen stummschalten', 'Stlmiť hlásenia', 'Ztlumit hlášení'),
+    ('Zapowiedzi mSIP są włączone', 'mSIP announcements are on', 'mSIP-Ansagen sind eingeschaltet', 'Hlásenia mSIP sú zapnuté', 'Hlášení mSIP jsou zapnutá'),
+    ('linia', 'line', 'Linie', 'linka', 'linka'),
+    ('mSIP – zapowiedzi włączone', 'mSIP – announcements on', 'mSIP – Ansagen ein', 'mSIP – hlásenia zapnuté', 'mSIP – hlášení zapnutá'),
+    ('na żywo', 'live', 'live', 'naživo', 'živě'),
+    ('Automatyczne odtwarzanie zapowiedzi', 'Play announcements automatically', 'Ansagen automatisch abspielen', 'Automaticky prehrávať hlásenia', 'Automaticky přehrávat hlášení'),
+    ('Koło', 'Circle', 'Kreis', 'Kruh', 'Kruh'),
+    ('Męski', 'Male', 'Männlich', 'Mužský', 'Mužský'),
+    ('Żeński', 'Female', 'Weiblich', 'Ženský', 'Ženský'),
+    ('Numery linii przy przystankach', 'Line numbers at the stops', 'Liniennummern an den Haltestellen', 'Čísla liniek pri zastávkach', 'Čísla linek u zastávek'),
+    ('Prostokąt', 'Rectangle', 'Rechteck', 'Obdĺžnik', 'Obdélník'),
+    ('Przystanek na żądanie', 'Request stop', 'Bedarfshaltestelle', 'Zastávka na znamenie', 'Zastávka na znamení'),
+    ('Tłumaczenia nazw przystanków', 'Translations of stop names', 'Übersetzungen der Haltestellennamen', 'Preklady názvov zastávok', 'Překlady názvů zastávek'),
 ]
 
 WEEKDAYS = {
