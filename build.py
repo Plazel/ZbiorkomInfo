@@ -238,9 +238,33 @@ def build_routes(groups, meta_of):
                 cand = [q for q in cand if not {lname(x) for x in q} & set(m['main_not'])] or cand
             main = max(cand, key=lambda q: (base_c[q] * len(q), base_c[q]))
             pats = [main] + [p for p, _ in pat_count.most_common() if p != main]
+            # a line cut in two (S2 changing trains at Gdańsk Osowa; Berlin's M17 parted by building works, a replacement bus
+            # between its parts): the other part, run about as often and meeting the main one at one stop or at none, is a
+            # main route too; the two follow one another in the list, with a break between them (brk)
+            seg = None; brk = None; mnames = {lname(x) for x in main}
+            # (only where a line is known to be cut: S2, and the trams and U-Bahn of Berlin and Hamburg during building works;
+            # elsewhere – trains run through the main station as two halves in the data, regional buses – it would mislead)
+            rid_ = str(m.get('id', key))
+            split_ok = rid_ == 'kS2' or (rid_[:2] in ('be', 'hh') and not rid_.endswith('E') and (m.get('t') == 'tram' or re.fullmatch(r'(be|hh)U\d+', rid_)))
+            for p_ in [] if not split_ok else sorted((p for p in pats[1:] if len(p) >= 3), key=lambda p: -base_c.get(p, 0)):
+                if base_c.get(p_, 0) < .25 * base_c[main]: break
+                common = mnames & {lname(x) for x in p_}
+                if len(common) > 1: continue
+                if common and not ({lname(main[-1]), lname(main[0])} & common and {lname(p_[0]), lname(p_[-1])} & common): continue
+                seg = p_; break
+            if seg:
+                dist = lambda a_, b_: math.hypot(STOPS[a_][2] - STOPS[b_][2], (STOPS[a_][3] - STOPS[b_][3]) * .63)
+                after = (lname(main[-1]) == lname(seg[0])) if (mnames & {lname(x) for x in seg}) else dist(main[-1], seg[0]) <= dist(seg[-1], main[0])
+                first, second = (main, seg) if after else (seg, main)
+                if lname(first[-1]) == lname(second[0]):   # one stop of both: the change there
+                    base = list(first) + [x for x in second if x != first[-1]]; brk = [len(first) - 1, 'p', lname(first[-1]), '']   # (another pole there: both kept)
+                else:   # a gap between them (a replacement bus)
+                    base = list(first) + list(second); brk = [len(first) - 1, 'z', lname(first[-1]), lname(second[0])]
+                merged = base
             # variant-only stops go right before the stop where the variant joins the main route
             # (or right after the stop where it leaves it), like on the ZTM website
-            merged = list(main)
+            if not seg: merged = list(main)
+            brk_sid = merged[brk[0]] if brk else None
             for p in pats[1:]:
                 pending = []; last = -1
                 for sid in p:
@@ -254,7 +278,8 @@ def build_routes(groups, meta_of):
                     else:
                         pending.append(sid)
                 for j, x in enumerate(pending): merged.insert(last + 1 + j, x)
-            mpos = {s: i for i, s in enumerate(merged)}; main_set = set(main)
+            mpos = {s: i for i, s in enumerate(merged)}; main_set = set(main) | set(seg or ())
+            if brk: brk[0] = merged.index(brk_sid)   # (the other routes' stops put in since)
             req = collections.Counter(); tot = collections.Counter()
             for _, _, rows, _t in tl:
                 for x in rows:
@@ -279,7 +304,7 @@ def build_routes(groups, meta_of):
                 return r
             for p in pats:
                 pat_out.append(pat_idx(p))
-                if p == main: notes.append(''); continue
+                if p == main or p == seg: notes.append(''); continue
                 parts = []
                 if lname(p[0]) != lname(main[0]): parts.append('kurs rozpoczyna się na przystanku ' + lname(p[0]))
                 if lname(p[-1]) != lname(main[-1]): parts.append('kurs kończy bieg na przystanku ' + lname(p[-1]))
@@ -323,8 +348,9 @@ def build_routes(groups, meta_of):
                     return (w[-1] - w[0]) / (len(w) - 1) if len(w) >= 4 else 999
                 best = lambda lo, hi: min(hw(x, x + 120) for x in range(lo, hi - 119, 5))
                 peak_all.append(max(best(300, 600), best(780, 1140)))
-            out_dirs.append({'_shape': SHAPE_OF.get((rid_key, main)), '_vshapes': [SHAPE_OF.get((rid_key, q)) for q in pats[1:]], 'd': d, 'head': lname(main[-1]), 'from': lname(main[0]), 'stops': stops_out,
-                             'pats': pat_out, 'notes': notes, 'prof': profiles, **plans_of(trips_out), **({'tends': tends} if tends else {})})
+            out_dirs.append({'_shape': SHAPE_OF.get((rid_key, main)), '_vshapes': [SHAPE_OF.get((rid_key, q)) for q in pats[1:]], 'd': d, 'head': lname((second if seg else main)[-1]), 'from': lname((first if seg else main)[0]), 'stops': stops_out,
+                             'pats': pat_out, 'notes': notes, 'prof': profiles, **plans_of(trips_out), **({'tends': tends} if tends else {}),
+                             **({'brk': brk, 'seg': pats.index(seg)} if seg else {})})
         if not out_dirs: continue
         cov24 = min(cov24_all) if cov24_all else 0
         deps = sum(dep_all) / max(1, len(dep_all))
@@ -1235,7 +1261,7 @@ def seq_pole(area, name, sid):
 def city_name(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[0]
     if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
-        return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', r['stop_name'].replace(' (Berlin)', ''))).strip())
+        return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', re.sub(r'\s*\(Berlin,?\s*\)', '', r['stop_name']))).strip())
     if area == 'fl': return fl_name(r['stop_name'])[0]
     return r['stop_name'].strip()
 def city_pole(area, r):
@@ -1407,7 +1433,7 @@ for area, A in NEW_AREAS.items():
             if r['n'] in AREA_LINE_COLORS and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True; r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]   # (Berlin, Hamburg: not the replacement bus S1)
         print(A['op'] + ':', len(ROUTES_OUT) - n0, 'linii')
     except Exception as e:
-        print(A['op'] + ': pominięty (%s)' % e)
+        print(A['op'] + ': pominięty (%s)' % e); import traceback; traceback.print_exc()
 
 used = {s[0] for f in os.listdir(OUT + '/r') for dd in json.load(open(OUT + '/r/' + f, encoding='utf-8'))['dirs'] for s in dd['stops']}
 fi = next(rd(SCR + '/gtfs/x/feed_info.txt'), {})

@@ -453,6 +453,12 @@ ROWS = [
 ("Szczegóły na stronie ZTP", "Details on the ZTP website", "Details auf der ZTP-Website", "Podrobnosti na webe ZTP", "Podrobnosti na webu ZTP"),
 ("Niemcy", "Germany", "Deutschland", "Nemecko", "Německo"),
 ("Szczegóły na stronie VBB", "Details on the VBB website", "Details auf der VBB-Website", "Podrobnosti na webe VBB", "Podrobnosti na webu VBB"),
+("Przesiadka na przystanku", "Change at", "Umstieg an der Haltestelle", "Prestup na zastávke", "Přestup na zastávce"),
+("Komunikacja zastępcza", "Replacement service", "Ersatzverkehr", "Náhradná doprava", "Náhradní doprava"),
+("Linia kursuje w dwóch częściach", "The line runs in two parts", "Die Linie fährt in zwei Abschnitten", "Linka premáva v dvoch častiach", "Linka jezdí ve dvou částech"),
+("oraz", "and", "und", "a", "a"),
+("Na odcinku", "Between", "Zwischen", "V úseku", "V úseku"),
+("kursuje komunikacja zastępcza", "a replacement service runs", "fährt Ersatzverkehr", "premáva náhradná doprava", "jezdí náhradní doprava"),
 ]
 
 WEEKDAYS = {
