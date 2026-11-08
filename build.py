@@ -1235,7 +1235,7 @@ def seq_pole(area, name, sid):
 def city_name(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[0]
     if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
-        return re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', r['stop_name'].replace(' (Berlin)', ''))).strip()
+        return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', r['stop_name'].replace(' (Berlin)', ''))).strip())
     if area == 'fl': return fl_name(r['stop_name'])[0]
     return r['stop_name'].strip()
 def city_pole(area, r):
@@ -1246,6 +1246,7 @@ def city_pole(area, r):
     if area in ('ber', 'ham'):   # the platform ("Pos. 5", "2", "A"), else the stop's own number; else numbered in order
         v = re.sub(r'^(Pos\.|Gleis|Steig)\s*', '', (r.get('platform_code') or '').strip())
         if not re.fullmatch(r'[0-9A-Za-z]{1,3}', v): v = (r.get('stop_code') or '').strip() if area == 'ber' else ''
+        if re.fullmatch(r'\d{1,2}', v or ''): return '%02d' % int(v)   # (01, 02… as the numbers made up for the others)
         return v if re.fullmatch(r'[0-9A-Za-z]{1,3}', v or '') else seq_pole(area, city_name(area, r), r['stop_id'])
     if area == 'krk':
         for v in (r.get('stop_desc'), r.get('platform_code'), (r.get('stop_code') or '').split('-')[-1]):

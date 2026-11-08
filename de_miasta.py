@@ -6,7 +6,7 @@ Hamburg: hvv (Hamburger Verkehrsverbund, Transparenzportal Hamburg, dl-de/by-2.0
 VHH, S-Bahn Hamburg and HADAG's ferries that stop in Hamburg itself (stop ids de:02000:…); the hvv file names no operators,
 only its agency numbers, so those are listed here.
 Only the files a timetable needs are written (the stop times and shapes of the lines kept)."""
-import csv, io, json, os, re, sys, urllib.request, zipfile
+import collections, csv, io, json, os, re, sys, urllib.request, zipfile
 
 CITIES = {
     'ber': {'agencies': {'1', '796'}, 'stop_prefix': None},
@@ -56,11 +56,12 @@ def cut(src_zip, out, area, log=print):
         rows = [row for row in rows if row[it] in tids]
     with open(st_path, 'w', encoding='utf-8', newline='') as f:
         w = csv.writer(f); w.writerow(hdr); w.writerows(rows)
-    used = {row[isd] for row in rows}; del rows
+    used = {row[isd] for row in rows}
+    del rows
     stops = [s for s in rd('stops.txt') if s['stop_id'] in used]
     sids = {t['service_id'] for t in trips}; shp = {t.get('shape_id') for t in trips if t.get('shape_id')}
     agencies = [a for a in rd('agency.txt') if a['agency_id'] in C['agencies']]
-    write('agency.txt', agencies); write('routes.txt', routes); write('trips.txt', trips); write('stops.txt', stops)
+    write('agency.txt', agencies); write('routes.txt', routes, list(dict.fromkeys(k for r in routes for k in r))); write('trips.txt', trips); write('stops.txt', stops)
     for n in ('calendar.txt', 'calendar_dates.txt'):
         if n in z.namelist(): write(n, (r for r in rd(n) if r['service_id'] in sids))
     if 'feed_info.txt' in z.namelist(): write('feed_info.txt', rd('feed_info.txt'))
