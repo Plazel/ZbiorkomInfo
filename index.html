@@ -137,7 +137,7 @@ span.chip{cursor:inherit}
 .ac button svg.ic{width:24px;height:24px;color:var(--fg);margin-right:4px;flex:none}
 .ac .shared{margin-left:auto;padding-left:10px;font-family:var(--font-body);font-weight:400;font-size:.78rem;color:var(--muted);white-space:nowrap}
 .wkLab{color:var(--muted);margin-right:-4px;font-size:.9rem;align-self:center;white-space:nowrap}
-.wkPick{position:relative;display:inline-block;max-width:100%}.wkPick .wkList{left:0;right:auto;min-width:100%;width:max-content;max-width:calc(100vw - 32px);max-height:none;scrollbar-width:none}.wkPick .wkList li{color:var(--fg)}.wkPick .wkList li.cur{font-weight:600}
+.wkPick{position:relative;display:inline-block;max-width:100%}.wkPick .wkList{left:0;right:auto;min-width:100%;width:max-content;max-width:calc(100vw - 32px);max-height:none}.wkPick .wkList li{color:var(--fg)}.wkPick .wkList li.cur{font-weight:600}
 .wksel{appearance:none;text-align:left;-webkit-appearance:none;padding-right:30px;max-width:100%;font-family:inherit;line-height:1.5;box-sizing:border-box;
   height:calc(.88rem * 1.5 + 16px);padding-top:0;padding-bottom:0;
   background-image:linear-gradient(45deg,transparent 50%,var(--fg) 50%),linear-gradient(135deg,var(--fg) 50%,transparent 50%);
@@ -496,7 +496,7 @@ span.chip{cursor:inherit}
 .comboOpt{margin-top:14px}
 .depBox.coBox{max-width:620px;width:100%;background:var(--bg);color:var(--fg);border-color:var(--line);grid-template-rows:auto 1fr}.depBox.coBox .depX{color:var(--muted)}.coBox .hint{margin:4px 0}.coBox .groups{display:flex;flex-wrap:wrap;gap:12px}.coBox h3{font-size:1rem;margin:16px 0 6px}.coBox h3:first-child{margin-top:0}.coBox .frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .depBox.coBox input[type=text]{border:1px solid var(--line);background:var(--bg);color:var(--fg);padding:8px 10px;font:inherit;min-width:0;flex:1;border-radius:0}
-.coAB{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}.coAB label{display:flex;align-items:center;gap:6px;position:relative}.coAB .lnAc li{color:var(--fg)}.coAB label>span{font-weight:700}#coDlg input[type=text]:focus,#coDlg input[type=text]:focus-visible{outline:none;border-color:var(--fg)}#coDlg .lnAc{scrollbar-width:none;box-sizing:border-box;left:0;right:0;width:auto}#coDlg .coFld{flex:1;min-width:0;display:flex}#coDlg .coFld input{flex:1;width:100%}#coDlg input[type=text],#coDlg .frow>.btn,#coDlg .coAB>.btn{height:40px;box-sizing:border-box}#coDlg .frow>.btn,#coDlg .coAB>.btn{padding-top:0;padding-bottom:0}#coDlg .lnAc::-webkit-scrollbar{display:none}#coDlg{overflow:auto}#coDlg .depBox.coBox{max-height:none}#coDlg .depBody{overflow:visible}
+.coAB{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}.coAB label{display:flex;align-items:center;gap:6px;position:relative}.coAB .lnAc li{color:var(--fg)}.coAB label>span{font-weight:700}#coDlg input[type=text]:focus,#coDlg input[type=text]:focus-visible{outline:none;border-color:var(--fg)}#coDlg .lnAc{box-sizing:border-box;left:0;right:0;width:auto}#coDlg .coFld{flex:1;min-width:0;display:flex}#coDlg .coFld input{flex:1;width:100%}#coDlg input[type=text],#coDlg .frow>.btn,#coDlg .coAB>.btn{height:40px;box-sizing:border-box}#coDlg .frow>.btn,#coDlg .coAB>.btn{padding-top:0;padding-bottom:0}#coDlg .lnAc::-webkit-scrollbar{display:none}#coDlg{overflow:auto}#coDlg .depBox.coBox{max-height:none}#coDlg .depBody{overflow:visible}
 @media (max-width:560px){.coAB{grid-template-columns:1fr}}
 .plusPanel{max-width:1560px;margin:10px auto 0;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));display:flex;justify-content:flex-end}
 .plusPanel form{background:var(--panel);border-radius:10px;padding:14px;display:grid;gap:8px;max-width:420px;width:100%}
@@ -982,7 +982,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
   .setPanel{position:fixed;left:8px;right:8px;top:calc(var(--top-h) + 6px);width:auto;max-width:none;max-height:calc(100dvh - var(--top-h) - 90px);overflow:auto;padding:14px 16px;gap:18px}
   .expPanel{position:fixed;left:8px;right:8px;top:calc(var(--top-h) + 6px);width:auto;max-width:none;max-height:calc(100dvh - var(--top-h) - 90px);overflow:auto}
   /* map: header in one scrolling row, the map over the whole screen, the line list as a sheet from the bottom */
-  .mapHead{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:8px 12px;scrollbar-width:none}
+  .mapHead{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:8px 12px}
   .mapHead::-webkit-scrollbar{display:none}
   .mapHead>*{flex:none}
   .mapHead h2{display:none}
@@ -1083,7 +1083,7 @@ nav.rail{overflow-y:auto;overscroll-behavior:contain}
 @media (max-width:760px){nav.rail{overflow-x:auto;overflow-y:hidden;justify-content:flex-start}nav.rail button{flex:1 0 72px;min-width:72px}}
 html.app nav.rail{touch-action:pan-x pan-y!important}
 /* no browser scrollbars anywhere (the page and its panels still scroll) */
-html,body,*,*::before,*::after{scrollbar-width:none!important;-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
+/* (the standard property only where there is no ::-webkit-scrollbar (Firefox): Chromium ignores ::-webkit-scrollbar wherever scrollbar-width is set, and on Android its overlay scrollbar of the page heeds only display:none) */@supports not selector(::-webkit-scrollbar){html,body,*,*::before,*::after{scrollbar-width:none!important}}html,body,*{-ms-overflow-style:none!important}html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{display:none!important;width:0!important;height:0!important;background:transparent!important}
 /* the buttons of a second row (under the top bar) as large as the top bar's and in line with them: same size, same gaps, same right edge */
 :root{--ib:38px;--ibg:8px}
 @media (max-width:460px){:root{--ib:34px;--ibg:6px}}
@@ -3601,7 +3601,8 @@ const GD_SAY=[[/Groddecka/g,'Grodeka'],[/Traugutta/g,'Trauguta'],[/Westerplatte/
   // abbreviations in the names said in full
   [/\bMPGK\b/g,'Miejskie Przedsiębiorstwo Gospodarki Komunalnej'],[/\bZAiKS\b/g,'Związek Autorów i Kompozytorów Scenicznych'],
   [/\bOSP\b/g,'Ochotnicza Straż Pożarna'],[/\bRSP\b/g,'Rolnicza Spółdzielnia Produkcyjna'],[/\bGS\b/g,'Gminna Spółdzielnia'],
-  [/\bUKW\b/g,'Uniwersytet Kazimierza Wielkiego'],[/Gł\.(?=\s|$)/g,'Główny'],
+  [/\bUKW\b/g,'Uniwersytet Kazimierza Wielkiego'],[/(^|[^\p{L}])Ł\.\s*(?=\p{L})/gu,'$1Łódź '],[/(^|[^\p{L}.])Dw\.\s*(?=\p{L})/gu,'$1Dworzec '],   // (Łódź: "Dw. Ł. Kaliska" said "Dworzec Łódź Kaliska")
+  [/Gł\.(?=\s|$)/g,'Główny'],
   // "Św.": Świętego before a genitive (Wzgórze Św. Maksymiliana), Świętej before a woman's name in it (Św. Barbary), else Święty
   [/Św\.\s*(\p{Lu}\p{L}*)/gu,(m,w)=>(/[aą]$/.test(w)?'Świętego ':/[yi]$/.test(w)?'Świętej ':'Święty ')+w],
   [/Grudnia\s*['‘’]70/g,'Grudnia siedemdziesiątego roku'],[/Experyment/g,'Eksperyment'],[/\bFoch/g,'Fosz']];
