@@ -1,6 +1,7 @@
 {
- "sprawdzono": "2026-11-08 16:53",
+ "sprawdzono": "2026-11-08 17:50",
  "zrodla": {
-  "zkm": "pobrane z Mobility Database"
+  "zkm": "pobrane z Mobility Database",
+  "rail": "BrokenPipeError: [Errno 32] Broken pipe"
  }
 }
