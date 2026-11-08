@@ -95,8 +95,15 @@ if _lost:
 try:
     import flensburg_gtfs
     _fc = os.path.join(HERE, 'cache', 'fl')
-    if not os.path.exists(_fc + '/stop_times.txt') or (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) > 6 * 86400:
-        os.makedirs(os.path.dirname(_fc), exist_ok=True); flensburg_gtfs.build(flensburg_gtfs.current_url(), _fc)
+    # gtfs.de first (each stop's platforms, B1, B2…); the Schleswig-Holstein file when it cannot be read
+    _fresh = os.path.exists(_fc + '/stop_times.txt') and os.path.exists(_fc + '/zrodlo.txt') and (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) < 6 * 86400
+    if not _fresh:
+        os.makedirs(os.path.dirname(_fc), exist_ok=True)
+        try:
+            flensburg_gtfs.build_de(_fc); open(_fc + '/zrodlo.txt', 'w').write('gtfs.de')
+        except Exception as e:
+            print('Flensburg: gtfs.de niedostępne (%s), dane Szlezwika-Holsztyna' % e)
+            if not os.path.exists(_fc + '/stop_times.txt'): flensburg_gtfs.build(flensburg_gtfs.current_url(), _fc)
     shutil.copytree(_fc, os.path.join(SCR, 'fl'))
 except Exception as e: print('Flensburg: bez danych (%s)' % e)
 
@@ -1183,11 +1190,30 @@ def fl_name(n):
     n = re.sub(r'\s*-?>.*$', '', n.strip()); n = re.sub(r'\s+Richtung\s.*$', '', n); n = re.sub(r'\s+Ring [AB]\b.*$', '', n)
     n = re.sub(r'^Flensburg[ ,]+(?=\S)', '', n)   # the city's own name in front of its stops (Schleswig-Holstein data)
     m = re.match(r'^(.*?)\s+B(\d)$', n)
-    return (m.group(1).strip(), '%02d' % int(m.group(2))) if m else (n.strip(), '')
+    return (m.group(1).strip(), 'B' + m.group(2)) if m else (n.strip(), '')   # Flensburg's platforms are B1, B2…
 SEQ_POLE = collections.defaultdict(dict)   # Łódź, Flensburg: the poles of a stop numbered 01, 02… in the feed's order
+def _fl_b():
+    """Flensburg: the B numbers each stop's platforms have in the feed"""
+    out = collections.defaultdict(set)
+    try:
+        for r in csv.DictReader(open(os.path.join(SCR, 'fl', 'stops.txt'), encoding='utf-8-sig')):
+            n, b = fl_name(r['stop_name'])
+            if b: out[n].add(b)
+    except Exception: pass
+    return out
+class _Lazy(dict):
+    def get(self, k, d=None):
+        if not self.get_done: self.update(_fl_b()); self.get_done = True
+        return dict.get(self, k, d)
+FL_B = _Lazy(); FL_B.get_done = False
 def seq_pole(area, name, sid):
     d = SEQ_POLE[(area, name)]
-    if sid not in d: d[sid] = '%02d' % (len(d) + 1)
+    if sid not in d:
+        if area == 'fl':   # the platforms without a number in the feed: the next B number the stop does not use yet
+            have = set(d.values()) | FL_B.get(name, set()); k = 1
+            while 'B%d' % k in have: k += 1
+            d[sid] = 'B%d' % k
+        else: d[sid] = '%02d' % (len(d) + 1)
     return d[sid]
 def city_name(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[0]

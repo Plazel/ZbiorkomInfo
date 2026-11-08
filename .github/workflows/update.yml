@@ -33,6 +33,18 @@ jobs:
         if: steps.gate.outputs.go == '1'
         with:
           python-version: '3.12'
+      # remotezip: build.py reads Flensburg's part of the all-Germany gtfs.de file without downloading the whole file
+      - name: Biblioteki
+        if: steps.gate.outputs.go == '1'
+        run: pip install remotezip
+      # Flensburg's timetable, cut out of gtfs.de, kept a week (build.py renews it after six days)
+      - name: Flensburg (z pamięci podręcznej)
+        if: steps.gate.outputs.go == '1'
+        uses: actions/cache@v4
+        with:
+          path: cache/fl
+          key: fl-${{ github.run_id }}
+          restore-keys: fl-
       # the last copy of each source fetched, used when a source cannot be fetched (build.py)
       - name: Ostatnie pobrane kopie źródeł
         if: steps.gate.outputs.go == '1'

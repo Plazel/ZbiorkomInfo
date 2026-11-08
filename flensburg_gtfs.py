@@ -3,7 +3,7 @@
 dataset "Fahrplandaten", GTFS, CC BY 4.0). Only the operator's routes, their trips, stop times, shapes, stops and calendars
 are kept, written as a small GTFS folder.
 Usage: python flensburg_gtfs.py <zip path or URL> <output folder>   (build.py calls build())"""
-import csv, io, os, sys, urllib.request, zipfile, shutil
+import csv, io, os, re, sys, urllib.request, zipfile, shutil
 
 URL = 'https://opendata.schleswig-holstein.de/dataset/5e0652d8-7f59-42fc-92ab-a6358f800e1d/resource/d26a3f87-b8a9-4c02-ab2e-13ea4755ebc3/download/fahrplandaten'
 AGENCY = 'Aktiv Bus Flensburg GmbH'
@@ -67,6 +67,59 @@ def build(src, out, log=print):
     log('Flensburg: %d linii, %d kursów, %d przystanków, %d odjazdów' % (len(routes), len(trips), len(stops), n))
     if src.endswith('.zip') and os.path.dirname(src) == os.path.dirname(out.rstrip('/')) and os.path.basename(src) == os.path.basename(out.rstrip('/')) + '.zip':
         os.remove(src)
+
+
+# gtfs.de (DELFI data, CC BY 4.0): the same timetable with every stop's platforms ("Angelburger Str. B1 > Südermarkt",
+# "Stuhrsallee > ZOB"), which the Schleswig-Holstein file merges into one point per stop; read from the zip on the server
+# (HTTP ranges), so that only the small files and the stop times of Flensburg are taken from its 2 GB of stop times
+DE_URL = 'https://download.gtfs.de/germany/nv_free/latest.zip'
+DE_AGENCY = 'Aktiv Bus Flensburg'
+
+
+def build_de(out, log=print, url=DE_URL):
+    from remotezip import RemoteZip
+    os.makedirs(out, exist_ok=True)
+    with RemoteZip(url, headers={'User-Agent': 'Mozilla/5.0 (rozklady-trojmiasto)'}) as z:
+        rd = lambda n: csv.DictReader(io.TextIOWrapper(z.open(n), encoding='utf-8-sig'))
+
+        def write(name, rows, fields):
+            with open(os.path.join(out, name + '.tmp'), 'w', encoding='utf-8', newline='') as f:
+                w = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore'); w.writeheader(); w.writerows(rows)
+        ag = [a for a in rd('agency.txt') if a['agency_name'] == DE_AGENCY]
+        aids = {a['agency_id'] for a in ag}
+        routes = [r for r in rd('routes.txt') if r['agency_id'] in aids]
+        rids = {r['route_id'] for r in routes}
+        trips = [t for t in rd('trips.txt') if t['route_id'] in rids]
+        tids = {t['trip_id'] for t in trips}; sids = {t['service_id'] for t in trips}
+        if not trips: raise RuntimeError('gtfs.de: brak kursów ' + DE_AGENCY)
+        cal = {n: [r for r in rd(n) if r['service_id'] in sids] for n in ('calendar.txt', 'calendar_dates.txt')}
+        used = set(); n = 0
+        with z.open('stop_times.txt') as fh, open(os.path.join(out, 'stop_times.txt.tmp'), 'w', encoding='utf-8', newline='') as fo:
+            rdr = csv.reader(io.TextIOWrapper(fh, encoding='utf-8-sig')); hdr = next(rdr); it = hdr.index('trip_id'); isd = hdr.index('stop_id')
+            w = csv.writer(fo); w.writerow(hdr)
+            for row in rdr:
+                if row[it] in tids: w.writerow(row); used.add(row[isd]); n += 1
+        allst = list(rd('stops.txt'))
+        stops = [s for s in allst if s['stop_id'] in used]
+        par = {s['parent_station'] for s in stops if s.get('parent_station')}
+        pname = {s['stop_id']: s['stop_name'] for s in allst if s['stop_id'] in par}
+        for s in stops:   # the stop's own name from its parent ("Flensburg Stuhrsallee"), the platform's ("B1", the way) after it
+            pn = pname.get(s.get('parent_station'))
+            if pn and not s['stop_name'].startswith(pn):
+                m = re.search(r'\bB(\d)\b', s['stop_name'])
+                s['stop_name'] = pn + (' B' + m.group(1) if m else '')
+    write('agency.txt', ag, list(ag[0].keys())); write('routes.txt', routes, list(routes[0].keys()))
+    write('trips.txt', trips, list(trips[0].keys()))
+    for k, rows in cal.items():
+        if rows: write(k, rows, list(rows[0].keys()))
+    write('stops.txt', stops, list(stops[0].keys()))
+    # the new files take the old ones' place only now, when all of them are there; no shapes here: build.py draws the
+    # routes along the streets of the map itself
+    new = {f[:-4] for f in os.listdir(out) if f.endswith('.tmp')}
+    for f in os.listdir(out):
+        if f.endswith('.txt') and f not in new: os.remove(os.path.join(out, f))
+    for f in new: os.replace(os.path.join(out, f + '.tmp'), os.path.join(out, f))
+    log('Flensburg (gtfs.de): %d linii, %d kursów, %d przystanków (perony), %d odjazdów' % (len(routes), len(trips), len(stops), n))
 
 
 if __name__ == '__main__':
