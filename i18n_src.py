@@ -459,6 +459,8 @@ ROWS = [
 ("oraz", "and", "und", "a", "a"),
 ("Na odcinku", "Between", "Zwischen", "V úseku", "V úseku"),
 ("kursuje komunikacja zastępcza", "a replacement service runs", "fährt Ersatzverkehr", "premáva náhradná doprava", "jezdí náhradní doprava"),
+("Wszystkie komunikaty", "All notices", "Alle Meldungen", "Všetky oznámenia", "Všechna oznámení"),
+("Szczegóły na stronie BVG", "Details on the BVG website", "Details auf der BVG-Website", "Podrobnosti na webe BVG", "Podrobnosti na webu BVG"),
 ]
 
 WEEKDAYS = {

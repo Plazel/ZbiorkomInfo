@@ -1944,6 +1944,10 @@ print('Paczki tras:', len(os.listdir(OUT + '/rp')), 'plików')
 try:
     import krynica_nazwy; krynica_nazwy.apply(OUT)
 except Exception as e: print('Krynica bez „-Zdrój”: pominięto (%s)' % e)
+# BVG's disruption notices for Berlin (bvg_utrudnienia.py; also refreshed hourly by their own workflow)
+try:
+    import bvg_utrudnienia; bvg_utrudnienia.fetch(OUT)
+except Exception as e: print('BVG: utrudnienia pominięte (%s)' % e)
 # stops with "Dworzec" in full, not "Dw." (dworce_nazwy.py)
 try:
     import dworce_nazwy; dworce_nazwy.apply(OUT)

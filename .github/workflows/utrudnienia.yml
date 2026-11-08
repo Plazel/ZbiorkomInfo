@@ -1,0 +1,36 @@
+name: Utrudnienia BVG
+
+# BVG's disruption notices (www.bvg.de/de/verbindungen/stoerungsmeldungen) for Berlin, every hour: only
+# data/alerts_ber.json, committed when the notices changed
+on:
+  schedule:
+    - cron: '40 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: utrudnienia
+  cancel-in-progress: false
+
+jobs:
+  bvg:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pobierz komunikaty
+        run: python3 bvg_utrudnienia.py data
+      - name: Zapisz zmiany
+        run: |
+          git config user.name "rozklady-bot"
+          git config user.email "rozklady-bot@users.noreply.github.com"
+          git add data/alerts_ber.json
+          git diff --cached --quiet && exit 0
+          git commit -m "Utrudnienia BVG $(date +%F\ %H:%M)"
+          for i in 1 2 3; do
+            git pull --rebase -X theirs origin main && git push && exit 0
+            git rebase --abort 2>/dev/null || true
+            sleep 15
+          done
