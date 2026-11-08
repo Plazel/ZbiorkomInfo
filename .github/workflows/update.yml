@@ -3,10 +3,16 @@ name: Aktualizacja rozkładów
 on:
   schedule:
     - cron: '30 2 * * *'   # codziennie ok. 4:30 czasu polskiego
+    - cron: '15 * * * *'   # co godzinę: tylko gdy jakieś źródło było niedostępne (data/brak_zrodel.json)
   workflow_dispatch:        # ręczne uruchomienie z zakładki Actions
 
 permissions:
   contents: write
+
+# (one run at a time: an hourly try waits for a build still running)
+concurrency:
+  group: aktualizacja
+  cancel-in-progress: false
 
 jobs:
   update:
@@ -14,17 +20,36 @@ jobs:
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+      # the hourly runs build only while a source is missing; the daily one and a run started by hand always
+      - name: Czy budować
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ] || [ "${{ github.event.schedule }}" = "30 2 * * *" ] || [ -s data/brak_zrodel.json ]; then
+            echo "go=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "Wszystkie źródła były dostępne – nic do zrobienia."
+          fi
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.go == '1'
         with:
           python-version: '3.12'
+      # the last copy of each source fetched, used when a source cannot be fetched (build.py)
+      - name: Ostatnie pobrane kopie źródeł
+        if: steps.gate.outputs.go == '1'
+        uses: actions/cache@v4
+        with:
+          path: cache/zrodla
+          key: zrodla-${{ github.run_id }}
+          restore-keys: zrodla-
       - name: Narzędzia LOOM do schematu oktylinearnego (z pamięci podręcznej)
+        if: steps.gate.outputs.go == '1'
         id: loom
         uses: actions/cache@v4
         with:
           path: loom-bin
           key: loom-bin-v1
       - name: Zbuduj LOOM (tylko za pierwszym razem)
-        if: steps.loom.outputs.cache-hit != 'true'
+        if: steps.gate.outputs.go == '1' && steps.loom.outputs.cache-hit != 'true'
         run: |
           git clone --recurse-submodules --depth 1 https://github.com/ad-freiburg/loom.git /tmp/loom
           # the tools do not need LOOM's own tests, which take most of the build time
@@ -35,10 +60,12 @@ jobs:
           make -C /tmp/loom/build -j4 topo loom octi
           mkdir -p loom-bin && cp /tmp/loom/build/topo /tmp/loom/build/loom /tmp/loom/build/octi loom-bin/
       - name: Pobierz otwarte dane i wygeneruj rozkłady
+        if: steps.gate.outputs.go == '1'
         env:
           LOOM_BIN: ${{ github.workspace }}/loom-bin
         run: python3 build.py data
       - name: Zapisz zmiany
+        if: steps.gate.outputs.go == '1'
         run: |
           git config user.name "rozklady-bot"
           git config user.email "rozklady-bot@users.noreply.github.com"

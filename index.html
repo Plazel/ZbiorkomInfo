@@ -3522,6 +3522,10 @@ function gdNameSaid(name,nl){let n=name;
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II)$/.test(rest)){n=p+', '+rest;break}}}
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
+  // (German names: the abbreviations said in full – Flensburg: "Förde-Park Abzweigung", "Sankt Pauli", "Park and Ride Exe",
+  // "Krusau, Dänemark", "Handelslehranstalt, Wirtschaftsschule")
+  if(nl==='de')n=n.replace(/\bAbzw\./g,'Abzweigung').replace(/\bSt\.(-?)\s*/g,(m,h)=>'Sankt'+(h||' ')).replace(/\bP\+R\b/g,'Park and Ride')
+    .replace(/\s*\(DK\)/g,', Dänemark').replace(/\s*\(TGZ\)/g,'').replace(/\bHLA\s*\/\s*/g,'Handelslehranstalt, ').replace(/\bStr\./g,'Straße');
   n=n.replace(/\s+[-–]\s+/g,', ');   // ("Kraszewskiego - Szpital", "Brzechwy - Szafirowa": a pause between)
   return /[.!?]$/.test(n)?n:n+'.'}
 function gdSegs0(kind,name,isLast,req,zc){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;

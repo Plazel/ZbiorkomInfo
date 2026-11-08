@@ -42,10 +42,43 @@ def fetch(url, dest):
     req = urllib.request.Request(url, headers={'User-Agent': 'rozklady-trojmiasto/1.0'})
     with urllib.request.urlopen(req, timeout=300) as r, open(dest, 'wb') as f: shutil.copyfileobj(r, f)
 
+# a source that cannot be fetched (its server down, its certificate lapsed…) does not stop the build: its last copy fetched is
+# used (kept in cache/zrodla, which the GitHub workflow keeps between its runs) and the source is written into
+# data/brak_zrodel.json; while that file lists any source, the workflow tries again every hour. With no copy kept yet, nothing
+# is built (the data stays as it was) and the source is tried again the same way.
+SRC_CACHE = os.path.join(HERE, 'cache', 'zrodla')
+MISSING_F = os.path.join(OUT, 'brak_zrodel.json')
+MISSING = {}
+
+def fetch_src(key, dest):
+    kept = os.path.join(SRC_CACHE, key)
+    try:
+        fetch(SOURCES[key], dest)
+        os.makedirs(SRC_CACHE, exist_ok=True); shutil.copyfile(dest, kept)
+        return True
+    except Exception as e:
+        MISSING[key] = '%s: %s' % (type(e).__name__, str(e)[:300])
+        if not os.path.exists(kept): return False
+        print('UWAGA: %s niedostępne (%s) – użyta ostatnia pobrana kopia z %s' % (key, MISSING[key],
+              time.strftime('%d.%m.%Y %H:%M', time.localtime(os.path.getmtime(kept)))))
+        shutil.copyfile(kept, dest)
+        return True
+
+def write_missing():
+    if MISSING:
+        json.dump({'sprawdzono': time.strftime('%Y-%m-%d %H:%M'), 'zrodla': MISSING}, open(MISSING_F, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    elif os.path.exists(MISSING_F): os.remove(MISSING_F)
+
 print('Pobieranie danych…')
+_lost = []
 for key, sub in (('ztm', 'gtfs/x'), ('zkm', 'gdy'), ('rail', 'tr'), ('byd', 'byd'), ('poz', 'poz'), ('krkA', 'krkA'), ('krkT', 'krkT'), ('waw', 'waw'), ('wej', 'wej'), ('ldz', 'ldz'), ('prg', 'prg')):
-    z = os.path.join(SCR, key + '.zip'); fetch(SOURCES[key], z)
+    z = os.path.join(SCR, key + '.zip')
+    if not fetch_src(key, z): _lost.append(key); continue
     zipfile.ZipFile(z).extractall(os.path.join(SCR, sub)); os.remove(z)
+if not fetch_src('ztrips', os.path.join(SCR, 'ztrips.json')): _lost.append('ztrips')
+if _lost:
+    print('BRAK DANYCH (i brak zachowanej kopii): %s – dane bez zmian, ponowna próba za godzinę' % ', '.join(_lost))
+    os.makedirs(OUT, exist_ok=True); write_missing(); shutil.rmtree(SCR, ignore_errors=True); sys.exit(0)
 # Flensburg (Aktiv Bus Flensburg): cut out of the Schleswig-Holstein GTFS (opendata.schleswig-holstein.de), kept a week in cache/fl
 try:
     import flensburg_gtfs
@@ -54,7 +87,6 @@ try:
         os.makedirs(os.path.dirname(_fc), exist_ok=True); flensburg_gtfs.build(flensburg_gtfs.current_url(), _fc)
     shutil.copytree(_fc, os.path.join(SCR, 'fl'))
 except Exception as e: print('Flensburg: bez danych (%s)' % e)
-fetch(SOURCES['ztrips'], os.path.join(SCR, 'ztrips.json'))
 
 # representative days: the nearest Wednesday (or Tuesday/Thursday), Saturday and Sunday from today
 TODAY = datetime.date.today()
@@ -1846,4 +1878,5 @@ try:
         for c in r.get('c') or []: _names[c].add(r['n'])
     rtindex.build(SCR, OUT, _names)
 except Exception as e: print('Indeks kursów na żywo: pominięty (%s)' % e)
+write_missing()
 shutil.rmtree(SCR, ignore_errors=True)
