@@ -484,6 +484,9 @@ ROWS = [
     ('Dane rozkładowe', 'Timetable data', 'Fahrplandaten', 'Údaje z cestovného poriadku', 'Údaje z jízdního řádu'),
     ('Dane rozkładowe z opóźnieniami z tablic', 'Timetable data with delays from the stop displays', 'Fahrplandaten mit Verspätungen der Haltestellenanzeigen', 'Údaje z cestovného poriadku s meškaniami z tabúľ', 'Údaje z jízdního řádu se zpožděními z tabulí'),
     ('Pozycja estymowana', 'Estimated position', 'Geschätzte Position', 'Odhadovaná poloha', 'Odhadovaná poloha'),
+    ('od', 'from', 'ab', 'od', 'od'),
+    ('do', 'until', 'bis', 'do', 'do'),
+    ('do odwołania', 'until further notice', 'bis auf Weiteres', 'do odvolania', 'do odvolání'),
 ]
 
 WEEKDAYS = {
