@@ -3322,9 +3322,9 @@ function lineLets(id){const M=MAP.data&&MAP.data.routes[id];const tools=!!store.
   return M&&M.vr?[...new Set(M.vr.filter(e=>e.l>=0&&!(hideDepot&&e.dp)&&(tools||!e.tech)).map(e=>e.l))].sort((a,b)=>a-b):[]}
 function updateVarPanel(){
   const box=document.getElementById('mapVar');if(!box)return;const tools=!!store.get('ztm.tools',false);
-  // lines no longer shown are forgotten; a newly shown line starts with its main route (with the tools: all its variants)
+  // lines no longer shown are forgotten; a newly shown line starts with its main route, with the tools too (all its variants: chosen)
   Object.keys(MAP.varOf).forEach(id=>{if(!MAP.hl.has(id))delete MAP.varOf[id]});
-  [...MAP.hl].forEach(id=>{if(!(id in MAP.varOf))MAP.varOf[id]=tools?null:'main';else if(!tools&&MAP.varOf[id]==null)MAP.varOf[id]='main'});
+  [...MAP.hl].forEach(id=>{if(!(id in MAP.varOf))MAP.varOf[id]='main';else if(!tools&&MAP.varOf[id]==null)MAP.varOf[id]='main'});
   MAP.lastId=[...MAP.hl].pop()||null;
   const ids=MAP.stopHL?[]:[...MAP.hl].filter(id=>lineLets(id).length);
   if(!ids.length){box.hidden=true;box.innerHTML='';return}
