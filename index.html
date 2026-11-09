@@ -4881,27 +4881,62 @@ function ztmAlerts(g0){const g=g0||alertGrp(city);if(!g)return Promise.resolve([
       if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();mtAlerts(g);return l})}
 // ---- the notices in the language chosen: the browser's own translator (Translator API, on the device: Chrome), sentence by
 // sentence from the original (BVG: German, ZTM/ZTP: Polish); without it the phrases the page knows (BVG) or the original
-const MT={tr:{},memo:new Map(),run:0};
+const MT={tr:{},memo:new Map(),wait:new Map(),run:0};
 async function mtGet(src,dst,gesture){const k=src+'>'+dst;if(MT.tr[k])return MT.tr[k];if(!('Translator' in self))return null;
   const tmo=(pr,ms)=>Promise.race([pr,new Promise((_,j)=>setTimeout(()=>j(0),ms))]);
   try{const av=await tmo(Translator.availability({sourceLanguage:src,targetLanguage:dst}),4000);if(av==='unavailable'||(av!=='available'&&!gesture))return null;
     return MT.tr[k]=await tmo(Translator.create({sourceLanguage:src,targetLanguage:dst}),gesture?120000:8000)}catch(e){return null}}
 async function mtLines(tr,k,t){if(!t)return t;const out=[];for(const l of String(t).split('\n')){const m=l.match(/^(\s*(?:•\s*)?)(.*)$/),body=m[2];
     if(!/[A-Za-zÀ-ž]{3}/.test(body)){out.push(l);continue}const hd=body.match(/^\[(.+)\]$/),src=hd?hd[1]:body,key=k+'|'+src;
-    let v=MT.memo.get(key);if(v==null){try{v=await tr.translate(src)}catch(e){v=src}MT.memo.set(key,v)}out.push(m[1]+(hd?'['+v+']':v))}return out.join('\n')}
+    let v=MT.memo.get(key);if(v==null){try{v=await tr.translate(src);MT.memo.set(key,v)}catch(e){v=src}}out.push(m[1]+(hd?'['+v+']':v))}return out.join('\n')}
 async function mtLeads(tr,k,src){for(const l of String(src||'').split('\n')){const m=alNorm(l).match(AL_LIST_RE);if(!m)continue;const key=k+'|'+m[1];
     if(!MT.memo.has(key)){try{MT.memo.set(key,await tr.translate(m[1]))}catch(e){}}}}
-async function mtAlerts(g,gesture){const L=alertsOf(g);if(!L.length)return;const run=++MT.run,dst=LANG;let ch=false;
-  const show=()=>{if(!ch)return;ch=false;if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();
+// without the browser's translator (anything but Chrome on a computer): Claude translates the notices – the page's "sample"
+// capability, only where the page is opened in claude.ai; asked first on a click (the viewer's consent), afterwards by itself;
+// the lines of each notice in one batch, the translations kept on the device so that a notice is translated once
+const MT_LS='zbMtMemo1',MT_LN={pl:'Polish',en:'English',de:'German',sk:'Slovak',cs:'Czech'};let MT_SM=null;
+try{(JSON.parse(localStorage.getItem(MT_LS)||'[]')||[]).forEach(([k,v])=>MT.memo.set(k,v))}catch(e){}
+function mtSave(){try{localStorage.setItem(MT_LS,JSON.stringify([...MT.memo].slice(-4000)))}catch(e){}}
+async function mtSample(gesture){if(MT_SM===false)return null;try{if(!self.claude||!claude.use)return null;
+  const sm=MT_SM||await claude.use('sample');if(!sm){MT_SM=false;return null}MT_SM=sm;
+  if(!gesture){const pm=await claude.use('permissions');if(!pm||await pm.state('sample')!=='granted')return null}return sm}catch(e){return null}}
+// the strings mtLines and mtLeads look up: a line each (without its "• " and its [heading] brackets), the lead before a list of stops
+function mtStrs(t){const out=[];for(const l of String(t||'').split('\n')){const body=l.replace(/^\s*(?:•\s*)?/,'');if(!/[A-Za-zÀ-ž]{3}/.test(body))continue;
+    const hd=body.match(/^\[(.+)\]$/);out.push(hd?hd[1]:body);const m=alNorm(l).match(AL_LIST_RE);if(m)out.push(m[1])}return out}
+async function mtBatch(src,dst,strs,gesture){const k=src+'>'+dst,need=[...new Set(strs)].filter(x=>x&&!MT.memo.has(k+'|'+x)&&!MT.wait.has(k+'|'+x));
+  if(need.length){const sm=await mtSample(gesture);if(!sm)return need.some(x=>!MT.memo.has(k+'|'+x))?null:mtFake(k);
+    // (in parts of ~5000 characters, two at a time, in the order given: the headings first, so that the bar is translated soon)
+    const parts=[];let cur=[],n=0;for(const x of need){if(cur.length&&(n+x.length>5000||cur.length>=60)){parts.push(cur);cur=[];n=0}cur.push(x);n+=x.length}if(cur.length)parts.push(cur);
+    const W=x=>{let r;const pr=new Promise(z=>r=z);MT.wait.set(k+'|'+x,{pr,r})};need.forEach(W);
+    const done=(x,v)=>{const w=MT.wait.get(k+'|'+x);if(v!=null)MT.memo.set(k+'|'+x,v);if(w){MT.wait.delete(k+'|'+x);w.r(v)}};let stop=false;
+    const work=async()=>{while(parts.length&&!stop){const part=parts.shift();
+      try{const r=await sm.json('You translate public transport service notices from '+MT_LN[src]+' to '+MT_LN[dst]+'. Translate every string of the JSON array below. '+
+          'Keep unchanged: line numbers and line names (e.g. 5, N12, S41, E-2, M10, U6), stop and street names (proper nouns), times, dates, '+
+          'the markers **…** around bold text and every [text](url) link\'s url (translate only its text). Keep the meaning exact, add nothing. '+
+          'Answer with a JSON array of the same length and order holding only the translations.\n'+JSON.stringify(part),{modelTier:'quick'});
+        part.forEach((x,j)=>done(x,Array.isArray(r)&&r.length===part.length&&typeof r[j]==='string'&&r[j].trim()?r[j]:null))}
+      catch(e){if(e&&e.code==='not_granted')MT_SM=false;if(e&&/not_granted|rate_limited/.test(e.code||''))stop=true;part.forEach(x=>done(x,null))}}
+      parts.splice(0).forEach(p=>p.forEach(x=>done(x,null)))};
+    Promise.all([work(),work()]).then(mtSave)}
+  return mtFake(k)}
+// the translations as a translator would give them: from the memo, or once the batch has the line (none: the original kept)
+function mtFake(k){return {translate:async x=>{let v=MT.memo.get(k+'|'+x);if(v==null&&MT.wait.has(k+'|'+x))v=await MT.wait.get(k+'|'+x).pr;if(v==null)throw 0;return v}}}
+async function mtAlerts(g,gesture){const L=alertsOf(g);if(!L.length)return;const run=++MT.run,dst=LANG,B={},TR={};let ch=false,last=Date.now();
+  const show=()=>{if(!ch)return;ch=false;last=Date.now();if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();
     const d=document.getElementById('alertDlg');if(d&&!d.hidden&&AL_CUR.g===g)alertShow(AL_CUR.i,g,true)};
-  for(const pass of [0,1]){for(const a of L){const bvg=a.de!=null,src=bvg?'de':(a.lang||'pl');
-    const base={title:bvg&&!BVG_GEN.test(a.deTitle||'')?bvgTitle(a.deTitle):a.o0.title,text:bvg?bvgTr(a.de):a.o0.text};
-    if(bvg&&BVG_GEN.test(a.deTitle||''))base.title=a.o0.title.replace(/^[^:]*/,bvgTitle(a.deTitle));
-    let t=base;if(src!==dst){if(!pass){if(base.title!==a.title||base.text!==a.text){a.title=base.title;a.text=base.text;ch=true}continue}const tr=await mtGet(src,dst,gesture);if(run!==MT.run)return;
-      if(tr){const k=src+'>'+dst;t={title:bvg&&BVG_GEN.test(a.deTitle||'')?base.title:await mtLines(tr,k,bvg?a.deTitle:a.o0.title),text:await mtLines(tr,k,bvg?a.de:a.o0.text)};await mtLeads(tr,k,bvg?a.de:a.o0.text);if(run!==MT.run)return}}
-    else t={title:bvg&&!BVG_GEN.test(a.deTitle||'')?a.deTitle:base.title,text:bvg?a.de:a.o0.text};
-    if(t.title!==a.title||t.text!==a.text){a.title=t.title;a.text=t.text;ch=true}}
-    show();if(run!==MT.run)return}}
+  const srcOf=b=>b.de!=null?'de':(b.lang||'pl'),gen=b=>b.de!=null&&BVG_GEN.test(b.deTitle||'');
+  // passes: 0 – the original (BVG: the phrases the page knows); 1 – the headings translated; 2 – the whole notices
+  for(const pass of [0,1,2]){for(const a of L){const bvg=a.de!=null,src=srcOf(a);
+    const base={title:bvg&&!gen(a)?bvgTitle(a.deTitle):a.o0.title,text:bvg?bvgTr(a.de):a.o0.text};
+    if(gen(a))base.title=a.o0.title.replace(/^[^:]*/,bvgTitle(a.deTitle));
+    let t=base;if(src!==dst){if(!pass){if(base.title!==a.title||base.text!==a.text){a.title=base.title;a.text=base.text;ch=true}continue}
+      const tr=(src in TR?TR[src]:(TR[src]=await mtGet(src,dst,gesture)))||(B[src]=B[src]||mtBatch(src,dst,(()=>{const M=L.filter(b=>srcOf(b)===src);
+        return [...M.flatMap(b=>gen(b)?[]:mtStrs(b.de!=null?b.deTitle:b.o0.title)),...M.flatMap(b=>mtStrs(b.de!=null?b.de:b.o0.text))]})(),gesture),await B[src]);if(run!==MT.run)return;
+      if(tr){const k=src+'>'+dst;t={title:gen(a)?base.title:await mtLines(tr,k,bvg?a.deTitle:a.o0.title),text:pass===1?a.text:await mtLines(tr,k,bvg?a.de:a.o0.text)};
+        if(pass===2)await mtLeads(tr,k,bvg?a.de:a.o0.text);if(run!==MT.run)return}}
+    else t={title:bvg&&!gen(a)?a.deTitle:base.title,text:bvg?a.de:a.o0.text};
+    if(t.title!==a.title||t.text!==a.text){a.title=t.title;a.text=t.text;ch=true}if(Date.now()-last>2500)show()}
+    show();if(run!==MT.run)return}mtSave()}
 const AL_CUR={i:null,g:null};
 function alertBar(){const el=document.getElementById('alertBar');if(!el)return;const L=alertsOf(alertGrp(city));
   if(!L.length){el.hidden=true;el.innerHTML='';return}el.hidden=false;
