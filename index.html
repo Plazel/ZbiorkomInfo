@@ -4879,33 +4879,29 @@ function ztmAlerts(g0){const g=g0||alertGrp(city);if(!g)return Promise.resolve([
       if(prev&&prev.raw===raw){prev.t=Date.now();return prev.list}   // (unchanged: the list kept as it is, translated or not)
       l.forEach(a=>{a.o0={title:a.title,text:a.text}});ALERT_BY[g]={t:Date.now(),list:l,raw,t0:Date.now()};
       if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();mtAlerts(g);return l})}
-// ---- the notices in the language chosen: translated by the build itself, free and with no service (tlumacz_komunikaty.py:
-// Argos Translate's open models, hourly), line by line from the original (BVG: German, PID: Czech, the rest: Polish), into
-// data/tl/<group>_<language>.json; a line not translated yet (a notice newer than the last run): the original, BVG's with
-// the phrases the page knows
-const MT={memo:new Map(),run:0,files:{}};
-function mtLines(k,t,fb){if(!t)return t;return String(t).split('\n').map(l=>{const m=l.match(/^(\s*(?:•\s*)?)(.*)$/),body=m[2];
-    if(!/[A-Za-zÀ-ž]{3}/.test(body))return l;const hd=body.match(/^\[(.+)\]$/),src=hd?hd[1]:body,v=MT.memo.get(k+'|'+src);
-    return v==null?(fb?fb(l):l):m[1]+(hd?'['+v+']':v)}).join('\n')}
-// the build's translations of a group's notices into a language, once per page load (kept 10 minutes: the build is hourly)
-function mtFile(g,dst){const f=MT.files[g+'_'+dst];if(f&&Date.now()-f.t<600000)return f.p;
-  const p=fetch('data/tl/'+g+'_'+dst+'.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(j=>{if(!j||!j.m)return false;
-    for(const [x,v] of Object.entries(j.m))MT.memo.set(j.s+'>'+j.d+'|'+x,v);return true}).catch(()=>false);
-  MT.files[g+'_'+dst]={t:Date.now(),p};return p}
-async function mtAlerts(g){const L=alertsOf(g);if(!L.length)return;const run=++MT.run,dst=LANG;let ch=false;
-  const srcOf=b=>b.de!=null?'de':(b.lang||'pl'),gen=b=>b.de!=null&&BVG_GEN.test(b.deTitle||'');
-  const have=L.some(a=>srcOf(a)!==dst)?await mtFile(g,dst):false;if(run!==MT.run)return;
-  for(const a of L){const bvg=a.de!=null,src=srcOf(a),k=src+'>'+dst;
-    const base={title:bvg&&!gen(a)?bvgTitle(a.deTitle):a.o0.title,text:bvg?bvgTr(a.de):a.o0.text};
-    if(gen(a))base.title=a.o0.title.replace(/^[^:]*/,bvgTitle(a.deTitle));
-    let t=base;
-    if(src===dst)t={title:bvg&&!gen(a)?a.deTitle:base.title,text:bvg?a.de:a.o0.text};
-    else if(have){const h=bvg?a.deTitle:a.o0.title,x=bvg?a.de:a.o0.text,th=mtLines(k,h),tx=mtLines(k,x,bvg?bvgTr:null);
-      // (a line the build has not translated yet: the original; BVG's: with the phrases the page knows)
-      t={title:gen(a)||th===h?base.title:th,text:tx}}
+// ---- the notices in the language chosen: the browser's own translator (Translator API, on the device: Chrome), sentence by
+// sentence from the original (BVG: German, ZTM/ZTP: Polish); without it the phrases the page knows (BVG) or the original
+const MT={tr:{},memo:new Map(),run:0};
+async function mtGet(src,dst,gesture){const k=src+'>'+dst;if(MT.tr[k])return MT.tr[k];if(!('Translator' in self))return null;
+  const tmo=(pr,ms)=>Promise.race([pr,new Promise((_,j)=>setTimeout(()=>j(0),ms))]);
+  try{const av=await tmo(Translator.availability({sourceLanguage:src,targetLanguage:dst}),4000);if(av==='unavailable'||(av!=='available'&&!gesture))return null;
+    return MT.tr[k]=await tmo(Translator.create({sourceLanguage:src,targetLanguage:dst}),gesture?120000:8000)}catch(e){return null}}
+async function mtLines(tr,k,t){if(!t)return t;const out=[];for(const l of String(t).split('\n')){const m=l.match(/^(\s*(?:•\s*)?)(.*)$/),body=m[2];
+    if(!/[A-Za-zÀ-ž]{3}/.test(body)){out.push(l);continue}const hd=body.match(/^\[(.+)\]$/),src=hd?hd[1]:body,key=k+'|'+src;
+    let v=MT.memo.get(key);if(v==null){try{v=await tr.translate(src);MT.memo.set(key,v)}catch(e){v=src}}out.push(m[1]+(hd?'['+v+']':v))}return out.join('\n')}
+async function mtLeads(tr,k,src){for(const l of String(src||'').split('\n')){const m=alNorm(l).match(AL_LIST_RE);if(!m)continue;const key=k+'|'+m[1];
+    if(!MT.memo.has(key)){try{MT.memo.set(key,await tr.translate(m[1]))}catch(e){}}}}
+async function mtAlerts(g,gesture){const L=alertsOf(g);if(!L.length)return;const run=++MT.run,dst=LANG,TR={};let ch=false;
+  const show=()=>{if(!ch)return;ch=false;if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();
+    const d=document.getElementById('alertDlg');if(d&&!d.hidden&&AL_CUR.g===g)alertShow(AL_CUR.i,g,true)};
+  for(const pass of [0,1]){for(const a of L){const bvg=a.de!=null,src=bvg?'de':(a.lang||'pl');
+    const base={title:bvg&&!BVG_GEN.test(a.deTitle||'')?bvgTitle(a.deTitle):a.o0.title,text:bvg?bvgTr(a.de):a.o0.text};
+    if(bvg&&BVG_GEN.test(a.deTitle||''))base.title=a.o0.title.replace(/^[^:]*/,bvgTitle(a.deTitle));
+    let t=base;if(src!==dst){if(!pass){if(base.title!==a.title||base.text!==a.text){a.title=base.title;a.text=base.text;ch=true}continue}const tr=src in TR?TR[src]:(TR[src]=await mtGet(src,dst,gesture));if(run!==MT.run)return;
+      if(tr){const k=src+'>'+dst;t={title:bvg&&BVG_GEN.test(a.deTitle||'')?base.title:await mtLines(tr,k,bvg?a.deTitle:a.o0.title),text:await mtLines(tr,k,bvg?a.de:a.o0.text)};await mtLeads(tr,k,bvg?a.de:a.o0.text);if(run!==MT.run)return}}
+    else t={title:bvg&&!BVG_GEN.test(a.deTitle||'')?a.deTitle:base.title,text:bvg?a.de:a.o0.text};
     if(t.title!==a.title||t.text!==a.text){a.title=t.title;a.text=t.text;ch=true}}
-  if(!ch)return;if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();
-  const d=document.getElementById('alertDlg');if(d&&!d.hidden&&AL_CUR.g===g)alertShow(AL_CUR.i,g,true)}
+    show();if(run!==MT.run)return}}
 const AL_CUR={i:null,g:null};
 function alertBar(){const el=document.getElementById('alertBar');if(!el)return;const L=alertsOf(alertGrp(city));
   if(!L.length){el.hidden=true;el.innerHTML='';return}el.hidden=false;
@@ -4959,6 +4955,7 @@ function alertBody(title,text){if(!text)return '';const L=String(text).split('\n
   return (L.length&&n(L[0])===n(title||'')?L.slice(1):L).join('\n').replace(/^\n+/,'')}
 function alertShow(i,g,redraw){const d=document.getElementById('alertDlg'),L=alertsOf(g||alertGrp(city));if(!L.length)return;
   const was=redraw?[...document.querySelectorAll('#alertBody details.aItem')].map(x=>x.open):null;AL_CUR.i=i;AL_CUR.g=g||alertGrp(city);
+  if(!redraw&&LANG!==(L[0].de!=null?'de':(L[0].lang||'pl')))mtAlerts(AL_CUR.g,true);   // (a click: the translator may be downloaded now)
   const order=i==null?L.map((_,k)=>k):[i,...L.map((_,k)=>k).filter(k=>k!==i)];
   const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map((k,o)=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>alertFmt(lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>'));return `<details class="aItem"${(was?was[o]:!o)?' open':''}><summary><h3>${sg(a.title)}</h3></summary>${a.stretch||a.kind?`<div class="aSub">${lineSigns((a.lines||[]).map(esc).join(' '),a.lines||[])} ${esc(a.stretch||'')}${a.kind?`<span class="aKind">${esc(bvgTitle?bvgTitle(a.kind):a.kind)}</span>`:''}</div>`:''}${alertPeriod(a)}${alertParas(a,sg)}${(a.img||[]).map(im=>`<a class="aImg" href="${esc(im.url)}" target="_blank" rel="noopener"><img src="${esc(im.url)}" alt="${esc(im.alt||'')}" loading="lazy" onerror="this.parentNode.hidden=true"></a>`).join('')}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl|ztm\.poznan\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':/pid\.cz/.test(a.url)?'Szczegóły na stronie PID':/zdmikp/.test(a.url)?'Szczegóły na stronie ZDMiKP':/mpk\.nowysacz/.test(a.url)?'Szczegóły na stronie MPK':/mzkwejherowo/.test(a.url)?'Szczegóły na stronie MZK':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</details>`}).join('');   // (only the notice chosen open, the others by their headings: a click opens them)
   if(!redraw&&d.hidden){try{history.pushState(Object.assign({},history.state||{},{alertDlg:1}),'',location.href)}catch(e){}}   // (the phone's back button: the window closed, the page stays)
