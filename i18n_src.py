@@ -493,6 +493,7 @@ ROWS = [
     ('Szczegóły na stronie MZK', 'Details on the MZK website', 'Details auf der Website von MZK', 'Podrobnosti na stránke MZK', 'Podrobnosti na webu MZK'),
     ("Poprzedni miesiąc", "Previous month", "Vorheriger Monat", "Predchádzajúci mesiac", "Předchozí měsíc"),
     ("Następny miesiąc", "Next month", "Nächster Monat", "Nasledujúci mesiac", "Následující měsíc"),
+    ("Przeciągnij, by zmienić wielkość mapy", "Drag to resize the map", "Ziehen, um die Kartengröße zu ändern", "Potiahnutím zmeníte veľkosť mapy", "Tažením změníte velikost mapy"),
 ]
 
 WEEKDAYS = {
