@@ -80,7 +80,8 @@ def prague(data):
 
 def past(title, text):
     """a notice all of whose dates are gone ("1 listopada", "31.10-01.11.2026") is over"""
-    t = title + ' ' + text[:1500]; ds = []; y = NOW.year
+    t = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', (title + ' ' + text[:1500]).replace('**', ''))   # (the bold and links' marks: no part of the dates)
+    t = re.sub(r'[ \t]+', ' ', t); ds = []; y = NOW.year
     for d, m, yy in re.findall(r'\b(\d{1,2})\.(\d{1,2})\.(\d{4})?', t):
         try: ds.append(datetime.date(int(yy or y), int(m), int(d)))
         except ValueError: pass
@@ -111,10 +112,16 @@ def nowy_sacz(data):
     for u, t in re.findall(r'<div[^>]*class="hcb_item[^"]*"[^>]*>\s*<a href="([^"]+)"[^>]*>(.*?)</a>', home)[:6]:
         try: a = get(u)
         except Exception: continue
-        i = a.find('class="gp_content'); body = a[i:a.find('</section>', i)] if i >= 0 else ''
+        # (the notice's own text only: what follows it in the section – the share buttons, the "virtual stop" form with every
+        # stop, the lines' routes – is the page's, not the notice's)
+        i = a.find('class="gp_content'); e = min([x for x in (a.find('<div class="kom_social', i), a.find('</section>', i)) if x > i] or [i])
+        body = a[i:e] if i >= 0 else ''
         d = re.search(r'class="gp_date">(\d{1,2})\.(\d{2})\.(\d{4})<', a)
         tt = html.unescape(re.sub(r'<[^>]+>', '', t)).strip(); tx = plain(body[body.find('>') + 1:])
         if past(tt, tx): continue
+        # (a change made for good – lines back on their routes, a new timetable – is news for two weeks, not a disruption)
+        pub = datetime.date(int(d.group(3)), int(d.group(2)), int(d.group(1))) if d else None
+        if pub and (NOW.date() - pub).days > 14 and re.search(r'powr[óo]t|wracaj|przywr[óo]c|stał\w* (?:tras|rozkład)|zmiana rozkładu|nowy rozkład', tt + ' ' + tx[:400], re.I): continue
         res.append({'id': u, 'lines': [], 'title': tt, 'text': tx,
                     'start': None, 'end': None, 'url': u})
     return 'https://www.mpk.nowysacz.pl/komunikaty/', res
