@@ -45,6 +45,8 @@ select.sselN{display:none!important}
 .alertBox details.aItem>summary{list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:8px}.alertBox details.aItem>summary::-webkit-details-marker{display:none}.alertBox details.aItem>summary h3{flex:1}.alertBox details.aItem>summary::after{content:'';flex:none;width:9px;height:9px;margin-top:6px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg);color:var(--muted);transition:transform .2s}.alertBox details.aItem[open]>summary::after{transform:rotate(-135deg);margin-top:10px}.alertBox details.aItem:not([open]) h3{margin-bottom:0}
 @media (max-width:700px){.lineWarn>div{max-height:9.8em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.lineWarn.lwRep>div{max-height:none;-webkit-mask-image:none;mask-image:none}}
 .chip.rail.r2{padding:0;letter-spacing:-.02em}   /* (M1, U2, S9: round, the wide letters not stretching it) */
+.nw{white-space:nowrap}
+.alertBox .aItem h3 b{color:var(--fg);margin-right:.15em}.alertBox .aTxt p{margin:0 0 .55em}.alertBox .aTxt p:last-child{margin-bottom:.7em}
 </style>
 <title>ZbiorkomInfo</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#ffffff"><meta name="mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M3%206h15v3.6L8.2%2022.4H18V26H2.6v-3.6l9.8-12.8H3z%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2221.5%22%20y%3D%226%22%20width%3D%225%22%20height%3D%2220%22%20fill%3D%22%23d71920%22%2F%3E%3C%2Fsvg%3E">
@@ -4805,7 +4807,7 @@ function bvgSent(x,T){const nm=/^\(nachts\)\s*/.test(x);const y=x.replace(/^\(na
 const VEH_W='(?:Tram|Bus|U-Bahn|Fähre|Tramwaj|Autobus|Prom|Ferry|Přívoz|Prievoz|Ersatzverkehr|Komunikacja zastępcza|Replacement service|Náhradní doprava|Náhradná doprava)';
 const SEV_W=/Ersatz|zastępcza|Replacement|Náhrad/;
 // words after which a number is a line's, kept in the sentence ("linii 6", "linky 9", "line 175")
-const KEEP_W='(?:l\\.|linii|linie|linia|liniach|liniami|linią|nr|lines?|Linien?|linky|linka|lince|linek|linkami)';   // (a replacement service: its lines are buses; the words kept)
+const KEEP_W='(?:[Ll]\\.|[Ll]inii|[Ll]inie|[Ll]inia|[Ll]iniach|[Ll]iniami|[Ll]inią|[Nn]r|[Ll]ines?|Linien?|[Ll]inky|[Ll]inka|[Ll]ince|[Ll]inek|[Ll]inkami)';   // ("Linia 183" at a sentence's start too)   // (a replacement service: its lines are buses; the words kept)
 function lineSigns(html,lines){const set=new Set(lines||[]);const here=IDX?IDX.routes.filter(r=>inCity(r)):[];
   const find=(n,kind)=>{const c=here.filter(r=>r.n===n);if(!c.length)return null;const want=kind&&/Tram/.test(kind)?['tram']:kind&&(/Bus|Autobus/.test(kind)||SEV_W.test(kind))?['repl','bus','night','exp']:null;
     return want?c.find(r=>want.includes(r.t))||null:c.find(r=>r.t!=='repl')||c[0]};   // (a bus 18 replacing tram 18 that the timetable lacks: the number, not the tram's sign)
@@ -4896,11 +4898,16 @@ function alertBar(){const el=document.getElementById('alertBar');if(!el)return;c
   if(many&&!open){const ul=el.querySelector('.abVp ul');let k=AB_ROT.k%L.length;const go=(anim)=>{ul.style.transition=anim?'transform .55s ease':'none';ul.style.transform=`translateY(${-k*100/(L.length+1)}%)`};go(false);
     AB_ROT.t=setInterval(()=>{if(document.hidden)return;k++;go(true);AB_ROT.k=k%L.length;if(k===L.length)setTimeout(()=>{k=0;go(false)},600)},6000)}}
 const AB_ROT={t:0,k:0,open:false};
+// a notice easier to read: its times in bold, a sign never parted from the comma after it, the heading not repeated as its first line
+function alertFmt(h){return h.replace(/(?<![\d:>.\/-])(\d{1,2}:\d{2})(?![\d:])/g,'<b>$1</b>')
+  .replace(/(<(span|b|a) class="chip[^"]*"[^>]*>.*?<\/\2>)([,.;:)])/g,'<span class="nw">$1$3</span>')}
+function alertBody(title,text){if(!text)return '';const L=String(text).split('\n'),n=x=>x.replace(/\s+/g,' ').trim().toLowerCase();
+  return (L.length&&n(L[0])===n(title||'')?L.slice(1):L).join('\n').replace(/^\n+/,'')}
 function alertShow(i,g,redraw){const d=document.getElementById('alertDlg'),L=alertsOf(g||alertGrp(city));if(!L.length)return;
   const was=redraw?[...document.querySelectorAll('#alertBody details.aItem')].map(x=>x.open):null;AL_CUR.i=i;AL_CUR.g=g||alertGrp(city);
   if(!redraw&&LANG!==(L[0].de!=null?'de':'pl'))mtAlerts(AL_CUR.g,true);   // (a click: the translator may be downloaded now)
   const order=i==null?L.map((_,k)=>k):[i,...L.map((_,k)=>k).filter(k=>k!==i)];
-  const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map((k,o)=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>');return `<details class="aItem"${(was?was[o]:!o)?' open':''}><summary><h3>${sg(a.title)}</h3></summary>${a.text?`<p>${sg(a.text)}</p>`:''}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</details>`}).join('');   // (only the notice chosen open, the others by their headings: a click opens them)
+  const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map((k,o)=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>alertFmt(lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>'));const body=alertBody(a.title,a.text);return `<details class="aItem"${(was?was[o]:!o)?' open':''}><summary><h3>${sg(a.title)}</h3></summary>${body?`<div class="aTxt">${body.split('\n').filter(x=>x.trim()).map(x=>`<p>${sg(x)}</p>`).join('')}</div>`:''}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</details>`}).join('');   // (only the notice chosen open, the others by their headings: a click opens them)
   if(!redraw&&d.hidden){try{history.pushState(Object.assign({},history.state||{},{alertDlg:1}),'',location.href)}catch(e){}}   // (the phone's back button: the window closed, the page stays)
   d.hidden=false;if(!redraw)document.getElementById('alertClose').focus()}
 let AL_BACK=false;
