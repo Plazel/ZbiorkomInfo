@@ -1348,6 +1348,7 @@ for area, A in NEW_AREAS.items():
                 if area == 'ldz' and re.fullmatch(r'o?[PR]\d+', short): continue   # Łódź: staff and works lines, not for passengers
                 if area == 'prg' and not (rt['route_type'] == '2' and re.fullmatch(r'S\d+', short)) and (rt.get('is_regional') == '1' or rt['route_type'] == '2' or re.match(r'(MHD|BB\d|IKEA)', short)): continue   # Prague: the city lines and the Esko (S) trains
                 rk = A['rk'] + re.sub(r'\W', '', short)
+                if area == 'ham': short = re.sub(r'\s*\(Shuttle\)$', '', short)   # (Hamburg: "386(Shuttle)" shown as 386; its id kept)
                 if area in ('ber', 'ham') and rt['route_type'] in ('3', '700', '702') and short in DE_RAIL_NAMES[area]: rk += 'E'   # (bus S1 apart from train S1)
                 tid = pre + ':' + r['trip_id']
                 rot[tid] = (rk, pre + ':' + r['service_id']); tmeta[tid] = (r.get('direction_id') or '0',)
