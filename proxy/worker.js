@@ -14,10 +14,18 @@
 // 4. ZTM Gdańsk's notices of disruptions: /alerts returns the notices shown in the red "UWAGA" bar on ztm.gda.pl, each with
 //    its text from its own page (JSON: [{title, url, text}]), kept 2 minutes.
 //
+// 5. Translations of the notices: POST /tr {s: source language, d: target language, q: [lines]} returns {t: [lines]} from Google
+//    Translate (Cloud Translation API, Basic v2). Each line is translated once and then kept in Cloudflare's cache for 30
+//    days, so the quota is spent only on new notices. Bold (**…**) and links ([text](url)) are kept: sent as HTML, the
+//    url not translated. Needs GOOGLE_TRANSLATE_KEY; without it 503, and the page uses the browser's own translator.
+//
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
 // For the voices, Azure: in the worker's Settings → Variables and Secrets add AZURE_KEY (type Secret: the key of an Azure
 // "Speech service" resource, pricing tier Free F0) and AZURE_REGION (type Text: the resource's region, e.g. westeurope).
+// For the translations: GOOGLE_TRANSLATE_KEY (type Secret): an API key of a Google Cloud project with the Cloud Translation API
+// enabled (console.cloud.google.com → APIs & Services → Library → Cloud Translation API → Enable; Credentials → Create
+// credentials → API key, restricted to the Cloud Translation API).
 const ALLOWED = ['ckan2.multimediagdansk.pl', 'cdn.zbiorkom.live', 'www.ztm.poznan.pl', 'gtfs.ztp.krakow.pl', 'api.golemio.cz'];
 const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs-CZ-VlastaNeural': 'cs-CZ', 'cs-CZ-AntoninNeural': 'cs-CZ',
   'sk-SK-ViktoriaNeural': 'sk-SK', 'sk-SK-LukasNeural': 'sk-SK', 'de-DE-SeraphinaMultilingualNeural': 'de-DE', 'de-DE-FlorianMultilingualNeural': 'de-DE',
@@ -99,13 +107,46 @@ async function tts(req, env, ctx, cors) {
   return new Response(res.body, { status: 200, headers: h });
 }
 
+const TR_LANGS = ['pl', 'en', 'de', 'sk', 'cs'];
+const escH = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// a line as HTML for the translator (its bold and links as tags, which it keeps) and back
+const toHtml = x => escH(x).replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2">$1</a>').replace(/\*\*\s*(.+?)\s*\*\*/g, '<b>$1</b>');
+const fromHtml = h => ent(h.replace(/<a\s+href="([^"]+)"\s*>\s*([\s\S]*?)\s*<\/a>/gi, '[$2]($1)').replace(/<b>\s*([\s\S]*?)\s*<\/b>/gi, '**$1**').replace(/<[^>]+>/g, ''));
+async function trKey(s, d, x) {
+  const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s + '>' + d + '|' + x));
+  return new Request('https://tr.cache/g1/' + s + '/' + d + '/' + [...new Uint8Array(h)].map(b => b.toString(16).padStart(2, '0')).join(''));
+}
+async function translate(req, env, ctx, cors) {
+  const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8');
+  if (req.method !== 'POST') return new Response('POST', { status: 405, headers: h });
+  let j; try { j = await req.json(); } catch (e) { return new Response('bad request', { status: 400, headers: h }); }
+  const s = j.s, d = j.d, q = j.q;
+  if (!TR_LANGS.includes(s) || !TR_LANGS.includes(d) || s === d || !Array.isArray(q) || !q.length || q.length > 100 || q.some(x => typeof x !== 'string')
+      || q.reduce((n, x) => n + x.length, 0) > 6000) return new Response('bad request', { status: 400, headers: h });
+  if (!env.GOOGLE_TRANSLATE_KEY) return new Response('translation not set up', { status: 503, headers: h });
+  const cache = caches.default, keys = await Promise.all(q.map(x => trKey(s, d, x)));
+  const out = await Promise.all(keys.map(async k => { const r = await cache.match(k); return r ? r.text() : null; }));
+  const miss = q.map((x, i) => out[i] == null ? i : -1).filter(i => i >= 0);
+  if (miss.length) {
+    const r = await fetch('https://translation.googleapis.com/language/translate/v2?key=' + encodeURIComponent(env.GOOGLE_TRANSLATE_KEY), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: miss.map(i => toHtml(q[i])), source: s, target: d, format: 'html' }) });
+    if (!r.ok) return new Response(JSON.stringify({ error: r.status, msg: (await r.text()).slice(0, 300) }), { status: 502, headers: h });
+    const tr = ((await r.json()).data || {}).translations || [];
+    miss.forEach((i, n) => { const t = tr[n] && tr[n].translatedText; if (!t) return; out[i] = fromHtml(t);
+      ctx.waitUntil(cache.put(keys[i], new Response(out[i], { headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=2592000' } }))); });
+  }
+  return new Response(JSON.stringify({ t: out.map((t, i) => t == null ? q[i] : t) }), { status: 200, headers: h });
+}
+
 export default {
   async fetch(req, env, ctx) {
-    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };
+    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (new URL(req.url).pathname === '/tts') return tts(req, env, ctx, cors);
     if (new URL(req.url).pathname === '/byd') return byd(req, cors);
     if (new URL(req.url).pathname === '/alerts') return alerts(cors);
+    if (new URL(req.url).pathname === '/tr') return translate(req, env, ctx, cors);
     const target = new URL(req.url).searchParams.get('url');
     let u; try { u = new URL(target); } catch (e) { return new Response('url?', { status: 400, headers: cors }); }
     if (u.protocol !== 'https:' || !ALLOWED.includes(u.hostname)) return new Response('host not allowed', { status: 403, headers: cors });
