@@ -21,12 +21,20 @@ def get(u):
     return urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=40).read().decode('utf-8', 'replace')
 
 
+def marks(h):
+    """bold and links kept through the plain text: **bold**, [text](https://…) – the page draws them again"""
+    h = re.sub(r'(?is)<a\b[^>]*href="(https?://[^"]+)"[^>]*>(.*?)</a>', lambda m: (lambda t: '[%s](%s)' % (t, m.group(1)) if t else '')(re.sub(r'<[^>]+>', '', m.group(2)).strip()), h)
+    h = re.sub(r'(?is)<(strong|b)\b[^>]*>(.*?)</\1>', lambda m: (lambda t: ' **%s** ' % t.strip() if t.strip() else ' ')(re.sub(r'<[^>]+>', '', m.group(2))), h)
+    return h
+
+
 def plain(h):
     """HTML as plain text: a paragraph, heading or list item a line"""
     h = re.sub(r'(?is)<(script|style|table|img|figure)\b.*?(</\1>|/?>)', ' ', h)
     h = re.sub(r'(?i)<li[^>]*>', '\n• ', h); h = re.sub(r'(?i)</p>|<br\s*/?>|</li>|</h\d>|</div>|</tr>', '\n', h)
+    h = marks(h)
     h = html.unescape(re.sub(r'<[^>]+>', '', h))
-    L = [re.sub(r'[ \t ]+', ' ', x).strip() for x in h.split('\n')]
+    L = [re.sub(r'\s+([.,;:)])', r'\1', re.sub(r'\*\*\s*\*\*', ' ', re.sub(r'[ \t\u00a0]+', ' ', x))).strip() for x in h.split('\n')]
     L = [x for x in L if x and x != '•' and not re.match(r'^(Artykuł .* pochodzi z serwisu|Przeczytaj więcej|Czytaj dalej)', x)]
     return '\n'.join(L)[:3000]
 

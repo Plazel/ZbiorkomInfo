@@ -1967,6 +1967,9 @@ except Exception as e: print('Krynica bez „-Zdrój”: pominięto (%s)' % e)
 try:
     import bvg_utrudnienia; bvg_utrudnienia.fetch(OUT)
 except Exception as e: print('BVG: utrudnienia pominięte (%s)' % e)
+try:
+    import utrudnienia_miast; utrudnienia_miast.fetch(OUT)   # (PID, ZTM Poznań, ZDMiKP, MPK Nowy Sącz, MZK Wejherowo)
+except Exception as e: print('utrudnienia miast: pominięte (%s)' % e)
 # stops with "Dworzec" in full, not "Dw." (dworce_nazwy.py)
 try:
     import dworce_nazwy; dworce_nazwy.apply(OUT)

@@ -18,9 +18,11 @@ def plain(h):
     h = re.sub(r"<bds-icon[^>]*icon-name='bds-moon-line'[^>]*>\s*(</bds-icon>)?", '(nachts) ', h)
     h = re.sub(r"<bds-signet-transport[^>]*transport-id='(\w+)'[^>]*>\s*</bds-signet-transport>", lambda m: {'bus': ' Bus ', 'tram': ' Tram ', 'subway': ' U-Bahn ', 'ferry': ' Fähre '}.get(m.group(1), ' '), h)
     h = re.sub(r'<bds-tag[^>]*>(.*?)</bds-tag>', r'[\1]', h, flags=re.S)
+    h = re.sub(r'(?is)<a\b[^>]*href="(https?://[^"]+)"[^>]*>(.*?)</a>', lambda m: '[%s](%s)' % (re.sub(r'<[^>]+>', '', m.group(2)).strip(), m.group(1)), h)
+    h = re.sub(r'(?is)<(strong|b)\b[^>]*>(.*?)</\1>', lambda m: (lambda t: ' **%s** ' % t.strip() if t.strip() else ' ')(re.sub(r'<[^>]+>', '', m.group(2))), h)   # (bold and links kept: **…**, [text](url))
     h = re.sub(r'<li[^>]*>', '\n• ', h); h = re.sub(r'</p>|<br\s*/?>|</li>|</ul>', '\n', h)
     h = re.sub(r'<[^>]+>', '', h); h = html.unescape(h)
-    lines = [re.sub(r'\s+', ' ', x).replace(' .', '.').replace(' ,', ',').replace('( ', '(').strip() for x in h.split('\n')]
+    lines = [re.sub(r'\s+([.,;:)])', r'\1', re.sub(r'\*\*\s*\*\*', ' ', re.sub(r'\s+', ' ', x))).replace('( ', '(').strip() for x in h.split('\n')]
     lines = [re.sub(r'\b(Tram|Bus|U-Bahn)\s+\1\b', r'\1', x) for x in lines]
     return '\n'.join(x for x in lines if x)
 
@@ -44,7 +46,12 @@ def fetch(out, log=print):
         body = '\n'.join(plain(c.get('content') or '') for c in e.get('content') or [])
         title = next((c.get('headline') for c in e.get('content') or [] if c.get('headline')), '') or (e.get('disruptionTypes') or [{}])[0].get('displayName', '')
         res.append({'id': e['id'], 'lines': lines, 'title': html.unescape(title or ''), 'text': body, 'start': e.get('startDate'), 'end': e.get('endDate'),
-                    'station': (e.get('stationOne') or {}).get('displayName', '')})
+                    'station': (e.get('stationOne') or {}).get('displayName', ''),
+                    # the stretch and the kind, as BVG heads its notice ("21 Holteistr. ↔ Marktstr. · Unterbrechung"), and its map
+                    'stretch': ' ↔ '.join(x for x in ((e.get('stationOne') or {}).get('displayName', ''), (e.get('stationTwo') or {}).get('displayName', '')) if x),
+                    'kind': ', '.join(t.get('displayName', '') for t in e.get('disruptionTypes') or [] if t.get('displayName')),
+                    'img': [{'url': 'https://www.bvg.de' + (i.get('rawImage') or {}).get('link', ''), 'alt': i.get('subText') or ((i.get('rawImage') or {}).get('metadata') or {}).get('alt', '')}
+                            for i in e.get('images') or [] if (i.get('rawImage') or {}).get('link')]})
     f = os.path.join(out, 'alerts_ber.json')
     try: same = json.load(open(f, encoding='utf-8')).get('alerts') == res
     except Exception: same = False
