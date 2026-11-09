@@ -4812,7 +4812,7 @@ const KEEP_W='(?:[Ll]\\.|[Ll]inii|[Ll]inie|[Ll]inia|[Ll]iniach|[Ll]iniami|[Ll]in
 function lineSigns(html,lines){const set=new Set(lines||[]);const here=IDX?IDX.routes.filter(r=>inCity(r)):[];
   const find=(n,kind)=>{const c=here.filter(r=>r.n===n);if(!c.length)return null;const want=kind&&/Tram/.test(kind)?['tram']:kind&&(/Bus|Autobus/.test(kind)||SEV_W.test(kind))?['repl','bus','night','exp']:null;
     return want?c.find(r=>want.includes(r.t))||null:c.find(r=>r.t!=='repl')||c[0]};   // (a bus 18 replacing tram 18 that the timetable lacks: the number, not the tram's sign)
-  const tok='[A-Z]{0,2}\\d{1,3}[A-Z]?';html=html.replace(/\bl\.(?=N?\d)/g,'l. ');   // ("l.106": the line 106)
+  const tok='(?:[A-Z]{1,2}-?\\d{1,3}[A-Z]?|\\d{1,3}[A-Z]?)';html=html.replace(/\bl\.(?=[A-Z]{0,2}-?\d)/g,'l. ');   // ("l.106", "l.E-2": the lines; Warszawa's E-2 with its hyphen)
   return html.replace(new RegExp('(?:\\b('+VEH_W+'|'+KEEP_W+')\\s+)?(?<![\\w./:#&-])((?:'+tok+')(?:(?:\\s*,\\s*|\\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\\.)\\s+|\\s+)(?:'+tok+'))*)(?![\\d.:]\\d|:\\d|\\.\\d|-\\w)','g'),(m,veh,grp,off,all)=>{
     const parts=grp.split(/(\s*,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)/);let any=false;
     const sepRe=/^(\s*,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)$/,toks=parts.filter(p=>!sepRe.test(p));
@@ -4853,7 +4853,7 @@ async function alertsRT(url,viaProxy){const tries=viaProxy&&RT_PROXY?[RT_PROXY+'
           else if(f3===8)al.url=tr(a3,c3);else if(f3===10)al.title=tr(a3,c3);else if(f3===11)al.text=mdPlain(tr(a3,c3))});
         if(al.per.length&&!al.per.some(([s0,e0])=>(!s0||s0<=now)&&(!e0||e0>=now)))return;
         if(!al.title||/^Ogólny tekst|^Komunikat$/i.test(al.title)){const t=al.text.split('\n')[0];al.title=t.length>140?t.slice(0,137)+'…':t;if(al.title===al.text)al.text=''}
-        if(al.title){const pr=al.per.find(([s0,e0])=>(!s0||s0<=now)&&(!e0||e0>=now))||al.per[0]||[];out.push({title:al.title,text:al.text,url:al.url,from:pr[0]?pr[0]*1000:null,to:pr[1]?pr[1]*1000:null})}})});
+        if(al.title){const pr=al.per.find(([s0,e0])=>(!s0||s0<=now)&&(!e0||e0>=now))||al.per[0]||[];out.push({title:al.title,text:al.text,url:al.url,from:pr[0]?pr[0]*1000:null,to:pr[1]?pr[1]*1000:null,lines:[...new Set(al.routes.map(x=>String(x).toUpperCase()))]})}})});
       return out}catch(e){}}
   return []}
 // (kept for each city apart: a slow answer for the city left a moment ago never shows up in another)
