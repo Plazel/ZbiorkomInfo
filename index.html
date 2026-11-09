@@ -1128,7 +1128,7 @@ html.app nav.rail{touch-action:pan-x pan-y!important}
   <button class="btn" type="button" id="mapClose" aria-label="Zamknij schemat" style="display:none">✕ Zamknij</button></div>
  <div class="mapBody"><button type="button" id="mlTog" aria-expanded="false" aria-controls="mapList"><span>Lista linii</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button><aside id="mapList" aria-label="Linie do podświetlenia"></aside><div id="mlRes" role="separator" aria-orientation="vertical" aria-label="Szerokość listy linii" title="Przeciągnij, aby zmienić szerokość listy"></div>
   <div class="mapArea"><div id="mapRot"><canvas id="mapBase" aria-hidden="true"></canvas><svg id="mapSvg" preserveAspectRatio="xMidYMid meet"></svg></div>
-   <p class="mapAttr" id="mapAttr" hidden>Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">autorzy OpenStreetMap</a><span id="cartoAttr">, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></span>, <a href="https://www.openrailwaymap.org/" target="_blank" rel="noopener">OpenRailwayMap</a> (CC-BY-SA)</p>
+   <p class="mapAttr" id="mapAttr" hidden>Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">autorzy OpenStreetMap</a><span id="cartoAttr">, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></span></p>
    <div class="mapVar schSets" id="schSets" hidden><span class="vlab">Pokaż</span><div class="vbtns" id="schSetBtns" role="group" aria-label="Zakres schematu"></div></div>
    <div class="mapVar" id="mapVar" hidden><span id="varLine"></span><span class="vlab">Wariant</span><div class="vbtns" id="varBtns" role="group" aria-label="Wariant trasy"></div><div class="vdesc" id="varDesc"></div></div>
    <div class="mapZoom"><button type="button" id="mapIn" aria-label="Przybliż">+</button><button type="button" id="mapOut" aria-label="Oddal">−</button><button type="button" id="mapReset" aria-label="Pokaż całość">⤢</button><button type="button" id="mapMeBtn" aria-label="Moja lokalizacja" title="Moja lokalizacja" aria-pressed="false"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M12 1.5v4M12 18.5v4M1.5 12h4M18.5 12h4"/></svg></button><button type="button" id="mapNorth" aria-label="Północ u góry" title="Północ u góry" hidden><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M10 1.5l4.2 8.5H5.8z" fill="var(--brand,#d71920)"/><path d="M10 18.5l4.2-8.5H5.8z" fill="currentColor"/></svg></button></div>
@@ -1192,7 +1192,7 @@ html.app nav.rail{touch-action:pan-x pan-y!important}
  <div class="jpMap" id="jpMap"><canvas id="jpCv"></canvas>
   <div class="jpPick"><span>Kliknięcie na mapie ustawia:</span><div class="seg" role="group"><button type="button" data-jpick="from" aria-pressed="true">Początek</button><button type="button" data-jpick="to" aria-pressed="false">Cel</button></div></div>
   <div class="jpZoom"><button type="button" id="jpIn" aria-label="Przybliż">+</button><button type="button" id="jpOut" aria-label="Oddal">−</button></div>
-  <p class="mapAttr jpAttr2">Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">autorzy OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>, <a href="https://www.openrailwaymap.org/" target="_blank" rel="noopener">OpenRailwayMap</a> (CC-BY-SA)</p></div>
+  <p class="mapAttr jpAttr2">Mapa: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">autorzy OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></p></div>
 </div>
 <div class="alertWrap" id="alertBar" hidden></div><div class="alertDlg depDlg" id="alertDlg" hidden role="dialog" aria-modal="true" aria-labelledby="alertDlgT"><div class="depBox alertBox"><div class="depHead"><h2 id="alertDlgT">Zmiany w ruchu</h2><button type="button" class="depX" id="alertClose" aria-label="Zamknij">×</button></div><div class="depBody" id="alertBody"></div></div></div>
 <div class="wrap" id="app"><p class="loading">Trwa wczytywanie rozkładów</p></div>
@@ -2668,14 +2668,14 @@ async function loadBase(){
 // its corners fall on, which inside a tile matches to well under a pixel.
 // CARTO's tiles need a (free) API key: CARTO_KEY. Without one the standard OpenStreetMap tiles are used (toned down a little).
 const CARTO_KEY='cb1_4vdw_1_23a15f607749c4261b38e021';
-const TILE_URL=(st,z,x,y)=>st==='orm'?`https://tiles.openrailwaymap.org/standard/${z}/${x}/${y}.png`:CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/${st}/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png?key=${CARTO_KEY}`
+const TILE_URL=(st,z,x,y)=>CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/${st}/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png?key=${CARTO_KEY}`
   :`https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
 const TILES={c:new Map(),ok:0,bad:0};
 const PJC=Math.cos(54.45*Math.PI/180)*1000;
 const tLon=(x,z)=>x/2**z*360-180,tLat=(y,z)=>{const n=Math.PI-2*Math.PI*y/2**z;return 180/Math.PI*Math.atan(Math.sinh(n))};
 function tileImg(st,z,x,y){const k=st+'/'+z+'/'+x+'/'+y;let t=TILES.c.get(k);
   if(!t){const img=new Image();img.crossOrigin='anonymous';t={img,ok:false};TILES.c.set(k,t);
-    img.onload=()=>{t.ok=true;TILES.ok++;cancelAnimationFrame(TILES.raf);TILES.raf=requestAnimationFrame(()=>{drawBase();if(typeof JP!=='undefined'&&JP.open)jpDraw()})};img.onerror=()=>{if(st==='orm'){TILES.ormBad=(TILES.ormBad||0)+1;if(TILES.ormBad>8)TILES.ormOff=true;return}TILES.bad++;TILES.c.delete(k)};img.src=TILE_URL(st,z,x,y);
+    img.onload=()=>{t.ok=true;TILES.ok++;cancelAnimationFrame(TILES.raf);TILES.raf=requestAnimationFrame(()=>{drawBase();if(typeof JP!=='undefined'&&JP.open)jpDraw()})};img.onerror=()=>{TILES.bad++;TILES.c.delete(k)};img.src=TILE_URL(st,z,x,y);
     if(TILES.c.size>800){const it=TILES.c.keys();for(let i=0;i<200;i++)TILES.c.delete(it.next().value)}}
   return t}
 function drawTiles(ctx,s,ox,oy,cw,ch,cs){
@@ -2695,13 +2695,7 @@ function drawTiles(ctx,s,ox,oy,cw,ch,cs){
     // until it arrives: the same place from a coarser tile already loaded
     for(let d=1;d<=4&&z-d>=0;d++){const zz=z-d,f=2**d,px=Math.floor(x/f),py=Math.floor(y/f);const p=TILES.c.get(st+'/'+zz+'/'+px+'/'+py);
       if(p&&p.ok){const sz=p.img.naturalWidth/f;ctx.drawImage(p.img,(x-px*f)*sz,(y-py*f)*sz,sz,sz,X0,Y0,X1-X0+s*.6,Y1-Y0+s*.6);break}}}
-  ctx.restore();
-  // railways and tram tracks (CARTO draws no tram tracks): OpenRailwayMap's overlay on top, toned down to grey, from zoom 12
-  if(z>=12&&!TILES.ormOff){ctx.save();ctx.filter=dark?'grayscale(1) invert(1) brightness(.75)':'grayscale(1) brightness(1.1) contrast(1.15)';ctx.globalAlpha=dark?.45:.55;
-    for(let x=x0;x<=x1;x++)for(let y=y0;y<=y1;y++){const t=tileImg('orm',z,x,y);if(!t.ok)continue;
-      const X0=tLon(x,z)*PJC,X1=tLon(x+1,z)*PJC,Y0=-tLat(y,z)*1000,Y1=-tLat(y+1,z)*1000;ctx.drawImage(t.img,X0,Y0,X1-X0+s*.6,Y1-Y0+s*.6)}
-    ctx.restore()}
-  return true}
+  ctx.restore();return true}
 function drawBase(){
   const cv=document.getElementById('mapBase');if(!cv)return;
   if(MAP.view!=='osm'||!MAP.vb){if(cv.width)cv.width=0;return}
