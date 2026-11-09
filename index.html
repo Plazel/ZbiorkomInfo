@@ -3659,7 +3659,7 @@ const GD_TOWNS_X=['Krynica','Mochnaczka Niżna','Mochnaczka Wyżna','Wierchomla 
 // spa towns "… Zdrój")
 function gdTownsKM(){if(gdTownsKM.c)return gdTownsKM.c;const A=new Set(GD_TOWNS_X);Object.values(IDX.stops).forEach(X=>{if(X[4]==='km'&&!/\s(I|II|PKP)$/.test(X[0]))A.add(X[0])});
   const S=new Set([...A].filter(x=>/ Zdrój$/.test(x)||!x.split(' ').some((_,k,w)=>k>0&&A.has(w.slice(0,k).join(' ')))));return gdTownsKM.c=S}
-function gdNameSaid(name,nl){let n=name;
+function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{L}\d])/gu,'$1Park and Ride');   // (P+R said as Park and Ride in every language)
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II|Dolna|Górna|Wielka|Mała|Wyżna|Niżna)$/.test(rest)){n=p+', '+rest;break}}}   // (Krynica Dolna, Łabowa Górna: one name)
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
