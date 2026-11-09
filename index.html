@@ -2182,8 +2182,8 @@ function comboSheet(C,ci,i){
 function sheetHTML(S){
   const dayOn=k=>!(S.noX&&k==='x')&&(!S.days||k==='x'||S.days.has(k));
   const hours=new Set();Object.keys(S.cols).filter(dayOn).forEach(k=>S.cols[k].forEach(x=>hours.add(Math.floor(x.t/60))));
-  const hs=[...hours].sort((a,b)=>a-b);const allDay=true;   // (every timetable from 0 to 23: the runs after midnight at the top)   // (a line running round the clock: its hours 0, 1, 2 … 23, the ones after midnight with them)
-  const H=allDay?[...new Set(hs.map(h=>h%24))].sort((a,b)=>a-b):hs.length?Array.from({length:hs[hs.length-1]-hs[0]+1},(_,k)=>hs[0]+k):[];
+  const hs=[...hours].sort((a,b)=>a-b);const allDay=new Set(hs.map(h=>h%24)).size===24;   // (a line running round the clock: its hours 0, 1, 2 … 23, the ones after midnight with them)
+  const H=allDay?Array.from({length:24},(_,k)=>k):hs.length?Array.from({length:hs[hs.length-1]-hs[0]+1},(_,k)=>hs[0]+k):[];
   const wk=(IDX.weeks||[])[WEEK]||{};
   // only the days the line runs on (a line that does not run on Sundays gets no Sunday column)
   let days=Object.keys(S.cols).filter(k=>S.cols[k].length&&dayOn(k));if(!days.length)days=['w'];
@@ -3204,13 +3204,13 @@ function prevDay(day,DAYS){if(day==='w'||day==='f')return day;if(day==='h')retur
   if(day==='s')return DAYS.includes('x')&&XD_FRI?'x':DAYS.includes('p')?'p':'w';
   if(day==='x'){const wd=XD_CUR?new Date(+XD_CUR.slice(0,4),+XD_CUR.slice(4,6)-1,+XD_CUR.slice(6)).getDay():3;return wd===1?'h':wd===0?'s':wd===6?'w':'w'}return day}
 function nightShift(DAYS,get){const memo={},g=k=>memo[k]||(memo[k]=get(k)),out={};
-  DAYS.forEach(day=>{const own=g(day).filter(x=>x.t<1440),pd=prevDay(day,DAYS);let prev=[];try{prev=g(pd).filter(x=>x.t>=1440).map(x=>Object.assign({},x,{t:x.t-1440}))}catch(e){}
-    out[day]=own.concat(prev).sort((a,b)=>a.t-b.t)});return out}
+  // (the runs after midnight stay with the day they belong to, at the end of its column: 24:15 in the row 0 after 23)
+  DAYS.forEach(day=>{out[day]=g(day).slice().sort((a,b)=>a.t-b.t)});return out}
 function hourUnion(lists){const s=new Set();lists.forEach(l=>l.forEach(x=>s.add(Math.floor(x.t/60))));return [...s].sort((a,b)=>a-b)}
 // a line running round the clock: its hours 0, 1, 2 … 23 (those after midnight, 24 and on, with 0, 1 …), else as they come
-// every timetable from 0:00 to 23:59: the runs after midnight (24:15, 25:08) in the rows 0, 1 … at the top of their day
-function hourRows(HS,deps){const byH={};deps.forEach(x=>{const h=Math.floor(x.t/60)%24;(byH[h]=byH[h]||[]).push(x)});
-  for(const h in byH)byH[h].sort((a,b)=>a.t%60-b.t%60);return {hs:[...new Set(HS.map(h=>h%24))].sort((a,b)=>a-b),byH,all:true}}
+const roundClock=HS=>new Set(HS.map(h=>h%24)).size===24;
+function hourRows(HS,deps){const all=roundClock(HS),byH={};deps.forEach(x=>{const h=Math.floor(x.t/60)%(all?24:1e9);(byH[h]=byH[h]||[]).push(x)});
+  if(all)for(const h in byH)byH[h].sort((a,b)=>a.t%60-b.t%60);return {hs:all?Array.from({length:24},(_,k)=>k):HS,byH,all}}
 // rows of one hour as high as each other in every day's column
 function eqRows(){const cs=[...document.querySelectorAll('#grid .cols>.col:not(.ecol) tbody')];if(cs.length<2)return;
   cs.forEach(tb=>[...tb.rows].forEach(r=>r.style.height=''));const n=Math.max(...cs.map(tb=>tb.rows.length));
