@@ -4876,6 +4876,8 @@ async function mtGet(src,dst,gesture){const k=src+'>'+dst;if(MT.tr[k])return MT.
 async function mtLines(tr,k,t){if(!t)return t;const out=[];for(const l of String(t).split('\n')){const m=l.match(/^(\s*(?:•\s*)?)(.*)$/),body=m[2];
     if(!/[A-Za-zÀ-ž]{3}/.test(body)){out.push(l);continue}const hd=body.match(/^\[(.+)\]$/),src=hd?hd[1]:body,key=k+'|'+src;
     let v=MT.memo.get(key);if(v==null){try{v=await tr.translate(src)}catch(e){v=src}MT.memo.set(key,v)}out.push(m[1]+(hd?'['+v+']':v))}return out.join('\n')}
+async function mtLeads(tr,k,src){for(const l of String(src||'').split('\n')){const m=alNorm(l).match(AL_LIST_RE);if(!m)continue;const key=k+'|'+m[1];
+    if(!MT.memo.has(key)){try{MT.memo.set(key,await tr.translate(m[1]))}catch(e){}}}}
 async function mtAlerts(g,gesture){const L=alertsOf(g);if(!L.length)return;const run=++MT.run,dst=LANG;let ch=false;
   const show=()=>{if(!ch)return;ch=false;if(alertGrp(city)===g)alertBar();if(typeof DEP!=='undefined'&&DEP.open)depRender();
     const d=document.getElementById('alertDlg');if(d&&!d.hidden&&AL_CUR.g===g)alertShow(AL_CUR.i,g,true)};
@@ -4883,7 +4885,7 @@ async function mtAlerts(g,gesture){const L=alertsOf(g);if(!L.length)return;const
     const base={title:bvg&&!BVG_GEN.test(a.deTitle||'')?bvgTitle(a.deTitle):a.o0.title,text:bvg?bvgTr(a.de):a.o0.text};
     if(bvg&&BVG_GEN.test(a.deTitle||''))base.title=a.o0.title.replace(/^[^:]*/,bvgTitle(a.deTitle));
     let t=base;if(src!==dst){if(!pass){if(base.title!==a.title||base.text!==a.text){a.title=base.title;a.text=base.text;ch=true}continue}const tr=await mtGet(src,dst,gesture);if(run!==MT.run)return;
-      if(tr){const k=src+'>'+dst;t={title:bvg&&BVG_GEN.test(a.deTitle||'')?base.title:await mtLines(tr,k,bvg?a.deTitle:a.o0.title),text:await mtLines(tr,k,bvg?a.de:a.o0.text)};if(run!==MT.run)return}}
+      if(tr){const k=src+'>'+dst;t={title:bvg&&BVG_GEN.test(a.deTitle||'')?base.title:await mtLines(tr,k,bvg?a.deTitle:a.o0.title),text:await mtLines(tr,k,bvg?a.de:a.o0.text)};await mtLeads(tr,k,bvg?a.de:a.o0.text);if(run!==MT.run)return}}
     else t={title:bvg&&!BVG_GEN.test(a.deTitle||'')?a.deTitle:base.title,text:bvg?a.de:a.o0.text};
     if(t.title!==a.title||t.text!==a.text){a.title=t.title;a.text=t.text;ch=true}}
     show();if(run!==MT.run)return}}
@@ -4908,32 +4910,40 @@ function alertPeriod(a){if(!a.from&&!a.to)return '';const f=t=>{const d=new Date
 // the city's stops by name, for the links in a notice ("Brama Oliwska 03" opens that stop's timetable)
 let AL_STOPRE=null;
 function alStopRe(){const k=city;if(AL_STOPRE&&AL_STOPRE.k===k)return AL_STOPRE.re;const A=gdCityAreas(city),N=new Set();
-  Object.values(IDX.stops).forEach(v=>{if(A.has(v[4])&&v[0]&&v[0].length>3)N.add(v[0])});
+  Object.values(IDX.stops).forEach(v=>{if(A.has(v[4])&&v[0]&&v[0].length>3)N.add(alNorm(v[0]))});
   const L=[...N].sort((a,b)=>b.length-a.length).map(n=>esc(n).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
   AL_STOPRE={k,set:N,re:L.length?new RegExp('(?<![\\p{L}\\d])('+L.join('|')+')(?=\\s+(\\d{2})\\b)','gu'):null};return AL_STOPRE.re}
-function alertLinkStops(h){const re=alStopRe();if(!re)return h;
+function alertLinkStops(h){const re=alStopRe();if(!re)return h;h=h.normalize('NFC').replace(/[\u00a0\u202f]/g,' ');
   return h.split(/(<[^>]+>)/).map((part,i,arr)=>{if(i%2)return part;const open=arr.slice(0,i).filter((x,j)=>j%2).reduce((n,t)=>/^<a\b/.test(t)?n+1:/^<\/a>/.test(t)?n-1:n,0);if(open>0)return part;
     return part.replace(re,(m,n,pole)=>`<a class="aStop" href="#s${encodeURIComponent(n.replace(/&amp;/g,'&'))}|${pole}">${n}</a>`)}).join('')}
 // one paragraph: the first sentence of the notice in bold (what happens, to which lines); stops suspended as a list
 const AL_ABBR=/(?:^|[\s(])(?:ul|al|Al|Ul|pl|Pl|os|Os|godz|ks|św|im|nr|ok|tj|in|r|dn|tzw|ww|pn|pd|wsch|zach|str|Str|St|Dw|Bhf)\.$/;
-function alertPara(x,pi,sg){
-  const m=x.match(/^(.*?\b(?:zawiesza się obsługę|zawieszone zostaje funkcjonowanie|zawieszona zostaje obsługa|wyłącza się z obsługi|nieczynne będą|nie będą obsługiwane|nie będą obsługiwane przez autobusy|nie będą obsługiwane przez tramwaje)\s+przystank\p{L}*)\s*:?\s*(.+?)\.?\s*$/iu);
+const AL_LIST_RE=/^(.*?\b(?:zawiesza się obsługę|zawieszone zostaje funkcjonowanie|zawieszona zostaje obsługa|wyłącza się z obsługi|nieczynne będą|nie będą obsługiwane|nie będą obsługiwane przez autobusy|nie będą obsługiwane przez tramwaje)\s+przystank\p{L}*)\s*:?\s*(.+?)\.?\s*$/iu;
+const alNorm=t=>String(t||'').normalize('NFC').replace(/[\s\u00a0\u202f]+/g,' ').trim();
+// x: the paragraph in the language shown; src: the same paragraph in the source's language (its layout: the list of stops)
+function alertPara(x,pi,sg,src,srcLang){src=src==null?x:src;
+  const m=alNorm(src).match(AL_LIST_RE);
   if(m){const items=[];m[2].split(/\s*,\s*|\s+(?:oraz|i)\s+/).forEach(t=>{t=t.trim();if(!t)return;
       if(/^\d{1,2}$/.test(t)&&items.length){items[items.length-1].p.push(t);return}const q=t.match(/^(.*?)\s+(\d{1,2})$/);items.push(q?{n:q[1],p:[q[2]]}:{n:t,p:[]})});
     if(items.length>=2&&items.every(it=>it.n.length<60)){const re=alStopRe();
-      const li=items.map(it=>{const nm=esc(it.n),known=AL_STOPRE&&AL_STOPRE.set.has(it.n);
+      const li=items.map(it=>{const nm=esc(it.n),known=AL_STOPRE&&AL_STOPRE.set.has(alNorm(it.n));
         const nmH=known?`<a class="aStop" href="#s${encodeURIComponent(it.n)}${it.p.length===1?'|'+it.p[0]:''}">${nm}</a>`:nm;return `<li><b>${nmH}</b>${it.p.length?' <span class="aPole">'+it.p.map(esc).join(', ')+'</span>':''}</li>`}).join('');
-      return `<p>${sg(m[1])}:</p><ul class="aStops">${li}</ul>`}}
+      const lead=LANG===srcLang?m[1]:(MT.memo.get(srcLang+'>'+LANG+'|'+m[1])||m[1]);return `<p>${sg(lead)}:</p><ul class="aStops">${li}</ul>`}}
   let lead='',rest=x;if(pi===0){for(let i=0;i<x.length;i++){if(!'.!?'.includes(x[i]))continue;if(i<15)continue;if(x[i]==='.'&&AL_ABBR.test(x.slice(0,i+1)))continue;
       if(i+1<x.length&&!/\s/.test(x[i+1]))continue;lead=x.slice(0,i+1);rest=x.slice(i+1);break}if(!lead&&x.length<220){lead=x;rest=''}}
   return `<p>${lead?`<strong class="aLead">${alertLinkStops(sg(lead))}</strong>`:''}${alertLinkStops(sg(rest))}</p>`}
+function alertParas(a,sg){const srcLang=a.de!=null?'de':'pl',srcT=a.de!=null?a.de:(a.o0?a.o0.text:a.text),srcH=a.de!=null?(a.deTitle||''):(a.o0?a.o0.title:a.title);
+  const S=String(srcT||'').split('\n').map(alNorm),T=String(a.text||'').split('\n').map(alNorm);const al=S.length===T.length;
+  const out=[];let pi=0;const skip0=S.length&&alNorm(S[0]).toLowerCase()===alNorm(srcH).toLowerCase();
+  (al?S:T).forEach((line,k)=>{if(k===0&&(al?skip0:alNorm(T[0]).toLowerCase()===alNorm(a.title).toLowerCase()))return;const shown=al?T[k]:line;if(!shown)return;
+    out.push(alertPara(shown,pi++,sg,al?line:shown,al?srcLang:LANG))});return out.length?`<div class="aTxt">${out.join('')}</div>`:''}
 function alertBody(title,text){if(!text)return '';const L=String(text).split('\n'),n=x=>x.replace(/\s+/g,' ').trim().toLowerCase();
   return (L.length&&n(L[0])===n(title||'')?L.slice(1):L).join('\n').replace(/^\n+/,'')}
 function alertShow(i,g,redraw){const d=document.getElementById('alertDlg'),L=alertsOf(g||alertGrp(city));if(!L.length)return;
   const was=redraw?[...document.querySelectorAll('#alertBody details.aItem')].map(x=>x.open):null;AL_CUR.i=i;AL_CUR.g=g||alertGrp(city);
   if(!redraw&&LANG!==(L[0].de!=null?'de':'pl'))mtAlerts(AL_CUR.g,true);   // (a click: the translator may be downloaded now)
   const order=i==null?L.map((_,k)=>k):[i,...L.map((_,k)=>k).filter(k=>k!==i)];
-  const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map((k,o)=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>alertFmt(lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>'));const body=alertBody(a.title,a.text);return `<details class="aItem"${(was?was[o]:!o)?' open':''}><summary><h3>${sg(a.title)}</h3></summary>${alertPeriod(a)}${body?`<div class="aTxt">${body.split('\n').filter(x=>x.trim()).map((x,pi)=>alertPara(x,pi,sg)).join('')}</div>`:''}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</details>`}).join('');   // (only the notice chosen open, the others by their headings: a click opens them)
+  const pg=ALERT_PAGE[g||alertGrp(city)];document.getElementById('alertBody').innerHTML=order.map((k,o)=>{const a=L[k].url||!pg?L[k]:{...L[k],url:pg};const sg=t=>alertFmt(lineSigns(esc(t),a.lines||[]).replace(/^\[(.+)\]$/gm,'<b>$1</b>'));return `<details class="aItem"${(was?was[o]:!o)?' open':''}><summary><h3>${sg(a.title)}</h3></summary>${alertPeriod(a)}${alertParas(a,sg)}${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(trS(/ztm\.gda\.pl/.test(a.url)?'Szczegóły na stronie ZTM':/ztp\.krakow\.pl/.test(a.url)?'Szczegóły na stronie ZTP':/bvg\.de/.test(a.url)?'Szczegóły na stronie BVG':'Szczegóły na stronie przewoźnika'))} ↗</a>`:''}</details>`}).join('');   // (only the notice chosen open, the others by their headings: a click opens them)
   if(!redraw&&d.hidden){try{history.pushState(Object.assign({},history.state||{},{alertDlg:1}),'',location.href)}catch(e){}}   // (the phone's back button: the window closed, the page stays)
   d.hidden=false;if(!redraw)document.getElementById('alertClose').focus()}
 let AL_BACK=false;
