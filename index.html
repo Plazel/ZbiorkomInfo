@@ -349,7 +349,7 @@ span.chip{cursor:inherit}
 .notes h3{font-family:var(--font-display);font-weight:500;font-size:1.3rem;margin:0 0 12px}
 .notes p{margin:0 0 8px;max-width:90ch;font-size:.92rem;color:var(--muted)}
 .notes b.k{color:var(--accent);display:inline-block;min-width:22px}
-.tools{display:flex;gap:8px;margin-left:auto;align-items:center;flex-wrap:wrap}
+.tools{display:flex;gap:8px;margin-left:auto;align-items:center;flex-wrap:wrap}@media (max-width:760px){.lhead .tools,.fromto2+.tools{margin:0 auto;justify-content:center;flex-basis:100%}}
 .loading{min-height:calc(100vh - var(--top-h) - 160px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;color:var(--fg);font-size:1.15rem;font-weight:600;padding:20px 0;margin:0}
 /* (a message of the page – loading, nothing found –: in the middle, with its sign, as the brigade timetables' one) */
 .loading::before{content:"";width:48px;height:48px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--fg);animation:ldSpin 1s linear infinite}
