@@ -1594,8 +1594,8 @@ function autoGroups(){
   // the big cities: their numbering does not group lines (102 and 202 in Warsaw have nothing in common); groups of lines with
   // long common sections are found instead
   if(BIG_AREAS.includes(city)){
-    // Poznań: all day trams on the PST (Pestka), Os. Sobieskiego – Most Teatralny
-    const fx=(city==='poz'?[['12','14','15','16']]:[]).map(g=>g.filter(n=>BYNAME[n]&&inCity(BYNAME[n]))).filter(g=>g.length>1);
+    // Poznań: all day trams on the PST (Pestka), Os. Sobieskiego – Most Teatralny; Hamburg: U2 and U4, one line between Berliner Tor and Billstedt
+    const fx=(city==='poz'?[['12','14','15','16']]:city==='ham'?[['U2','U4']]:[]).map(g=>g.filter(n=>BYNAME[n]&&inCity(BYNAME[n]))).filter(g=>g.length>1);
     const k=g=>g.slice().sort().join('+'),have=new Set(fx.map(k));
     return {v:[],t:[],tr:fx.concat(bigGroups().filter(g=>!have.has(k(g))))}}
   const t=['8','9'].filter(n=>BYNAME[n]&&BYNAME['T'+n]&&inCity(BYNAME[n])&&inCity(BYNAME['T'+n])).map(n=>[n,'T'+n]);
