@@ -491,6 +491,8 @@ ROWS = [
     ('Szczegóły na stronie ZDMiKP', 'Details on the ZDMiKP website', 'Details auf der Website von ZDMiKP', 'Podrobnosti na stránke ZDMiKP', 'Podrobnosti na webu ZDMiKP'),
     ('Szczegóły na stronie MPK', 'Details on the MPK website', 'Details auf der Website von MPK', 'Podrobnosti na stránke MPK', 'Podrobnosti na webu MPK'),
     ('Szczegóły na stronie MZK', 'Details on the MZK website', 'Details auf der Website von MZK', 'Podrobnosti na stránke MZK', 'Podrobnosti na webu MZK'),
+    ("Poprzedni miesiąc", "Previous month", "Vorheriger Monat", "Predchádzajúci mesiac", "Předchozí měsíc"),
+    ("Następny miesiąc", "Next month", "Nächster Monat", "Nasledujúci mesiac", "Následující měsíc"),
 ]
 
 WEEKDAYS = {
