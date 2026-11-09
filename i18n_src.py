@@ -487,6 +487,10 @@ ROWS = [
     ('od', 'from', 'ab', 'od', 'od'),
     ('do', 'until', 'bis', 'do', 'do'),
     ('do odwołania', 'until further notice', 'bis auf Weiteres', 'do odvolania', 'do odvolání'),
+    ('Szczegóły na stronie PID', 'Details on the PID website', 'Details auf der Website von PID', 'Podrobnosti na stránke PID', 'Podrobnosti na webu PID'),
+    ('Szczegóły na stronie ZDMiKP', 'Details on the ZDMiKP website', 'Details auf der Website von ZDMiKP', 'Podrobnosti na stránke ZDMiKP', 'Podrobnosti na webu ZDMiKP'),
+    ('Szczegóły na stronie MPK', 'Details on the MPK website', 'Details auf der Website von MPK', 'Podrobnosti na stránke MPK', 'Podrobnosti na webu MPK'),
+    ('Szczegóły na stronie MZK', 'Details on the MZK website', 'Details auf der Website von MZK', 'Podrobnosti na stránke MZK', 'Podrobnosti na webu MZK'),
 ]
 
 WEEKDAYS = {
