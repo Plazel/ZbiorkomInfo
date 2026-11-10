@@ -22,9 +22,12 @@
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); DELETE /admin/konta/<id> → the account removed.
-//      PUT /admin/ustawienia {voice, lang, gong, en, msgs} → mKomputer's settings for every driver (null: the driver's own choice;
-//        en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements);
-//      POST /admin/komunikat {text} → a message to the drivers (GET /konto/komunikaty: the last 20); DELETE: all removed.
+//      PUT /admin/ustawienia {voice, lang, gong, en, msgs, l2, perm} → mKomputer's settings for every driver (null: the driver's
+//        own choice; en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements,
+//        each [pl, en, de, sk, cs]; l2: their second language; perm: what the drivers may do {ann, spec, mic, free});
+//      Messages: POST /admin/komunikat {text, to: "*" (every driver) | [ids], ack} → sent; GET /admin/komunikaty → the last 100
+//        with each recipient's status {d: delivered, r: read, c: confirmed}; DELETE /admin/komunikat[/<id>] → removed.
+//        The driver: GET /konto/komunikaty → their messages (marked delivered); POST /konto/komunikaty/<id> {c} → read (confirmed).
 //
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
@@ -139,8 +142,22 @@ async function konta(req, env, cors) {
   if (!u) return J({ error: 'unauthorized' }, 401);
   // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
   if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role, mk: await env.KONTA.get('cfg:mk', 'json') });
-  // the administrator's messages to the drivers (the last 20, newest first)
-  if (p === '/konto/komunikaty' && req.method === 'GET') return new Response((await env.KONTA.get('msg:mk')) || '[]', { headers: h });
+  // the administrator's messages: those for this account, newest first; fetching marks them delivered, opening read
+  const forMe = x => x.to === '*' ? u.role === 'driver' : Array.isArray(x.to) && x.to.includes(u.id);
+  const mine = x => { const s = (x.st || {})[u.id] || {}; return { id: x.id, t: x.t, text: x.text, from: x.from, ack: !!x.ack, r: s.r || null, c: s.c || null }; };
+  if (p === '/konto/komunikaty' && req.method === 'GET') {
+    const L = (await env.KONTA.get('msg:list', 'json')) || [], now = new Date().toISOString(); let ch = false;
+    const out = L.filter(forMe).map(x => { x.st = x.st || {}; const s = x.st[u.id] = x.st[u.id] || {}; if (!s.d) { s.d = now; ch = true; } return mine(x); });
+    if (ch) await env.KONTA.put('msg:list', JSON.stringify(L));
+    return J(out);
+  }
+  {const mm = p.match(/^\/konto\/komunikaty\/([a-z0-9]{6,16})$/);
+  if (mm && req.method === 'POST') {
+    let b = {}; try { b = await req.json(); } catch (e) {}
+    const L = (await env.KONTA.get('msg:list', 'json')) || [], x = L.find(x => x.id === mm[1]); if (!x || !forMe(x)) return J({ error: 'not found' }, 404);
+    const now = new Date().toISOString(); x.st = x.st || {}; const s = x.st[u.id] = x.st[u.id] || {}; s.d = s.d || now; s.r = s.r || now; if (b.c) s.c = s.c || now;
+    await env.KONTA.put('msg:list', JSON.stringify(L)); return J(mine(x));
+  }}
   if (p === '/konto/dane') {
     if (req.method === 'GET') return new Response((await env.KONTA.get('d:' + u.id)) || '{}', { headers: h });
     if (req.method === 'PUT') {
@@ -161,16 +178,23 @@ async function konta(req, env, cors) {
       if ('en' in b) c.en = b.en === true;
       // special announcements: up to 30, each [pl, en, de, sk, cs] of at most 300 characters (null: the built-in set)
       if ('msgs' in b) c.msgs = Array.isArray(b.msgs) ? b.msgs.slice(0, 30).map(m => (Array.isArray(m) ? m : []).slice(0, 5).map(x => String(x || '').trim().slice(0, 300)))
-        .filter(m => m[0]).map(m => { while (m.length < 5) m.push(''); return m; }) : null;
+        .map(m => { while (m.length < 5) m.push(''); return m; }).filter(m => m.some(Boolean)) : null;
+      if ('l2' in b) c.l2 = ['pl', 'en', 'de', 'sk', 'cs'].includes(b.l2) ? b.l2 : null;
+      // what the drivers may do: change the announcements' settings, use the special announcements, the microphone, trips without a duty
+      if ('perm' in b && b.perm && typeof b.perm === 'object') { c.perm = c.perm || {}; for (const k of ['ann', 'spec', 'mic', 'free']) if (k in b.perm) c.perm[k] = b.perm[k] !== false; }
       await env.KONTA.put('cfg:mk', JSON.stringify(c)); return J(c);
     }
+    if (p === '/admin/komunikaty' && req.method === 'GET') return J((await env.KONTA.get('msg:list', 'json')) || []);
     if (p === '/admin/komunikat' && req.method === 'POST') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       const text = String(b.text || '').trim().slice(0, 500); if (!text) return J({ error: 'text' }, 400);
-      const L = (await env.KONTA.get('msg:mk', 'json')) || []; L.unshift({ t: new Date().toISOString(), text, from: u.name }); L.splice(20);
-      await env.KONTA.put('msg:mk', JSON.stringify(L)); return J(L);
+      const to = b.to === '*' ? '*' : Array.isArray(b.to) ? [...new Set(b.to.filter(x => typeof x === 'string' && /^[a-z0-9]{3,32}$/.test(x)))].slice(0, 200) : null;
+      if (!to || (Array.isArray(to) && !to.length)) return J({ error: 'to' }, 400);
+      const L = (await env.KONTA.get('msg:list', 'json')) || []; L.unshift({ id: newTok(8), t: new Date().toISOString(), text, from: u.name, to, ack: !!b.ack, st: {} }); L.splice(100);
+      await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L);
     }
-    if (p === '/admin/komunikat' && req.method === 'DELETE') { await env.KONTA.put('msg:mk', '[]'); return J([]); }
+    {const mm = p.match(/^\/admin\/komunikat(?:\/([a-z0-9]{6,16}))?$/);
+    if (mm && req.method === 'DELETE') { const L = mm[1] ? ((await env.KONTA.get('msg:list', 'json')) || []).filter(x => x.id !== mm[1]) : []; await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L); }}
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
     // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
     const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created } });
