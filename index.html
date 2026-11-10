@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794353372;
+const APP_BUILD=1794353565;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3285,13 +3285,13 @@ function buildLabels(){
       term:srt(o.term),vterm:srt([...o.vterm].filter(r=>!o.term.has(r)))}}));
 }
 // ---- stops on the map (no line chosen): a round sign per kind of transport, as at the stops themselves ----
-// bus and trolleybus A (blue), tram T (red), Tricity SKM (S1 dark green, S2/S22 dark red, both: half and half),
+// bus and trolleybus A (blue), tram T (red), Tricity SKM as S (S1 dark green, S2/S22 dark red, both: half and half),
 // metro M in the line's colour, other trains S (S-lines) or K in the line's colour
 const SYM_A='#2f63ad',SYM_T='#d71920',SKM_S1='#0b6b39',SKM_S2='#8d1b21';
 function symKey(r){
   if(r.t==='rail'){
     if(r.cat==='metro')return {o:0,t:'M',c:colOf(r)};
-    if((r.c||[]).some(c=>c==='gda'||c==='gdy'||c==='sop')&&/^S\d/.test(r.n))return {o:1,t:'SKM',c:r.n==='S1'?SKM_S1:SKM_S2};
+    if((r.c||[]).some(c=>c==='gda'||c==='gdy'||c==='sop')&&/^S\d/.test(r.n))return {o:1,t:'S',c:r.n==='S1'?SKM_S1:SKM_S2};
     if((r.c||[]).includes('prg')&&/^S\d/.test(r.n))return {o:1,t:'ESKO',c:'#00377a'};   // Prague: the Esko sign
     if(/^SKA\d/.test(r.n))return {o:1,t:'S',c:colOf(r)};   // Kraków: SKA as S in the line's colour
     if(!/^S\d/.test(r.n))return {o:1,t:'TRAIN',c:colOf(r)};   // other trains (Krynica: PKP, Polregio): a square with a train
@@ -6217,13 +6217,11 @@ function mkMapDraw(){const S=MKM.st;if(!S||!S.C.isConnected)return;const C=S.C,w
   // the route: behind the vehicle grey, ahead in the line's colour
   const line=(pts,col,wd)=>{if(pts.length<2)return;x.beginPath();pts.forEach((q,i)=>{const p=px(q[0],q[1]);i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])});x.strokeStyle=col;x.lineWidth=wd/f;x.lineJoin=x.lineCap='round';x.stroke()};
   const G=S.G;line(G,light?'rgba(255,255,255,.9)':'rgba(0,0,0,.6)',10);line(G.slice(S.si),brand,6.5);line(G.slice(0,S.si+1).concat(S.sd<1600?[S.me]:[]),'#8a938d',6.5);
-  // the stops passed: small grey rings (the ones ahead: their signs, upright, drawn below)
-  S.P.forEach((St,i)=>{if(i>S.k)return;const p=px(St[2],St[3]);if(Math.hypot(p[0],p[1])>rad+20)return;x.beginPath();x.arc(p[0],p[1],5/f,0,7);x.fillStyle='#8a938d';x.fill();x.lineWidth=2.5/f;x.strokeStyle='#0b0d0c';x.stroke()});
   if(S.gps&&S.acc){const ra=S.acc*256*2**z/(40075016*Math.cos(S.me[0]*Math.PI/180));if(ra>14&&ra<Math.max(w,h)){x.beginPath();x.arc(0,0,ra,0,7);x.fillStyle='rgba(66,165,245,.16)';x.fill()}}
   x.restore();
-  // the stops ahead: the stop's sign of the map (A, T…), upright, the next one larger
-  {const R=MK.run&&MK.run.r,img=R?mkSymImg(R):null;if(img&&img.complete&&img.naturalWidth)for(let i=S.P.length-1;i>S.k;i--){const St=S.P[i],q=px(St[2],St[3]).map(v=>v*f),sx=vx+q[0]*Math.cos(rot)-q[1]*Math.sin(rot),sy=vy+q[0]*Math.sin(rot)+q[1]*Math.cos(rot);
-    if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;const sz=i===S.nx?34:26;x.drawImage(img,sx-sz/2,sy-sz/2,sz,sz)}}
+  // every stop: the stop's sign of the map (A, T…), upright, always shown; the next one larger, those passed in grey
+  {const R=MK.run&&MK.run.r,img=R?mkSymImg(R):null;if(img&&img.complete&&img.naturalWidth)for(let i=S.P.length-1;i>=0;i--){const St=S.P[i],q=px(St[2],St[3]).map(v=>v*f),sx=vx+q[0]*Math.cos(rot)-q[1]*Math.sin(rot),sy=vy+q[0]*Math.sin(rot)+q[1]*Math.cos(rot);
+    if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;const sz=i===S.nx?34:26;x.save();if(i<S.nx&&i!==S.k)x.filter='grayscale(1)';x.drawImage(img,sx-sz/2,sy-sz/2,sz,sz);x.restore()}}
   // the vehicle: an arrow pointing up (the way ahead)
   x.save();x.translate(vx,vy);x.beginPath();x.moveTo(0,-16);x.lineTo(11,12);x.lineTo(0,6);x.lineTo(-11,12);x.closePath();x.fillStyle=S.gps?'#1e88e5':brand;x.fill();x.lineWidth=3;x.strokeStyle='#fff';x.stroke();x.restore();
 }
