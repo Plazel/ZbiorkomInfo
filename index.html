@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794352226;
+const APP_BUILD=1794352316;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6236,11 +6236,13 @@ function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500
   const rows=[j+4,j+3,j+2,j+1,j,j-1],bt=B.querySelectorAll('.mkStops button');
   rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last;b.parentNode.className=(i===4?'cur'+(at?' at':''):i===5?'prev':'nx')+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
     b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').textContent=ok&&q>=j&&gdReq(q)?trS('na żądanie'):'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
-  // (the rows slide by as many stops as were passed – forward or back –; those coming from beyond the list fade in)
+  // (passing stops: the whole list scrolls as one – every row moved by the same distance, as many rows as stops passed, forward
+  // or back – and glides back into place; rows from beyond the list come in from under its edge)
   {const d=MK.lastJ!=null&&MK.lastRun===R?j-MK.lastJ:0;MK.lastJ=j;MK.lastRun=R;
-    if(d&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const lis=[...B.querySelectorAll('.mkStops li')],n=lis.length,tops=lis.map(l=>l.getBoundingClientRect().top),hA=n>1?(tops[n-1]-tops[0])/(n-1):60;
-      lis.forEach((li,i)=>{const b=li,k=i-d,ins=k>=0&&k<n,off=ins?tops[k]-tops[i]:-d*hA;b.style.transition='none';b.style.transform=`translateY(${Math.max(-n*hA,Math.min(n*hA,off))}px)`;if(!ins)b.style.opacity='0';
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{b.style.transition='transform .6s cubic-bezier(.3,.7,.2,1),opacity .6s';b.style.transform='';b.style.opacity=''}))})}}
+    if(d&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const lis=[...B.querySelectorAll('.mkStops li')],n=lis.length,tops=lis.map(l=>l.getBoundingClientRect().top),hA=n>1?(tops[n-1]-tops[0])/(n-1):60,
+      off=-Math.max(-n,Math.min(n,d))*hA;
+      lis.forEach(li=>{li.style.transition='none';li.style.transform=`translateY(${off}px)`});
+      void B.offsetHeight;requestAnimationFrame(()=>lis.forEach(li=>{li.style.transition='transform .75s cubic-bezier(.22,.8,.24,1)';li.style.transform=''}))}}
   mkMap(B,P,k,at,T,nowM)}
 // the microphone: the driver's voice through the device's own speaker (to the passengers), live, while it is on (the
 // announcements wait meanwhile); the device's echo cancelling and noise suppression on
