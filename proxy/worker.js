@@ -251,7 +251,7 @@ export default {
     if (new URL(req.url).pathname === '/tts') return tts(req, env, ctx, cors);
     if (new URL(req.url).pathname === '/byd') return byd(req, cors);
     if (new URL(req.url).pathname === '/alerts') return alerts(cors);
-    if (/^\/(konto|admin)(\/|$)/.test(new URL(req.url).pathname)) return konta(req, env, cors);
+    if (/^\/(konto|admin|siec)(\/|$)/.test(new URL(req.url).pathname)) return konta(req, env, cors);   // (/siec: the TEST network, read by the drivers and administrators)
     const target = new URL(req.url).searchParams.get('url');
     let u; try { u = new URL(target); } catch (e) { return new Response('url?', { status: 400, headers: cors }); }
     if (u.protocol !== 'https:' || !ALLOWED.includes(u.hostname)) return new Response('host not allowed', { status: 403, headers: cors });
