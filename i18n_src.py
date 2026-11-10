@@ -653,6 +653,17 @@ ROWS = [
     ("Ten token powstał, zanim serwer zaczął przechowywać tokeny do podglądu.", "This token was made before the server began keeping tokens for preview.", "Dieser Token entstand, bevor der Server Token zur Vorschau speicherte.", "Tento token vznikol skôr, ako server začal uchovávať tokeny na náhľad.", "Tento token vznikl dříve, než server začal uchovávat tokeny pro náhled."),
     ("Serwer nie ma podglądu tokenów – wdróż najnowszy worker.js", "The server has no token preview – deploy the latest worker.js", "Der Server hat keine Token-Vorschau – aktuelle worker.js bereitstellen", "Server nemá náhľad tokenov – nasaďte najnovší worker.js", "Server nemá náhled tokenů – nasaďte nejnovější worker.js"),
     ("Kolejne", "Next", "Nächste", "Ďalšie", "Další"),
+    ("Względem rozkładu", "Against timetable", "Zum Fahrplan", "Voči cestovnému poriadku", "Vůči jízdnímu řádu"),
+    ("GPS wyłączony", "GPS off", "GPS aus", "GPS vypnuté", "GPS vypnuto"),
+    ("Kurs", "Trip", "Fahrt", "Spoj", "Spoj"),
+    ("np. 8 albo 8/3", "e.g. 8 or 8/3", "z. B. 8 oder 8/3", "napr. 8 alebo 8/3", "např. 8 nebo 8/3"),
+    ("Wpisz numer linii – pojawią się pasujące linie. Brygadę możesz wpisać od razu: linia/brygada, np. 8/3.", "Type the line number – matching lines will appear. A duty can be typed at once: line/duty, e.g. 8/3.", "Liniennummer eingeben – passende Linien erscheinen. Ein Dienst kann direkt eingegeben werden: Linie/Dienst, z. B. 8/3.", "Zadajte číslo linky – zobrazia sa zodpovedajúce linky. Turnus môžete zadať hneď: linka/turnus, napr. 8/3.", "Zadejte číslo linky – zobrazí se odpovídající linky. Pořadí lze zadat rovnou: linka/pořadí, např. 8/3."),
+    ("Nie ma takiej linii.", "No such line.", "Keine solche Linie.", "Taká linka neexistuje.", "Taková linka neexistuje."),
+    ("Wybierz kurs", "Choose a trip", "Fahrt wählen", "Vyberte spoj", "Vyberte spoj"),
+    ("wybierz kurs", "choose a trip", "Fahrt wählen", "vyberte spoj", "vyberte spoj"),
+    ("Wyczyść", "Clear", "Löschen", "Vymazať", "Vymazat"),
+    ("wł.", "on", "ein", "zap.", "zap."),
+    ("wył.", "off", "aus", "vyp.", "vyp."),
 ]
 
 WEEKDAYS = {
