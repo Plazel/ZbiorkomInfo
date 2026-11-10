@@ -554,6 +554,16 @@ ROWS = [
     ("Głos: wył.", "Voice: off", "Stimme: aus", "Hlas: vyp.", "Hlas: vyp."),
     ("Zakończ kurs", "End run", "Fahrt beenden", "Ukončiť spoj", "Ukončit spoj"),
     ("Numer linii", "Line number", "Liniennummer", "Číslo linky", "Číslo linky"),
+    ("Pełny ekran", "Full screen", "Vollbild", "Celá obrazovka", "Celá obrazovka"),
+    ("Wróć do przystanku wskazanego przez system", "Back to the stop the system shows", "Zurück zur vom System angezeigten Haltestelle", "Späť na zastávku podľa systému", "Zpět na zastávku podle systému"),
+    ("Zatwierdź wybór", "Confirm choice", "Auswahl bestätigen", "Potvrdiť výber", "Potvrdit výběr"),
+    ("Następny", "Next", "Weiter", "Ďalší", "Další"),
+    ("wybór – zatwierdź ✓", "choice – confirm ✓", "Auswahl – bestätigen ✓", "výber – potvrďte ✓", "výběr – potvrďte ✓"),
+    ("na przystanku", "at the stop", "an der Haltestelle", "na zastávke", "na zastávce"),
+    ("następny przystanek", "next stop", "nächste Haltestelle", "nasledujúca zastávka", "příští zastávka"),
+    ("GPS wyłączony – przystanki ręcznie", "GPS off – stops by hand", "GPS aus – Haltestellen manuell", "GPS vypnuté – zastávky ručne", "GPS vypnuto – zastávky ručně"),
+    ("do przystanku", "to the stop", "bis zur Haltestelle", "k zastávke", "k zastávce"),
+    ("Szukanie GPS…", "Finding GPS…", "GPS wird gesucht…", "Hľadá sa GPS…", "Hledá se GPS…"),
 ]
 
 WEEKDAYS = {
