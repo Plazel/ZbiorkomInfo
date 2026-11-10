@@ -14,10 +14,22 @@
 // 4. ZTM Gdańsk's notices of disruptions: /alerts returns the notices shown in the red "UWAGA" bar on ztm.gda.pl, each with
 //    its text from its own page (JSON: [{title, url, text}]), kept 2 minutes.
 //
+// 5. Accounts (only for people given one): /konto … with the header "Authorization: Bearer <token>". Each account has a long
+//    random token instead of a password; the page keeps it on the device. Only the token's SHA-256 is stored, so the
+//    store holds nothing that lets anyone in. Kept in a KV namespace bound as KONTA:
+//      t:<sha256 of token> → account id     u:<id> → {id, name, role, created}     d:<id> → the account's data (JSON)
+//    GET /konto → {id, name, role}; GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
+//    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
+//      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"} → {id, token} (the token shown once);
+//      POST /admin/konta/<id>/token → a new token (the old one stops working); DELETE /admin/konta/<id> → the account removed.
+//
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
 // For the voices, Azure: in the worker's Settings → Variables and Secrets add AZURE_KEY (type Secret: the key of an Azure
 // "Speech service" resource, pricing tier Free F0) and AZURE_REGION (type Text: the resource's region, e.g. westeurope).
+// For the accounts: Storage & Databases → KV → Create namespace (e.g. zbiorkom-konta); in the worker's Settings → Bindings add
+// a KV namespace binding named KONTA with it; in Variables and Secrets add ADMIN_TOKEN (type Secret: a long random text,
+// e.g. from `openssl rand -base64 32`; it is your administrator's token).
 const ALLOWED = ['ckan2.multimediagdansk.pl', 'cdn.zbiorkom.live', 'www.ztm.poznan.pl', 'gtfs.ztp.krakow.pl', 'api.golemio.cz'];
 const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs-CZ-VlastaNeural': 'cs-CZ', 'cs-CZ-AntoninNeural': 'cs-CZ',
   'sk-SK-ViktoriaNeural': 'sk-SK', 'sk-SK-LukasNeural': 'sk-SK', 'de-DE-SeraphinaMultilingualNeural': 'de-DE', 'de-DE-FlorianMultilingualNeural': 'de-DE',
@@ -99,13 +111,68 @@ async function tts(req, env, ctx, cors) {
   return new Response(res.body, { status: 200, headers: h });
 }
 
+// ---- accounts
+const ROLES = ['user', 'driver'];
+const b64u = a => btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+async function sha(t) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join(''); }
+function same(a, b) { if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false; let x = 0; for (let i = 0; i < a.length; i++) x |= a.charCodeAt(i) ^ b.charCodeAt(i); return x === 0; }
+async function who(req, env) {
+  const m = (req.headers.get('Authorization') || '').match(/^Bearer\s+([A-Za-z0-9_\-+/=]{20,200})$/);
+  if (!m) return null;
+  if (env.ADMIN_TOKEN && same(m[1], env.ADMIN_TOKEN)) return { id: 'admin', name: 'Administrator', role: 'admin' };
+  const id = await env.KONTA.get('t:' + await sha(m[1]));
+  if (!id) return null;
+  return await env.KONTA.get('u:' + id, 'json');
+}
+async function konta(req, env, cors) {
+  const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8'); h.set('Cache-Control', 'no-store');
+  const J = (o, st) => new Response(JSON.stringify(o), { status: st || 200, headers: h });
+  if (!env.KONTA) return J({ error: 'accounts not set up' }, 503);
+  const p = new URL(req.url).pathname.replace(/\/+$/, ''), u = await who(req, env);
+  if (!u) return J({ error: 'unauthorized' }, 401);
+  if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role });
+  if (p === '/konto/dane') {
+    if (req.method === 'GET') return new Response((await env.KONTA.get('d:' + u.id)) || '{}', { headers: h });
+    if (req.method === 'PUT') {
+      const t = await req.text(); if (t.length > 200000) return J({ error: 'too large' }, 413);
+      try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || Array.isArray(o)) throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
+      await env.KONTA.put('d:' + u.id, t); return J({ ok: true });
+    }
+  }
+  if (p.startsWith('/admin/')) {
+    if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
+    const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
+    const newToken = async id => { const t = b64u(crypto.getRandomValues(new Uint8Array(32))); await env.KONTA.put('t:' + await sha(t), id);
+      const a = await env.KONTA.get('u:' + id, 'json'); if (a && a.th) await env.KONTA.delete('t:' + a.th); return { t, th: await sha(t) }; };
+    if (!m[1] && req.method === 'GET') {
+      const out = []; let cur;
+      do { const l = await env.KONTA.list({ prefix: 'u:', cursor: cur }); for (const k of l.keys) { const a = await env.KONTA.get(k.name, 'json'); if (a) out.push({ id: a.id, name: a.name, role: a.role, created: a.created }); } cur = l.list_complete ? null : l.cursor; } while (cur);
+      return J(out.sort((a, b) => (a.created || '').localeCompare(b.created || '')));
+    }
+    if (!m[1] && req.method === 'POST') {
+      let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
+      const name = String(b.name || '').trim().slice(0, 60), role = ROLES.includes(b.role) ? b.role : 'user';
+      if (!name) return J({ error: 'name' }, 400);
+      const id = b64u(crypto.getRandomValues(new Uint8Array(9))).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12).padEnd(8, '0');
+      const a = { id, name, role, created: new Date().toISOString() }; await env.KONTA.put('u:' + id, JSON.stringify(a));
+      const nt = await newToken(id); a.th = nt.th; await env.KONTA.put('u:' + id, JSON.stringify(a));
+      return J({ id, name, role, token: nt.t });
+    }
+    const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a) return J({ error: 'not found' }, 404);
+    if (m[2] && req.method === 'POST') { const nt = await newToken(a.id); a.th = nt.th; await env.KONTA.put('u:' + a.id, JSON.stringify(a)); return J({ id: a.id, token: nt.t }); }
+    if (!m[2] && req.method === 'DELETE') { if (a.th) await env.KONTA.delete('t:' + a.th); await env.KONTA.delete('u:' + a.id); await env.KONTA.delete('d:' + a.id); return J({ ok: true }); }
+  }
+  return J({ error: 'not found' }, 404);
+}
+
 export default {
   async fetch(req, env, ctx) {
-    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS' };
+    const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, PUT, POST, DELETE, OPTIONS', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Max-Age': '86400' };
     if (req.method === 'OPTIONS') return new Response(null, { headers: cors });
     if (new URL(req.url).pathname === '/tts') return tts(req, env, ctx, cors);
     if (new URL(req.url).pathname === '/byd') return byd(req, cors);
     if (new URL(req.url).pathname === '/alerts') return alerts(cors);
+    if (/^\/(konto|admin)(\/|$)/.test(new URL(req.url).pathname)) return konta(req, env, cors);
     const target = new URL(req.url).searchParams.get('url');
     let u; try { u = new URL(target); } catch (e) { return new Response('url?', { status: 400, headers: cors }); }
     if (u.protocol !== 'https:' || !ALLOWED.includes(u.hostname)) return new Response('host not allowed', { status: 403, headers: cors });
