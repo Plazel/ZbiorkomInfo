@@ -856,6 +856,21 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .mkPFs{position:absolute;left:16px;bottom:10px;width:44px;height:44px;display:grid;place-items:center;background:var(--g,var(--brand));color:#fff;border:0;border-radius:4px;cursor:pointer}.mkPFs svg{width:24px;height:24px}
 .admMsgI label span{width:6.5em!important}.admBack{width:auto!important;align-self:flex-start}
 .mkPick{padding-bottom:66px!important}
+.mkMain{grid-template-rows:auto auto auto auto auto minmax(0,1fr) auto auto!important}
+.mkSide button svg{width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);min-width:22px;min-height:22px}
+.mkSide .mkMenuB{font-size:max(.8rem,calc(var(--u)*.75))}
+.mkSide .mkMenuB svg{width:calc(var(--u)*1.4);height:calc(var(--u)*1.4)}
+.mkLate{justify-self:center;width:min(100%,calc(var(--u)*22));padding:calc(var(--u)*.25) 0;font-size:calc(var(--u)*2.2)!important;line-height:1.15}
+.mkCtl button{flex:0 1 calc(var(--u)*5.4)!important;height:calc(var(--u)*3.4)}
+.mkCtl button svg{width:calc(var(--u)*1.7);height:calc(var(--u)*1.7);min-width:22px;min-height:22px}
+.mkStop{min-width:calc(var(--u)*5.5);font-size:calc(var(--u)*1.2)}
+.mkHead,.mkNowN,.mkList li b{min-width:0}
+.mkNow{min-width:0;overflow:hidden}.mkNowT{flex:none}
+.mkInfo b{overflow-wrap:anywhere}
+.mkTag:empty{display:none}
+.mkRun .mkMsgs .mkMT{grid-template-columns:repeat(auto-fill,minmax(max(120px,calc(var(--u)*9)),1fr))}
+.mkRun .mkMsgs .mkMI{min-height:max(84px,calc(var(--u)*5.5));font-size:max(.95rem,calc(var(--u)*.95))}.mkRun .mkMsgs .mkMI svg{width:max(30px,calc(var(--u)*2));height:max(30px,calc(var(--u)*2))}
+.mkRun .mkMsgs h3{font-size:max(1.05rem,calc(var(--u)*1.1))}.mkRun .mkMsgs .mkSB,.mkRun .mkMail p,.mkRowS>span{font-size:max(1rem,calc(var(--u)*1))}
 .mkPickC{height:100%}
 .mkRes>.mkLines{margin-top:auto}
 .mkLines{flex-direction:column;flex-wrap:nowrap;gap:6px}
@@ -3757,19 +3772,20 @@ function gdTrnPl(name,nl){for(const [re,t] of GD_TRN_PL[nl]||[]){if(re.test(name
 // mKomputer, by the administrator's choice: the stations (railway and bus), the ferry terminal and the airport also named in English – nothing else
 function gdEnStation(name){if(/^Sucharskiego/.test(name))return null;
   if(!/\bPKP\b|\bSKM\b|\bPKM\b|\bDworzec\b|\bDw\.|\bStacja\b|Port Lotniczy|Lotnisko|Terminal Promowy|\bProm\b/i.test(name))return null;
-  const g=GD_TRN[name]&&GD_TRN[name].en;if(g)return g.map(x=>x[0]).join(' ');
-  if(/Port Lotniczy|Lotnisko/i.test(name))return 'Airport';if(/Terminal Promowy|\bProm\b/i.test(name))return 'Ferry Terminal';
-  if(/Dworzec G[łl]|Dw\. G[łl]/.test(name))return 'Main Station';if(/Dworzec Centralny/.test(name))return 'Central Station';
-  if(/Dworzec Wsch|Dw\. Wsch/.test(name))return 'East Station';if(/Dworzec Zach|Dw\. Zach/.test(name))return 'West Station';
-  if(/Dworzec (PKS|Autobusowy)/i.test(name))return 'Bus Station';
-  const m=name.match(/^(.*?)\s*\b(PKP|SKM|PKM)\b/);if(m){const pl=m[1].replace(/\bDworzec\b|\bDw\./g,'').replace(/[-–\s]+$/,'').trim();return pl?pl+' railway station':'Railway Station'}
-  if(/\bDworzec\b|\bStacja\b/.test(name))return 'Station';return null}
+  const g=GD_TRN[name]&&GD_TRN[name].en;if(g)return g;   /* (as in mSIP: the Polish part in Polish, the English one in English) */
+  const E=t=>[[t,'en']];
+  if(/Port Lotniczy|Lotnisko/i.test(name))return E('Airport');if(/Terminal Promowy|\bProm\b/i.test(name))return E('Ferry Terminal');
+  if(/Dworzec G[łl]|Dw\. G[łl]/.test(name))return E('Main Station');if(/Dworzec Centralny/.test(name))return E('Central Station');
+  if(/Dworzec Wsch|Dw\. Wsch/.test(name))return E('East Station');if(/Dworzec Zach|Dw\. Zach/.test(name))return E('West Station');
+  if(/Dworzec (PKS|Autobusowy)/i.test(name))return E('Bus Station');
+  const m=name.match(/^(.*?)\s*\b(PKP|SKM|PKM)\b/);if(m){const pl=m[1].replace(/\bDworzec\b|\bDw\./g,'').replace(/[-–\s]+$/,'').trim();return pl?[[pl,'pl'],['railway station','en']]:E('Railway Station')}
+  if(/\bDworzec\b|\bStacja\b/.test(name))return E('Station');return null}
 function gdSegs0(kind,name,isLast,req,zc){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);else if(gdGongId()==='word'&&GD_STOPW[l])out.push([GD_STOPW[l],l,0]);out.push([gdNameSaid(name,nl),nl,1]);
   const tr=l!=='pl'&&nl==='pl'&&store.get('ztm.gdTrans',false)&&!gdNoTrn(name,l)&&GD_TRN[name]&&GD_TRN[name][l];
   {const tp=l==='pl'&&nl!=='pl'&&store.get('ztm.gdTrans',false)&&gdTrnPl(name,nl);if(tp)out.push([tp+'.','pl',2])}   // (Praha, Flensburg in Polish: the name's meaning in Polish after it)
   if(tr)tr.forEach(([t,x],i)=>out.push([i===tr.length-1&&!/[.!?]$/.test(t)?t+'.':t,x,2]));   // (the translated name too ends going down, a full stop, before what follows)
-  if(window.MK_OVR&&MK_OVR.en&&nl==='pl'&&!(tr&&l==='en')){const e=gdEnStation(name);if(e)out.push([e+'.','en',2])}
+  if(window.MK_OVR&&MK_OVR.en&&nl==='pl'&&!(tr&&l==='en')){const e=gdEnStation(name);if(e)e.forEach(([t,x],i)=>out.push([i===e.length-1&&!/[.!?]$/.test(t)?t+'.':t,x,2]))}
   const ex=store.get('ztm.gdExtra',true);
   // in the Tricity, in Czech: the change to the S lines (SKM), at the main stations also to the other trains
   if(ex&&l==='cs'&&gdTri()){if(gdSKM(name))out.push(['Přestup na linky S.','cs',3]);
@@ -5785,14 +5801,15 @@ function langNm(l){try{const n=new Intl.DisplayNames([LANG],{type:'language'}).o
 // MENU → Ustawienia → Zapowiedzi: the voice, language and gong (what the administrator set: shown greyed, not changeable)
 function mkMenu(lv){const P=document.querySelector('#tdMk [data-pane=menu]');if(!P)return;MK.mlv=lv=lv||MK.mlv||'root';const o=MK_OVR_GET();
   const head=(t,back)=>`<div class="mkMH">${back?`<button type="button" class="mkMBack" data-mlv="${back}" aria-label="${esc(trS('Wstecz'))}">‹</button>`:''}<h3>${esc(t)}</h3></div>`;
-  const IC={set:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',ann:'<path d="M3 10v4h4l5 4V6L7 10z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>'};
+  const IC={chg:'<path d="M4 7h13l-3-3M20 17H7l3 3"/>',end:'<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',ann:'<path d="M3 10v4h4l5 4V6L7 10z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>'};
   const item=(lv,t)=>`<div class="mkMT"><button type="button" class="mkMI" data-mlv="${lv}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[lv]}</svg><span>${esc(t)}</span></button></div>`;
   const row=(k,opts,cur,fixed)=>`<label class="mkRowS${fixed?' mkFixed':''}"><span>${esc(trS(MK_ANN_L[k]))}${fixed?`<small>${esc(trS('zablokowane przez administratora'))}</small>`:''}</span><select data-set="${k}"${fixed?' disabled':''} aria-label="${esc(trS(MK_ANN_L[k]))}">${optsH(opts,cur)}</select></label>`;
-  if(lv==='root')P.innerHTML=head(trS('Menu'))+item('set',trS('Ustawienia'));
+  if(lv==='root'){P.innerHTML=head(trS('Menu'))+`<div class="mkMT">`+[['chg','Zmień kurs'],['end','Wymelduj'],['set','Ustawienia']].map(([k,t])=>item(k,trS(t)).replace(/^<div class="mkMT">|<\/div>$/g,'')).join('')+`</div>`;
+    P.querySelectorAll('[data-mlv=chg],[data-mlv=end]').forEach(b=>b.onclick=e=>{e.stopPropagation();P.hidden=true;mkAct(b.dataset.mlv)});}
   else if(lv==='set')P.innerHTML=head(trS('Ustawienia'),'root')+item('ann',trS('Zapowiedzi'));
   else{const O=mkAnnOpts();P.innerHTML=head(trS('Zapowiedzi'),'set')+`<div class="mkRowsS">`+row('voice',O.voice,o.voice,o.fixed.voice)+row('lang',O.lang,o.lang,o.fixed.lang)+
     row('gong',O.gong,o.gong,o.fixed.gong)+row('en',O.en,o.en?'1':'0',true)+`</div>`}
-  P.querySelectorAll('[data-mlv]').forEach(b=>b.onclick=()=>mkMenu(b.dataset.mlv));
+  P.querySelectorAll('[data-mlv]').forEach(b=>{if(!b.onclick)b.onclick=()=>mkMenu(b.dataset.mlv)});
   P.querySelectorAll('select[data-set]:not([disabled])').forEach(b=>b.onchange=()=>{const c=store.get('ztm.mkSet',{})||{},a=(ACC.user&&ACC.user.mk)||{};c[b.dataset.set]={v:b.value,base:a[b.dataset.set]||null};store.set('ztm.mkSet',c);mkOvr(true);
     if(b.dataset.set==='gong'&&GD_GONGS[b.value]){try{GD_GONG.currentTime=0;GD_GONG.play().catch(()=>{})}catch(e){}}})}
 // the administrator's messages: fetched every minute while the computer is open; the unread ones counted on the envelope
@@ -5837,8 +5854,9 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
         <div class="mkStop">STOP</div></div>
       <div class="mkTrack"><i class="mkBar"></i><i class="mkFill"></i><i class="mkSel"></i></div>
       <div class="mkNow"><span class="mkNowT"></span><b class="mkNowN"></b><em class="mkTag"></em></div>
-      <div class="mkRow"><div class="mkLate"></div><ol class="mkList"></ol></div>
-      <div class="mkCtl"><button type="button" data-mk="chg" class="mkTxt">${esc(trS('Zmień kurs'))}</button><button type="button" data-mk="back" aria-label="${esc(trS('Poprzedni'))}">${I('<path d="m15 5-7 7 7 7"/>')}</button><button type="button" data-mk="no" class="mkRound" aria-label="${esc(trS('Wróć do przystanku wskazanego przez system'))}">${I('<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>')}</button><button type="button" data-mk="ok" class="mkRound" aria-label="${esc(trS('Zatwierdź wybór'))}">${I('<circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/>')}</button><button type="button" data-mk="fwd" aria-label="${esc(trS('Następny'))}">${I('<path d="m9 5 7 7-7 7"/>')}</button><button type="button" data-mk="end" class="mkTxt">${esc(trS('Wymelduj'))}</button></div>
+      <ol class="mkList"></ol>
+      <div class="mkLate"></div>
+      <div class="mkCtl"><button type="button" data-mk="back" aria-label="${esc(trS('Poprzedni'))}">${I('<path d="m15 5-7 7 7 7"/>')}</button><button type="button" data-mk="no" class="mkRound" aria-label="${esc(trS('Wróć do przystanku wskazanego przez system'))}">${I('<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>')}</button><button type="button" data-mk="ok" class="mkRound" aria-label="${esc(trS('Zatwierdź wybór'))}">${I('<circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/>')}</button><button type="button" data-mk="fwd" aria-label="${esc(trS('Następny'))}">${I('<path d="m9 5 7 7-7 7"/>')}</button></div>
       <div class="mkMsgs mkPane" data-pane="spec" hidden><div class="mkMH"><h3>${esc(trS('Komunikaty specjalne'))}</h3></div><div class="mkSL">${mkMsgs().map((m,i)=>`<button type="button" class="mkSB" data-msg="${i}"><b>${i+1}</b><span>${esc(m[MK_L.indexOf(mkCityL())]||m.find(Boolean)||'')}</span></button>`).join('')}</div></div>
       <div class="mkMsgs mkPane" data-pane="inbox" hidden></div><div class="mkMsgs mkPane" data-pane="menu" hidden></div></div></div>`;
   B.querySelector('.mkLn').textContent=R.r.n;B.querySelector('.mkHead').textContent=R.head;B.querySelector('.mkLine').textContent=R.r.n+' · '+hm(R.t0+R.off[0]);B.querySelector('.mkDrv').textContent=ACC.user?ACC.user.name:'–';
@@ -5853,7 +5871,7 @@ function mkUpd(){const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.
   B.querySelector('.mkClock').textContent=hm(nowM)+':'+String(d.getSeconds()).padStart(2,'0')+'  '+String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
   B.querySelector('.mkStop').classList.toggle('on',!at&&gdReq(j));   // (the next stop on request: STOP lit)
   B.querySelector('.mkNowT').textContent=hm(T[j]);B.querySelector('.mkNowN').textContent=P[j][0];
-  B.querySelector('.mkTag').textContent=trS(MK.sel!=null?'wybór – zatwierdź ✓':at?'na przystanku':'następny przystanek');B.querySelector('.mkNow').classList.toggle('sel',MK.sel!=null);
+  B.querySelector('.mkTag').textContent=MK.sel!=null?trS('wybór – zatwierdź ✓'):'';B.querySelector('.mkNow').classList.toggle('sel',MK.sel!=null);
   const ls=Math.round(late*60),aL=Math.abs(ls),L=B.querySelector('.mkLate');L.textContent=(ls>0?'+':ls<0?'−':'')+Math.floor(aL/60)+':'+String(aL%60).padStart(2,'0');L.className='mkLate '+(ls>90?'l':ls<-60?'e':'');
   B.querySelector('.mkPos').textContent=(j+1)+'/'+(last+1);
   B.querySelector('.mkGps').textContent=!MK.gpsOn?trS('GPS wyłączony – przystanki ręcznie'):MK.fix?('GPS · ±'+Math.round(MK.fix.acc||0)+' m'+(MK.fix.d!=null?' · '+trS('do przystanku')+' '+Math.round(MK.fix.d)+' m':'')):trS('Szukanie GPS…');
