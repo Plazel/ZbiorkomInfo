@@ -6037,10 +6037,13 @@ function mkPickRender(B){const P=MK.pick,wm=trS('mKomputer');
   draw();if(MK.duty&&/[\/.-]/.test(MK.duty)){q.value=MK.duty;q.oninput()}else if(P&&inCity(P))duties(P);if(!matchMedia('(pointer:coarse)').matches)setTimeout(()=>q.focus(),50)}
 {const k=store.get('ztm.mkRun',null);MK.restore=k}
 function mkOpen(){mkOvr(true);mkInboxLoad();clearInterval(MK.ibT);MK.ibT=setInterval(()=>{if(TD.view==='mk')mkInboxLoad();else clearInterval(MK.ibT)},60000);if(!MK.run&&MK.restore&&MK.restore.c===city){const r=IDX.routes.find(x=>x.id===MK.restore.id);if(r)MK.run={...MK.restore,r}}MK.restore=null;mkRender()}
-// the side bar by the mode: the driver's mKomputer in place of mSIP
+// the side bar by the mode: the driver's mKomputer in place of mSIP; no planner and no board for the driver and the administrator
 function mkNav(){const drv=!!(ACC.user&&ACC.mode==='driver');window.ACC_DRV=drv;document.querySelectorAll('nav.rail .railMk').forEach(b=>b.hidden=!drv);
   document.querySelectorAll('nav.rail .railA11y').forEach(b=>b.hidden=drv||!store.get('ztm.a11y',false));
-  if(drv&&GUIDE.open)closeGuide();if(!drv&&TD.view==='mk')closeTool()}
+  if(drv&&GUIDE.open)closeGuide();if(!drv&&TD.view==='mk')closeTool();
+  // (the driver's and the administrator's modes: no journey planner and no departure board)
+  const staff=!!(ACC.user&&(ACC.mode==='driver'||ACC.mode==='admin'));document.querySelectorAll('nav.rail [data-nav=dep],nav.rail [data-nav=jp]').forEach(b=>b.hidden=staff);
+  if(staff&&((typeof DEP!=='undefined'&&DEP.open)||(typeof JP!=='undefined'&&JP.open))){const t=document.querySelector('nav.rail [data-nav=tt]');if(t)t.click()}}
 // the top bar's menus: one open at a time – opening one (or the search) closes the others
 {const M=[['cityBtn','cityMenu'],['langBtn','langMenu'],['accTop','accMenu'],['setBtn','setPanel']];
   const shut=keep=>M.forEach(([b,p])=>{if(b===keep)return;const P=document.getElementById(p),B=document.getElementById(b);if(P&&!P.hidden){P.hidden=true;if(B)B.setAttribute('aria-expanded','false')}});
