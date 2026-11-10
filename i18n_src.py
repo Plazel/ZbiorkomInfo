@@ -564,6 +564,8 @@ ROWS = [
     ("GPS wyłączony – przystanki ręcznie", "GPS off – stops by hand", "GPS aus – Haltestellen manuell", "GPS vypnuté – zastávky ručne", "GPS vypnuto – zastávky ručně"),
     ("do przystanku", "to the stop", "bis zur Haltestelle", "k zastávke", "k zastávce"),
     ("Szukanie GPS…", "Finding GPS…", "GPS wird gesucht…", "Hľadá sa GPS…", "Hledá se GPS…"),
+    ("Zmień kurs", "Change run", "Fahrt wechseln", "Zmeniť spoj", "Změnit spoj"),
+    ("Wymelduj", "Sign off", "Abmelden", "Odhlásiť", "Odhlásit"),
 ]
 
 WEEKDAYS = {
