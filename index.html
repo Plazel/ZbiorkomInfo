@@ -1175,7 +1175,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkStops li.prev button{background:transparent;border-style:dashed;color:var(--muted);font-size:calc(var(--u)*1.3)}.mkStops li.prev b{font-weight:500}
 .mkStops .sym{display:none}
 /* the stops on the line: a vertical line in the line's colour (grey behind), a stop sign at each stop, the present one larger */
-.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}
+.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}.lineV .mkStops li:first-child::before{top:calc(var(--gap)/2)}.lineV .mkStops li:last-child::before{bottom:calc(var(--gap)/2)}.mkStops{overflow:hidden}
 .lineV .mkStops li::before{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;bottom:0;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.end::before{top:50%}.lineV .mkStops li.prev::before{background:#9aa3ab}.lineV .mkStops li.prev::after{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;height:50%;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.none::before{display:none}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794342364;
+const APP_BUILD=1794342599;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6117,6 +6117,10 @@ function mkUpd(){const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.
   const rows=[j+4,j+3,j+2,j+1,j,j-1],bt=B.querySelectorAll('.mkStops button');
   rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last;b.parentNode.className=(i===4?'cur'+(at?' at':''):i===5?'prev':'nx')+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
     b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').textContent=ok&&q>=j&&gdReq(q)?trS('na żądanie'):'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
+  {const mv=MK.lastJ!=null&&MK.lastRun===R&&j===MK.lastJ+1;MK.lastJ=j;MK.lastRun=R;
+    if(mv&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const lis=[...B.querySelectorAll('.mkStops li')],tops=lis.map(l=>l.getBoundingClientRect().top),h0=lis[1]?tops[1]-tops[0]:60;
+      lis.forEach((li,i)=>{const b=li.querySelector('button');if(!b)return;b.style.transition='none';b.style.transform=`translateY(${i?tops[i-1]-tops[i]:-h0}px)`;if(!i)b.style.opacity='0';
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{b.style.transition='transform .6s cubic-bezier(.3,.7,.2,1),opacity .6s';b.style.transform='';b.style.opacity=''}))})}}
   mkMap(B,P,k,at,T,nowM)}
 // the microphone: the driver's voice through the device's own speaker (to the passengers), live, while it is on (the
 // announcements wait meanwhile); the device's echo cancelling and noise suppression on
@@ -6212,7 +6216,7 @@ function mkPickRender(B){const wm=trS('mKomputer'),FS=on=>on?'<path d="M9 4v5H4M
     MK.pick=r;MK.duty=String(bgLabel(src,b,Pl));MK.dutyQ=v;dutyShow(r,src,Pl,b,'line');return true};
   // a TEST duty: its trips in order, each started as the line's run leaving at that time
   const netDutyShow=(r,lab,trips,from)=>{head(null,trS('Brygada')+' '+lab+' – '+trS('wybierz kurs'));backTo=from;RU.replaceChildren();const now=todayType().min;
-    trips.forEach(t=>{const lr=IDX.routes.find(x=>x.id==='tst-'+t.l);const li=document.createElement('li');if(t.t<now-1)li.className='past';const bt=document.createElement('button');bt.type='button';
+    trips.forEach(t=>{const lr=IDX.routes.find(x=>x.id==='tstl'+t.l);const li=document.createElement('li');if(t.t<now-1)li.className='past';const bt=document.createElement('button');bt.type='button';
       bt.innerHTML=`<span class="t">${fmtT(t.t)}</span><span class="mkC"></span><span class="n"></span>`;if(lr)bt.querySelector('.mkC').append(chip(lr,'small',true));const R0=lr&&CACHE[lr.id],dd=R0&&R0.dirs[t.d];bt.lastChild.textContent=dd?dd.from+' → '+dd.head:'';
       bt.onclick=async()=>{if(!lr)return;const L=await lineRunsToday(lr);const d=L.find(x=>x.di===t.d&&Math.abs(x.t-t.t)<=1);if(d){MK.pick=lr;start(lr,d)}else bt.classList.add('mkMiss')};li.append(bt);RU.append(li)});
     show('trip');mark()};
@@ -6250,10 +6254,10 @@ function netRoute(L,N){const nm=id=>(krStop(id)||{n:'?'}).n,keys=Object.keys(IDX
   const dirs=(L.dirs||[]).map(d=>{if(!d.s||d.s.every(krStop))return d;const o={...d,s:[],run:[]};d.s.forEach((x,i)=>{if(krStop(x)){o.s.push(x);if(i<d.s.length-1)o.run.push(+(d.run||[])[i]||0)}else if(o.run.length)o.run[o.run.length-1]+=+(d.run||[])[i]||0});o.run.length=Math.max(0,o.s.length-1);return o}).filter(d=>d.s&&d.s.length>1).map((d,di)=>{const off=[0];for(let i=1;i<d.s.length;i++)off.push(off[i-1]+Math.max(0,+(d.run||[])[i-1]||0));
     const ids=d.s.map(x=>'tst_'+x);return {d:String(di),head:nm(d.s[d.s.length-1]),from:nm(d.s[0]),stops:ids.map(id=>[id,0,0,'',0]),pats:[ids.map((_,i)=>i)],notes:[''],prof:[[0,off]],
       shape:(()=>{const g=[];for(let i=1;i<d.s.length;i++){const A=krStop(d.s[i-1]),B=krStop(d.s[i]),e=d.g&&d.gk&&d.gk[i-1]&&d.gk[i-1].startsWith(d.s[i-1]+'|'+d.s[i]+'|')?d.g[i-1]:'';const P=e?krDec(e):[[A.lat,A.lon],[B.lat,B.lon]];g.push(...(g.length?P.slice(1):P))}return g.length>1?g:null})(),plans:['w','s','h'].map(k=>((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(t=>[t,0,0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1]}});
-  return {id:'tst-'+L.id,n:L.n,t:L.t,op:'TEST',dates:IDX.days,dirs,lt:[]}}
+  return {id:'tstl'+L.id,n:L.n,t:L.t,op:'TEST',dates:IDX.days,dirs,lt:[]}}
 // the network into the index: its stops and lines replace those put in before
 function netInject(){if(!IDX)return;const N=NET.data||netEmpty();
-  Object.keys(IDX.stops).forEach(k=>{if(k.startsWith('tst_'))delete IDX.stops[k]});IDX.routes=IDX.routes.filter(r=>r.op!=='TEST');Object.keys(CACHE).forEach(k=>{if(k.startsWith('tst_')||k.startsWith('tst-'))delete CACHE[k]});
+  Object.keys(IDX.stops).forEach(k=>{if(k.startsWith('tst_'))delete IDX.stops[k]});IDX.routes=IDX.routes.filter(r=>r.op!=='TEST');Object.keys(CACHE).forEach(k=>{if(k.startsWith('tst'))delete CACHE[k]});
   if(netStaff()){Object.entries(IDX.stops).forEach(([k,S])=>{if(S[4]==='km')IDX.stops['tst_'+k]=[S[0],S[1],S[2],S[3],'tst',...S.slice(5)]});N.stops.forEach(S=>IDX.stops['tst_'+S.id]=[S.n,'',S.lat,S.lon,'tst']);
     N.lines.forEach(L=>{const R=netRoute(L,N);if(!R.dirs.length)return;const d0=R.dirs[0];CACHE[R.id]=R;
       IDX.routes.push({id:R.id,n:L.n,t:L.t||'bus',op:'TEST',f:true,pk:null,fh:0,avg:15,c:['tst'],ends:[d0.from,d0.head],sn:[...new Set(R.dirs.flatMap(d=>d.stops.map(s=>IDX.stops[s[0]][0])))].sort(),k:L.k||'#2e7d32'})})}
