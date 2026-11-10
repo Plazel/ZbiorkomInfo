@@ -779,6 +779,8 @@ ROWS = [
     ("Tekst nie mieści się na tablicy i został ucięty. Skróć go, np. „NÁM.” zamiast „NÁMESTIE”.", "The text does not fit and was cut. Shorten it, e.g. “NÁM.” for “NÁMESTIE”.", "Der Text passt nicht und wurde abgeschnitten. Kürze ihn, z. B. „NÁM.“ statt „NÁMESTIE“.", "Text sa nezmestí a bol orezaný. Skráťte ho, napr. „NÁM.“ namiesto „NÁMESTIE“.", "Text se nevejde a byl oříznut. Zkraťte ho, např. „NÁM.“ místo „NÁMESTIE“."),
     ("Trwa aktualizacja ZbiorkomInfo…", "Updating ZbiorkomInfo…", "ZbiorkomInfo wird aktualisiert…", "Prebieha aktualizácia ZbiorkomInfo…", "Probíhá aktualizace ZbiorkomInfo…"),
     ("Wczytujemy najnowszą wersję. Strona odświeży się sama.", "Loading the newest version. The page will reload by itself.", "Die neueste Version wird geladen. Die Seite lädt sich selbst neu.", "Načítavame najnovšiu verziu. Stránka sa obnoví sama.", "Načítáme nejnovější verzi. Stránka se obnoví sama."),
+    ("Skopiuj rozkład z kierunku 1", "Copy the timetable of direction 1", "Fahrplan von Richtung 1 kopieren", "Skopírovať cestovný poriadok zo smeru 1", "Zkopírovat jízdní řád ze směru 1"),
+    ("przesunięty o", "shifted by", "verschoben um", "posunutý o", "posunutý o"),
 ]
 
 WEEKDAYS = {
