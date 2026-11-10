@@ -566,6 +566,10 @@ ROWS = [
     ("Szukanie GPS…", "Finding GPS…", "GPS wird gesucht…", "Hľadá sa GPS…", "Hledá se GPS…"),
     ("Zmień kurs", "Change run", "Fahrt wechseln", "Zmeniť spoj", "Změnit spoj"),
     ("Wymelduj", "Sign off", "Abmelden", "Odhlásiť", "Odhlásit"),
+    ("Zapowiedzi: wł.", "Announcements: on", "Ansagen: an", "Hlásenia: zap.", "Hlášení: zap."),
+    ("Zapowiedzi: wył.", "Announcements: off", "Ansagen: aus", "Hlásenia: vyp.", "Hlášení: vyp."),
+    ("Mikrofon", "Microphone", "Mikrofon", "Mikrofón", "Mikrofon"),
+    ("Brak dostępu do mikrofonu", "No access to the microphone", "Kein Zugriff auf das Mikrofon", "Bez prístupu k mikrofónu", "Bez přístupu k mikrofonu"),
 ]
 
 WEEKDAYS = {
