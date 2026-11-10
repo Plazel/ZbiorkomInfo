@@ -117,128 +117,128 @@
   ],
   "km21": [
    "Złockie Skrzyżowanie",
-   "",
-   49.36324,
-   20.88827,
+   "01",
+   49.363241,
+   20.888254,
    "osm"
   ],
   "km22": [
    "Muszyna Zazamcze",
-   "",
-   49.35635,
-   20.88835,
+   "01",
+   49.356357,
+   20.888529,
    "osm"
   ],
   "km45": [
    "Muszyna Kościół",
-   "",
-   49.35964,
-   20.9032,
+   "01",
+   49.35967,
+   20.903151,
    "osm"
   ],
   "km46": [
    "Muszyna Grunwaldzka",
-   "",
-   49.35925,
-   20.91265,
+   "01",
+   49.359485,
+   20.913377,
    "osm"
   ],
   "km47": [
    "Muszyna Polna",
-   "",
+   "01",
    49.36336,
    20.92552,
    "osm"
   ],
   "km48": [
    "Muszyna Granica",
-   "",
+   "01",
    49.36525,
    20.93385,
    "osm"
   ],
   "km49": [
    "Powroźnik PKP",
-   "",
+   "01",
    49.36792,
    20.93996,
    "osm"
   ],
   "km50": [
    "Powroźnik Skrzyżowanie",
-   "",
+   "01",
    49.37086,
    20.94694,
    "osm"
   ],
   "km65": [
    "Powroźnik MPGK",
-   "",
-   49.3774,
-   20.95058,
+   "01",
+   49.377079,
+   20.950595,
    "osm-near"
   ],
   "km66": [
    "Krynica-Zdrój Dolna",
-   "",
-   49.38366,
-   20.95328,
+   "01",
+   49.383699,
+   20.953395,
    "osm"
   ],
   "km67": [
    "Krynica-Zdrój Kraszewskiego Lecznica",
-   "",
+   "01",
    49.38892,
    20.95154,
    "osm"
   ],
   "km69": [
    "Krynica-Zdrój Kraszewskiego Szpital",
-   "",
-   49.40081,
-   20.95499,
+   "01",
+   49.40088,
+   20.955021,
    "osm"
   ],
   "km70": [
    "Krynica-Zdrój Kraszewskiego Graniczna",
-   "",
-   49.40565,
-   20.95326,
+   "01",
+   49.405645,
+   20.953275,
    "osm"
   ],
   "km71": [
    "Krynica-Zdrój Kraszewskiego Ośrodek Zdrowia",
-   "",
-   49.40902,
-   20.95417,
+   "01",
+   49.408941,
+   20.954234,
    "osm"
   ],
   "km72": [
    "Krynica-Zdrój Kraszewskiego Urząd Miasta",
-   "",
-   49.41286,
-   20.95568,
+   "01",
+   49.413322,
+   20.955986,
    "osm"
   ],
   "km73": [
    "Krynica-Zdrój Zdrojowa Bank",
-   "",
-   49.42041,
-   20.95686,
+   "01",
+   49.420388,
+   20.95689,
    "osm"
   ],
   "km75": [
    "Krynica-Zdrój Piłsudskiego Jastrzębia",
-   "",
-   49.42629,
-   20.9552,
+   "01",
+   49.427519,
+   20.954294,
    "osm"
   ],
   "km77": [
    "Mochnaczka Wyżna Kopciowa",
-   "",
-   49.44935,
-   20.95266,
+   "01",
+   49.449397,
+   20.952682,
    "osm"
   ],
   "kmx1": [
@@ -640,23 +640,23 @@
   ],
   "km33": [
    "Muszyna Piłsudskiego",
-   "",
-   49.35056,
-   20.89442,
+   "01",
+   49.350722,
+   20.894145,
    "osm"
   ],
   "km34": [
    "Muszyna PKP",
-   "",
+   "01",
    49.34658,
    20.89353,
    "osm"
   ],
   "km95": [
    "Krynica-Zdrój Pułaskiego Hajduczek",
-   "",
-   49.41695,
-   20.97431,
+   "01",
+   49.416931,
+   20.974204,
    "osm"
   ],
   "nsr1": [
