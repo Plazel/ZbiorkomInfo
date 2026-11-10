@@ -584,6 +584,22 @@ ROWS = [
     ("Przewoźnik tej linii nie udostępnia brygad.", "This line's operator does not publish duties.", "Der Betreiber dieser Linie veröffentlicht keine Dienste.", "Dopravca tejto linky nezverejňuje turnusy.", "Dopravce této linky nezveřejňuje pořadí."),
     ("Brak danych o brygadach na dziś.", "No duty data for today.", "Keine Dienstdaten für heute.", "Žiadne údaje o turnusoch na dnes.", "Žádná data o pořadích na dnes."),
     ("Nie ma takiej brygady dziś.", "No such duty today.", "Diesen Dienst gibt es heute nicht.", "Taký turnus dnes nie je.", "Takové pořadí dnes není."),
+    ("Wiadomości od administratora", "Messages from the administrator", "Nachrichten vom Administrator", "Správy od administrátora", "Zprávy od administrátora"),
+    ("Komunikaty specjalne", "Special announcements", "Sonderdurchsagen", "Špeciálne hlásenia", "Zvláštní hlášení"),
+    ("Gong", "Chime", "Gong", "Gong", "Gong"),
+    ("ustawione przez administratora", "set by the administrator", "vom Administrator festgelegt", "nastavené administrátorom", "nastaveno administrátorem"),
+    ("Według miasta", "By city", "Nach Stadt", "Podľa mesta", "Podle města"),
+    ("Brak wiadomości.", "No messages.", "Keine Nachrichten.", "Žiadne správy.", "Žádné zprávy."),
+    ("mKomputer – ustawienia dla kierowców", "mComputer – settings for drivers", "mBordcomputer – Einstellungen für Fahrer", "mPočítač – nastavenia pre vodičov", "mPočítač – nastavení pro řidiče"),
+    ("Nieustalone ustawienie kierowca wybiera sam w menu mKomputera.", "A setting left unset is chosen by the driver in the mComputer menu.", "Eine nicht festgelegte Einstellung wählt der Fahrer im Menü des mBordcomputers.", "Nenastavené nastavenie si vodič vyberie v ponuke mPočítača.", "Nenastavené nastavení si řidič vybere v nabídce mPočítače."),
+    ("Nie ustalono", "Not set", "Nicht festgelegt", "Nenastavené", "Nenastaveno"),
+    ("Wiadomość do kierowców", "Message to drivers", "Nachricht an die Fahrer", "Správa vodičom", "Zpráva řidičům"),
+    ("Treść wiadomości", "Message text", "Nachrichtentext", "Text správy", "Text zprávy"),
+    ("Wyślij", "Send", "Senden", "Odoslať", "Odeslat"),
+    ("Wysłano.", "Sent.", "Gesendet.", "Odoslané.", "Odesláno."),
+    ("Nie udało się wysłać.", "Could not send.", "Senden fehlgeschlagen.", "Nepodarilo sa odoslať.", "Nepodařilo se odeslat."),
+    ("Nie udało się zapisać.", "Could not save.", "Speichern fehlgeschlagen.", "Nepodarilo sa uložiť.", "Nepodařilo se uložit."),
+    ("Dla nerdów", "For nerds", "Für Nerds", "Pre nerdov", "Pro nerdy"),
 ]
 
 WEEKDAYS = {

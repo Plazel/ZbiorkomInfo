@@ -22,6 +22,8 @@
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); DELETE /admin/konta/<id> → the account removed.
+//      PUT /admin/ustawienia {voice, lang, gong} → mKomputer's settings for every driver (null: the driver's own choice);
+//      POST /admin/komunikat {text} → a message to the drivers (GET /konto/komunikaty: the last 20); DELETE: all removed.
 //
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
 // address (https://….workers.dev) into RT_PROXY in index.html.
@@ -134,7 +136,10 @@ async function konta(req, env, cors) {
   if (!env.KONTA) return J({ error: 'accounts not set up' }, 503);
   const p = new URL(req.url).pathname.replace(/\/+$/, ''), u = await who(req, env);
   if (!u) return J({ error: 'unauthorized' }, 401);
-  if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role });
+  // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
+  if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role, mk: await env.KONTA.get('cfg:mk', 'json') });
+  // the administrator's messages to the drivers (the last 20, newest first)
+  if (p === '/konto/komunikaty' && req.method === 'GET') return new Response((await env.KONTA.get('msg:mk')) || '[]', { headers: h });
   if (p === '/konto/dane') {
     if (req.method === 'GET') return new Response((await env.KONTA.get('d:' + u.id)) || '{}', { headers: h });
     if (req.method === 'PUT') {
@@ -145,6 +150,19 @@ async function konta(req, env, cors) {
   }
   if (p.startsWith('/admin/')) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
+    if (p === '/admin/ustawienia' && req.method === 'PUT') {
+      let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
+      const c = { voice: ['m', 'f'].includes(b.voice) ? b.voice : null, lang: ['auto', 'pl', 'en', 'de', 'sk', 'cs'].includes(b.lang) ? b.lang : null,
+        gong: typeof b.gong === 'string' && /^[a-z]{2,8}$/.test(b.gong) ? b.gong : null };
+      await env.KONTA.put('cfg:mk', JSON.stringify(c)); return J(c);
+    }
+    if (p === '/admin/komunikat' && req.method === 'POST') {
+      let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
+      const text = String(b.text || '').trim().slice(0, 500); if (!text) return J({ error: 'text' }, 400);
+      const L = (await env.KONTA.get('msg:mk', 'json')) || []; L.unshift({ t: new Date().toISOString(), text, from: u.name }); L.splice(20);
+      await env.KONTA.put('msg:mk', JSON.stringify(L)); return J(L);
+    }
+    if (p === '/admin/komunikat' && req.method === 'DELETE') { await env.KONTA.put('msg:mk', '[]'); return J([]); }
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
     // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
     const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created } });
