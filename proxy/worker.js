@@ -26,6 +26,8 @@
 //      PUT /admin/ustawienia {voice, lang, gong, en, msgs, l2, perm} → mKomputer's settings for every driver (null: the driver's
 //        own choice; en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements,
 //        each [pl, en, de, sk, cs]; l2: their second language; perm: what the drivers may do {ann, spec, mic, free});
+//      POST /konto/status (mKomputer: on a trip / a break / off) · GET /admin/statusy (the administrator's table)
+//      PUT /admin/konta/<id> (the profile: name, role, first and last name, phone, e-mail, note); POST …/token {token} (own code)
 //      GET /siec (drivers, administrators) / PUT /admin/siec → the TEST network made in the creator (≤ 900 kB).
 //      Messages: POST /admin/komunikat {text, to: "*" (every driver) | [ids], ack} → sent; GET /admin/komunikaty → the last 100
 //        with each recipient's status {d: delivered, r: read, c: confirmed}; DELETE /admin/komunikat[/<id>] → removed.
@@ -167,6 +169,16 @@ async function konta(req, env, cors) {
     const now = new Date().toISOString(); x.st = x.st || {}; const s = x.st[u.id] = x.st[u.id] || {}; s.d = s.d || now; s.r = s.r || now; if (b.c) s.c = s.c || now;
     await env.KONTA.put('msg:list', JSON.stringify(L)); return J(mine(x));
   }}
+  // what the account is doing now (mKomputer): "run" (a trip: the line, the stops, the times, the place), "break" (a duty, no trip
+  // now), "off"; kept 6 hours at most (a driver who just closed the page is not shown working for ever)
+  if (p === '/konto/status' && req.method === 'POST') {
+    if (u.role !== 'driver' && u.role !== 'admin') return J({ error: 'forbidden' }, 403);
+    const t = await req.text(); if (t.length > 40000) return J({ error: 'too large' }, 413);
+    let b; try { b = JSON.parse(t); } catch (e) { return J({ error: 'bad json' }, 400); }
+    if (b.s === 'off') { await env.KONTA.delete('st:' + u.id); return J({ ok: true }); }
+    b.at = new Date().toISOString(); b.s = b.s === 'run' ? 'run' : 'break';
+    await env.KONTA.put('st:' + u.id, JSON.stringify(b), { expirationTtl: 6 * 3600 }); return J({ ok: true });
+  }
   if (p === '/konto/dane') {
     if (req.method === 'GET') return new Response((await env.KONTA.get('d:' + u.id)) || '{}', { headers: h });
     if (req.method === 'PUT') {
@@ -215,31 +227,61 @@ async function konta(req, env, cors) {
     }
     {const mm = p.match(/^\/admin\/komunikat(?:\/([a-z0-9]{6,16}))?$/);
     if (mm && req.method === 'DELETE') { const L = mm[1] ? ((await env.KONTA.get('msg:list', 'json')) || []).filter(x => x.id !== mm[1]) : []; await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L); }}
+    if (p === '/admin/statusy' && req.method === 'GET') {
+      const keys = []; let cur;
+      do { const l = await env.KONTA.list({ prefix: 'st:', cursor: cur }); keys.push(...l.keys); cur = l.list_complete ? null : l.cursor; } while (cur);
+      const out = {}; await Promise.all(keys.map(async k => { const v = await env.KONTA.get(k.name, 'json'); if (v) out[k.name.slice(3)] = v; })); return J(out);
+    }
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
     // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
-    const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created } });
+    const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: (a.fn || '').slice(0, 60), ln: (a.ln || '').slice(0, 60) } });
+    const nextEmp = async () => { const n = (+(await env.KONTA.get('cnt:emp')) || 1000) + 1; await env.KONTA.put('cnt:emp', String(n)); return n; };
+    const PROF = ['fn', 'ln', 'phone', 'email', 'note'];
+    const pub = a => ({ id: a.id, name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: a.fn || '', ln: a.ln || '', phone: a.phone || '', email: a.email || '', note: a.note || '' });
     const newToken = async a => { const t = newTok(), th = await sha(t), old = a.th; a.th = th; a.tk = await tokSeal(env, t);
       await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old ? env.KONTA.delete('t:' + old) : null]); return t; };
     if (!m[1] && req.method === 'GET') {
       const keys = []; let cur;
       do { const l = await env.KONTA.list({ prefix: 'u:', cursor: cur }); keys.push(...l.keys); cur = l.list_complete ? null : l.cursor; } while (cur);
-      const out = await Promise.all(keys.map(async k => { const a = k.metadata && k.metadata.name ? k.metadata : await env.KONTA.get(k.name, 'json');
-        return a ? { id: k.name.slice(2), name: a.name, role: a.role, created: a.created } : null; }));
-      return J(out.filter(Boolean).sort((a, b) => (a.created || '').localeCompare(b.created || '')));
+      // (the whole record for each account: the profile's fields; accounts from before the numbers get theirs now, in the order made)
+      const all = (await Promise.all(keys.map(k => env.KONTA.get(k.name, 'json')))).filter(Boolean).sort((a, b) => (a.created || '').localeCompare(b.created || ''));
+      for (const a of all) if (!a.emp) { a.emp = await nextEmp(); await putU(a); }
+      return J(all.map(pub));
     }
     if (!m[1] && req.method === 'POST') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       const name = String(b.name || '').trim().slice(0, 60), role = ROLES.includes(b.role) ? b.role : 'user';
       if (!name) return J({ error: 'name' }, 400);
-      const id = newTok(10), a = { id, name, role, created: new Date().toISOString() };
+      const id = newTok(10), a = { id, name, role, created: new Date().toISOString(), emp: await nextEmp() };
+      for (const k of PROF) if (b[k]) a[k] = String(b[k]).trim().slice(0, k === 'note' ? 500 : 80);
       const token = await newToken(a);
-      return J({ id, name, role, created: a.created, token });
+      return J(Object.assign(pub(a), { token }));
     }
     const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a) return J({ error: 'not found' }, 404);
-    if (m[2] && req.method === 'POST') return J({ id: a.id, token: await newToken(a) });
+    // a new token: drawn, or the administrator's own code ({token}: 8–40 letters and digits, not in use by another account);
+    // the profile and the data stay
+    if (m[2] && req.method === 'POST') {
+      let b = {}; try { b = await req.json(); } catch (e) {}
+      if (b && b.token) {
+        const t = String(b.token).trim(); if (!/^[A-Za-z0-9]{8,40}$/.test(t)) return J({ error: 'format' }, 400);
+        const th = await sha(t), other = await env.KONTA.get('t:' + th); if (other && other !== a.id) return J({ error: 'taken' }, 409);
+        if (env.ADMIN_TOKEN && same(t, env.ADMIN_TOKEN)) return J({ error: 'taken' }, 409);
+        const old = a.th; a.th = th; a.tk = await tokSeal(env, t); await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old && old !== th ? env.KONTA.delete('t:' + old) : null]);
+        return J({ id: a.id, token: t });
+      }
+      return J({ id: a.id, token: await newToken(a) });
+    }
+    // the profile changed: the name shown, the role, first and last name, phone, e-mail, note
+    if (!m[2] && req.method === 'PUT') {
+      let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
+      if ('name' in b) { const n = String(b.name || '').trim().slice(0, 60); if (n) a.name = n; }
+      if ('role' in b && ROLES.includes(b.role)) a.role = b.role;
+      for (const k of PROF) if (k in b) a[k] = String(b[k] || '').trim().slice(0, k === 'note' ? 500 : 80);
+      await putU(a); return J(pub(a));
+    }
     // the token now in use, for the administrator (null: made before tokens were kept – a new one is needed)
     if (m[2] && req.method === 'GET') return J({ id: a.id, token: await tokOpen(env, a.tk) });
-    if (!m[2] && req.method === 'DELETE') { await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id)]); return J({ ok: true }); }
+    if (!m[2] && req.method === 'DELETE') { await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
   }
   return J({ error: 'not found' }, 404);
 }
