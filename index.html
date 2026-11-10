@@ -1074,7 +1074,7 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
 .infoBox{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border-left:4px solid var(--fg);padding:14px 16px;margin:4px 0 18px;max-width:none}
 .infoBox svg{flex:none;margin-top:1px}.lineWarn{display:flex;gap:8px;align-items:center;flex:1 1 320px;background:#fff4c2;color:#3a2f00;border-left:4px solid #e0b100;padding:8px 12px;font-size:.88rem;line-height:1.4;align-self:center}.lineWarn a.lwItem{text-decoration:none}.lineWarn a.lwItem:hover{text-decoration:underline}.lineWarn .lwItem{display:block;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.lineWarn .lwItem+.lwItem{margin-top:4px}.lineWarn .lwItem:hover b{text-decoration:underline}.aItem p{white-space:pre-line}.lineWarn .lwItem{display:block;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.lineWarn .lwItem+.lwItem{margin-top:4px}.lineWarn .lwItem:hover b{text-decoration:underline}.aItem p{white-space:pre-line}.lineWarn svg{flex:none;margin-top:1px}
 .infoBox.warn{background:#fff4c2;border-left-color:#e0b100;color:#3a2f00}.infoBox.warn p{color:#3a2f00}
-:root[data-theme=dark] .infoBox.warn{background:#4a3f12;color:#fff4c2}:root[data-theme=dark] .lineWarn{background:#4a3f12;color:#fff4c2}:root[data-theme=dark] .infoBox.warn p{color:#fff4c2}
+:root[data-theme=dark] .infoBox.warn{background:#4a3f12;color:#fff4c2}:root[data-theme=dark] .lineWarn{background:#4a3f12;color:#fff4c2}.lineWarn.lwAlert{background:#fdecea;color:#5f1111;border-left-color:#d32f2f}.lineWarn.lwAlert svg{color:#d32f2f}:root[data-theme=dark] .lineWarn.lwAlert{background:#4d1515;color:#ffe1e1;border-left-color:#ff5252}:root[data-theme=dark] .lineWarn.lwAlert svg{color:#ff6b6b}body.abOff #alertBar{display:none!important}:root[data-theme=dark] .infoBox.warn p{color:#fff4c2}
 .infoBox b{display:block;font-size:.95rem;margin-bottom:3px}
 /* (a note folded at first: its title only, the text after a click) */
 .infoFold{cursor:pointer;align-items:center}.infoFold[aria-expanded="false"] p{display:none}.infoFold[aria-expanded="false"] b{margin:0}
@@ -1175,7 +1175,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkStops li.prev button{background:transparent;border-style:dashed;color:var(--muted);font-size:calc(var(--u)*1.3)}.mkStops li.prev b{font-weight:500}
 .mkStops .sym{display:none}
 /* the stops on the line: a vertical line in the line's colour (grey behind), a stop sign at each stop, the present one larger */
-.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}.lineV .mkStops li.vt::before{top:calc(var(--gap)/2)}.lineV .mkStops li.vb::before{bottom:calc(var(--gap)/2)}.mkStops{position:relative}.mkStops li.buf{position:absolute;left:0;right:0;height:var(--rh,60px)}.mkStops li.bt2{top:calc(var(--rh,60px)*-2)}.mkStops li.bt1{top:calc(var(--rh,60px)*-1)}.mkStops li.bb1{top:100%}.mkStops li.bb2{top:calc(100% + var(--rh,60px))}.lineV .mkStops li.buf.prev::after{display:none}.mkStops{overflow:hidden}
+.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}.lineV .mkStops li.vt::before{top:calc(var(--gap)/2)}.lineV .mkStops li.vb::before{bottom:0}.mkStops{position:relative}.mkStops li.buf{position:absolute;left:0;right:0;height:var(--rh,60px)}.mkStops li.bt2{top:calc(var(--rh,60px)*-2)}.mkStops li.bt1{top:calc(var(--rh,60px)*-1)}.mkStops li.bb1{top:100%}.mkStops li.bb2{top:calc(100% + var(--rh,60px))}.lineV .mkStops li.buf.prev::after{display:none}.mkStops{overflow:hidden}
 .lineV .mkStops li::before{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;bottom:0;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.end::before{top:50%}.lineV .mkStops li.prev::before{background:#9aa3ab}.lineV .mkStops li.prev::after{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;height:50%;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.none::before{display:none}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794353045;
+const APP_BUILD=1794353372;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2055,14 +2055,17 @@ function lineWarnRep(r){if(r.t==='repl')return '';const rep=IDX.routes.filter(x=
   return `<div class="lineWarn lwRep" role="note">${WARN_ICO}<div>${it}</div></div>`}
 // the operator's own notices about the line (Berlin: BVG's), in place of the note made from the timetable: each notice's
 // heading and its sentences about this line (all of it: a click)
-function lineWarnLive(r){const g=alertGrp(city);if(g!=='ber')return;ztmAlerts(g).then(A=>{if(location.hash!=='#l'+r.id&&!(document.getElementById('hc')&&document.querySelector('.lhead')))return;
+function lineWarnLive(r){const g=alertGrp(city);if(!g)return;ztmAlerts(g).then(A=>{if(location.hash!=='#l'+r.id&&!(document.getElementById('hc')&&document.querySelector('.lhead')))return;
   const re=new RegExp('(^|[\\s(,])'+r.n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?=$|[\\s,.:)])');
-  const mine=A.map((a,i)=>[a,i]).filter(([a])=>(a.lines||[]).includes(r.n));if(!mine.length)return;
+  // (a notice without its lines given – ZTM Gdańsk's –: the line named after "linia", "tramwaje", "autobusy"… in its heading or text)
+  const nre=new RegExp('(?:lini\\p{L}*|tramwaj\\p{L}*|autobus\\p{L}*|Linie|Tram|Bus|linky?|l\\.)\\s+(?:[A-Z]{0,2}\\d{1,3}[A-Z]?(?:\\s*,\\s*|\\s+(?:i|oraz|und|a|and)\\s+))*'+r.n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?![\\p{L}\\d])','iu');
+  const mine=A.map((a,i)=>[a,i]).filter(([a])=>a.lines&&a.lines.length?a.lines.includes(r.n):nre.test((a.title||'')+'\n'+(a.text||'')));if(!mine.length)return;
   const sc=l=>/fährt (nicht )?zwischen|hält .*nicht/.test(l)?0:/Ersatzverkehr/.test(l)?1:/Nutzen Sie/.test(l)?2:3;   // (judged on the German: its route first, the replacement, the alternatives)
-  const parts=mine.slice(0,3).map(([a,i])=>{const T=(a.text||'').split('\n'),D=(a.de||'').split('\n');
+  const md=t=>t.replace(/\*\*\s*(.+?)\s*\*\*/g,'$1').replace(/\*\*/g,'');   // (the source's ** marks of bold: left out here)
+  const parts=mine.slice(0,3).map(([a,i])=>{const T=(a.text||'').split('\n'),D=(a.de||a.text||'').split('\n');
     const ls=D.map((l,k)=>[l,k]).filter(([l])=>re.test(l)&&!/^\[|kommt es bei den/.test(l)).sort((x,y)=>sc(x[0])-sc(y[0])||x[1]-y[1]).map(([,k])=>(T[k]||D[k]).replace(/^•\s*/,''));
-    return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?' '+lineSigns(esc(ls.slice(0,4).join(' · ')),a.lines):''}</button>`}).join('');
-  const old=document.querySelector('.lhead .lineWarn');const rep=(lineWarnRep(r).match(/<a class="lwItem"[\s\S]*<\/a>/)||[''])[0];const html=`<div class="lineWarn" role="note">${WARN_ICO}<div>${parts}${rep}${mine.length>3?`<button type="button" class="lwItem" data-i="all">${esc(trS('Wszystkie komunikaty'))} (${mine.length})</button>`:''}</div></div>`;
+    return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?' '+lineSigns(esc(md(ls.slice(0,4).join(' · '))),a.lines):''}</button>`}).join('');
+  const old=document.querySelector('.lhead .lineWarn');const rep=(lineWarnRep(r).match(/<a class="lwItem"[\s\S]*<\/a>/)||[''])[0];const html=`<div class="lineWarn lwAlert" role="note">${ALERT_IC}<div>${parts}${rep}${mine.length>3?`<button type="button" class="lwItem" data-i="all">${esc(trS('Wszystkie komunikaty'))} (${mine.length})</button>`:''}</div></div>`;
   if(old)old.outerHTML=html;else document.getElementById('hc').insertAdjacentHTML('afterend',html);
   document.querySelectorAll('.lhead .lineWarn button.lwItem').forEach(b=>b.onclick=()=>alertShow(b.dataset.i==='all'?mine[0][1]:+b.dataset.i,g))})}
 // lines run in two parts with a change of trains between them
@@ -5633,6 +5636,7 @@ async function renderStopPage(name,pole){
   draw();SP_TIMER=setInterval(draw,30000)}
 async function route(){
   const h=location.hash.slice(1);if(!h.startsWith('s'))clearInterval(SP_TIMER);
+  document.body.classList.toggle('abOff',/^(l\w|t\w|c[A-Za-z0-9_]|k[A-Za-z0-9_]|s[^|])/.test(h));   // (the red bar of notices: only over the board of lines)
   try{
     let m;
     if((m=h.match(/^l(\w+)$/)))await renderLine(m[1]);
