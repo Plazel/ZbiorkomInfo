@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794339379;
+const APP_BUILD=1794341174;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7108,6 +7108,13 @@ function krEdit(L,d){krDirty();krRender();krAfter(L,d)}
 // --- the route map of the line chosen: the stops of Krynica-Zdrój and Muszyna; the direction chosen in the line's colour, along
 // its way. "Klikaj przystanki": a click on a stop puts it at the end of the direction; "Rysuj trasę": what is drawn picks the
 // stops along it, in order. Dragging with the right button (or, clicking stops, with the left) moves the map; the wheel or +/− zoom
+// ---- reordering a list by dragging: hold the grip (.persGrip) of a row a moment, drag it up or down; let go – done(the rows'
+// data-i in their new order), called only when the order changed
+function gripSort(ul,done){if(!ul)return;ul.querySelectorAll(':scope>li>.persGrip').forEach(g=>{const li=g.parentNode;let hold=0,on=false;
+  const mv=e=>{if(!on)return;e.preventDefault();const o=[...ul.children].find(x=>x!==li&&x.dataset.i!=null&&(()=>{const r=x.getBoundingClientRect();return e.clientY>r.top&&e.clientY<r.bottom})());if(!o)return;const r=o.getBoundingClientRect();ul.insertBefore(li,e.clientY<r.top+r.height/2?o:o.nextSibling)};
+  const end=()=>{clearTimeout(hold);document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',end);document.removeEventListener('pointercancel',end);if(!on)return;on=false;li.classList.remove('persDrag');
+    const ord=[...ul.children].filter(x=>x.dataset.i!=null).map(x=>+x.dataset.i);if(ord.some((v,k)=>v!==k))done(ord)};
+  g.onpointerdown=e=>{e.preventDefault();document.addEventListener('pointermove',mv);document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);hold=setTimeout(()=>{on=true;li.classList.add('persDrag');if(navigator.vibrate)try{navigator.vibrate(15)}catch(_){}},180)}})}
 const krInv=(x,y,z)=>{const n=256*2**z;return [Math.atan(Math.sinh(Math.PI*(1-2*y/n)))*180/Math.PI,x/n*360-180]};
 function krMap(W,L){if(!W)return;const all=krAll(),d=L.dirs[KR.dir]||L.dirs[0];
   if(!KR.v||KR.v.line!==L.id){const P=(d.s.length?d.s.map(krStop).filter(Boolean):all.filter(S=>S.n));const la=P.reduce((a,S)=>a+S.lat,0)/(P.length||1),lo=P.reduce((a,S)=>a+S.lon,0)/(P.length||1);KR.v={lat:P.length?la:49.42,lon:P.length?lo:20.96,z:d.s.length?15:13,line:L.id}}
@@ -7120,7 +7127,9 @@ function krMap(W,L){if(!W)return;const all=krAll(),d=L.dirs[KR.dir]||L.dirs[0];
   const view=()=>{const w=C.clientWidth,h=C.clientHeight,z=KR.v.z,c=mkWm(KR.v.lat,KR.v.lon,z);return {w,h,z,c,px:(la,lo)=>{const q=mkWm(la,lo,z);return [q[0]-c[0]+w/2,q[1]-c[1]+h/2]}}};
   const draw=()=>{const w=C.clientWidth,h=C.clientHeight;if(!w||!h)return;const dpr=window.devicePixelRatio||1;C.width=Math.round(w*dpr);C.height=Math.round(h*dpr);const x=C.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
     const V=view(),lt=pageLight();x.fillStyle=lt?'#e9edf0':'#1b1f1d';x.fillRect(0,0,w,h);
-    for(let ty=Math.floor((V.c[1]-h/2)/256);ty<=Math.floor((V.c[1]+h/2)/256);ty++)for(let tx=Math.floor((V.c[0]-w/2)/256);tx<=Math.floor((V.c[0]+w/2)/256);tx++){const t=mkTile(V.z,tx,ty,draw,lt);if(t.ok)x.drawImage(t.img,tx*256-V.c[0]+w/2,ty*256-V.c[1]+h/2,256.5,256.5)}
+    {const tz=Math.min(V.z,18),f=2**(V.z-tz),ts=256*f,cx=V.c[0]/f,cy=V.c[1]/f;
+      for(let ty=Math.floor((cy-h/2/f)/256);ty<=Math.floor((cy+h/2/f)/256);ty++)for(let tx=Math.floor((cx-w/2/f)/256);tx<=Math.floor((cx+w/2/f)/256);tx++){const X=tx*ts-V.c[0]+w/2,Y=ty*ts-V.c[1]+h/2,t=mkTile(tz,tx,ty,draw,lt);
+        if(t.ok){x.drawImage(t.img,X,Y,ts+.5,ts+.5);continue}const p=MKM.tiles.get((lt?'rastertiles/voyager':'dark_all')+'/'+(tz-1)+'/'+(tx>>1)+'/'+(ty>>1));if(p&&p.ok){const sw=p.img.naturalWidth/2;x.drawImage(p.img,(tx&1)*sw,(ty&1)*sw,sw,sw,X,Y,ts+.5,ts+.5)}}}
     const col=L.k||'#2e7d32';x.lineJoin=x.lineCap='round';
     const way=(o,wd,a)=>{for(let i=1;i<o.s.length;i++){const A=krStop(o.s[i-1]),B=krStop(o.s[i]);if(!A||!B)continue;const g=o.g&&o.g[i-1]&&(!o.gk||o.gk[i-1]&&o.gk[i-1].startsWith(o.s[i-1]+'|'+o.s[i]+'|'))?krDec(o.g[i-1]):null;
       x.beginPath();(g||[[A.lat,A.lon],[B.lat,B.lon]]).forEach((q,k)=>{const p=V.px(q[0],q[1]);k?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])});x.setLineDash(g?[]:[7,6]);x.strokeStyle=col;x.lineWidth=wd;x.globalAlpha=a;x.stroke()}x.globalAlpha=1;x.setLineDash([])};
@@ -7147,8 +7156,8 @@ function krMap(W,L){if(!W)return;const all=krAll(),d=L.dirs[KR.dir]||L.dirs[0];
     const g=KR.drag;KR.drag=null;if(!g||g.m||g.r)return;const r=C.getBoundingClientRect(),V=view(),mx=e.clientX-r.left,my=e.clientY-r.top;let best=null,bd=16;
     all.forEach(S=>{const p=V.px(S.lat,S.lon),dd=Math.hypot(p[0]-mx,p[1]-my);if(dd<bd){bd=dd;best=S}});if(!best)return;krPush(d,[best.id]);krEdit(L,d)};
   C.onpointercancel=()=>{KR.ink=null;KR.drag=null;draw()};
-  C.onwheel=e=>{e.preventDefault();KR.v.z=Math.max(11,Math.min(19,KR.v.z+(e.deltaY<0?1:-1)));draw()};
-  W.querySelectorAll('[data-kz]').forEach(b=>b.onclick=()=>{KR.v.z=Math.max(11,Math.min(19,KR.v.z+ +b.dataset.kz));draw()});
+  C.onwheel=e=>{e.preventDefault();KR.v.z=Math.max(11,Math.min(20,KR.v.z+(e.deltaY<0?1:-1)));draw()};
+  W.querySelectorAll('[data-kz]').forEach(b=>b.onclick=()=>{KR.v.z=Math.max(11,Math.min(20,KR.v.z+ +b.dataset.kz));draw()});
   W.querySelectorAll('[data-kd]').forEach(b=>b.onclick=()=>{KR.dir=+b.dataset.kd;krRender()});
   W.querySelectorAll('[data-km]').forEach(b=>b.onclick=()=>{KR.mode=b.dataset.km;krRender()});
   W.querySelector('[data-a=clr]').onclick=e=>{const b=e.currentTarget;if(!b.classList.contains('ask')){b.classList.add('ask');b.textContent=trS('Na pewno usunąć?');return}d.s=[];d.run=[];d.g=[];d.gk=[];krEdit(L,d)};
@@ -7171,7 +7180,7 @@ function krLines(B){const N=krN();let L=N.lines.find(x=>x.id===KR.line);
     <div class="admRow"><span>${esc(trS('Rodzaj'))}</span><span class="seg admSeg">${[['bus','Autobus'],['tram','Tramwaj']].map(([v,t])=>`<button type="button" data-kt="${v}" aria-pressed="${(L.t||'bus')===v}">${esc(trS(t))}</button>`).join('')}</span></div>
     <div class="admRow"><span>${esc(trS('Kolor'))}</span><span class="krCols2">${KR_COL.map(c=>`<button type="button" class="krSw" data-kc="${c}" style="background:${c}" aria-pressed="${L.k===c}" aria-label="${c}"></button>`).join('')}</span></div></div>
     <div class="krDirs">${L.dirs.map((d,di)=>`<section class="krDir${di===KR.dir?' on':''}" data-di="${di}"><div class="krDH"><h3>${esc(trS('Kierunek'))} ${di+1}${d.s.length>1?': '+esc((krStop(d.s[d.s.length-1])||{}).n||''):''} <small>(${d.s.length})</small></h3>${di?`<button type="button" class="accBtn" data-a="deldir">${esc(trS('Usuń kierunek'))}</button>`:''}</div>
-      <ol class="krSeq">${d.s.map((sid,i)=>`<li data-i="${i}"><b>${esc(krNm(krStop(sid)))}</b>${i<d.s.length-1?`<label class="krRun"><input type="number" class="tdIn" min="0" max="120" value="${+(d.run||[])[i]||0}"> ${esc(trS('min'))}</label>`:'<span class="krRun"></span>'}<button type="button" class="accBtn" data-a="up" aria-label="↑">↑</button><button type="button" class="accBtn" data-a="dn" aria-label="↓">↓</button><button type="button" class="accBtn" data-a="rm" aria-label="${esc(trS('Usuń'))}">✕</button></li>`).join('')}</ol>
+      <ol class="krSeq">${d.s.map((sid,i)=>`<li data-i="${i}"><span class="persGrip" aria-label="${esc(trS('Przytrzymaj i przeciągnij, aby zmienić kolejność'))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span><b>${esc(krNm(krStop(sid)))}</b>${i<d.s.length-1?`<label class="krRun"><input type="number" class="tdIn" min="0" max="120" value="${+(d.run||[])[i]||0}"> ${esc(trS('min'))}</label>`:'<span class="krRun"></span>'}<button type="button" class="accBtn" data-a="rm" aria-label="${esc(trS('Usuń'))}">✕</button></li>`).join('')}</ol>
       <div class="accRow"><select class="krAddS" aria-label="${esc(trS('Dodaj przystanek'))}"><option value="">${esc(trS('Dodaj przystanek…'))}</option>${opt}</select></div>
       <h4>${esc(trS('Odjazdy z pierwszego przystanku'))}</h4>
       ${[['w','Dni robocze'],['s','Soboty'],['h','Niedziele i święta']].map(([k,t])=>`<label class="krDep"><span>${esc(trS(t))} <small>(${((d.dep||{})[k]||[]).length})</small></span><textarea class="tdIn" rows="2" data-k="${k}" placeholder="05:00 05:30 06:00">${esc(((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(m2hm).join(' '))}</textarea></label>`).join('')}
@@ -7184,9 +7193,8 @@ function krLines(B){const N=krN();let L=N.lines.find(x=>x.id===KR.line);
   E.querySelectorAll('[data-kc]').forEach(b=>b.onclick=()=>{L.k=b.dataset.kc;krDirty();krRender()});
   E.querySelectorAll('.krDir').forEach(sec=>{const d=L.dirs[+sec.dataset.di];d.run=d.run||[];d.dep=d.dep||{w:[],s:[],h:[]};
     sec.querySelectorAll('.krSeq li').forEach(li=>{const i=+li.dataset.i;const r=li.querySelector('.krRun input');if(r)r.onchange=()=>{d.run[i]=Math.max(0,+r.value||0);krDirty()};
-      li.querySelector('[data-a=up]').onclick=()=>{if(i<1)return;[d.s[i-1],d.s[i]]=[d.s[i],d.s[i-1]];krEdit(L,d)};
-      li.querySelector('[data-a=dn]').onclick=()=>{if(i>=d.s.length-1)return;[d.s[i+1],d.s[i]]=[d.s[i],d.s[i+1]];krEdit(L,d)};
       li.querySelector('[data-a=rm]').onclick=()=>{const ids=d.s.slice();ids.splice(i,1);d.s=[];d.run=[];krPush(d,ids);krEdit(L,d)}});
+    gripSort(sec.querySelector('.krSeq'),ord=>{const ids=ord.map(i=>d.s[i]);d.s=[];d.run=[];krPush(d,ids);krEdit(L,d)});
     sec.querySelector('.krAddS').onchange=e=>{const v=e.target.value;if(!v)return;krPush(d,[v]);KR.dir=+sec.dataset.di;krEdit(L,d)};
     sec.querySelectorAll('textarea[data-k]').forEach(t=>t.onchange=()=>{d.dep[t.dataset.k]=[...new Set(t.value.split(/[\s,;]+/).map(hm2m).filter(x=>x!=null))].sort((a,b)=>a-b);krDirty();krRender()});
     sec.querySelector('[data-a=gen]').onclick=()=>{const g=k=>sec.querySelector(`[data-g="${k}"]`).value,a=hm2m(g('a')),b=hm2m(g('b')),ev=Math.max(1,+g('ev')||0),k=g('k');if(a==null||b==null)return;
