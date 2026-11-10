@@ -1224,9 +1224,10 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkPH{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*.8);min-width:0}
 .mkMark{flex:none}.mkMark span{font-family:var(--font-head,inherit);font-weight:800;font-size:max(1.15rem,calc(var(--u)*1.5));letter-spacing:-.02em;color:var(--fg)}.mkMark i{font-style:normal;color:var(--g)}
 .mkPFs{flex:none;display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--line);border-radius:0;background:var(--panel);color:var(--fg)}.mkPFs svg{width:22px;height:22px}.mkPFs[aria-pressed=true]{background:var(--g);border-color:var(--g);color:#fff}
-.mkPB{min-height:0;display:flex;justify-content:center}
+.mkPB{min-height:0;display:flex}
 .mkS{flex:1;min-width:0;min-height:0;max-width:1100px;display:flex;flex-direction:column;gap:calc(var(--u)*.6)}
-.mkSLine{flex:1;min-width:0;min-height:0;max-width:1300px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:calc(var(--u)*1);align-items:stretch}.mkSLine.abc{grid-template-columns:minmax(0,.8fr) minmax(360px,1.2fr)}
+.mkSLine{flex:1;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,min(56%,760px)) minmax(280px,460px);gap:calc(var(--u)*1);align-items:stretch}
+.mkSLine.abc{grid-template-columns:minmax(0,min(56%,760px)) minmax(280px,1fr)}   /* (the full keyboard: wider into the free space on the right, the box as it was) */
 .mkRes{min-height:0;min-width:0;display:flex;flex-direction:column;gap:10px;overflow:auto;border:1px solid var(--line);border-radius:0;padding:10px;background:var(--panel)}
 .mkHint{margin:auto;max-width:28em;text-align:center;color:var(--muted);font-size:max(1.1rem,calc(var(--u)*1.3));font-weight:500;line-height:1.4}
 .mkLines{display:flex;flex-direction:column;gap:6px}
@@ -3246,7 +3247,6 @@ function symKey(r){
     return {o:1,t:'S',c:colOf(r)}}
   if(r.t==='tram')return {o:2,t:'T',c:SYM_T};
   if(r.cat==='ferry')return {o:2.5,t:'F',c:'#0277bd'};
-  if(r.t==='trol')return {o:2.7,t:'Tr',c:'#2e9d4f'};
   return {o:3,t:'A',c:SYM_A}}
 function symsOf(routes){const m=new Map();
   routes.forEach(r=>{const k=symKey(r);const id=k.o+k.t;const e=m.get(id)||{o:k.o,t:k.t,cs:[]};if(!e.cs.includes(k.c))e.cs.push(k.c);m.set(id,e)});
@@ -3834,7 +3834,7 @@ function gdTownsKM(){if(gdTownsKM.c)return gdTownsKM.c;const A=new Set(GD_TOWNS_
   const S=new Set([...A].filter(x=>/ Zdrój$/.test(x)||!x.split(' ').some((_,k,w)=>k>0&&A.has(w.slice(0,k).join(' ')))));return gdTownsKM.c=S}
 function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{L}\d])/gu,'$1Park and Ride');   // (P+R said as Park and Ride in every language)
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
-    for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II|Dolna|Górna|Wielka|Mała|Wyżna|Niżna)$/.test(rest)){n=p+', '+rest;break}}}   // (Krynica Dolna, Łabowa Górna: one name)
+    for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II|III|Dolna|Górna|Wielka|Mała|Wyżna|Niżna|Dolny|Górny|Wielki|Mały|Wyżny|Niżny|Dolne|Górne|Wielkie|Małe|Wyżne|Niżne|Nowy|Stary|Nowa|Stara|Nowe|Stare)$/.test(rest)){n=p+', '+rest;break}}}   // (Krynica Dolna, Łabowa Górna, Milik Niżny: one name)
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
   // (German names: the abbreviations said in full – Flensburg: "Förde-Park Abzweigung", "Sankt Pauli", "Park and Ride Exe",
   // "Krusau, Dänemark", "Handelslehranstalt, Wirtschaftsschule")
