@@ -29,7 +29,7 @@
 // "Speech service" resource, pricing tier Free F0) and AZURE_REGION (type Text: the resource's region, e.g. westeurope).
 // For the accounts: Storage & Databases → KV → Create namespace (e.g. zbiorkom-konta); in the worker's Settings → Bindings add
 // a KV namespace binding named KONTA with it; in Variables and Secrets add ADMIN_TOKEN (type Secret: a long random text,
-// e.g. from `openssl rand -base64 32`; it is your administrator's token).
+// at least 8 characters, e.g. 12 random letters and digits; it is your administrator's token).
 const ALLOWED = ['ckan2.multimediagdansk.pl', 'cdn.zbiorkom.live', 'www.ztm.poznan.pl', 'gtfs.ztp.krakow.pl', 'api.golemio.cz'];
 const VOICES = { 'pl-PL-ZofiaNeural': 'pl-PL', 'pl-PL-MarekNeural': 'pl-PL', 'cs-CZ-VlastaNeural': 'cs-CZ', 'cs-CZ-AntoninNeural': 'cs-CZ',
   'sk-SK-ViktoriaNeural': 'sk-SK', 'sk-SK-LukasNeural': 'sk-SK', 'de-DE-SeraphinaMultilingualNeural': 'de-DE', 'de-DE-FlorianMultilingualNeural': 'de-DE',
@@ -114,10 +114,14 @@ async function tts(req, env, ctx, cors) {
 // ---- accounts
 const ROLES = ['user', 'driver'];
 const b64u = a => btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+// a token: 12 characters of 31 that cannot be mistaken for each other (no 0/o, 1/l/i), about 59 bits – far beyond guessing
+// through the worker; drawn evenly (bytes past the last whole multiple of 31 are drawn again)
+const TOK_ABC = 'abcdefghjkmnpqrstuvwxyz23456789';
+function newTok(n = 12) { let t = ''; while (t.length < n) for (const b of crypto.getRandomValues(new Uint8Array(n * 2))) { if (b < 248 && t.length < n) t += TOK_ABC[b % 31]; } return t; }
 async function sha(t) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join(''); }
 function same(a, b) { if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false; let x = 0; for (let i = 0; i < a.length; i++) x |= a.charCodeAt(i) ^ b.charCodeAt(i); return x === 0; }
 async function who(req, env) {
-  const m = (req.headers.get('Authorization') || '').match(/^Bearer\s+([A-Za-z0-9_\-+/=]{20,200})$/);
+  const m = (req.headers.get('Authorization') || '').match(/^Bearer\s+([A-Za-z0-9_\-+/=]{8,200})$/);
   if (!m) return null;
   if (env.ADMIN_TOKEN && same(m[1], env.ADMIN_TOKEN)) return { id: 'admin', name: 'Administrator', role: 'admin' };
   const id = await env.KONTA.get('t:' + await sha(m[1]));
@@ -142,7 +146,7 @@ async function konta(req, env, cors) {
   if (p.startsWith('/admin/')) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
-    const newToken = async id => { const t = b64u(crypto.getRandomValues(new Uint8Array(32))); await env.KONTA.put('t:' + await sha(t), id);
+    const newToken = async id => { const t = newTok(); await env.KONTA.put('t:' + await sha(t), id);
       const a = await env.KONTA.get('u:' + id, 'json'); if (a && a.th) await env.KONTA.delete('t:' + a.th); return { t, th: await sha(t) }; };
     if (!m[1] && req.method === 'GET') {
       const out = []; let cur;
