@@ -664,6 +664,8 @@ ROWS = [
     ("Wyczyść", "Clear", "Löschen", "Vymazať", "Vymazat"),
     ("wł.", "on", "ein", "zap.", "zap."),
     ("wył.", "off", "aus", "vyp.", "vyp."),
+    ("Wprowadź numer linii lub brygady", "Enter a line or duty number", "Linien- oder Dienstnummer eingeben", "Zadajte číslo linky alebo turnusu", "Zadejte číslo linky nebo pořadí"),
+    ("Powrót", "Back", "Zurück", "Späť", "Zpět"),
 ]
 
 WEEKDAYS = {
