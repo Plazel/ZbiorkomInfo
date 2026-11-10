@@ -725,6 +725,8 @@ ROWS = [
     ("Nie znaleziono przystanków na narysowanej trasie.", "No stops found along the drawn route.", "Keine Haltestellen an der gezeichneten Strecke gefunden.", "Na nakreslenej trase sa nenašli žiadne zastávky.", "Na nakreslené trase nebyly nalezeny žádné zastávky."),
     ("Dodano przystanków:", "Stops added:", "Hinzugefügte Haltestellen:", "Pridané zastávky:", "Přidané zastávky:"),
     ("Przytrzymaj i przeciągnij, aby zmienić kolejność", "Hold and drag to change the order", "Halten und ziehen, um die Reihenfolge zu ändern", "Podržte a potiahnite na zmenu poradia", "Podržte a přetáhněte pro změnu pořadí"),
+    ("Wyznaczanie trasy…", "Finding the route…", "Strecke wird ermittelt…", "Hľadá sa trasa…", "Hledá se trasa…"),
+    ("Rysuj trasę po mapie – przystanki leżące na niej zostaną dodane w kolejności. Zbędne usuniesz z listy. Prawym przyciskiem przesuniesz mapę.", "Draw the route on the map – the stops along it are added in order. Remove the ones you don't need from the list. Drag with the right button to move the map.", "Zeichne die Strecke auf der Karte – die Haltestellen daran werden der Reihe nach hinzugefügt. Überflüssige entfernst du aus der Liste. Mit der rechten Maustaste verschiebst du die Karte.", "Nakreslite trasu na mape – zastávky na nej sa pridajú v poradí. Nepotrebné odstránite zo zoznamu. Pravým tlačidlom posuniete mapu.", "Nakreslete trasu na mapě – zastávky na ní se přidají v pořadí. Nepotřebné odstraníte ze seznamu. Pravým tlačítkem posunete mapu."),
 ]
 
 WEEKDAYS = {
