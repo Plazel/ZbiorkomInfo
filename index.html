@@ -1072,7 +1072,7 @@ header.top #cityBtn{height:38px;box-sizing:border-box}
 @media (max-width:460px){header.top .themebar .plus,header.top #gsMob,header.top #cityBtn{height:34px}header.top .themebar .plus,header.top #gsMob{width:34px}}
 
 .infoBox{display:flex;gap:12px;align-items:flex-start;background:var(--panel);border-left:4px solid var(--fg);padding:14px 16px;margin:4px 0 18px;max-width:none}
-.infoBox svg{flex:none;margin-top:1px}.lineWarn{display:flex;gap:8px;align-items:center;flex:1 1 320px;background:#fff4c2;color:#3a2f00;border-left:4px solid #e0b100;padding:8px 12px;font-size:.88rem;line-height:1.4;align-self:center}.lineWarn a.lwItem{text-decoration:none}.lineWarn a.lwItem:hover{text-decoration:underline}.lineWarn .lwItem{display:block;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.lineWarn .lwItem+.lwItem{margin-top:4px}.lineWarn .lwItem:hover b{text-decoration:underline}.aItem p{white-space:pre-line}.lineWarn .lwItem{display:block;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.lineWarn .lwItem+.lwItem{margin-top:4px}.lineWarn .lwItem:hover b{text-decoration:underline}.aItem p{white-space:pre-line}.lineWarn svg{flex:none;margin-top:1px}
+.infoBox svg{flex:none;margin-top:1px}.lineWarn{display:flex;gap:8px;align-items:center;flex:1 1 320px;background:#fff4c2;color:#3a2f00;border-left:4px solid #e0b100;padding:8px 12px;font-size:.88rem;line-height:1.4;align-self:center}.lineWarn a.lwItem{text-decoration:none}.lineWarn a.lwItem:hover{text-decoration:underline}.lineWarn .lwItem{display:block;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.lineWarn .lwItem+.lwItem{margin-top:4px}.lineWarn .lwItem:hover b{text-decoration:underline}.lwItem>b{display:block}.lwTx{display:block;margin-top:2px}.aItem p{white-space:pre-line}.lineWarn .lwItem{display:block;text-align:left;border:0;background:none;color:inherit;font:inherit;padding:0;cursor:pointer}.lineWarn .lwItem+.lwItem{margin-top:4px}.lineWarn .lwItem:hover b{text-decoration:underline}.aItem p{white-space:pre-line}.lineWarn svg{flex:none;margin-top:1px}
 .infoBox.warn{background:#fff4c2;border-left-color:#e0b100;color:#3a2f00}.infoBox.warn p{color:#3a2f00}
 :root[data-theme=dark] .infoBox.warn{background:#4a3f12;color:#fff4c2}:root[data-theme=dark] .lineWarn{background:#4a3f12;color:#fff4c2}.lineWarn.lwAlert{background:#fdecea;color:#5f1111;border-left-color:#d32f2f}.lineWarn.lwAlert svg{color:#d32f2f}:root[data-theme=dark] .lineWarn.lwAlert{background:#4d1515;color:#ffe1e1;border-left-color:#ff5252}:root[data-theme=dark] .lineWarn.lwAlert svg{color:#ff6b6b}body.abOff #alertBar{display:none!important}:root[data-theme=dark] .infoBox.warn p{color:#fff4c2}
 .infoBox b{display:block;font-size:.95rem;margin-bottom:3px}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794353565;
+const APP_BUILD=1794353896;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2064,7 +2064,7 @@ function lineWarnLive(r){const g=alertGrp(city);if(!g)return;ztmAlerts(g).then(A
   const md=t=>t.replace(/\*\*\s*(.+?)\s*\*\*/g,'$1').replace(/\*\*/g,'');   // (the source's ** marks of bold: left out here)
   const parts=mine.slice(0,3).map(([a,i])=>{const T=(a.text||'').split('\n'),D=(a.de||a.text||'').split('\n');
     const ls=D.map((l,k)=>[l,k]).filter(([l])=>re.test(l)&&!/^\[|kommt es bei den/.test(l)).sort((x,y)=>sc(x[0])-sc(y[0])||x[1]-y[1]).map(([,k])=>(T[k]||D[k]).replace(/^•\s*/,''));
-    return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?' '+lineSigns(esc(md(ls.slice(0,4).join(' · '))),a.lines):''}</button>`}).join('');
+    return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?'<span class="lwTx">'+lineSigns(esc(md(ls.slice(0,4).join(' · '))),a.lines)+'</span>':''}</button>`}).join('');
   const old=document.querySelector('.lhead .lineWarn');const rep=(lineWarnRep(r).match(/<a class="lwItem"[\s\S]*<\/a>/)||[''])[0];const html=`<div class="lineWarn lwAlert" role="note">${ALERT_IC}<div>${parts}${rep}${mine.length>3?`<button type="button" class="lwItem" data-i="all">${esc(trS('Wszystkie komunikaty'))} (${mine.length})</button>`:''}</div></div>`;
   if(old)old.outerHTML=html;else document.getElementById('hc').insertAdjacentHTML('afterend',html);
   document.querySelectorAll('.lhead .lineWarn button.lwItem').forEach(b=>b.onclick=()=>alertShow(b.dataset.i==='all'?mine[0][1]:+b.dataset.i,g))})}
@@ -2996,6 +2996,14 @@ function schOrient(G){
     G.e.forEach((E,k)=>{const L=E.l;if(L.length<2)return;let c=cost(k);
       for(let i=0;i+1<L.length;i++){[L[i],L[i+1]]=[L[i+1],L[i]];const c1=cost(k);if(c1<c-1e-6){c=c1;ch++}else [L[i],L[i+1]]=[L[i+1],L[i]]}});
     if(!ch)break}
+  // where a trunk splits into two branches with no line in common (Hucisko: 10 and 12 turn off, the rest go on), the lines
+  // of each branch run side by side on the trunk, those of the branch turning off on its side – never woven in among the others
+  G.n.forEach(N=>{if(N.ends.length!==3)return;
+    N.ends.forEach(([kt],i)=>{const T=G.e[kt],[A,B]=N.ends.filter((_,j)=>j!==i).map(([k])=>G.e[k]);if(!A.l.length||!B.l.length||A===T||B===T)return;
+      if(A.l.some(id=>B.l.includes(id))||A.l.length+B.l.length!==T.l.length||!T.l.every(id=>A.l.includes(id)||B.l.includes(id)))return;
+      const ga=T.l.filter(id=>A.l.includes(id)),gb=T.l.filter(id=>B.l.includes(id));
+      const cands=[[...ga,...gb],[...gb,...ga],[...ga.slice().reverse(),...gb],[...gb,...ga.slice().reverse()],[...ga,...gb.slice().reverse()],[...gb.slice().reverse(),...ga]];
+      let best=null,bc=1e18;cands.forEach(c=>{T.l.splice(0,T.l.length,...c);const v=cost(kt);if(v<bc-1e-9){bc=v;best=c}});T.l.splice(0,T.l.length,...best)})});
 }
 // the lines are cut back a little from every node where they go on, so the links from edge to edge have room to bend
 // (otherwise lines on the inside of a turn overshoot each other and the links loop back); the full geometry stays in p0
@@ -3084,6 +3092,18 @@ function drawSchema(){
     N.ends.forEach(([k,s])=>{const E=G.e[k];const P=[];E.l.forEach((id,li)=>{if(!stops(E,id)){N.pass.add(id);return}const Q=lineEnd(E,li,s,sign,E.p0);pts.push([Q.x,Q.y]);P.push(Q)});
       if(P.length>maxN){maxN=P.length;dir=[P[0].dx,P[0].dy];bar=[P[0],P[P.length-1]]}});
     if(!pts.length)return;
+    // a stop beside the trunk (only the lines turning off stop there, the others pass by): the marker on the branch, off the trunk
+    let side=null;if(N.pass.size){const sets=N.ends.map(([k])=>G.e[k].l.filter(id=>stops(G.e[k],id)).sort().join()).filter(Boolean);
+      if(new Set(sets).size===1)side=N.ends.find(([k])=>{const E=G.e[k];return E.l.length&&E.l.every(id=>stops(E,id))})}
+    if(side){const [k,s]=side,E=G.e[k],P=E.l.map((id,li)=>lineEnd(E,li,s,sign));const pad=SG.w*.9;let box;
+      if(P.length===1){const r=pad*1.05;parts.push(`<circle data-n="${ni}" cx="${P[0].x.toFixed(3)}" cy="${P[0].y.toFixed(3)}" r="${r.toFixed(3)}"/>`);box=[P[0].x-r,P[0].y-r,P[0].x+r,P[0].y+r]}
+      else{const a=P[0],b=P[P.length-1],cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,len=Math.hypot(b.x-a.x,b.y-a.y)+pad*2,th=pad*2.1,ang=Math.atan2(a.dy,a.dx)*180/Math.PI;
+        parts.push(`<rect data-n="${ni}" x="${(-th/2).toFixed(3)}" y="${(-len/2).toFixed(3)}" width="${th.toFixed(3)}" height="${len.toFixed(3)}" rx="${(th/2).toFixed(3)}" transform="translate(${cx.toFixed(3)} ${cy.toFixed(3)}) rotate(${ang.toFixed(1)})"/>`);
+        const R=Math.max(len,th)/2;box=[cx-R,cy-R,cx+R,cy+R]}
+      occ.push(box);const lines=new Set(E.l);
+      const fN=x=>fold(String(x||'')).replace(/[^a-z0-9]/g,''),nl=fN(N.l);
+      const term=[...lines].filter(id=>N.ends.filter(([k2])=>G.e[k2].all.includes(id)).length===1).map(schR).filter(Boolean).filter(r=>!r.ends||!nl||r.ends.some(e=>{const x=fN(e);return x&&(x===nl||x.startsWith(nl)||nl.startsWith(x))}));
+      st.push({N,term,box,lines,pri:(term.length?4:0)+Math.min(lines.size,6)/10});N.pass=new Set();return}
     const dirs=new Set(N.ends.filter(([k])=>G.e[k].l.some(id=>stops(G.e[k],id))).map(([k,s])=>{const P=lineEnd(G.e[k],0,s,sign,G.e[k].p0);return orient(P.dx,P.dy)}));
     const lines=new Set();N.ends.forEach(([k])=>G.e[k].all.forEach(id=>{if(at(id))lines.add(id)}));
     // a stop where lines turn off is an interchange even on a straight run
@@ -3886,6 +3906,16 @@ function gdTownsKM(){if(gdTownsKM.c)return gdTownsKM.c;const A=new Set(GD_TOWNS_
 function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{L}\d])/gu,'$1Park and Ride');   // (P+R said as Park and Ride in every language)
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II|III|Dolna|Górna|Wielka|Mała|Wyżna|Niżna|Dolny|Górny|Wielki|Mały|Wyżny|Niżny|Dolne|Górne|Wielkie|Małe|Wyżne|Niżne|Nowy|Stary|Nowa|Stara|Nowe|Stare)$/.test(rest)){n=p+', '+rest;break}}}   // (Krynica Dolna, Łabowa Górna, Milik Niżny: one name)
+  // (a Roman numeral after a name – "Jana Pawła II", "Władysława IV", "Mieszka I", "Jana III Sobieskiego", "Elżbiety II" –: an ordinal
+  // in the genitive, "Jana Pawła drugiego"; so too before a unit, a war, a century – "XVI Pułku", "I Brygady", "II Wojny Światowej", "XXI Wieku")
+  if(nl==='pl'){const U=['','pierwszego','drugiego','trzeciego','czwartego','piątego','szóstego','siódmego','ósmego','dziewiątego','dziesiątego','jedenastego','dwunastego','trzynastego','czternastego','piętnastego','szesnastego','siedemnastego','osiemnastego','dziewiętnastego'],
+    T=['','','dwudziestego','trzydziestego'],ord=d=>d<20?U[d]:T[Math.floor(d/10)]+(d%10?' '+U[d%10]:''),
+    rom=r=>{const v={I:1,V:5,X:10};let t=0;for(let i=0;i<r.length;i++){const a=v[r[i]],b=v[r[i+1]]||0;t+=a<b?-a:a}return t>0&&t<40?t:0},
+    M='Jana|Pawła|Władysława|Kazimierza|Zygmunta|Augusta|Stefana|Bolesława|Mieszka|Henryka|Ludwika|Leona|Piusa|Benedykta|Fryderyka|Karola|Ottona|Stanisława|Aleksandra|Mikołaja|Piotra|Jakuba|Wacława|Przemysła|Przemysława|Konrada|Leszka|Jerzego|Ferdynanda|Wilhelma|Ryszarda|Edwarda|Grzegorza|Innocentego|Bonifacego|Klemensa|Sykstusa|Urbana|Franciszka|Gustawa|Waldemara|Eryka|Krystiana|Filipa|Karola|Józefa|Leopolda|Napoleona',
+    F='Elżbiety|Jadwigi|Katarzyny|Bony|Anny|Marii|Wiktorii|Krystyny|Małgorzaty|Izabeli';
+    n=n.replace(/(^|[^\p{L}])JP\s*(?=II(?![\p{L}\d]))/gu,'$1Jana Pawła ')
+    .replace(new RegExp('(^|[^\\p{L}])('+M+'|'+F+')\\s+([IVX]{1,6})(?![\\p{L}\\d])','gu'),(m,a,w,r)=>{const d=rom(r);if(!d)return m;const o=ord(d);return a+w+' '+(new RegExp('^('+F+')$').test(w)?o.replace(/ego\b/g,'ej'):o)})
+    .replace(/(^|[^\p{L}\d])([IVX]{1,6})\s+(pułku|batalionu|dywizjonu|korpusu|szwadronu|regimentu|wieku|dywizji|brygady|armii|kompanii|eskadry|flotylli|wojny)(?!\p{L})/giu,(m,a,r,u)=>{const d=rom(r);if(!d)return m;const f=/^(dywizji|brygady|armii|kompanii|eskadry|flotylli|wojny)$/i.test(u),o=ord(d);return a+(f?o.replace(/ego\b/g,'ej'):o)+' '+u})}
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
   // (Polish abbreviations said in full: "dw." dworzec, "aut." autobusowy – "Dw. aut." dworzec autobusowy –, "przyst." przystanek)
   // (a day and a month – "1 Maja", "3-go Maja", "11 Listopada" –: the day said as an ordinal in the genitive, "pierwszego maja")
