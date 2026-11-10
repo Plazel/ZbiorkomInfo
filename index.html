@@ -3571,7 +3571,8 @@ const VP_FEEDS={poz:[['P','https://www.ztm.poznan.pl/pl/dla-deweloperow/getGtfsR
 function a11ySet(on){store.set('ztm.a11y',!!on);const sw=document.getElementById('a11ySw');if(sw)sw.checked=!!on;document.querySelectorAll('nav.rail .railA11y').forEach(b=>b.hidden=!on||!!window.ACC_DRV);if(!on&&GUIDE.open)closeGuide()}
 function gdLang(){return GD_TXT[LANG]?LANG:'en'}
 const gdNameLang=()=>GD_CITY_LANG[city]||'pl';
-function openGuide(){if(!IDX)return;if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool();
+function openGuide(){if(!IDX)return;if(window.ACC_DRV){openTool('mk');return}   // (the driver: mKomputer in place of mSIP, wherever mSIP is opened from)
+  if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool();
   document.getElementById('guideModal').hidden=false;GUIDE.open=true;navMark();document.documentElement.classList.add('gdOn');{const t=document.getElementById('gdLocTop');if(t)t.hidden=false}
   gdTBtn();gdVoiceBtn();gdSrcLabel();
   // the position: the last one known (if recent) at once, then a quick rough fix (network), then the exact one (GPS)
@@ -5485,8 +5486,8 @@ const accAdmin=()=>!!(ACC.user&&ACC.user.role==='admin');
 // and the accents); only in the administrator's mode are the administrator's tools shown
 const MODES={user:['user'],driver:['user','driver'],admin:['user','driver','admin']};
 const accModes=()=>ACC.user?MODES[ACC.user.role]||['user']:['user'];
-function accMode(m){const ok=accModes();if(m==null)m=store.get('ztm.accMode','user');if(!ok.includes(m))m=ok.includes('user')?'user':ok[0];
-  ACC.mode=m;if(ACC.user)store.set('ztm.accMode',m);const h=document.documentElement;if(m==='user')delete h.dataset.mode;else h.dataset.mode=m;if(typeof setBrand==='function')setBrand();return m}
+function accMode(m){const ok=accModes();const mk_='ztm.mode.'+(ACC.user?ACC.user.id:'');if(m==null)m=store.get(mk_,null)||(ACC.user?ACC.user.role:'user');   // (nothing chosen yet: the account's own role)if(!ok.includes(m))m=ok.includes('user')?'user':ok[0];
+  ACC.mode=m;if(ACC.user)store.set(mk_,m);const h=document.documentElement;if(m==='user')delete h.dataset.mode;else h.dataset.mode=m;if(typeof setBrand==='function')setBrand();return m}
 async function accLogin(tok,quiet){tok=(tok||'').trim();if(!tok)return false;ACC.state='wait';accRender();
   try{const u=await accApi('konto',{tok});ACC.token=tok;store.set('ztm.token',tok);ACC.user=u;ACC.state='in';
     try{ACC.data=await accApi('konto/dane')||{}}catch(e){ACC.data={}}accClose();accShow();
