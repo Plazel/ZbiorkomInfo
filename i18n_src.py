@@ -833,6 +833,7 @@ ROWS = [
     ("Telefon", "Phone", "Telefon", "Telefón", "Telefon"),
     ("E-mail", "E-mail", "E-Mail", "E-mail", "E-mail"),
     ("Nr służbowy", "Staff no.", "Dienstnr.", "Služobné č.", "Služební č."),
+    ("Zapowiedź linii i kierunku", "Announce the line and destination", "Linie und Richtung ansagen", "Hlásenie linky a smeru", "Hlášení linky a směru"),
 ]
 
 WEEKDAYS = {
