@@ -1175,7 +1175,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkStops li.prev button{background:transparent;border-style:dashed;color:var(--muted);font-size:calc(var(--u)*1.3)}.mkStops li.prev b{font-weight:500}
 .mkStops .sym{display:none}
 /* the stops on the line: a vertical line in the line's colour (grey behind), a stop sign at each stop, the present one larger */
-.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}.lineV .mkStops li:first-child::before{top:calc(var(--gap)/2)}.lineV .mkStops li:last-child::before{bottom:calc(var(--gap)/2)}.mkStops{overflow:hidden}
+.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}.lineV .mkStops li.vt::before{top:calc(var(--gap)/2)}.lineV .mkStops li.vb::before{bottom:calc(var(--gap)/2)}.mkStops{position:relative}.mkStops li.buf{position:absolute;left:0;right:0;height:var(--rh,60px)}.mkStops li.bt2{top:calc(var(--rh,60px)*-2)}.mkStops li.bt1{top:calc(var(--rh,60px)*-1)}.mkStops li.bb1{top:100%}.mkStops li.bb2{top:calc(100% + var(--rh,60px))}.lineV .mkStops li.buf.prev::after{display:none}.mkStops{overflow:hidden}
 .lineV .mkStops li::before{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;bottom:0;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.end::before{top:50%}.lineV .mkStops li.prev::before{background:#9aa3ab}.lineV .mkStops li.prev::after{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;height:50%;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.none::before{display:none}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794352537;
+const APP_BUILD=1794352805;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5984,7 +5984,7 @@ function admStatusDlg(a,again){const s=admSt(a.id);if(s.s!=='run'){if(again&&ADM
 // the duty and its trips, the vehicle; a break: a duty chosen, no trip; off) – the administrator's table shows it
 function mkStatusData(){const veh=String(store.get('ztm.mkVeh','')||'').trim(),R=MK.run;
   {const rr=document.querySelectorAll('#tdMk .mkRuns li:not(.mkDir) button');if(rr.length&&!R)MK.dRows=[...rr].slice(0,60).map(b=>b.innerText.replace(/\s+/g,' ').trim())}
-  if(R&&R.r){const lis=[...document.querySelectorAll('#tdMk .mkStops li')];if(lis.length)MK.lastSt=lis.map(li=>[(li.querySelector('.t')||{}).textContent||'',(li.querySelector('b')||{}).textContent||'',li.classList.contains('cur')?1:li.classList.contains('prev')?-1:0]).filter(x=>x[1]).reverse();
+  if(R&&R.r){const lis=[...document.querySelectorAll('#tdMk .mkStops li:not(.buf)')];if(lis.length)MK.lastSt=lis.map(li=>[(li.querySelector('.t')||{}).textContent||'',(li.querySelector('b')||{}).textContent||'',li.classList.contains('cur')?1:li.classList.contains('prev')?-1:0]).filter(x=>x[1]).reverse();
     const me=typeof MKM!=='undefined'&&MKM.st&&MKM.st.me;let c='';try{c=colOf(R.r)}catch(e){}
     return {s:'run',l:R.r.n,rid:R.r.id,t:R.r.t||'bus',c,dest:R.head||(R.r.ends||[])[1]||'',duty:MK.duty||null,city,veh,st:MK.lastSt||[],lat:me?+(+me[0]).toFixed(5):null,lon:me?+(+me[1]).toFixed(5):null,
       gps:!!MK.fix,late:((document.querySelector('#tdMk .mkLate')||{}).textContent||'').trim(),trips:MK.duty?MK.dRows||null:null}}
@@ -6128,7 +6128,7 @@ function mkRender(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1
     <div class="mkMidB"><div class="mkTrack"><i class="mkFill"></i></div><button type="button" class="mkPBack" hidden>‹ ${esc(trS('Powrót'))}</button></div>
     <div class="mkWrap">
       <div class="mkMap"><canvas aria-hidden="true"></canvas><small class="mkAttr">© OpenStreetMap · © CARTO</small></div>
-      <ol class="mkStops">${[0,1,2,3,4,5].map(i=>`<li><button type="button" data-row="${i}"><span class="sym" aria-hidden="true"></span><span class="t"></span><b></b><i></i><span class="pf"><svg viewBox="0 0 14 24" aria-hidden="true"><rect x="1" y="1" width="12" height="9" rx="1"/><path d="M7 10v13M4 23h6"/></svg><span></span></span></button></li>`).join('')}</ol>
+      <ol class="mkStops">${[0,1,2,3,4,5,6,7,8,9].map(i=>`<li><button type="button" data-row="${i}"><span class="sym" aria-hidden="true"></span><span class="t"></span><b></b><i></i><span class="pf"><svg viewBox="0 0 14 24" aria-hidden="true"><rect x="1" y="1" width="12" height="9" rx="1"/><path d="M7 10v13M4 23h6"/></svg><span></span></span></button></li>`).join('')}</ol>
       <div class="mkMsgs mkPane" data-pane="spec" hidden><div class="mkMH"><h3>${esc(trS('Komunikaty specjalne'))}</h3></div><div class="mkSL">${mkMsgs().map((m,i)=>`<button type="button" class="mkSB" data-msg="${i}"><b>${i+1}</b><span>${esc(m[MK_L.indexOf(mkCityL())]||m.find(Boolean)||'')}</span></button>`).join('')}</div></div>
       <div class="mkMsgs mkPane" data-pane="inbox" hidden></div><div class="mkMsgs mkPane" data-pane="menu" hidden></div>
     </div>
@@ -6233,14 +6233,15 @@ function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500
   const G=B.querySelector('.mkGps'),gs=!MK.gpsOn?'off':MK.fix?((MK.fix.acc||0)<=50?'ok':'weak'):'wait';G.className='mkGps '+gs;
   G.title=G.ariaLabel=gs==='off'?trS('GPS wyłączony'):gs==='wait'?trS('Szukanie GPS…'):'GPS ±'+Math.round(MK.fix.acc||0)+' m';
   // the stops: from the top the four after the next one (the farthest first), the next / present one larger, under it the one before
-  const rows=[j+4,j+3,j+2,j+1,j,j-1],bt=B.querySelectorAll('.mkStops button');
-  rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last;b.parentNode.className=(i===4?'cur'+(at?' at':''):i===5?'prev':'nx')+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
+  // (and two more above and two below, out of sight under the list's edges: the scrolling brings them in, never from nowhere)
+  const rows=[j+6,j+5,j+4,j+3,j+2,j+1,j,j-1,j-2,j-3],bt=B.querySelectorAll('.mkStops button');
+  rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last,v=i-2;b.parentNode.className=(v<0?'nx buf bt'+(-v):v>5?'prev buf bb'+(v-5):v===4?'cur'+(at?' at':''):v===5?'prev vb':'nx'+(v===0?' vt':''))+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
     b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').textContent=ok&&q>=j&&gdReq(q)?trS('na żądanie'):'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
   // (passing stops: the whole list scrolls as one – every row moved by the same distance, as many rows as stops passed, forward
   // or back – and glides back into place; rows from beyond the list come in from under its edge)
-  {const d=MK.lastJ!=null&&MK.lastRun===R?j-MK.lastJ:0;MK.lastJ=j;MK.lastRun=R;
-    if(d&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const lis=[...B.querySelectorAll('.mkStops li')],n=lis.length,tops=lis.map(l=>l.getBoundingClientRect().top),hA=n>1?(tops[n-1]-tops[0])/(n-1):60,
-      off=-Math.max(-n,Math.min(n,d))*hA;
+  {const ol=B.querySelector('.mkStops'),vis=[...ol.querySelectorAll('li:not(.buf)')],tv=vis.map(l=>l.offsetTop),hA=vis.length>1?(tv[tv.length-1]-tv[0])/(vis.length-1):60;ol.style.setProperty('--rh',hA+'px');
+    const d=MK.lastJ!=null&&MK.lastRun===R?j-MK.lastJ:0;MK.lastJ=j;MK.lastRun=R;
+    if(d&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const lis=[...ol.querySelectorAll('li')],n=vis.length,off=-Math.max(-n,Math.min(n,d))*hA;
       lis.forEach(li=>{li.style.transition='none';li.style.transform=`translateY(${off}px)`});
       void B.offsetHeight;requestAnimationFrame(()=>lis.forEach(li=>{li.style.transition='transform .75s cubic-bezier(.22,.8,.24,1)';li.style.transform=''}))}}
   mkMap(B,P,k,at,T,nowM)}
