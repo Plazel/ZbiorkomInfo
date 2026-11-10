@@ -781,6 +781,10 @@ ROWS = [
     ("Wczytujemy najnowszą wersję. Strona odświeży się sama.", "Loading the newest version. The page will reload by itself.", "Die neueste Version wird geladen. Die Seite lädt sich selbst neu.", "Načítavame najnovšiu verziu. Stránka sa obnoví sama.", "Načítáme nejnovější verzi. Stránka se obnoví sama."),
     ("Skopiuj rozkład z kierunku 1", "Copy the timetable of direction 1", "Fahrplan von Richtung 1 kopieren", "Skopírovať cestovný poriadok zo smeru 1", "Zkopírovat jízdní řád ze směru 1"),
     ("przesunięty o", "shifted by", "verschoben um", "posunutý o", "posunutý o"),
+    ("tworzony automatycznie z kierunku 1 – zmiana jego przystanków go odłączy", "made from direction 1 by itself – changing its stops detaches it", "automatisch aus Richtung 1 erstellt – eine Änderung seiner Haltestellen löst ihn davon", "vytvorený automaticky zo smeru 1 – zmena jeho zastávok ho odpojí", "vytvořený automaticky ze směru 1 – změna jeho zastávek ho odpojí"),
+    ("Twórz brygady automatycznie z rozkładów linii", "Make the duties from the line timetables automatically", "Umläufe automatisch aus den Linienfahrplänen erstellen", "Vytvárať turnusy automaticky z cestovných poriadkov liniek", "Vytvářet oběhy automaticky z jízdních řádů linek"),
+    ("Brygady powstają same z odjazdów linii. Aby je zmieniać ręcznie, wyłącz tworzenie automatyczne.", "The duties are made from the line departures. To change them by hand, turn automatic making off.", "Die Umläufe entstehen aus den Abfahrten der Linien. Um sie von Hand zu ändern, schalte die automatische Erstellung aus.", "Turnusy vznikajú z odchodov liniek. Ak ich chcete meniť ručne, vypnite automatické vytváranie.", "Oběhy vznikají z odjezdů linek. Chcete-li je měnit ručně, vypněte automatické vytváření."),
+    ("Wybierz brygadę.", "Choose a duty.", "Wähle einen Umlauf.", "Vyberte turnus.", "Vyberte oběh."),
 ]
 
 WEEKDAYS = {
