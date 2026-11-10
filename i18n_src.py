@@ -651,6 +651,7 @@ ROWS = [
     ("Pokaż token", "Show token", "Token anzeigen", "Zobraziť token", "Zobrazit token"),
     ("Brak podglądu – utwórz nowy token", "No preview – create a new token", "Keine Vorschau – neuen Token erstellen", "Bez náhľadu – vytvorte nový token", "Bez náhledu – vytvořte nový token"),
     ("Ten token powstał, zanim serwer zaczął przechowywać tokeny do podglądu.", "This token was made before the server began keeping tokens for preview.", "Dieser Token entstand, bevor der Server Token zur Vorschau speicherte.", "Tento token vznikol skôr, ako server začal uchovávať tokeny na náhľad.", "Tento token vznikl dříve, než server začal uchovávat tokeny pro náhled."),
+    ("Serwer nie ma podglądu tokenów – wdróż najnowszy worker.js", "The server has no token preview – deploy the latest worker.js", "Der Server hat keine Token-Vorschau – aktuelle worker.js bereitstellen", "Server nemá náhľad tokenov – nasaďte najnovší worker.js", "Server nemá náhled tokenů – nasaďte nejnovější worker.js"),
 ]
 
 WEEKDAYS = {
