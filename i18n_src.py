@@ -644,6 +644,8 @@ ROWS = [
     ("Wybierz odbiorców.", "Choose the recipients.", "Empfänger auswählen.", "Vyberte príjemcov.", "Vyberte příjemce."),
     ("Potwierdź", "Confirm", "Bestätigen", "Potvrdiť", "Potvrdit"),
     ("Wiadomości", "Messages", "Nachrichten", "Správy", "Zprávy"),
+    ("To ustawienia domyślne kierowców; mogą je zmienić u siebie (Uprawnienia).", "These are the drivers' defaults; they may change them for themselves (Permissions).", "Dies sind die Standardeinstellungen der Fahrer; sie dürfen sie für sich ändern (Berechtigungen).", "Toto sú predvolené nastavenia vodičov; môžu si ich zmeniť (Oprávnenia).", "Toto jsou výchozí nastavení řidičů; mohou si je změnit (Oprávnění)."),
+    ("zablokowane przez administratora", "locked by the administrator", "vom Administrator gesperrt", "zablokované administrátorom", "zablokováno administrátorem"),
 ]
 
 WEEKDAYS = {
