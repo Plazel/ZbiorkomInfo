@@ -1149,6 +1149,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkTop .mkLn .chip{height:calc(var(--u)*3.2);min-width:calc(var(--u)*3.2);font-size:calc(var(--u)*1.75);box-shadow:0 0 0 2px rgba(255,255,255,.9)}
 .mkTop .mkLn .chip:not(.wide){width:calc(var(--u)*3.2);padding:0}.mkTop .mkLn .chip.wide{padding:0 calc(var(--u)*.5)}
 .mkHead{flex:1;min-width:0;font-size:calc(var(--u)*2.2);font-weight:800;line-height:1.1;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mkClock{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}.mkClock b{font-weight:700}.mkClock small{font-size:.72em;font-weight:500;opacity:.9}
 .mkPos,.mkClock{flex:none;font-size:calc(var(--u)*1.25);font-weight:600;font-variant-numeric:tabular-nums;opacity:.95}
 .mkPos{padding:2px calc(var(--u)*.5);border:1.5px solid rgba(255,255,255,.7);border-radius:0}
 .mkMidB{display:flex;flex-direction:column;gap:var(--gap)}
@@ -1170,6 +1171,18 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkStops li.cur button{background:var(--g);border-color:var(--g);color:#fff;font-size:calc(var(--u)*2.15)}.mkStops li.cur .t{color:#fff;opacity:.9}.mkStops li.cur b{font-weight:800}
 .mkStops li.cur:not(.at) button{background:color-mix(in srgb,var(--g) 82%,#000)}
 .mkStops li.prev button{background:transparent;border-style:dashed;color:var(--muted);font-size:calc(var(--u)*1.3)}.mkStops li.prev b{font-weight:500}
+.mkStops .sym{display:none}
+/* the stops on the line: a vertical line in the line's colour (grey behind), a stop sign at each stop, the present one larger */
+.lineV .mkStops{gap:0}.lineV .mkStops li{position:relative;padding:calc(var(--gap)/2) 0}
+.lineV .mkStops li::before{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;bottom:0;width:8px;background:var(--g);z-index:1}
+.lineV .mkStops li.end::before{top:50%}.lineV .mkStops li.prev::before{background:#9aa3ab}.lineV .mkStops li.prev::after{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;height:50%;width:8px;background:var(--g);z-index:1}
+.lineV .mkStops li.none::before{display:none}
+.lineV .mkStops button{padding-left:calc(var(--u)*4.4)}
+.lineV .mkStops .sym{display:grid;place-items:center;position:absolute;left:calc(var(--u)*2.1);top:50%;transform:translate(-50%,-50%);z-index:2;width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:50%;background:#ffd400;border:3px solid #fff;box-shadow:0 0 0 2px var(--g)}
+.lineV .mkStops .sym::after{content:"H";font:800 calc(var(--u)*1.05)/1 Roboto,sans-serif;color:#1a6b2a}
+.lineV .mkStops li.cur .sym{width:calc(var(--u)*2.9);height:calc(var(--u)*2.9);box-shadow:0 0 0 3px #fff,0 0 0 6px var(--g)}.lineV .mkStops li.cur .sym::after{font-size:calc(var(--u)*1.5)}
+.lineV .mkStops li.prev .sym{background:#c3c9cf;box-shadow:0 0 0 2px #9aa3ab}.lineV .mkStops li.prev .sym::after{color:#6b747c}
+.lineV .mkStops li.cur button{margin-left:0}
 /* the bottom bar */
 .mkBar{display:flex;align-items:stretch;gap:var(--gap);min-width:0;height:calc(var(--u)*4)}
 .mkBar button{flex:none;position:relative;display:flex;align-items:center;justify-content:center;gap:.5em;min-width:calc(var(--u)*4.6);padding:0 calc(var(--u)*.8);border:0;border-radius:0;background:var(--g);color:#fff;font-weight:800;font-size:calc(var(--u)*1.1)}
@@ -5921,12 +5934,12 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
   const I=(p)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
   // the top bar: the line's symbol and the direction; the body: the map (a third, on the left) and the stops; the bottom bar:
   // MENU, the messages, the announcements on / off, the GPS, the time against the timetable
-  B.innerHTML=`<div class="mk mkRun">
-    <div class="mkTop"><span class="mkLn"></span><b class="mkHead"></b><span class="mkPos"></span><span class="mkClock"></span></div>
+  B.innerHTML=`<div class="mk mkRun${store.get('ztm.mkLineV',false)?' lineV':''}">
+    <div class="mkTop"><span class="mkLn"></span><b class="mkHead"></b><span class="mkPos"></span><span class="mkClock"><b></b><small></small></span></div>
     <div class="mkMidB"><div class="mkTrack"><i class="mkFill"></i></div><button type="button" class="mkPBack" hidden>‹ ${esc(trS('Powrót'))}</button></div>
     <div class="mkWrap">
       <div class="mkMap"><canvas aria-hidden="true"></canvas><small class="mkAttr">© OpenStreetMap · © CARTO</small></div>
-      <ol class="mkStops">${[0,1,2,3,4,5].map(i=>`<li><button type="button" data-row="${i}"><span class="t"></span><b></b><i></i></button></li>`).join('')}</ol>
+      <ol class="mkStops">${[0,1,2,3,4,5].map(i=>`<li><button type="button" data-row="${i}"><span class="sym" aria-hidden="true"></span><span class="t"></span><b></b><i></i></button></li>`).join('')}</ol>
       <div class="mkMsgs mkPane" data-pane="spec" hidden><div class="mkMH"><h3>${esc(trS('Komunikaty specjalne'))}</h3></div><div class="mkSL">${mkMsgs().map((m,i)=>`<button type="button" class="mkSB" data-msg="${i}"><b>${i+1}</b><span>${esc(m[MK_L.indexOf(mkCityL())]||m.find(Boolean)||'')}</span></button>`).join('')}</div></div>
       <div class="mkMsgs mkPane" data-pane="inbox" hidden></div><div class="mkMsgs mkPane" data-pane="menu" hidden></div>
     </div>
@@ -6017,7 +6030,7 @@ function mkUpd(){const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.
   const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,T=R.off.map(o=>R.t0+o),p=R.p,k=p>>1,at=p%2===0,j=at?k:Math.min(k+1,last);
   const hm=t=>{const m=Math.round(t)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
   const d=new Date(),nowM=d.getHours()*60+d.getMinutes()+d.getSeconds()/60,late=nowM-T[j];
-  B.querySelector('.mkClock').textContent=hm(Math.floor(nowM))+':'+String(d.getSeconds()).padStart(2,'0');
+  {const c=B.querySelector('.mkClock');c.firstChild.textContent=hm(Math.floor(nowM))+':'+String(d.getSeconds()).padStart(2,'0');c.lastChild.textContent=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear()}
   B.querySelector('.mkPos').textContent=(j+1)+'/'+(last+1);B.querySelector('.mkFill').style.width=(last?Math.min(1,p/(2*last)):1)*100+'%';
   // the time against the timetable: + late (red past a minute and a half), − early (blue past a minute)
   const ls=Math.round(late*60),aL=Math.abs(ls),L=B.querySelector('.mkLate');L.querySelector('b').textContent=(ls>0?'+':ls<0?'−':'')+Math.floor(aL/60)+':'+String(aL%60).padStart(2,'0');L.className='mkLate '+(ls>90?'l':ls<-60?'e':'');
