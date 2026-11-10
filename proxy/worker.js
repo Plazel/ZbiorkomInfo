@@ -21,7 +21,8 @@
 //    GET /konto → {id, name, role}; GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
-//      POST /admin/konta/<id>/token → a new token (the old one stops working); DELETE /admin/konta/<id> → the account removed.
+//      POST /admin/konta/<id>/token → a new token (the old one stops working); GET /admin/konta/<id>/token → the token in use
+//        (kept encrypted with ADMIN_TOKEN; null for accounts made earlier); DELETE /admin/konta/<id> → the account removed.
 //      PUT /admin/ustawienia {voice, lang, gong, en, msgs, l2, perm} → mKomputer's settings for every driver (null: the driver's
 //        own choice; en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements,
 //        each [pl, en, de, sk, cs]; l2: their second language; perm: what the drivers may do {ann, spec, mic, free});
@@ -134,6 +135,12 @@ async function who(req, env) {
   if (!id) return null;
   return await env.KONTA.get('u:' + id, 'json');
 }
+// a token kept for the administrator's preview: encrypted (AES-GCM) with a key made from the ADMIN_TOKEN secret, so the
+// stored data alone does not give it away (without ADMIN_TOKEN nothing is kept and there is no preview)
+async function tokKey(env) { const raw = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('konta-podglad:' + env.ADMIN_TOKEN)); return crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']); }
+const b64 = a => btoa(String.fromCharCode(...new Uint8Array(a))), unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function tokSeal(env, t) { if (!env.ADMIN_TOKEN) return null; const iv = crypto.getRandomValues(new Uint8Array(12)); return b64(iv) + '.' + b64(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await tokKey(env), new TextEncoder().encode(t))); }
+async function tokOpen(env, x) { if (!env.ADMIN_TOKEN || !x) return null; try { const [iv, c] = x.split('.'); return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(iv) }, await tokKey(env), unb64(c))); } catch (e) { return null; } }
 async function konta(req, env, cors) {
   const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8'); h.set('Cache-Control', 'no-store');
   const J = (o, st) => new Response(JSON.stringify(o), { status: st || 200, headers: h });
@@ -199,7 +206,7 @@ async function konta(req, env, cors) {
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
     // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
     const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created } });
-    const newToken = async a => { const t = newTok(), th = await sha(t), old = a.th; a.th = th;
+    const newToken = async a => { const t = newTok(), th = await sha(t), old = a.th; a.th = th; a.tk = await tokSeal(env, t);
       await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old ? env.KONTA.delete('t:' + old) : null]); return t; };
     if (!m[1] && req.method === 'GET') {
       const keys = []; let cur;
@@ -218,6 +225,8 @@ async function konta(req, env, cors) {
     }
     const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a) return J({ error: 'not found' }, 404);
     if (m[2] && req.method === 'POST') return J({ id: a.id, token: await newToken(a) });
+    // the token now in use, for the administrator (null: made before tokens were kept – a new one is needed)
+    if (m[2] && req.method === 'GET') return J({ id: a.id, token: await tokOpen(env, a.tk) });
     if (!m[2] && req.method === 'DELETE') { await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id)]); return J({ ok: true }); }
   }
   return J({ error: 'not found' }, 404);
