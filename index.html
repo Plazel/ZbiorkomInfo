@@ -1165,7 +1165,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkStops{list-style:none;margin:0;padding:0;display:grid;grid-template-rows:repeat(4,minmax(0,1fr)) minmax(0,1.45fr) minmax(0,1fr);gap:var(--gap);min-height:0;min-width:0}
 .mkStops li{min-height:0;min-width:0;display:flex}.mkStops li.none{visibility:hidden}
 .mkStops button{flex:1;min-width:0;display:flex;align-items:center;gap:calc(var(--u)*.9);padding:0 calc(var(--u)*.9);border:1px solid var(--line);border-radius:0;background:var(--panel);color:var(--fg);text-align:left;font-size:calc(var(--u)*1.55)}
-.mkStops button:active{filter:brightness(.92)}
+.mkStops button:active{background-image:linear-gradient(rgba(0,0,0,.07),rgba(0,0,0,.07))}
 .mkStops .t{flex:none;font-variant-numeric:tabular-nums;font-weight:500;color:var(--muted)}
 .mkStops b{flex:1;min-width:0;font-weight:700;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mkStops i{flex:none;font-style:normal;font-size:.5em;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:.25em .6em;border-radius:0;background:#ffcc00;color:#231a00}.mkStops i:empty{display:none}.mkStops .pf{flex:none;display:flex;align-items:center;gap:.3em;margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;font-size:.85em;opacity:.85}.mkStops .pf[hidden]{display:none}.mkStops .pf svg{height:1.1em;width:auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}.mkStops .pf rect{fill:currentColor;fill-opacity:.25}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794351516;
+const APP_BUILD=1794351629;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3887,8 +3887,10 @@ function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{
   // (Polish abbreviations said in full: "dw." dworzec, "aut." autobusowy – "Dw. aut." dworzec autobusowy –, "przyst." przystanek)
   // (a day and a month – "1 Maja", "3-go Maja", "11 Listopada" –: the day said as an ordinal in the genitive, "pierwszego maja")
   if(nl==='pl'){const U=['','pierwszego','drugiego','trzeciego','czwartego','piątego','szóstego','siódmego','ósmego','dziewiątego','dziesiątego','jedenastego','dwunastego','trzynastego','czternastego','piętnastego','szesnastego','siedemnastego','osiemnastego','dziewiętnastego'],
-    ord=d=>d<20?U[d]:(d<30?'dwudziestego':'trzydziestego')+(d%10?' '+U[d%10]:'');
-    n=n.replace(/(^|[^\p{L}\d])([12]?\d|3[01])(?:\s*-?\s*go)?\.?\s+(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)(?!\p{L})/giu,(m,a,d,mo)=>+d>=1&&+d<=31?a+ord(+d)+' '+mo.toLowerCase():m)}
+    T=['','','dwudziestego','trzydziestego','czterdziestego','pięćdziesiątego','sześćdziesiątego','siedemdziesiątego','osiemdziesiątego','dziewięćdziesiątego'],
+    ord=d=>d<20?U[d]:T[Math.floor(d/10)]+(d%10?' '+U[d%10]:'');
+    n=n.replace(/(^|[^\p{L}\d])([12]?\d|3[01])(?:\s*-?\s*go)?\.?\s+(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)(?!\p{L})/giu,(m,a,d,mo)=>+d>=1&&+d<=31?a+ord(+d)+' '+mo.toLowerCase():m)
+    .replace(/(^|[^\p{L}\d])([1-9]\d?)(?:\s*-?\s*(?:go|ej))?\.?\s+(pułku|batalionu|dywizjonu|korpusu|szwadronu|regimentu|dywizji|brygady|armii|kompanii|eskadry|flotylli)(?!\p{L})/giu,(m,a,d,u)=>{const f=/^(dywizji|brygady|armii|kompanii|eskadry|flotylli)$/i.test(u),o=ord(+d);return a+(f?o.replace(/ego\b/g,'ej'):o)+' '+u.toLowerCase()})}
   if(nl==='pl'){const cap=(w,c)=>c===c.toUpperCase()?w[0].toUpperCase()+w.slice(1):w;n=n.replace(/(^|[^\p{L}])([Dd])w\.\s*/gu,(m,a,c)=>a+cap('dworzec',c)+' ')
     .replace(/(^|[^\p{L}])([Aa])ut\.\s*/gu,(m,a,c)=>a+cap('autobusowy',c)+' ').replace(/(^|[^\p{L}])([Pp])rzyst\.\s*/gu,(m,a,c)=>a+cap('przystanek',c)+' ').replace(/\s{2,}/g,' ').trim()}
   // (German names: the abbreviations said in full – Flensburg: "Förde-Park Abzweigung", "Sankt Pauli", "Park and Ride Exe",
@@ -6236,7 +6238,7 @@ function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500
     b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').textContent=ok&&q>=j&&gdReq(q)?trS('na żądanie'):'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
   {const mv=MK.lastJ!=null&&MK.lastRun===R&&j===MK.lastJ+1;MK.lastJ=j;MK.lastRun=R;
     if(mv&&!matchMedia('(prefers-reduced-motion:reduce)').matches){const lis=[...B.querySelectorAll('.mkStops li')],tops=lis.map(l=>l.getBoundingClientRect().top),h0=lis[1]?tops[1]-tops[0]:60;
-      lis.forEach((li,i)=>{const b=li.querySelector('button');if(!b)return;b.style.transition='none';b.style.transform=`translateY(${i?tops[i-1]-tops[i]:-h0}px)`;if(!i)b.style.opacity='0';
+      lis.forEach((li,i)=>{const b=li;b.style.transition='none';b.style.transform=`translateY(${i?tops[i-1]-tops[i]:-h0}px)`;if(!i)b.style.opacity='0';
         requestAnimationFrame(()=>requestAnimationFrame(()=>{b.style.transition='transform .6s cubic-bezier(.3,.7,.2,1),opacity .6s';b.style.transform='';b.style.opacity=''}))})}}
   mkMap(B,P,k,at,T,nowM)}
 // the microphone: the driver's voice through the device's own speaker (to the passengers), live, while it is on (the
