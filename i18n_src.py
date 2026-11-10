@@ -832,6 +832,7 @@ ROWS = [
     ("Nie udało się zmienić tokenu.", "The token could not be changed.", "Das Token konnte nicht geändert werden.", "Token sa nepodarilo zmeniť.", "Token se nepodařilo změnit."),
     ("Telefon", "Phone", "Telefon", "Telefón", "Telefon"),
     ("E-mail", "E-mail", "E-Mail", "E-mail", "E-mail"),
+    ("Nr służbowy", "Staff no.", "Dienstnr.", "Služobné č.", "Služební č."),
 ]
 
 WEEKDAYS = {
