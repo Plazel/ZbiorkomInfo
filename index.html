@@ -5213,7 +5213,7 @@ function depLinesTable(){const tb=document.getElementById('depLinesB');tb.replac
 let NAV_READY=false,NAV_LAST='tt',NAV_CUR='tt',NAV_POP=false,NAV_SILENT=false,NAV_T=0;
 // every section its own address, like the pages of a website: #mapa, #odjazdy, #polaczenia, #msip, #takty, #brygady; the
 // timetables keep theirs (#l…, #t…, #s…), given back on the way back to them
-const NAV_HASH={map:'mapa',dep:'odjazdy',jp:'polaczenia',guide:'msip',takt:'takty',bryg:'brygady',hub:'hub',adm:'konta',mk:'mkomputer'};let TT_HASH='';
+const NAV_HASH={map:'mapa',dep:'odjazdy',jp:'polaczenia',guide:'msip',takt:'takty',bryg:'brygady',hub:'hub',adm:'konta',mk:'mkomputer',mkadm:'mkomputer-ustawienia',msgadm:'wiadomosci'};let NAV_PEND='';let TT_HASH='';
 function navUrl(v){const base=location.pathname+location.search;const h=location.hash.slice(1);
   if(h&&!Object.values(NAV_HASH).includes(h))TT_HASH=h;
   return base+(NAV_HASH[v]?'#'+NAV_HASH[v]:TT_HASH?'#'+TT_HASH:'')}
@@ -5499,7 +5499,7 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
 const NAV0=(()=>{let v='';try{v=sessionStorage.getItem('ztm.nav')||''}catch(e){}if(!v){const k=store.get('ztm.nav',null);if(Array.isArray(k)&&Date.now()-k[1]<43200000)v=k[0]}return v})();
 (window.EMBEDDED_DATA?Promise.resolve(EMBEDDED_DATA.index):fetch('data/index.json').then(r=>r.json())).then(async j=>{IDX=j;hideRoutes();nightTrams();setByName();setCorridors();await route();if(typeof alertBar==='function')alertBar();
   NAV_READY=true;{const hs=location.hash.slice(1),hv=Object.keys(NAV_HASH).find(k=>NAV_HASH[k]===hs);const v0=hv||(location.hash&&!hv?'':NAV0);   // (an address of a section opens it; a timetable's address its timetable)
-    if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click()}}})
+    if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click();else NAV_PEND=v0}}})   // (a section of the account's not there yet: opened once logged in)
  .catch(()=>{app.innerHTML='<p class="loading err">Nie udało się wczytać rozkładów</p>'});
 </script>
 <script>
@@ -5555,7 +5555,7 @@ function tdRail(on){store.set('ztm.tools',on);if(typeof MAP!=='undefined'&&MAP.o
   document.querySelectorAll('nav.rail .railTool').forEach(b=>b.hidden=!on);if(!on&&['takt','bryg'].includes(TD.view))closeTool();if(typeof gdTBtn==='function')gdTBtn()}
 function openTool(v){if(!IDX)return;if(MAP.open)closeMap();if(DEP.open)closeDep();if(JP.open)closeJP();
   TD.view=v;document.getElementById('toolsDr').hidden=false;document.getElementById('tdTakt').hidden=v!=='takt';document.getElementById('tdBryg').hidden=v!=='bryg';document.getElementById('tdHub').hidden=v!=='hub';document.getElementById('tdAdm').hidden=v!=='adm';document.getElementById('tdMkAdm').hidden=v!=='mkadm';document.getElementById('tdMsgAdm').hidden=v!=='msgadm';document.getElementById('tdMk').hidden=v!=='mk';document.getElementById('toolsDr').classList.toggle('mkOn',v==='mk');
-  clearInterval(HUB.timer);clearInterval(MSA.timer);navMark();if(v==='takt')tkRender();else if(v==='hub'){hubRender();HUB.timer=setInterval(hubFill,30000)}else if(v==='adm')accAdminRender();else if(v==='mkadm'){MKA.view=null;mkAdmRender()}else if(v==='msgadm'){msgAdmRender();msgAdmLoad();MSA.timer=setInterval(()=>{if(TD.view==='msgadm')msgAdmLoad()},30000)}else if(v==='mk')mkOpen();else bgRender()}
+  clearInterval(HUB.timer);clearInterval(MSA.timer);navMark();if(v==='takt')tkRender();else if(v==='hub'){hubRender();HUB.timer=setInterval(hubFill,30000)}else if(v==='adm')accAdminRender();else if(v==='mkadm'){mkAdmRender()}else if(v==='msgadm'){msgAdmRender();msgAdmLoad();MSA.timer=setInterval(()=>{if(TD.view==='msgadm')msgAdmLoad()},30000)}else if(v==='mk')mkOpen();else bgRender()}
 function closeTool(){if(!TD.view)return;if(TD.view==='mk'){if(GUIDE.run&&GUIDE.run===MK.run)GUIDE.run=null;mkGps(false);mkMic(false);if(MK.fs)mkFull(false);mkOvr(false);clearInterval(MK.ibT)}TD.view=null;clearInterval(HUB.timer);clearInterval(MSA.timer);document.getElementById('toolsDr').hidden=true;navMark()}
 function tdTab(v){openTool(v)}
 document.getElementById('toolsSw').onchange=ev=>tdRail(ev.target.checked);
@@ -5583,7 +5583,8 @@ function accMode(m){const ok=accModes();const mk_='ztm.mode.'+(ACC.user?ACC.user
 async function accLogin(tok,quiet){tok=(tok||'').trim();if(!tok)return false;ACC.state='wait';accRender();
   try{const u=await accApi('konto',{tok});ACC.token=tok;store.set('ztm.token',tok);ACC.user=u;ACC.state='in';
     try{ACC.data=await accApi('konto/dane')||{}}catch(e){ACC.data={}}accClose();accShow();
-    if(quiet&&NAV0==='hub'&&!TD.view&&IDX&&!location.hash.slice(1))openTool('hub');   // (the Hub left open last time: opened again)
+    // (the section left open last time that needs the account – Hub, mKomputer, the administrator's – opened again)
+    {const v=NAV_PEND||(!location.hash.slice(1)&&NAV0)||'';if(quiet&&v&&IDX&&!TD.view){const b=document.querySelector(`[data-nav="${v}"]`);if(b&&!b.hidden){NAV_PEND='';b.click()}}}
     return true}
   catch(e){ACC.user=null;ACC.state=e.st===401?'bad':e.st===503||e.st===404||e.st===405?'nosrv':'net';
     if(e.st===401&&tok===ACC.token){ACC.token='';store.set('ztm.token','')}accShow();if(quiet&&e.st!==401)ACC.state='out';return false}}
@@ -5628,7 +5629,7 @@ async function accAdminLoad(){try{ACC.admin=await accApi('admin/konta')}catch(e)
 // the administrator's settings for every driver's mKomputer, in tiles: Zapowiedzi (voice, language, gong, English names –
 // "not set": the driver's choice, if the driver may), Komunikaty specjalne (in the city's language and a second one),
 // Uprawnienia (what the drivers may do)
-const MKA={view:null,msgs:null};
+const MKA={view:(()=>{try{return sessionStorage.getItem('ztm.mka')||null}catch(e){return null}})(),msgs:null};
 const mkCityL=()=>{const l=gdNameLang();return MK_L.includes(l)?l:'pl'};
 const mkPerm=()=>{const p=(ACC.user&&ACC.user.mk&&ACC.user.mk.perm)||{};return {ann:p.ann!==false,spec:p.spec!==false,mic:p.mic!==false,free:p.free!==false}};
 const optsH=(opts,cur)=>opts.map(([v,t])=>`<option value="${esc(v)}"${String(cur)===String(v)?' selected':''}>${esc(t)}</option>`).join('');
@@ -5662,7 +5663,7 @@ function admMkRender(){const A=document.getElementById('admMk');if(!A)return;con
     document.getElementById('admMAdd').onclick=()=>{if(D.length>=30)return;D.push(['','','','','']);admMkRender();const t=A.querySelectorAll(`.admMsgI textarea[data-ml="${ci}"]`);t[t.length-1]&&t[t.length-1].focus()};
     document.getElementById('admMSave').onclick=async()=>{if(await put({msgs:D.filter(m=>m.some(x=>x.trim()))})){MKA.msgs=null;admMkRender();document.getElementById('admSt').textContent=trS('Zapisano.')}};
     document.getElementById('admMDef').onclick=async()=>{if(await put({msgs:null})){MKA.msgs=null;admMkRender();document.getElementById('admSt').textContent=trS('Zapisano.')}}}
-  A.querySelectorAll('[data-mka]').forEach(b=>b.onclick=()=>{MKA.view=b.dataset.mka||null;MKA.msgs=null;admMkRender();A.scrollIntoView({block:'start'})})}
+  A.querySelectorAll('[data-mka]').forEach(b=>b.onclick=()=>{MKA.view=b.dataset.mka||null;try{sessionStorage.setItem('ztm.mka',MKA.view||'')}catch(e){}MKA.msgs=null;admMkRender();A.scrollIntoView({block:'start'})})}
 // the mKomputer's settings for every driver: a section of its own
 function mkAdmRender(){const A=document.getElementById('tdMkAdm');if(!A||TD.view!=='mkadm')return;if(!window.ACC_ADMIN){closeTool();return}
   A.innerHTML=`<h2>${esc(trS('Ustawienia mKomputera'))}</h2><div id="admMk"></div>`;admMkRender()}
