@@ -1139,11 +1139,11 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mk .chip{flex:none;font-weight:700}
 /* the run */
 .mkRun{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:var(--gap);padding:var(--gap)}
-.mkTop{display:flex;align-items:center;gap:calc(var(--u)*.8);background:var(--g);color:#fff;border-radius:6px;padding:calc(var(--u)*.4) calc(var(--u)*.8);min-width:0}
+.mkTop{display:flex;align-items:center;gap:calc(var(--u)*.9);background:var(--g);color:#fff;border-radius:6px;padding:calc(var(--u)*.8) calc(var(--u)*1);min-height:calc(var(--u)*5);min-width:0}
 .mkTop .mkLn{display:flex;flex:none}
-.mkTop .mkLn .chip{height:calc(var(--u)*2.7);min-width:calc(var(--u)*2.7);font-size:calc(var(--u)*1.5);box-shadow:0 0 0 2px rgba(255,255,255,.9)}
-.mkTop .mkLn .chip:not(.wide){width:calc(var(--u)*2.7);padding:0}.mkTop .mkLn .chip.wide{padding:0 calc(var(--u)*.5)}
-.mkHead{flex:1;min-width:0;font-size:calc(var(--u)*1.9);font-weight:800;line-height:1.1;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mkTop .mkLn .chip{height:calc(var(--u)*3.2);min-width:calc(var(--u)*3.2);font-size:calc(var(--u)*1.75);box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.mkTop .mkLn .chip:not(.wide){width:calc(var(--u)*3.2);padding:0}.mkTop .mkLn .chip.wide{padding:0 calc(var(--u)*.5)}
+.mkHead{flex:1;min-width:0;font-size:calc(var(--u)*2.2);font-weight:800;line-height:1.1;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mkPos,.mkClock{flex:none;font-size:calc(var(--u)*1.25);font-weight:600;font-variant-numeric:tabular-nums;opacity:.95}
 .mkPos{padding:2px calc(var(--u)*.5);border:1.5px solid rgba(255,255,255,.7);border-radius:999px}
 .mkTrack{height:4px;border-radius:2px;background:var(--line);overflow:hidden}.mkFill{display:block;height:100%;background:var(--g);transition:width .4s}
@@ -1151,10 +1151,6 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkMap{position:relative;min-height:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
 .mkMap canvas{flex:1;min-height:0;width:100%;display:block}
 .mkAttr{position:absolute;left:4px;top:4px;font-size:9px;line-height:1.5;color:var(--muted);background:color-mix(in srgb,var(--bg) 80%,transparent);padding:0 4px;border-radius:2px;pointer-events:none}
-.mkMapL{display:flex;align-items:center;gap:10px;padding:calc(var(--u)*.4) calc(var(--u)*.6);font-size:max(.85rem,calc(var(--u)*.95));border-top:1px solid var(--line);background:var(--bg)}
-.mkMapL .b{flex:1;min-width:0;display:flex;align-items:center;gap:.5em;font-weight:600;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mkMapL .b::before{content:"";flex:none;width:.8em;height:.8em;border-radius:50%;background:#ffcc00;box-shadow:0 0 0 1.5px #0b0d0c}
-.mkDist{flex:none;font-style:normal;font-weight:800;font-variant-numeric:tabular-nums}
 /* the stops: the four after the next one, the next / present one (larger), the one before (grey) */
 .mkStops{list-style:none;margin:0;padding:0;display:grid;grid-template-rows:repeat(4,minmax(0,1fr)) minmax(0,1.45fr) minmax(0,1fr);gap:var(--gap);min-height:0;min-width:0}
 .mkStops li{min-height:0;min-width:0;display:flex}.mkStops li.none{visibility:hidden}
@@ -1174,12 +1170,14 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkBar button[aria-pressed=false]{background:var(--panel);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
 .mkBar .mkMicOn{background:#c62828;animation:mkPulse 1.2s infinite}@keyframes mkPulse{50%{opacity:.6}}
 .mkBadge{position:absolute;top:-5px;right:-5px;min-width:1.6em;height:1.6em;border-radius:.8em;background:#e53935;color:#fff;font:700 max(.7rem,calc(var(--u)*.7))/1.6em Roboto,sans-serif;padding:0 .35em;text-align:center}
-.mkGps{flex:1;min-width:0;display:flex;align-items:center;gap:.6em;padding:0 calc(var(--u)*.8);border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:calc(var(--u)*1.1);font-weight:600;white-space:nowrap;overflow:hidden}
-.mkGps i{flex:none;width:.8em;height:.8em;border-radius:50%;background:var(--muted)}.mkGps.ok i{background:#2e9d4f}.mkGps.weak i{background:#f0a400}.mkGps.wait i{background:#f0a400;animation:mkPulse 1s infinite}
-.mkGps span{overflow:hidden;text-overflow:ellipsis}.mkGps.off{color:var(--muted)}
+.mkBar .mkGps{min-width:calc(var(--u)*4);background:var(--panel);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.mkBar .mkGps.ok{background:#2e9d4f;color:#fff;box-shadow:none}.mkBar .mkGps.weak{background:#f0a400;color:#231a00;box-shadow:none}.mkBar .mkGps.wait{color:#f0a400;animation:mkPulse 1s infinite}
+.mkStat{flex:1;min-width:0;display:flex;align-items:center;gap:calc(var(--u)*1.6);padding:0 calc(var(--u)*.9);border:1px solid var(--line);border-radius:6px;background:var(--panel);overflow:hidden;white-space:nowrap}
+.mkStat span{display:flex;align-items:baseline;gap:.5em;min-width:0}.mkStat small{color:var(--muted);font-size:max(.7rem,calc(var(--u)*.75));text-transform:uppercase;letter-spacing:.04em}
+.mkStat b{font-size:calc(var(--u)*1.25);font-weight:700;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
 .mkLate{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:calc(var(--u)*8.5);padding:0 calc(var(--u)*.8);border-radius:6px;background:#2e9d4f;color:#fff}
 .mkLate small{font-size:max(.6rem,calc(var(--u)*.55));text-transform:uppercase;letter-spacing:.04em;opacity:.9;white-space:nowrap}
-.mkLate b{font-size:calc(var(--u)*1.75);font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums}.mkLate.l{background:#c62828}.mkLate.e{background:#1565c0}
+.mkLate b{font-size:calc(var(--u)*2);font-weight:800;line-height:1.05;font-variant-numeric:tabular-nums}.mkLate.l{background:#c62828}.mkLate.e{background:#1565c0}
 /* the panes over the map and the stops: the menu, the special announcements, the messages */
 .mkMsgs{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;gap:calc(var(--u)*.6);overflow:auto;padding:calc(var(--u)*.7);background:var(--bg);border:1px solid var(--line);border-radius:6px}
 .mkMH{display:flex;align-items:center;gap:10px}.mkMH h3{margin:0;font-size:max(1.1rem,calc(var(--u)*1.3))}
@@ -1243,7 +1241,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 @media (max-width:760px){
   .mkWrap{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,.62fr) minmax(0,1fr)}
   .mk{--u:clamp(9px,min(1.55vh,3vw),16px)}
-  .mkBar{height:calc(var(--u)*4.4)}.mkBar button{min-width:0;flex:1 1 0}.mkBar .mkMenuB span{display:none}.mkGps{flex:2 1 0;padding:0 8px}.mkLate{min-width:0;flex:2 1 0}.mkLate small{display:none}
+  .mkBar{height:calc(var(--u)*4.4)}.mkBar button{min-width:0;flex:1 1 0;padding:0 4px}.mkBar .mkMenuB span{display:none}.mkStat{flex:3 1 0;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;padding:0 8px}.mkStat b{font-size:.9rem}.mkLate{min-width:0;flex:2 1 0;padding:0 4px}.mkLate b{font-size:clamp(.95rem,4.6vw,1.25rem)}.mkStat small{font-size:.65rem}
   .mkClock{display:none}
   .mkSLine{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
   .mkSteps span{display:none}.mkSteps li.on span{display:inline}.mkSteps button{padding-right:.35em}.mkSteps li.on button{padding-right:.8em}
@@ -5925,7 +5923,7 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
     <div class="mkTop"><span class="mkLn"></span><b class="mkHead"></b><span class="mkPos"></span><span class="mkClock"></span></div>
     <div class="mkTrack"><i class="mkFill"></i></div>
     <div class="mkWrap">
-      <div class="mkMap"><canvas aria-hidden="true"></canvas><small class="mkAttr">© OpenStreetMap · © CARTO</small><div class="mkMapL"><span class="b"></span><em class="mkDist"></em></div></div>
+      <div class="mkMap"><canvas aria-hidden="true"></canvas><small class="mkAttr">© OpenStreetMap · © CARTO</small></div>
       <ol class="mkStops">${[0,1,2,3,4,5].map(i=>`<li><button type="button" data-row="${i}"><span class="t"></span><b></b><i></i></button></li>`).join('')}</ol>
       <div class="mkMsgs mkPane" data-pane="spec" hidden><div class="mkMH"><h3>${esc(trS('Komunikaty specjalne'))}</h3></div><div class="mkSL">${mkMsgs().map((m,i)=>`<button type="button" class="mkSB" data-msg="${i}"><b>${i+1}</b><span>${esc(m[MK_L.indexOf(mkCityL())]||m.find(Boolean)||'')}</span></button>`).join('')}</div></div>
       <div class="mkMsgs mkPane" data-pane="inbox" hidden></div><div class="mkMsgs mkPane" data-pane="menu" hidden></div>
@@ -5935,10 +5933,12 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
       <button type="button" data-mk="inbox" class="mkInbox" title="${esc(trS('Wiadomości od administratora'))}" aria-label="${esc(trS('Wiadomości od administratora'))}">${I('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>')}<b class="mkBadge" hidden></b></button>
       <button type="button" data-mk="voice" aria-pressed="${MK.voice}" title="${esc(trS(MK.voice?'Zapowiedzi: wł.':'Zapowiedzi: wył.'))}" aria-label="${esc(trS(MK.voice?'Zapowiedzi: wł.':'Zapowiedzi: wył.'))}">${I(MK.voice?'<path d="M3 10v4h3l5 4V6L6 10z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/>':'<path d="M3 10v4h3l5 4V6L6 10z"/><path d="m16 9 5 6M21 9l-5 6"/>')}</button>
       <button type="button" data-mk="mic" class="mkMicOn" hidden>${I('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>')}<span>${esc(trS('Mikrofon'))}</span></button>
-      <div class="mkGps"><i></i><span></span></div>
-      <div class="mkLate"><small>${esc(trS('Względem rozkładu'))}</small><b></b></div>
+      <button type="button" data-mk="gps" class="mkGps" aria-pressed="${MK.gpsOn}">${I('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/>')}</button>
+      <div class="mkStat"><span><small>${esc(trS('Brygada'))}</small><b class="mkDuty"></b></span><span><small>${esc(trS('Kierowca'))}</small><b class="mkDrv"></b></span></div>
+      <div class="mkLate"><b></b></div>
     </div></div>`;
   B.querySelector('.mkLn').replaceChildren(chip(R.r,'',true));B.querySelector('.mkHead').textContent=R.head;
+  B.querySelector('.mkDuty').textContent=R.duty||'–';B.querySelector('.mkDrv').textContent=ACC.user?ACC.user.id:'–';B.querySelector('.mkDrv').title=ACC.user?ACC.user.name:'';
   B.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mkAct(b.dataset.mk));
   B.querySelectorAll('[data-row]').forEach(b=>b.onclick=()=>{if(b.dataset.q!=null&&b.dataset.q!=='')mkTap(+b.dataset.q)});
   B.querySelectorAll('[data-msg]').forEach(b=>b.onclick=()=>{const m=mkMsgs()[+b.dataset.msg],cl=mkCityL(),l2=mkL2(),seg=[];const t1=m[MK_L.indexOf(cl)];if(t1)seg.push([t1,cl]);const t2=l2!==cl&&m[MK_L.indexOf(l2)];if(t2)seg.push([t2,l2]);if(!seg.length){const j=m.findIndex(Boolean);if(j>=0)seg.push([m[j],MK_L[j]])}mkSpeak(seg);B.querySelector('[data-pane=spec]').hidden=true});mkBadge();mkSideMark();
@@ -5974,8 +5974,7 @@ function mkMap(B,P,k,at,T,nowM){const C=B.querySelector('.mkMap canvas');if(!C)r
   if(hd==null){let a=G[si],b=null;for(let i=si+1;i<G.length;i++){if(mkDistM(a,G[i])>25){b=G[i];break}}if(!b){for(let i=si-1;i>=0;i--){if(mkDistM(G[i],a)>25){b=a;a=G[i];break}}}
     if(b){const pa=mkWm(a[0],a[1],MKM.z),pb=mkWm(b[0],b[1],MKM.z);hd=(Math.atan2(pb[0]-pa[0],-(pb[1]-pa[1]))*180/Math.PI+360)%360}else hd=MKM.ang||0}
   MKM.st={C,P,k,nx,last,me,G,si,sd,hd,gps:!!g,acc:g?MK.fix.acc:0,at};if(MKM.ang==null)MKM.ang=hd;
-  const L=B.querySelector('.mkMapL');L.querySelector('.b').textContent=P[nx][0];const dm=mkDistM(me,[P[nx][2],P[nx][3]]);L.querySelector('.mkDist').textContent=nx===k&&at?'':dm<1000?Math.round(dm/10)*10+' m':(dm/1000).toFixed(1).replace('.',',')+' km';
-  mkMapDraw()}
+    mkMapDraw()}
 function mkMapDraw(){const S=MKM.st;if(!S||!S.C.isConnected)return;const C=S.C,w=C.clientWidth,h=C.clientHeight;if(!w||!h)return;
   // (the turn eased: a part of the way to the new direction each frame)
   let df=((S.hd-MKM.ang+540)%360)-180;if(Math.abs(df)>.6){MKM.ang=(MKM.ang+df*.18+360)%360;cancelAnimationFrame(MKM.raf);MKM.raf=requestAnimationFrame(mkMapDraw)}else MKM.ang=S.hd;
@@ -6014,7 +6013,7 @@ function mkUpd(){const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.
   const ls=Math.round(late*60),aL=Math.abs(ls),L=B.querySelector('.mkLate');L.querySelector('b').textContent=(ls>0?'+':ls<0?'−':'')+Math.floor(aL/60)+':'+String(aL%60).padStart(2,'0');L.className='mkLate '+(ls>90?'l':ls<-60?'e':'');
   // the GPS
   const G=B.querySelector('.mkGps'),gs=!MK.gpsOn?'off':MK.fix?((MK.fix.acc||0)<=50?'ok':'weak'):'wait';G.className='mkGps '+gs;
-  G.querySelector('span').textContent=gs==='off'?trS('GPS wyłączony'):gs==='wait'?trS('Szukanie GPS…'):'GPS ±'+Math.round(MK.fix.acc||0)+' m';
+  G.title=G.ariaLabel=gs==='off'?trS('GPS wyłączony'):gs==='wait'?trS('Szukanie GPS…'):'GPS ±'+Math.round(MK.fix.acc||0)+' m';
   // the stops: from the top the four after the next one (the farthest first), the next / present one larger, under it the one before
   const rows=[j+4,j+3,j+2,j+1,j,j-1],bt=B.querySelectorAll('.mkStops button');
   rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last;b.parentNode.className=(i===4?'cur'+(at?' at':''):i===5?'prev':'nx')+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
@@ -6028,7 +6027,7 @@ async function mkMic(on){if(!on){if(MK.mic){try{MK.mic.st.getTracks().forEach(t=
     const ac=new (window.AudioContext||window.webkitAudioContext)();const src=ac.createMediaStreamSource(st),g=ac.createGain();g.gain.value=1.4;src.connect(g);g.connect(ac.destination);
     MK.mic={st,ac}}catch(e){MK.mic=null;const g=document.querySelector('#tdMk .mkGps span');if(g)g.textContent=trS('Brak dostępu do mikrofonu')}mkSideMark()}
 function mkSideMark(){const b=document.querySelector('#tdMk .mkMicOn');if(b)b.hidden=!MK.mic}
-function mkSaveRun(){const R=MK.run;store.set('ztm.mkRun',R?{c:city,id:R.r.id,ps:R.ps,off:R.off,t0:R.t0,head:R.head,p:R.p}:null)}
+function mkSaveRun(){const R=MK.run;store.set('ztm.mkRun',R?{c:city,id:R.r.id,ps:R.ps,off:R.off,t0:R.t0,head:R.head,p:R.p,duty:R.duty||null}:null)}
 function mkAct(a){const R=MK.run,B=document.getElementById('tdMk');if(!R)return;
   if(a==='mic'){mkMic(!MK.mic);return}
   if(a==='spec'||a==='inbox'||a==='menu'){B.querySelectorAll('[data-pane]').forEach(x=>{x.hidden=x.dataset.pane!==a||!x.hidden});if(a==='inbox')mkInbox();if(a==='menu')mkMenu('root');return}
@@ -6036,7 +6035,7 @@ function mkAct(a){const R=MK.run,B=document.getElementById('tdMk');if(!R)return;
   if(a==='gps'){MK.gpsOn=!MK.gpsOn;store.set('ztm.mkGps',MK.gpsOn);mkRender();return}
   if(a==='fs'){mkFull(!MK.fs);return}
   // (another run: the list of the same line's runs again; signing off: the computer from the start)
-  if(a==='chg'||a==='end'){MK.run=null;MK.sel=null;MKM.ang=null;mkMic(false);if(a==='end'){MK.pick=null;MK.duty=null}mkSaveRun();mkRender()}}
+  if(a==='chg'||a==='end'){MK.run=null;MK.sel=null;MKM.ang=null;mkMic(false);if(a==='end'){MK.pick=null;MK.duty=null;MK.dutyQ=null}mkSaveRun();mkRender()}}
 // full screen: the computer alone (the page's bars and the less needed lines hidden); where the browser has no full screen
 // for a page element (iPhone), the computer laid over the whole window instead
 function mkFull(on){MK.fs=on;const D=document.getElementById('toolsDr');D.classList.toggle('mkFs',on);document.documentElement.classList.toggle('mkFsOn',on);
@@ -6090,17 +6089,17 @@ function mkPickRender(B){const wm=trS('mKomputer'),FS=on=>on?'<path d="M9 4v5H4M
     L.forEach(r=>{const b=document.createElement('button');b.type='button';b.className='mkLb';const c=document.createElement('span');c.className='mkC';c.append(chip(r,'small',true));const t=document.createElement('span');t.className='mkLe';const e=r.ends||[];t.textContent=e.length?e[0]+(e[1]&&e[1]!==e[0]?' – '+e[1]:''):'';
       const a=document.createElement('span');a.className='mkGo';a.textContent='›';b.append(c,t,a);b.onclick=()=>duties(r);LN.append(b)})};
   // 2 – the line's duties of today (from the operator's duty data), else straight to its trips
-  const duties=async r=>{MK.pick=r;MK.duty=null;q.value=r.n;const src=BG_SRC[r.op];let Pl=null;if(src)try{Pl=await bgPlan(src,ymd(new Date()))}catch(e){}
+  const duties=async r=>{MK.pick=r;MK.duty=null;MK.dutyQ=null;q.value=r.n;const src=BG_SRC[r.op];let Pl=null;if(src)try{Pl=await bgPlan(src,ymd(new Date()))}catch(e){}
     const li0=Pl?Pl.L.indexOf(r.n):-1,D=li0<0?[]:Pl.B.filter(b=>b[2].some(t=>t[0]===li0)).map(b=>({b,lab:String(bgLabel(src,b,Pl))})).sort((x,y)=>x.lab.localeCompare(y.lab,'pl',{numeric:true}));
     hasDuty=!!D.length;if(!D.length){runs(r);return}
     head('duty',r,' '+trS('Wybierz brygadę'));const g=S('duty').querySelector('.mkDutyG');g.replaceChildren();
     D.forEach(({b,lab})=>{const bt=document.createElement('button');bt.type='button';const t0=Math.min(...b[2].map(t=>t[1])),t1=Math.max(...b[2].map(t=>t[3]));bt.innerHTML=`<b></b><small></small>`;bt.firstChild.textContent=lab;bt.lastChild.textContent=fmtT(t0)+'–'+fmtT(t1);bt.onclick=()=>{MK.duty=lab;dutyShow(r,src,Pl,b,'duty')};g.append(bt)});
     const all=S('duty').querySelector('.mkDutyAll');all.hidden=!mkPerm().free;all.onclick=()=>runs(r);step('duty')};
-  const start=(r,d)=>{MK.run={r,ps:d.ps,off:d.off,t0:d.t0,head:d.head,p:0};MKM.ang=null;mkSaveRun();mkRender();mkSay('at')};
+  const start=(r,d)=>{MK.run={r,ps:d.ps,off:d.off,t0:d.t0,head:d.head,p:0,duty:MK.duty||null};MKM.ang=null;mkSaveRun();mkRender();mkSay('at')};
   const back=(to,txt)=>{const b=S('trip').querySelector('.mkBack');b.textContent='‹ '+trS(txt);b.onclick=()=>{if(to==='duty'&&MK.pick)duties(MK.pick);else step('line')}};
   const mark=()=>{const f=RU.querySelector('li:not(.past):not(.mkDir)');if(f){f.classList.add('soon');f.scrollIntoView({block:'center'})}};
   // 3 – the line's trips of today, by direction
-  const runs=async r=>{MK.pick=r;MK.duty=null;head('trip',r,' '+trS('Wybierz kurs'));back(hasDuty?'duty':'line',hasDuty?'Brygada':'Linia');RU.replaceChildren();step('trip');const L=await lineRunsToday(r);const now=todayType().min;let last=-1;
+  const runs=async r=>{MK.pick=r;MK.duty=null;MK.dutyQ=null;head('trip',r,' '+trS('Wybierz kurs'));back(hasDuty?'duty':'line',hasDuty?'Brygada':'Linia');RU.replaceChildren();step('trip');const L=await lineRunsToday(r);const now=todayType().min;let last=-1;
     if(!L.length){RU.innerHTML=`<li class="mkNo">${esc(trS('Brak kursów'))}</li>`;return}
     L.forEach(d=>{if(d.di!==last){last=d.di;const h=document.createElement('li');h.className='mkDir';h.textContent='→ '+d.head;RU.append(h)}
       const li=document.createElement('li');if(d.t<now-1)li.className='past';const b=document.createElement('button');b.type='button';b.innerHTML=`<span class="t">${fmtT(d.t)}</span><span class="n"></span>`;b.lastChild.textContent=d.from+' → '+d.head;
@@ -6112,7 +6111,7 @@ function mkPickRender(B){const wm=trS('mKomputer'),FS=on=>on?'<path d="M9 4v5H4M
     const nb=x=>String(x).toUpperCase().replace(/^0+(?=\w)/,''),li0=Pl.L.indexOf(r.n),want=nb(m[2]);
     const b=Pl.B.find(b=>b[2].some(t=>t[0]===li0)&&(()=>{const lab=bgLabel(src,b,Pl),mm=String(lab).match(/([A-Za-z0-9]+)\D+([A-Za-z0-9]+)$/);return mm?nb(mm[2])===want&&nb(mm[1])===nb(r.n):nb(lab)===want})());
     if(!b){hint(trS('Nie ma takiej brygady dziś.'));return true}
-    hint('');MK.pick=r;MK.duty=v;dutyShow(r,src,Pl,b,'line');return true};
+    hint('');MK.pick=r;MK.duty=String(bgLabel(src,b,Pl));MK.dutyQ=v;dutyShow(r,src,Pl,b,'line');return true};
   // the duty's trips of today in order, each started as the line's run that leaves its first stop at that time
   const dutyShow=(r,src,Pl,b,from)=>{head('trip',null,trS('Brygada')+' '+bgLabel(src,b,Pl)+' – '+trS('wybierz kurs'));back(from,from==='duty'?'Brygada':'Linia');RU.replaceChildren();const now=todayType().min;
     const byLine={};for(const t of b[2]){const ln=Pl.L[t[0]],lr=lineIn(ln);const li=document.createElement('li');if(t[3]<now-1)li.className='past';const bt=document.createElement('button');bt.type='button';
@@ -6130,7 +6129,7 @@ function mkPickRender(B){const wm=trS('mKomputer'),FS=on=>on?'<path d="M9 4v5H4M
     K.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(k==='mode'){abc=!abc;draw();return}q.value=k==='clr'?'':k==='del'?q.value.slice(0,-1):(q.value+k).slice(0,10);q.oninput()})};
   draw();step('line');lines('');
   // (back from a run – "Zmień kurs": the line's duties or trips again)
-  const P=MK.pick;if(MK.duty&&/[\/.-]/.test(MK.duty)){q.value=MK.duty;q.oninput()}else if(P&&inCity(P))duties(P)}
+  const P=MK.pick;if(MK.dutyQ){q.value=MK.dutyQ;q.oninput()}else if(P&&inCity(P))duties(P)}
 {const k=store.get('ztm.mkRun',null);MK.restore=k}
 new MutationObserver(()=>{if(TD.view==='mk'&&MK.run)mkUpd()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 function mkOpen(){mkOvr(true);mkInboxLoad();clearInterval(MK.ibT);MK.ibT=setInterval(()=>{if(TD.view==='mk')mkInboxLoad();else clearInterval(MK.ibT)},60000);if(!MK.run&&MK.restore&&MK.restore.c===city){const r=IDX.routes.find(x=>x.id===MK.restore.id);if(r)MK.run={...MK.restore,r}}MK.restore=null;mkRender()}
