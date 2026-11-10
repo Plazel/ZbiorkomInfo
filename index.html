@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794343606;
+const APP_BUILD=1794343677;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3884,6 +3884,9 @@ function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II|III|Dolna|Górna|Wielka|Mała|Wyżna|Niżna|Dolny|Górny|Wielki|Mały|Wyżny|Niżny|Dolne|Górne|Wielkie|Małe|Wyżne|Niżne|Nowy|Stary|Nowa|Stara|Nowe|Stare)$/.test(rest)){n=p+', '+rest;break}}}   // (Krynica Dolna, Łabowa Górna, Milik Niżny: one name)
   if(nl==='pl')n=n.replace(/\sII$/,' dwa').replace(/\sI$/,' jeden');
+  // (Polish abbreviations said in full: "dw." dworzec, "aut." autobusowy – "Dw. aut." dworzec autobusowy –, "przyst." przystanek)
+  if(nl==='pl'){const cap=(w,c)=>c===c.toUpperCase()?w[0].toUpperCase()+w.slice(1):w;n=n.replace(/(^|[^\p{L}])([Dd])w\.\s*/gu,(m,a,c)=>a+cap('dworzec',c)+' ')
+    .replace(/(^|[^\p{L}])([Aa])ut\.\s*/gu,(m,a,c)=>a+cap('autobusowy',c)+' ').replace(/(^|[^\p{L}])([Pp])rzyst\.\s*/gu,(m,a,c)=>a+cap('przystanek',c)+' ').replace(/\s{2,}/g,' ').trim()}
   // (German names: the abbreviations said in full – Flensburg: "Förde-Park Abzweigung", "Sankt Pauli", "Park and Ride Exe",
   // "Krusau, Dänemark", "Handelslehranstalt, Wirtschaftsschule")
   if(nl==='de')n=n.replace(/\bAbzw\./g,'Abzweigung').replace(/\bSt\.(-?)\s*/g,(m,h)=>'Sankt'+(h||' ')).replace(/\bP\+R\b/g,'Park and Ride')
