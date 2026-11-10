@@ -1,0 +1,48 @@
+name: Strona
+
+# Publishing the site on GitHub Pages, one run at a time: a newer push cancels the run still going (so a push soon after another
+# does not fail with "in progress deployment"). Works once Settings → Pages → Source is "GitHub Actions"; until then it ends at
+# once without doing anything (the old "pages build and deployment" publishes).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      on: ${{ steps.t.outputs.on }}
+    steps:
+      - id: t
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          t=$(gh api "repos/${{ github.repository }}/pages" --jq .build_type 2>/dev/null || echo none)
+          echo "build_type=$t"
+          if [ "$t" = "workflow" ]; then echo "on=1" >> "$GITHUB_OUTPUT"; else echo "on=0" >> "$GITHUB_OUTPUT"; fi
+  deploy:
+    needs: check
+    if: needs.check.outputs.on == '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: d
+        uses: actions/deploy-pages@v4
