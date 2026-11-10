@@ -1216,7 +1216,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 /* the bottom bar */
 .mkBar{display:flex;align-items:stretch;gap:var(--gap);min-width:0;height:calc(var(--u)*4)}
 .mkBar button{flex:none;position:relative;display:flex;align-items:center;justify-content:center;gap:.5em;min-width:calc(var(--u)*4.6);padding:0 calc(var(--u)*.8);border:0;border-radius:0;background:var(--g);color:#fff;font-weight:800;font-size:calc(var(--u)*1.1)}
-.mkBar button svg{width:calc(var(--u)*1.9);height:calc(var(--u)*1.9);flex:none}.mkLAnn svg{transform:translateX(-22%)}.mkLAc{position:absolute;left:52%;top:50%;transform:translateY(-15%);pointer-events:none;line-height:1}.mkLAc>*{animation:none!important;transform:none!important;box-shadow:0 0 0 2px #fff}
+.mkBar button svg{width:calc(var(--u)*1.9);height:calc(var(--u)*1.9);flex:none}
 .mkBar button:disabled{background:var(--panel);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line);cursor:not-allowed;opacity:.6}
 .mkBar button[aria-pressed=false]{background:var(--panel);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
 .mkBar .mkMicOn{background:#c62828;animation:mkPulse 1.2s infinite}@keyframes mkPulse{50%{opacity:.6}}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794352316;
+const APP_BUILD=1794352537;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6135,14 +6135,14 @@ function mkRender(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1
     <div class="mkBar">
       <button type="button" data-mk="menu" class="mkMenuB">${I('<rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M8.5 8h7M8.5 12h7M8.5 16h7"/>')}<span>MENU</span></button>
       <button type="button" data-mk="inbox" class="mkInbox" title="${esc(trS('Wiadomości od administratora'))}" aria-label="${esc(trS('Wiadomości od administratora'))}">${I('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>')}<b class="mkBadge" hidden></b></button>
-      <button type="button" data-mk="lann" class="mkLAnn" title="${esc(trS('Zapowiedź linii i kierunku'))}" aria-label="${esc(trS('Zapowiedź linii i kierunku'))}">${I('<path d="M3 10v4a1 1 0 0 0 1 1h2l6 4V5L6 9H4a1 1 0 0 0-1 1z"/><path d="M15.5 9a4 4 0 0 1 0 6"/>')}<span class="mkLAc"></span></button><button type="button" data-mk="spec"${mkPerm().spec?'':' disabled aria-disabled="true"'} title="${esc(trS('Komunikaty specjalne'))}" aria-label="${esc(trS('Komunikaty specjalne'))}">${I('<path d="M3 11v3a1 1 0 0 0 1 1h2l6 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M17 8v5M17 16v.5"/>')}</button>
+      <button type="button" data-mk="lann" class="mkLAnn" title="${esc(trS('Zapowiedź linii i kierunku'))}" aria-label="${esc(trS('Zapowiedź linii i kierunku'))}">${I('<path d="M2 9.5v4a1 1 0 0 0 1 1h2l5.5 4V5L5 8.5H3a1 1 0 0 0-1 1z"/><path d="M13 9a3.6 3.6 0 0 1 0 5"/><circle cx="18" cy="16.5" r="5.6" fill="currentColor" stroke="var(--g)" stroke-width="1.6"/><text x="18" y="19.3" text-anchor="middle" font-size="8.2" font-weight="900" font-family="Roboto,Arial,sans-serif" fill="var(--g)" stroke="none">6</text>')}</button><button type="button" data-mk="spec"${mkPerm().spec?'':' disabled aria-disabled="true"'} title="${esc(trS('Komunikaty specjalne'))}" aria-label="${esc(trS('Komunikaty specjalne'))}">${I('<path d="M3 11v3a1 1 0 0 0 1 1h2l6 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M17 8v5M17 16v.5"/>')}</button>
       <button type="button" data-mk="voice" aria-pressed="${MK.voice}" title="${esc(trS(MK.voice?'Zapowiedzi: wł.':'Zapowiedzi: wył.'))}" aria-label="${esc(trS(MK.voice?'Zapowiedzi: wł.':'Zapowiedzi: wył.'))}">${I(MK.voice?'<path d="M3 10v4h3l5 4V6L6 10z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/>':'<path d="M3 10v4h3l5 4V6L6 10z"/><path d="m16 9 5 6M21 9l-5 6"/>')}</button>
       <button type="button" data-mk="mic" class="mkMicOn" hidden>${I('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>')}<span>${esc(trS('Mikrofon'))}</span></button>
       <button type="button" data-mk="gps" class="mkGps" aria-pressed="${MK.gpsOn}">${I('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7"/>')}</button>
       <div class="mkStat"><span><small>${esc(trS('Brygada'))}</small><b class="mkDuty"></b></span><span><small>${esc(trS('Kierowca'))}</small><b class="mkDrv"></b></span></div>
       <div class="mkLate"><b></b></div>
     </div></div>`;
-  B.querySelector('.mkLn').replaceChildren(chip(R.r,'',true));{const c=B.querySelector('.mkLAc');if(c)c.replaceChildren(chip(R.r,'small',true))}B.querySelector('.mkHead').textContent=R.head;
+  B.querySelector('.mkLn').replaceChildren(chip(R.r,'',true));B.querySelector('.mkHead').textContent=R.head;
   {const sv=`<svg viewBox="-11.6 -11.6 23.2 23.2">${(()=>{const k=symKey(R.r);return symSVG({t:k.t,cs:[k.c]},0)})()}</svg>`;B.querySelectorAll('.mkStops .sym').forEach(e=>e.innerHTML=sv)}
   B.querySelector('.mkDuty').textContent=R.duty||'–';B.querySelector('.mkDrv').textContent=ACC.user?ACC.user.id:'–';B.querySelector('.mkDrv').title=ACC.user?ACC.user.name:'';
   B.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mkAct(b.dataset.mk));
