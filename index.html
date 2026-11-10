@@ -59,7 +59,7 @@ select.sselN{display:none!important}
 :root{
   --bg:#ffffff; --fg:#1f2a37; --muted:#5d6977; --line:#e3e7ec; --panel:#f4f6f9; --stripe:#f2f4f7;
   --chip-grey:#8a929b; --chip-grey-fg:#ffffff; --night:#22262b; --night-fg:#ffffff; --nightline:#000000;
-  --head:#444b56; --head-fg:#ffffff; --hlbg:#ffe27a; --hand:#000000; --mapgrey:#a3abb5; --accent:var(--brand,#d71920); --now:#fbd9c4; --dot:var(--brand,#d71920);
+  --head:#444b56; --head-fg:#ffffff; --hlbg:#ffe27a; --hand:#000000; --mapgrey:#a3abb5; --accent:var(--brand,#d71920); --now:#fbd9c4; --dot:#d71920;
   --focus:#f5b400;
   --bm-land:#f5f3ef; --bm-urban:#eee8e0; --bm-ind:#ebe8e5; --bm-green:#dcebd3; --bm-wood:#d2e5ca; --bm-beach:#f3ead2; --bm-water:#cde2ee;
   --bm-r1:#f4dcb8; --bm-r2:#f9eedb; --bm-r3:#ffffff; --bm-r4:#ffffff; --bm-rail:#c3bfcc;
@@ -70,7 +70,7 @@ select.sselN{display:none!important}
 :root[data-theme="dark"]{
   --bg:#14181d; --fg:#e7ebf0; --muted:#9aa5b2; --line:#2a3139; --panel:#1c2229; --stripe:#1a1f25;
   --chip-grey:#5d656e; --chip-grey-fg:#f2f4f6; --night:#000000; --night-fg:#f2f4f6; --nightline:#d5dae0;
-  --head:#2b323b; --head-fg:#f2f4f6; --hlbg:#6e5a10; --hand:#f2f4f6; --mapgrey:#5b6470; --accent:var(--brand,#d71920); --now:#5a3420; --dot:var(--brand,#d71920); color-scheme:dark;
+  --head:#2b323b; --head-fg:#f2f4f6; --hlbg:#6e5a10; --hand:#f2f4f6; --mapgrey:#5b6470; --accent:var(--brand,#d71920); --now:#5a3420; --dot:#d71920; color-scheme:dark;
   --bm-land:#1b2026; --bm-urban:#21272e; --bm-ind:#20242a; --bm-green:#1d2922; --bm-wood:#1b2820; --bm-beach:#2a2820; --bm-water:#172836;
   --bm-r1:#3f3b33; --bm-r2:#363a3f; --bm-r3:#2c3238; --bm-r4:#272d33; --bm-rail:#3d4049;}
 
@@ -896,7 +896,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .jpPt:focus-within{border-color:var(--fg)}
 .jpPt input{flex:1;border:0;outline:0;background:none;font:inherit;font-size:.95rem;color:var(--fg);padding:6px 2px;min-width:0}
 .jpDot{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:.7rem;font-weight:700;color:#fff;flex:none}
-.jpDot.a{background:#1f9a3e}.jpDot.b{background:var(--brand,#d71920)}
+.jpDot.a{background:#1f9a3e}.jpDot.b{background:#d71920}
 .jpIcon{border:0;background:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:6px;display:grid;place-items:center}.jpIcon:hover{background:var(--panel);color:var(--fg)}
 .jpSwap{border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:50%;width:36px;height:36px;cursor:pointer;display:grid;place-items:center}
 .jpAc{position:absolute;left:0;right:44px;top:100%;margin-top:4px;z-index:5}
@@ -6296,7 +6296,7 @@ function jpDraw(){const cv=document.getElementById('jpCv');if(!JP.open||!cv)retu
       const r=T.r;const col=r.t==='night'?'#22262b':(r.f||r.t==='rail')?colOf(r):'#6b7480';
       line(pts,'#fff',8);line(pts,col,5);stp.forEach((p,i)=>dot(p,i===0||i===stp.length-1?5:2.6,'#fff',col))})}
   const pin=(P0,col,t)=>{if(!P0)return;const p=proj(P0.lat,P0.lon);dot(p,11,col,'#fff');ctx.fillStyle='#fff';ctx.font=`700 ${11*px}px Roboto,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,p[0],p[1]+.5*px)};
-  pin(JP.from,'#1f9a3e','A');pin(JP.to,getComputedStyle(document.documentElement).getPropertyValue('--brand').trim()||'#d71920','B')}
+  pin(JP.from,'#1f9a3e','A');pin(JP.to,'#d71920','B')   /* (A and B: always green and red, whatever the account's mode) */}
 // the course of a ride along the streets or tracks: the direction's shape between the stops (straight only where it has none)
 function jpLegPts(N,l){const T=N.trips[l.T];const st=[];for(let j=l.bc-T.c0;j<=l.ec-T.c0+1;j++)st.push(T.st[j]);
   {const M=MAP.data&&MAP.data.routes&&MAP.data.routes[T.r.id];const a=N.sid[st[0]],b=N.sid[st[st.length-1]];
