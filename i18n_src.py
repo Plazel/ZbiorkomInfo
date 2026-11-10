@@ -786,6 +786,7 @@ ROWS = [
     ("Brygady powstają same z odjazdów linii. Aby je zmieniać ręcznie, wyłącz tworzenie automatyczne.", "The duties are made from the line departures. To change them by hand, turn automatic making off.", "Die Umläufe entstehen aus den Abfahrten der Linien. Um sie von Hand zu ändern, schalte die automatische Erstellung aus.", "Turnusy vznikajú z odchodov liniek. Ak ich chcete meniť ručne, vypnite automatické vytváranie.", "Oběhy vznikají z odjezdů linek. Chcete-li je měnit ručně, vypněte automatické vytváření."),
     ("Wybierz brygadę.", "Choose a duty.", "Wähle einen Umlauf.", "Vyberte turnus.", "Vyberte oběh."),
     ("Nie udało się wczytać sieci z serwera, więc zapis jest wstrzymany, żeby nie nadpisać zapisanych linii. Wdróż najnowszy worker.js i odśwież stronę.", "The network could not be read from the server, so saving is paused so as not to overwrite the saved lines. Deploy the newest worker.js and reload the page.", "Das Netz konnte nicht vom Server geladen werden, daher ist das Speichern angehalten, um die gespeicherten Linien nicht zu überschreiben. Stelle die neueste worker.js bereit und lade die Seite neu.", "Sieť sa nepodarilo načítať zo servera, preto je ukladanie pozastavené, aby sa neprepísali uložené linky. Nasaďte najnovší worker.js a obnovte stránku.", "Síť se nepodařilo načíst ze serveru, proto je ukládání pozastaveno, aby se nepřepsaly uložené linky. Nasaďte nejnovější worker.js a obnovte stránku."),
+    ("Brak wiadomości", "No messages", "Keine Nachrichten", "Žiadne správy", "Žádné zprávy"),
 ]
 
 WEEKDAYS = {
