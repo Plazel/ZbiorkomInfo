@@ -646,6 +646,7 @@ ROWS = [
     ("Wiadomości", "Messages", "Nachrichten", "Správy", "Zprávy"),
     ("To ustawienia domyślne kierowców; mogą je zmienić u siebie (Uprawnienia).", "These are the drivers' defaults; they may change them for themselves (Permissions).", "Dies sind die Standardeinstellungen der Fahrer; sie dürfen sie für sich ändern (Berechtigungen).", "Toto sú predvolené nastavenia vodičov; môžu si ich zmeniť (Oprávnenia).", "Toto jsou výchozí nastavení řidičů; mohou si je změnit (Oprávnění)."),
     ("zablokowane przez administratora", "locked by the administrator", "vom Administrator gesperrt", "zablokované administrátorom", "zablokováno administrátorem"),
+    ("Serwer nie zapisał tego ustawienia – wdróż najnowszy worker.js.", "The server did not save this setting – deploy the latest worker.js.", "Der Server hat diese Einstellung nicht gespeichert – aktuelle worker.js bereitstellen.", "Server toto nastavenie neuložil – nasaďte najnovší worker.js.", "Server toto nastavení neuložil – nasaďte nejnovější worker.js."),
 ]
 
 WEEKDAYS = {

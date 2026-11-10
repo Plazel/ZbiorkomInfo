@@ -143,7 +143,8 @@ async function konta(req, env, cors) {
   // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
   if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role, mk: await env.KONTA.get('cfg:mk', 'json') });
   // the administrator's messages: those for this account, newest first; fetching marks them delivered, opening read
-  const forMe = x => x.to === '*' ? u.role === 'driver' : Array.isArray(x.to) && x.to.includes(u.id);
+  // ("every driver": the administrators too, who can use the drivers' mode)
+  const forMe = x => x.to === '*' ? u.role === 'driver' || u.role === 'admin' : Array.isArray(x.to) && x.to.includes(u.id);
   const mine = x => { const s = (x.st || {})[u.id] || {}; return { id: x.id, t: x.t, text: x.text, from: x.from, ack: !!x.ack, r: s.r || null, c: s.c || null }; };
   if (p === '/konto/komunikaty' && req.method === 'GET') {
     const L = (await env.KONTA.get('msg:list', 'json')) || [], now = new Date().toISOString(); let ch = false;
