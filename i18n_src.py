@@ -777,6 +777,8 @@ ROWS = [
     ("Górny wiersz zmniejszono, by się zmieścił.", "The upper row was made smaller to fit.", "Die obere Zeile wurde verkleinert, damit sie passt.", "Horný riadok sa zmenšil, aby sa zmestil.", "Horní řádek byl zmenšen, aby se vešel."),
     ("Napis zmniejszono, by się zmieścił.", "The text was made smaller to fit.", "Der Text wurde verkleinert, damit er passt.", "Nápis sa zmenšil, aby sa zmestil.", "Nápis byl zmenšen, aby se vešel."),
     ("Tekst nie mieści się na tablicy i został ucięty. Skróć go, np. „NÁM.” zamiast „NÁMESTIE”.", "The text does not fit and was cut. Shorten it, e.g. “NÁM.” for “NÁMESTIE”.", "Der Text passt nicht und wurde abgeschnitten. Kürze ihn, z. B. „NÁM.“ statt „NÁMESTIE“.", "Text sa nezmestí a bol orezaný. Skráťte ho, napr. „NÁM.“ namiesto „NÁMESTIE“.", "Text se nevejde a byl oříznut. Zkraťte ho, např. „NÁM.“ místo „NÁMESTIE“."),
+    ("Trwa aktualizacja ZbiorkomInfo…", "Updating ZbiorkomInfo…", "ZbiorkomInfo wird aktualisiert…", "Prebieha aktualizácia ZbiorkomInfo…", "Probíhá aktualizace ZbiorkomInfo…"),
+    ("Wczytujemy najnowszą wersję. Strona odświeży się sama.", "Loading the newest version. The page will reload by itself.", "Die neueste Version wird geladen. Die Seite lädt sich selbst neu.", "Načítavame najnovšiu verziu. Stránka sa obnoví sama.", "Načítáme nejnovější verzi. Stránka se obnoví sama."),
 ]
 
 WEEKDAYS = {
