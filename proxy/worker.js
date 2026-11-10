@@ -146,25 +146,28 @@ async function konta(req, env, cors) {
   if (p.startsWith('/admin/')) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
-    const newToken = async id => { const t = newTok(); await env.KONTA.put('t:' + await sha(t), id);
-      const a = await env.KONTA.get('u:' + id, 'json'); if (a && a.th) await env.KONTA.delete('t:' + a.th); return { t, th: await sha(t) }; };
+    // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
+    const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created } });
+    const newToken = async a => { const t = newTok(), th = await sha(t), old = a.th; a.th = th;
+      await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old ? env.KONTA.delete('t:' + old) : null]); return t; };
     if (!m[1] && req.method === 'GET') {
-      const out = []; let cur;
-      do { const l = await env.KONTA.list({ prefix: 'u:', cursor: cur }); for (const k of l.keys) { const a = await env.KONTA.get(k.name, 'json'); if (a) out.push({ id: a.id, name: a.name, role: a.role, created: a.created }); } cur = l.list_complete ? null : l.cursor; } while (cur);
-      return J(out.sort((a, b) => (a.created || '').localeCompare(b.created || '')));
+      const keys = []; let cur;
+      do { const l = await env.KONTA.list({ prefix: 'u:', cursor: cur }); keys.push(...l.keys); cur = l.list_complete ? null : l.cursor; } while (cur);
+      const out = await Promise.all(keys.map(async k => { const a = k.metadata && k.metadata.name ? k.metadata : await env.KONTA.get(k.name, 'json');
+        return a ? { id: k.name.slice(2), name: a.name, role: a.role, created: a.created } : null; }));
+      return J(out.filter(Boolean).sort((a, b) => (a.created || '').localeCompare(b.created || '')));
     }
     if (!m[1] && req.method === 'POST') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       const name = String(b.name || '').trim().slice(0, 60), role = ROLES.includes(b.role) ? b.role : 'user';
       if (!name) return J({ error: 'name' }, 400);
-      const id = b64u(crypto.getRandomValues(new Uint8Array(9))).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12).padEnd(8, '0');
-      const a = { id, name, role, created: new Date().toISOString() }; await env.KONTA.put('u:' + id, JSON.stringify(a));
-      const nt = await newToken(id); a.th = nt.th; await env.KONTA.put('u:' + id, JSON.stringify(a));
-      return J({ id, name, role, token: nt.t });
+      const id = newTok(10), a = { id, name, role, created: new Date().toISOString() };
+      const token = await newToken(a);
+      return J({ id, name, role, created: a.created, token });
     }
     const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a) return J({ error: 'not found' }, 404);
-    if (m[2] && req.method === 'POST') { const nt = await newToken(a.id); a.th = nt.th; await env.KONTA.put('u:' + a.id, JSON.stringify(a)); return J({ id: a.id, token: nt.t }); }
-    if (!m[2] && req.method === 'DELETE') { if (a.th) await env.KONTA.delete('t:' + a.th); await env.KONTA.delete('u:' + a.id); await env.KONTA.delete('d:' + a.id); return J({ ok: true }); }
+    if (m[2] && req.method === 'POST') return J({ id: a.id, token: await newToken(a) });
+    if (!m[2] && req.method === 'DELETE') { await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id)]); return J({ ok: true }); }
   }
   return J({ error: 'not found' }, 404);
 }

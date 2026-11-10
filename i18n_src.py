@@ -534,6 +534,10 @@ ROWS = [
     ("Dodaj rozkład przyciskiem ☆ na stronie rozkładu przystanku.", "Add a timetable with the ☆ button on a stop's timetable page.", "Fügen Sie einen Fahrplan mit der Schaltfläche ☆ auf der Fahrplanseite einer Haltestelle hinzu.", "Pridajte cestovný poriadok tlačidlom ☆ na stránke cestovného poriadku zastávky.", "Přidejte jízdní řád tlačítkem ☆ na stránce jízdního řádu zastávky."),
     ("Pełny rozkład", "Full timetable", "Ganzer Fahrplan", "Celý cestovný poriadok", "Celý jízdní řád"),
     ("Mini rozkład w Hubie", "Mini timetable in the Hub", "Mini-Fahrplan im Hub", "Mini cestovný poriadok v Hube", "Mini jízdní řád v Hubu"),
+    ("Panel ustawień", "Settings panel", "Einstellungen", "Panel nastavení", "Panel nastavení"),
+    ("Zarządzanie kontami", "Account management", "Kontenverwaltung", "Správa účtov", "Správa účtů"),
+    ("Tokeny kont tworzą się same. Token pokazuje się tylko raz: przekaż go osobie, dla której jest konto (albo link, który loguje).", "Account tokens are created automatically. A token is shown only once: give it to the person the account is for (or the link that logs in).", "Konto-Token werden automatisch erstellt. Ein Token wird nur einmal angezeigt: Geben Sie es der Person, für die das Konto ist (oder den Anmeldelink).", "Tokeny účtov sa vytvárajú samy. Token sa zobrazí len raz: odovzdajte ho osobe, pre ktorú je účet (alebo odkaz, ktorý prihlási).", "Tokeny účtů se vytvářejí samy. Token se zobrazí jen jednou: předejte ho osobě, pro kterou je účet (nebo odkaz, který přihlásí)."),
+    ("Tworzenie…", "Creating…", "Wird erstellt…", "Vytvára sa…", "Vytváří se…"),
 ]
 
 WEEKDAYS = {
