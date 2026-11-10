@@ -570,6 +570,15 @@ ROWS = [
     ("Zapowiedzi: wył.", "Announcements: off", "Ansagen: aus", "Hlásenia: vyp.", "Hlášení: vyp."),
     ("Mikrofon", "Microphone", "Mikrofon", "Mikrofón", "Mikrofon"),
     ("Brak dostępu do mikrofonu", "No access to the microphone", "Kein Zugriff auf das Mikrofon", "Bez prístupu k mikrofónu", "Bez přístupu k mikrofonu"),
+    ("Personalizacja", "Personalisation", "Personalisierung", "Prispôsobenie", "Přizpůsobení"),
+    ("Więcej", "More", "Mehr", "Viac", "Více"),
+    ("Wybierz, co ma być na pasku, co w menu „Więcej”, a czego nie pokazywać. Strzałkami zmienisz kolejność (albo przytrzymaj i przeciągnij ikonę na samym pasku).", "Choose what is on the bar, what goes into the “More” menu and what is hidden. The arrows change the order (or hold and drag an icon on the bar itself).", "Wählen Sie, was in der Leiste steht, was ins Menü „Mehr“ kommt und was ausgeblendet wird. Mit den Pfeilen ändern Sie die Reihenfolge (oder halten und ziehen Sie ein Symbol in der Leiste).", "Vyberte, čo bude na lište, čo v ponuke „Viac“ a čo skryť. Šípkami zmeníte poradie (alebo podržte a potiahnite ikonu priamo na lište).", "Vyberte, co bude na liště, co v nabídce „Více“ a co skrýt. Šipkami změníte pořadí (nebo podržte a přetáhněte ikonu přímo na liště)."),
+    ("Gdy brakuje miejsca na pasku, przenoś ostatnie pozycje do menu „Więcej”", "When the bar has no room, move the last items into the “More” menu", "Wenn die Leiste zu voll ist, die letzten Einträge ins Menü „Mehr“ verschieben", "Keď na lište chýba miesto, presuň posledné položky do ponuky „Viac“", "Když na liště chybí místo, přesuň poslední položky do nabídky „Více“"),
+    ("Przywróć domyślne", "Restore defaults", "Standard wiederherstellen", "Obnoviť predvolené", "Obnovit výchozí"),
+    ("W górę", "Up", "Nach oben", "Hore", "Nahoru"),
+    ("W dół", "Down", "Nach unten", "Dole", "Dolů"),
+    ("Pasek", "Bar", "Leiste", "Lišta", "Lišta"),
+    ("Ukryj", "Hide", "Ausblenden", "Skryť", "Skrýt"),
 ]
 
 WEEKDAYS = {
