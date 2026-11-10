@@ -543,6 +543,17 @@ ROWS = [
     ("Kod dostępu", "Access code", "Zugangscode", "Prístupový kód", "Přístupový kód"),
     ("Sprawdzanie kodu…", "Checking the code…", "Code wird geprüft…", "Kontrola kódu…", "Kontrola kódu…"),
     ("Nieprawidłowy kod.", "Invalid code.", "Ungültiger Code.", "Neplatný kód.", "Neplatný kód."),
+    ("Nazwa przystanku lub numer linii", "Stop name or line number", "Haltestelle oder Liniennummer", "Názov zastávky alebo číslo linky", "Název zastávky nebo číslo linky"),
+    ("na żądanie", "on request", "Bedarfshalt", "na znamenie", "na znamení"),
+    ("Poprzedni", "Previous", "Zurück", "Predchádzajúca", "Předchozí"),
+    ("Na przystanku", "At the stop", "An der Haltestelle", "Na zastávke", "Na zastávce"),
+    ("Zapowiedz przystanek", "Announce stop", "Haltestelle ansagen", "Ohlásiť zastávku", "Ohlásit zastávku"),
+    ("Zapowiedz następny", "Announce next", "Nächste ansagen", "Ohlásiť nasledujúcu", "Ohlásit příští"),
+    ("Komunikaty", "Messages", "Durchsagen", "Hlásenia", "Hlášení"),
+    ("Głos: wł.", "Voice: on", "Stimme: an", "Hlas: zap.", "Hlas: zap."),
+    ("Głos: wył.", "Voice: off", "Stimme: aus", "Hlas: vyp.", "Hlas: vyp."),
+    ("Zakończ kurs", "End run", "Fahrt beenden", "Ukončiť spoj", "Ukončit spoj"),
+    ("Numer linii", "Line number", "Liniennummer", "Číslo linky", "Číslo linky"),
 ]
 
 WEEKDAYS = {
