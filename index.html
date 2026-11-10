@@ -884,6 +884,9 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .mkMsgs .mkMI.mkOff{background:#2c3430;color:#9aa6a0}
 @media (max-width:760px){.mkRow{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,.8fr) minmax(0,1fr)}}
 .mk .chip{flex:none;font-weight:700}.mkRuns .mkC{min-width:42px;justify-content:center}
+.mkMap canvas{flex:1;min-height:0;width:100%;display:block}
+.mkAttr{position:absolute;left:4px;bottom:calc(var(--u)*1.9 + 10px);font-size:9px;color:#aab4ae;background:rgba(0,0,0,.5);padding:0 4px;border-radius:2px;pointer-events:none}
+.mkMapL{align-items:center}.mkMapL .b{flex:1}.mkDist{font-style:normal;font-weight:700;color:#ffcc00;white-space:nowrap}
 .mkPickC{height:100%}
 .mkRes>.mkLines{margin-top:auto}
 .mkLines{flex-direction:column;flex-wrap:nowrap;gap:6px}
@@ -3887,6 +3890,9 @@ async function gdSay0(kind,name,isLast,req,tok,zc){
   const segs=gdSegs(kind,name,isLast,req,zc).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
   gdNotify(kind==='next'?segs.map(x=>x[0]).join(' '):name);
   if(kind==='at'&&GD_GONGS[gdGongId()]){await gdPlay(GD_GONG);if(tok!==GUIDE.sayTok)return}
+  await gdPlaySegs(segs,tok)}
+// the parts of an announcement played (the recordings fetched at once and played close one after another, else the device's voice)
+async function gdPlaySegs(segs,tok){
   const urls=await Promise.all(segs.map(x=>x[2]||null));if(tok!==GUIDE.sayTok)return;
   if(urls.every(Boolean)){const A=urls.map((u,i)=>{const a=i?new Audio(u):GD_AUD;if(i)a.preload='auto';else a.src=u;try{a.load()}catch(e){}return a});
     for(let i=0;i<A.length;i++){await gdPlay(A[i],null,i<A.length-1?GD_CUT:0);if(tok!==GUIDE.sayTok)return}return}
@@ -5840,7 +5846,8 @@ function mkInbox(){const P=document.querySelector('#tdMk [data-pane=inbox]');if(
 async function mkSpeak(segs){if(!MK.voice||MK.mic)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
   try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
   {const ls=[...new Set(segs.map(x=>x[1]))].filter(l=>!gdPiperOk(l));if(ls.length){await Promise.race([Promise.all(ls.map(gdVoiceLoad)),new Promise(r=>setTimeout(r,4000))]);if(tok!==GUIDE.sayTok)return}}
-  for(const [t,l] of segs){let u=null;if(gdPiperOk(l))try{u=await gdWav(t,l)}catch(e){}if(tok!==GUIDE.sayTok)return;if(u)await gdPlay(GD_AUD,u);else await gdSpeakLocal(t,l);if(tok!==GUIDE.sayTok)return}}
+  const S=segs.map(([t,l])=>{t=l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t;return [t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]});
+  await gdPlaySegs(S,tok)}
 function mkSay(kind){const R=MK.run;if(!R||!MK.voice||MK.mic)return;const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,k=R.p>>1;
   // (the guide's announcements read the run from GUIDE.run: the computer's run there while it is open – the guide is closed then)
   if(!GUIDE.open)GUIDE.run=R;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
@@ -5868,7 +5875,7 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
         <div class="mkStop">STOP</div></div>
       <div class="mkTrack"><i class="mkBar"></i><i class="mkFill"></i><i class="mkSel"></i></div>
       <div class="mkNow"><span class="mkNowT"></span><b class="mkNowN"></b><em class="mkTag"></em></div>
-      <div class="mkRow"><div class="mkMap"><svg preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg><div class="mkMapL"><span class="a"></span><span class="b"></span></div></div><ol class="mkList"></ol></div>
+      <div class="mkRow"><div class="mkMap"><canvas aria-hidden="true"></canvas><small class="mkAttr">© OpenStreetMap · © CARTO</small><div class="mkMapL"><span class="b"></span><em class="mkDist"></em></div></div><ol class="mkList"></ol></div>
       <div class="mkLate"></div>
       <div class="mkCtl"><button type="button" data-mk="back" aria-label="${esc(trS('Poprzedni'))}">${I('<path d="m15 5-7 7 7 7"/>')}</button><button type="button" data-mk="no" class="mkRound" aria-label="${esc(trS('Wróć do przystanku wskazanego przez system'))}">${I('<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>')}</button><button type="button" data-mk="ok" class="mkRound" aria-label="${esc(trS('Zatwierdź wybór'))}">${I('<circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/>')}</button><button type="button" data-mk="fwd" aria-label="${esc(trS('Następny'))}">${I('<path d="m9 5 7 7-7 7"/>')}</button></div>
       <div class="mkMsgs mkPane" data-pane="spec" hidden><div class="mkMH"><h3>${esc(trS('Komunikaty specjalne'))}</h3></div><div class="mkSL">${mkMsgs().map((m,i)=>`<button type="button" class="mkSB" data-msg="${i}"><b>${i+1}</b><span>${esc(m[MK_L.indexOf(mkCityL())]||m.find(Boolean)||'')}</span></button>`).join('')}</div></div>
@@ -5877,21 +5884,48 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
   B.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mkAct(b.dataset.mk));
   B.querySelectorAll('[data-msg]').forEach(b=>b.onclick=()=>{const m=mkMsgs()[+b.dataset.msg],cl=mkCityL(),l2=mkL2(),seg=[];const t1=m[MK_L.indexOf(cl)];if(t1)seg.push([t1,cl]);const t2=l2!==cl&&m[MK_L.indexOf(l2)];if(t2)seg.push([t2,l2]);if(!seg.length){const j=m.findIndex(Boolean);if(j>=0)seg.push([m[j],MK_L[j]])}mkSpeak(seg);B.querySelector('[data-pane=spec]').hidden=true});mkBadge();
   mkUpd();MK.timer=setInterval(()=>{if(TD.view!=='mk')return clearInterval(MK.timer);mkUpd()},1000)}
-// the minimap: the run's route (by its stops), the part behind grey, the stop now (white) and the next one (yellow), the GPS
-// position (blue); the route drawn once per run, the marks every second
-function mkMap(B,P,k,at){const M=B.querySelector('.mkMap svg');if(!M)return;const last=P.length-1,nx=Math.min(k+1,last),R=MK.run;
-  const key=R.r.id+'|'+R.ps.length+'|'+R.t0;
-  if(M.dataset.k!==key){M.dataset.k=key;const la=P.map(S=>S[2]),lo=P.map(S=>S[3]),c=Math.cos((Math.min(...la)+Math.max(...la))/2*Math.PI/180);
-    const X=S=>S[3]*c*1000,Y=S=>-S[2]*1000,xs=P.map(X),ys=P.map(Y),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys),sp=Math.max(x1-x0,y1-y0,.3),pd=sp*.08;
-    M.setAttribute('viewBox',[x0-pd,y0-pd,x1-x0+2*pd,y1-y0+2*pd].map(v=>v.toFixed(3)).join(' '));M._xy=S=>[X(S),Y(S)];M._r=sp*.012;
-    const pts=P.map(S=>X(S).toFixed(3)+','+Y(S).toFixed(3));M._pts=pts;
-    M.innerHTML=`<polyline class="mmAll" points="${pts.join(' ')}"/><polyline class="mmDone"/><g class="mmStops">${P.map((S,i)=>`<circle cx="${X(S).toFixed(3)}" cy="${Y(S).toFixed(3)}" r="${(M._r*(i===0||i===last?1.3:.8)).toFixed(4)}"/>`).join('')}</g><circle class="mmGps" r="${(M._r*1.3).toFixed(4)}"/><circle class="mmNx" r="${(M._r*2).toFixed(4)}"/><circle class="mmCur" r="${(M._r*2).toFixed(4)}"/>`}
-  const r=M._r;M.querySelector('.mmDone').setAttribute('points',M._pts.slice(0,k+1).join(' '));
-  M.querySelectorAll('.mmStops circle').forEach((e,i)=>e.classList.toggle('done',i<k));
-  const put=(sel,S,show)=>{const e=M.querySelector(sel);e.style.display=show?'':'none';if(S){const [x,y]=M._xy(S);e.setAttribute('cx',x.toFixed(3));e.setAttribute('cy',y.toFixed(3))}};
-  put('.mmCur',P[k],true);put('.mmNx',P[nx],nx!==k);
-  const g=MK.fix&&MK.fix.pos;put('.mmGps',g?[0,0,g[0],g[1]]:null,!!g);
-  const L=B.querySelector('.mkMapL');L.querySelector('.a').textContent=P[k][0];L.querySelector('.b').textContent=nx!==k?P[nx][0]:'';L.querySelector('.b').hidden=nx===k}
+// the minimap, as a navigation's: the street map (CARTO, OpenStreetMap data) north up, centred on the vehicle – the GPS position,
+// else where the timetable puts it (at the stop, or between two stops by the time) – with the run's route along the streets
+// (the line's shape in the data, else straight between the stops), the part behind grey, the next stop marked and how far it is
+const MKM={tiles:new Map(),z:16};
+function mkTile(z,x,y,cb){const k=z+'/'+x+'/'+y;let t=MKM.tiles.get(k);if(t)return t;const img=new Image();img.crossOrigin='anonymous';t={img,ok:false};MKM.tiles.set(k,t);
+  img.onload=()=>{t.ok=true;cb()};img.onerror=()=>{};img.src=CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png?key=${CARTO_KEY}`:`https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
+  if(MKM.tiles.size>300){const it=MKM.tiles.keys();for(let i=0;i<100;i++)MKM.tiles.delete(it.next().value)}return t}
+const mkWm=(la,lo,z)=>{const n=256*2**z,s=Math.sin(la*Math.PI/180);return [(lo+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]};
+const mkDistM=(a,b)=>{const R=6371000,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+// the route along the streets: the direction whose shape passes the first and the last stop (within about 150 m), cut to them
+async function mkShape(R){if(R._sh!==undefined)return;R._sh=null;let L;try{L=await loadRoute(R.r.id)}catch(e){return}
+  const P=R.ps.map(id=>IDX.stops[id]).filter(Boolean);if(P.length<2||!L||!L.dirs)return;const near=(sh,S,from)=>{let bi=-1,bd=1e9;for(let i=from;i<sh.length;i++){const d=mkDistM(sh[i],[S[2],S[3]]);if(d<bd){bd=d;bi=i}}return [bi,bd]};
+  let best=null;for(const dd of L.dirs){const sh=dd&&dd.shape;if(!sh||sh.length<2)continue;const [i0,d0]=near(sh,P[0],0),[i1,d1]=near(sh,P[P.length-1],Math.max(0,i0));if(d0>150||d1>150||i1<=i0)continue;if(!best||d0+d1<best.e)best={e:d0+d1,g:sh.slice(i0,i1+1)}}
+  if(best){R._sh=best.g;const B=document.getElementById('tdMk');if(B&&TD.view==='mk')mkUpd()}}
+function mkMap(B,P,k,at,T,nowM){const C=B.querySelector('.mkMap canvas');if(!C)return;const R=MK.run,last=P.length-1,nx=Math.min(k+1,last);mkShape(R);
+  const w=C.clientWidth,h=C.clientHeight;if(!w||!h)return;const dpr=window.devicePixelRatio||1;if(C.width!==Math.round(w*dpr)||C.height!==Math.round(h*dpr)){C.width=Math.round(w*dpr);C.height=Math.round(h*dpr)}
+  const x=C.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.fillStyle='#1b1f1d';x.fillRect(0,0,w,h);
+  // where the vehicle is
+  const g=MK.fix&&MK.fix.pos;let me;if(g)me=g;else if(at||k>=last)me=[P[k][2],P[k][3]];else{const f=Math.max(0,Math.min(1,(nowM-T[k])/Math.max(.5,T[k+1]-T[k])));me=[P[k][2]+(P[k+1][2]-P[k][2])*f,P[k][3]+(P[k+1][3]-P[k][3])*f]}
+  const z=MKM.z,c=mkWm(me[0],me[1],z),cx=w/2,cy=h/2,px=(la,lo)=>{const q=mkWm(la,lo,z);return [q[0]-c[0]+cx,q[1]-c[1]+cy]};
+  // the street map
+  const redraw=()=>{if(TD.view==='mk'&&MK.run)mkUpd()};const tx0=Math.floor((c[0]-cx)/256),tx1=Math.floor((c[0]+cx)/256),ty0=Math.floor((c[1]-cy)/256),ty1=Math.floor((c[1]+cy)/256);
+  for(let ty=ty0;ty<=ty1;ty++)for(let tx=tx0;tx<=tx1;tx++){const t=mkTile(z,tx,ty,redraw);if(t.ok)x.drawImage(t.img,Math.round(tx*256-c[0]+cx),Math.round(ty*256-c[1]+cy),256,256)}
+  // the route: behind the vehicle grey, ahead in the line's green
+  const line=(pts,col,wd)=>{if(pts.length<2)return;x.beginPath();pts.forEach((q,i)=>{const p=px(q[0],q[1]);i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])});x.strokeStyle=col;x.lineWidth=wd;x.lineJoin=x.lineCap='round';x.stroke()};
+  const brand=getComputedStyle(B.querySelector('.mkRun')||B).getPropertyValue('--g').trim()||'#2e7d32';
+  let G=R._sh?R._sh.map(q=>[q[0],q[1]]):P.map(S=>[S[2],S[3]]);
+  // (split at the point of the route nearest the vehicle)
+  let si=0,sd=1e18;G.forEach((q,i)=>{const p=px(q[0],q[1]),d=(p[0]-cx)**2+(p[1]-cy)**2;if(d<sd){sd=d;si=i}});
+  line(G,'rgba(0,0,0,.55)',9);line(G.slice(si),brand,6);line(G.slice(0,si+1).concat(sd<1600?[me]:[]),'#7d8781',6);
+  // the stops: small rings; the next stop big and yellow
+  P.forEach((S,i)=>{const p=px(S[2],S[3]);if(p[0]<-20||p[1]<-20||p[0]>w+20||p[1]>h+20)return;x.beginPath();x.arc(p[0],p[1],i===nx?9:4.5,0,7);x.fillStyle=i===nx?'#ffcc00':i<=k?'#7d8781':'#fff';x.fill();x.lineWidth=2;x.strokeStyle='#0b0d0c';x.stroke()});
+  // the next stop off the map: an arrow at the edge pointing to it
+  {const p=px(P[nx][2],P[nx][3]);if(p[0]<8||p[1]<8||p[0]>w-8||p[1]>h-8){const a=Math.atan2(p[1]-cy,p[0]-cx),r=Math.min(cx,cy)-14;x.save();x.translate(cx+Math.cos(a)*r,cy+Math.sin(a)*r);x.rotate(a);x.beginPath();x.moveTo(10,0);x.lineTo(-7,-7);x.lineTo(-7,7);x.closePath();x.fillStyle='#ffcc00';x.fill();x.restore()}}
+  // the vehicle: an arrow along the GPS heading, else a dot
+  x.save();x.translate(cx,cy);const hd=g&&MK.fix.hd!=null?MK.fix.hd:null;
+  if(g&&MK.fix.acc){const ra=MK.fix.acc*256*2**z/(40075016*Math.cos(me[0]*Math.PI/180));if(ra>12&&ra<Math.max(w,h)){x.beginPath();x.arc(0,0,ra,0,7);x.fillStyle='rgba(66,165,245,.15)';x.fill()}}
+  if(hd!=null){x.rotate(hd*Math.PI/180);x.beginPath();x.moveTo(0,-13);x.lineTo(9,10);x.lineTo(0,5);x.lineTo(-9,10);x.closePath()}else{x.beginPath();x.arc(0,0,8,0,7)}
+  x.fillStyle=g?'#42a5f5':'#fff';x.fill();x.lineWidth=2.5;x.strokeStyle=g?'#fff':'#42a5f5';x.stroke();x.restore();
+  // north
+  x.fillStyle='rgba(0,0,0,.55)';x.beginPath();x.arc(w-18,18,12,0,7);x.fill();x.fillStyle='#fff';x.font='700 12px Roboto,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('N',w-18,18.5);
+  const L=B.querySelector('.mkMapL');L.querySelector('.b').textContent=P[nx][0];const dm=mkDistM(me,[P[nx][2],P[nx][3]]);L.querySelector('.mkDist').textContent=nx===k&&at?'':dm<1000?Math.round(dm/10)*10+' m':(dm/1000).toFixed(1).replace('.',',')+' km'}
 // what changes every second (and after each step): the clock, the stop shown (the driver's choice, else the run's), lateness
 function mkUpd(){const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.querySelector('.mkRun'))return;
   const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,T=R.off.map(o=>R.t0+o),p=MK.sel!=null?MK.sel:R.p,k=p>>1,at=p%2===0,j=at?k:Math.min(k+1,last);
@@ -5902,7 +5936,7 @@ function mkUpd(){const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.
   B.querySelector('.mkNowT').textContent=hm(T[j]);B.querySelector('.mkNowN').textContent=P[j][0];
   B.querySelector('.mkTag').textContent=MK.sel!=null?trS('wybór – zatwierdź ✓'):'';B.querySelector('.mkNow').classList.toggle('sel',MK.sel!=null);
   const ls=Math.round(late*60),aL=Math.abs(ls),L=B.querySelector('.mkLate');L.textContent=(ls>0?'+':ls<0?'−':'')+Math.floor(aL/60)+':'+String(aL%60).padStart(2,'0');L.className='mkLate '+(ls>90?'l':ls<-60?'e':'');
-  B.querySelector('.mkPos').textContent=(j+1)+'/'+(last+1);mkMap(B,P,k,at);
+  B.querySelector('.mkPos').textContent=(j+1)+'/'+(last+1);mkMap(B,P,k,at,T,nowM);
   B.querySelector('.mkGps').textContent=!MK.gpsOn?trS('GPS wyłączony – przystanki ręcznie'):MK.fix?('GPS · ±'+Math.round(MK.fix.acc||0)+' m'+(MK.fix.d!=null?' · '+trS('do przystanku')+' '+Math.round(MK.fix.d)+' m':'')):trS('Szukanie GPS…');
   const pc=v=>(last?Math.min(1,v/(2*last)):1)*100;B.querySelector('.mkFill').style.width=pc(R.p)+'%';const s=B.querySelector('.mkSel');s.style.left=pc(p)+'%';s.hidden=MK.sel==null;
   const ol=B.querySelector('.mkList'),from=j+1;if(ol.dataset.f!==from+'|'+last){ol.dataset.f=from+'|'+last;ol.replaceChildren();
@@ -5942,7 +5976,7 @@ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement
 // for 20 s after one set by hand
 function mkGps(on){if(!on||!navigator.geolocation){if(MK.watch!=null){navigator.geolocation.clearWatch(MK.watch);MK.watch=null}MK.fix=null;return}
   if(MK.watch!=null)return;
-  MK.watch=navigator.geolocation.watchPosition(p=>{const R=MK.run;if(!R)return;const h=[p.coords.latitude,p.coords.longitude];MK.fix={acc:p.coords.accuracy,d:null,pos:h};
+  MK.watch=navigator.geolocation.watchPosition(p=>{const R=MK.run;if(!R)return;const h=[p.coords.latitude,p.coords.longitude];MK.fix={acc:p.coords.accuracy,d:null,pos:h,hd:p.coords.heading!=null&&!isNaN(p.coords.heading)&&p.coords.speed>1?p.coords.heading:(MK.fix&&MK.fix.hd)};
     const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,cs=Math.cos(h[0]*Math.PI/180),xy=S=>[(S[3]-h[1])*cs*111320,(S[2]-h[0])*110540];
     const fresh=!R.fixed,j0=R.p>>1;let bj=j0,bd=1e9;
     for(let j=fresh?0:j0;j<(fresh?last:Math.min(last,j0+4));j++){const a=xy(P[j]),b=xy(P[j+1]),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy,u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0,d=Math.hypot(a[0]+u*dx,a[1]+u*dy);if(d<bd-1){bd=d;bj=j}}
