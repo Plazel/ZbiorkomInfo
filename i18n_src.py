@@ -538,6 +538,7 @@ ROWS = [
     ("Zarządzanie kontami", "Account management", "Kontenverwaltung", "Správa účtov", "Správa účtů"),
     ("Tokeny kont tworzą się same. Token pokazuje się tylko raz: przekaż go osobie, dla której jest konto (albo link, który loguje).", "Account tokens are created automatically. A token is shown only once: give it to the person the account is for (or the link that logs in).", "Konto-Token werden automatisch erstellt. Ein Token wird nur einmal angezeigt: Geben Sie es der Person, für die das Konto ist (oder den Anmeldelink).", "Tokeny účtov sa vytvárajú samy. Token sa zobrazí len raz: odovzdajte ho osobe, pre ktorú je účet (alebo odkaz, ktorý prihlási).", "Tokeny účtů se vytvářejí samy. Token se zobrazí jen jednou: předejte ho osobě, pro kterou je účet (nebo odkaz, který přihlásí)."),
     ("Tworzenie…", "Creating…", "Wird erstellt…", "Vytvára sa…", "Vytváří se…"),
+    ("Hej", "Hi", "Hallo", "Ahoj", "Ahoj"),
 ]
 
 WEEKDAYS = {

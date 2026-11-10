@@ -20,7 +20,7 @@
 //      t:<sha256 of token> → account id     u:<id> → {id, name, role, created}     d:<id> → the account's data (JSON)
 //    GET /konto → {id, name, role}; GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
-//      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"} → {id, token} (the token shown once);
+//      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); DELETE /admin/konta/<id> → the account removed.
 //
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
@@ -112,7 +112,7 @@ async function tts(req, env, ctx, cors) {
 }
 
 // ---- accounts
-const ROLES = ['user', 'driver'];
+const ROLES = ['user', 'driver', 'admin'];   // (an administrator may make other administrators)
 const b64u = a => btoa(String.fromCharCode(...a)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 // a token: 12 characters of 31 that cannot be mistaken for each other (no 0/o, 1/l/i), about 59 bits – far beyond guessing
 // through the worker; drawn evenly (bytes past the last whole multiple of 31 are drawn again)
