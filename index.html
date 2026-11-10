@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794353896;
+const APP_BUILD=1794354115;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3960,6 +3960,9 @@ function gdTrnPl(name,nl){for(const [re,t] of GD_TRN_PL[nl]||[]){if(re.test(name
 const GD_RAILST=/\bStacja\b(?:\s+kolejowa)?\s*\)?\s*$/i;
 function gdEnStation(name){if(/^Sucharskiego/.test(name))return null;
   if(!/\bPKP\b|\bSKM\b|\bPKM\b|\bDworzec\b|\bDw\.|Port Lotniczy|Lotnisko|Terminal Promowy|\bProm\b/i.test(name)&&!GD_RAILST.test(name))return null;
+  // (SKM, PKM and PKP stations: the whole of it said by the English voice – "Brętowo station", "Gdańsk Oliwa railway station" –, not "station" alone after the name)
+  {const m=name.match(/^(.*?)\s*\/?\s*\b(PKP|SKM|PKM)\b/);if(m&&!/Dworzec G[łl]|Dw\. G[łl]|Dworzec (Centralny|Wsch|Zach|PKS|Autobusowy)|Dw\. (Wsch|Zach)/i.test(name)){const pl=gdNameSaid(m[1].replace(/\bDworzec\b|\bDw\.|\bOs\.\s*/g,'').replace(/[\/\-–\s]+$/,'').trim(),'pl').replace(/[.\s]+$/,'');
+    return [[pl?pl+(m[2]==='PKP'?' railway station':' station'):'Railway Station','en']]}}
   const g=GD_TRN[name]&&GD_TRN[name].en;if(g)return g;   /* (as in mSIP: the Polish part in Polish, the English one in English) */
   const E=t=>[[t,'en']];
   if(/Port Lotniczy|Lotnisko/i.test(name))return E('Airport');if(/Terminal Promowy|\bProm\b/i.test(name))return E('Ferry Terminal');
@@ -4033,6 +4036,21 @@ function gdGongOpts(){const sel=document.getElementById('gdGongSel');if(!sel)ret
 gdGongOpts();
 {const sel=document.getElementById('gdGongSel');sel.value=gdGongId();sel.onchange=()=>{store.set('ztm.gdGong',sel.value);const f=GD_GONGS[sel.value];if(!f)return;GD_GONG.src='dzwieki/'+f+'.mp3'}}
 const GD_AUD=new Audio();
+// one stream for a whole announcement: the gong and the voice's parts decoded and played one after another through Web Audio
+// (two players one after the other at different rates – the R&G gong at 48 kHz, Zofia at 24 kHz – made the voice crackle);
+// the audio context is opened at the first tap; without it (or if a file cannot be read) the players as before
+const GDX={ctx:null,src:[],buf:new Map()};
+function gdCtxOpen(){try{if(!GDX.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;GDX.ctx=new C()}if(GDX.ctx.state!=='running')GDX.ctx.resume().catch(()=>{})}catch(e){}}
+['pointerdown','keydown','touchend'].forEach(ev=>document.addEventListener(ev,gdCtxOpen,{capture:true,passive:true}));
+function gdXStop(){GDX.src.forEach(n=>{try{n.stop()}catch(e){}});GDX.src=[]}
+function gdXBuf(u){const C=GDX.ctx;if(!GDX.buf.has(u)){const p=fetch(u).then(r=>{if(!r.ok)throw new Error('audio');return r.arrayBuffer()}).then(b=>new Promise((ok,no)=>C.decodeAudioData(b,ok,no)));p.catch(()=>GDX.buf.delete(u));GDX.buf.set(u,p);if(GDX.buf.size>80)GDX.buf.delete(GDX.buf.keys().next().value)}return GDX.buf.get(u)}
+// parts: [[url, cut]] – cut: seconds before the end at which the next part starts; resolves true when played, false if not possible
+async function gdXPlay(parts,tok){const C=GDX.ctx;if(!C||C.state!=='running')return false;let B;
+  try{B=await Promise.all(parts.map(([u])=>gdXBuf(u)))}catch(e){return false}if(tok!==GUIDE.sayTok)return true;
+  gdXStop();const g=C.createGain();g.gain.value=.92;g.connect(C.destination);let t=C.currentTime+.05;
+  B.forEach((b,i)=>{const n=C.createBufferSource();n.buffer=b;n.connect(g);n.start(t);GDX.src.push(n);t+=Math.max(.05,b.duration-(parts[i][1]||0))});
+  const end=t;await new Promise(res=>{const iv=setInterval(()=>{if(tok!==GUIDE.sayTok||C.currentTime>=end){clearInterval(iv);if(tok!==GUIDE.sayTok)gdXStop();res()}},100)});
+  return true}
 // (cut: seconds before the end at which the next part may start – the silence a recording ends with, so that the parts of
 // an announcement follow closely; a stuck one given up after its length and a little more, not after a fixed time)
 function gdPlay(a,src,cut=0){return new Promise(res=>{let done=false,tm=0;const end=()=>{if(!done){done=true;clearTimeout(tm);a.onplaying=null;res()}};a.onended=end;a.onerror=end;if(src)a.src=src;try{a.currentTime=0}catch(e){}
@@ -4057,15 +4075,19 @@ async function gdSay(kind,name,isLast,req,zc){if(!GUIDE.voice)return;const tok=G
   try{await gdSay0(kind,name,isLast,req,tok,zc)}finally{if(tok===GUIDE.sayTok&&GUIDE.voice&&GUIDE.open){try{const p_=GD_KEEP.play();if(p_)p_.catch(()=>{})}catch(e){}}}}
 const GD_CUT=.25;   // (the pause between the parts of an announcement in two languages: the recordings' own silence shortened by this)
 async function gdSay0(kind,name,isLast,req,tok,zc){
-  try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
+  try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();gdXStop();
   {const ls=[...new Set(gdSegs(kind,name,isLast,req,zc).map(x=>x[1]))].filter(l=>!gdPiperOk(l));if(ls.length){await Promise.race([Promise.all(ls.map(gdVoiceLoad)),new Promise(r=>setTimeout(r,4000))]);if(tok!==GUIDE.sayTok)return}}   // (a language just switched to: its voice first)
   const segs=gdSegs(kind,name,isLast,req,zc).map(([t,l])=>[t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]);
   gdNotify(kind==='next'?segs.map(x=>x[0]).join(' '):name);
-  if(kind==='at'&&GD_GONGS[gdGongId()]){await gdPlay(GD_GONG);if(tok!==GUIDE.sayTok)return}
+  const gong=kind==='at'&&GD_GONGS[gdGongId()];
+  if(gong&&GDX.ctx&&GDX.ctx.state==='running'){const urls=await Promise.all(segs.map(x=>x[2]||null));if(tok!==GUIDE.sayTok)return;
+    if(urls.every(Boolean)&&await gdXPlay([[GD_GONG.src,0],...urls.map((u,i)=>[u,i<urls.length-1?GD_CUT:0])],tok))return}
+  if(gong){await gdPlay(GD_GONG);if(tok!==GUIDE.sayTok)return}
   await gdPlaySegs(segs,tok)}
 // the parts of an announcement played (the recordings fetched at once and played close one after another, else the device's voice)
 async function gdPlaySegs(segs,tok){
   const urls=await Promise.all(segs.map(x=>x[2]||null));if(tok!==GUIDE.sayTok)return;
+  if(urls.every(Boolean)&&await gdXPlay(urls.map((u,i)=>[u,i<urls.length-1?GD_CUT:0]),tok))return;
   if(urls.every(Boolean)){const A=urls.map((u,i)=>{const a=i?new Audio(u):GD_AUD;if(i)a.preload='auto';else a.src=u;try{a.load()}catch(e){}return a});
     for(let i=0;i<A.length;i++){await gdPlay(A[i],null,i<A.length-1?GD_CUT:0);if(tok!==GUIDE.sayTok)return}return}
   if(urls.every(u=>!u)){await gdVoicesReady();await Promise.all(segs.map(([t,l],i)=>gdSpeakLocal(t,l,true)));return}   // queued at once
@@ -6145,7 +6167,7 @@ function mkInbox(){const P=document.querySelector('#tdMk [data-pane=inbox]');if(
   P.querySelectorAll('[data-ack]').forEach(b=>b.onclick=async()=>{b.disabled=true;await mkMailMark(L[+b.dataset.ack],true);mkInbox();mkBadge()});
   const un=L.filter(m=>!m.r);if(un.length)Promise.all(un.map(m=>mkMailMark(m))).then(mkBadge);mkBadge()}
 async function mkSpeak(segs,force){if((!MK.voice&&!force)||MK.mic)return;const tok=GUIDE.sayTok=(GUIDE.sayTok||0)+1;
-  try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();
+  try{speechSynthesis.cancel()}catch(e){}GD_GONG.pause();GD_AUD.pause();gdXStop();
   {const ls=[...new Set(segs.map(x=>x[1]))].filter(l=>!gdPiperOk(l));if(ls.length){await Promise.race([Promise.all(ls.map(gdVoiceLoad)),new Promise(r=>setTimeout(r,4000))]);if(tok!==GUIDE.sayTok)return}}
   const S=segs.map(([t,l])=>{t=l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t;return [t,l,gdPiperOk(l)?gdWav(t,l).catch(()=>null):null]});
   await gdPlaySegs(S,tok)}
@@ -6287,7 +6309,7 @@ function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500
 // the microphone: the driver's voice through the device's own speaker (to the passengers), live, while it is on (the
 // announcements wait meanwhile); the device's echo cancelling and noise suppression on
 async function mkMic(on){if(!on){if(MK.mic){try{MK.mic.st.getTracks().forEach(t=>t.stop());MK.mic.ac.close()}catch(e){}}MK.mic=null;mkSideMark();return}
-  if(MK.mic)return;try{GUIDE.sayTok++;try{speechSynthesis.cancel()}catch(e){}GD_AUD.pause();
+  if(MK.mic)return;try{GUIDE.sayTok++;try{speechSynthesis.cancel()}catch(e){}GD_AUD.pause();gdXStop();
     const st=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
     const ac=new (window.AudioContext||window.webkitAudioContext)();const src=ac.createMediaStreamSource(st),g=ac.createGain();g.gain.value=1.4;src.connect(g);g.connect(ac.destination);
     MK.mic={st,ac}}catch(e){MK.mic=null;const g=document.querySelector('#tdMk .mkGps span');if(g)g.textContent=trS('Brak dostępu do mikrofonu')}mkSideMark()}
@@ -6298,7 +6320,7 @@ function mkAct(a){const R=MK.run,B=document.getElementById('tdMk');if(!R)return;
   if(a==='lann'){const l=gdLang(),nl=gdNameLang(),W={pl:['Linia','kierunek'],en:['Line','destination'],de:['Linie','Richtung'],cs:['Linka','směr'],sk:['Linka','smer']}[l]||['Linia','kierunek'];
     mkSpeak([[W[0]+' '+R.r.n+', '+W[1]+':',l],[gdNameSaid(R.head||'',nl),nl]],true);return}
   if(a==='spec'||a==='inbox'||a==='menu'){B.querySelectorAll('[data-pane]').forEach(x=>{x.hidden=x.dataset.pane!==a||!x.hidden});if(a==='inbox')mkInbox();if(a==='menu')mkMenu('root');return}
-  if(a==='voice'){MK.voice=!MK.voice;store.set('ztm.mkVoice',MK.voice);if(!MK.voice){GUIDE.sayTok++;try{speechSynthesis.cancel()}catch(e){}GD_AUD.pause()}mkRender();return}
+  if(a==='voice'){MK.voice=!MK.voice;store.set('ztm.mkVoice',MK.voice);if(!MK.voice){GUIDE.sayTok++;try{speechSynthesis.cancel()}catch(e){}GD_AUD.pause();gdXStop()}mkRender();return}
   if(a==='gps'){MK.gpsOn=!MK.gpsOn;store.set('ztm.mkGps',MK.gpsOn);mkRender();return}
   if(a==='fs'){mkFull(!MK.fs);return}
   // (another run: the list of the same line's runs again; signing off: the computer from the start)
