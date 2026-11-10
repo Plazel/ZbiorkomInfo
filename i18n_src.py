@@ -600,6 +600,18 @@ ROWS = [
     ("Nie udało się wysłać.", "Could not send.", "Senden fehlgeschlagen.", "Nepodarilo sa odoslať.", "Nepodařilo se odeslat."),
     ("Nie udało się zapisać.", "Could not save.", "Speichern fehlgeschlagen.", "Nepodarilo sa uložiť.", "Nepodařilo se uložit."),
     ("Dla nerdów", "For nerds", "Für Nerds", "Pre nerdov", "Pro nerdy"),
+    ("Wybierz brygadę", "Choose a duty", "Dienst wählen", "Vyberte turnus", "Vyberte pořadí"),
+    ("Kursy bez brygady", "Trips without a duty", "Fahrten ohne Dienst", "Spoje bez turnusu", "Spoje bez pořadí"),
+    ("Dworce, stacje, terminal promowy i lotnisko także po angielsku", "Stations, the ferry terminal and the airport also in English", "Bahnhöfe, Fährterminal und Flughafen auch auf Englisch", "Stanice, prístav trajektov a letisko aj po anglicky", "Nádraží, stanice, trajektový terminál a letiště i anglicky"),
+    ("Wył.", "Off", "Aus", "Vyp.", "Vyp."),
+    ("Wł.", "On", "Ein", "Zap.", "Zap."),
+    ("Treść w każdym języku zapowiedzi; puste pole – komunikat po polsku.", "Text in each announcement language; an empty field – the message in Polish.", "Text in jeder Ansagesprache; leeres Feld – die Ansage auf Polnisch.", "Text v každom jazyku hlásení; prázdne pole – hlásenie po poľsky.", "Text v každém jazyce hlášení; prázdné pole – hlášení polsky."),
+    ("Dodaj komunikat", "Add a message", "Ansage hinzufügen", "Pridať hlásenie", "Přidat hlášení"),
+    ("Zapisz komunikaty", "Save messages", "Ansagen speichern", "Uložiť hlásenia", "Uložit hlášení"),
+    ("Przywróć domyślne", "Restore defaults", "Standard wiederherstellen", "Obnoviť predvolené", "Obnovit výchozí"),
+    ("Zapisano.", "Saved.", "Gespeichert.", "Uložené.", "Uloženo."),
+    ("Menu", "Menu", "Menü", "Menu", "Menu"),
+    ("Zapowiedzi", "Announcements", "Ansagen", "Hlásenia", "Hlášení"),
 ]
 
 WEEKDAYS = {

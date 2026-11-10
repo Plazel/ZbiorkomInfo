@@ -22,7 +22,8 @@
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); DELETE /admin/konta/<id> → the account removed.
-//      PUT /admin/ustawienia {voice, lang, gong} → mKomputer's settings for every driver (null: the driver's own choice);
+//      PUT /admin/ustawienia {voice, lang, gong, en, msgs} → mKomputer's settings for every driver (null: the driver's own choice;
+//        en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements);
 //      POST /admin/komunikat {text} → a message to the drivers (GET /konto/komunikaty: the last 20); DELETE: all removed.
 //
 // Set up: dash.cloudflare.com → Workers & Pages → Create → Worker → paste this file → Deploy; then put the worker's
@@ -152,8 +153,15 @@ async function konta(req, env, cors) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
     if (p === '/admin/ustawienia' && req.method === 'PUT') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
-      const c = { voice: ['m', 'f'].includes(b.voice) ? b.voice : null, lang: ['auto', 'pl', 'en', 'de', 'sk', 'cs'].includes(b.lang) ? b.lang : null,
-        gong: typeof b.gong === 'string' && /^[a-z]{2,8}$/.test(b.gong) ? b.gong : null };
+      // fields left out of the body keep their stored values
+      const c = (await env.KONTA.get('cfg:mk', 'json')) || {};
+      if ('voice' in b) c.voice = ['m', 'f'].includes(b.voice) ? b.voice : null;
+      if ('lang' in b) c.lang = ['auto', 'pl', 'en', 'de', 'sk', 'cs'].includes(b.lang) ? b.lang : null;
+      if ('gong' in b) c.gong = typeof b.gong === 'string' && /^[a-z]{2,8}$/.test(b.gong) ? b.gong : null;
+      if ('en' in b) c.en = b.en === true;
+      // special announcements: up to 30, each [pl, en, de, sk, cs] of at most 300 characters (null: the built-in set)
+      if ('msgs' in b) c.msgs = Array.isArray(b.msgs) ? b.msgs.slice(0, 30).map(m => (Array.isArray(m) ? m : []).slice(0, 5).map(x => String(x || '').trim().slice(0, 300)))
+        .filter(m => m[0]).map(m => { while (m.length < 5) m.push(''); return m; }) : null;
       await env.KONTA.put('cfg:mk', JSON.stringify(c)); return J(c);
     }
     if (p === '/admin/komunikat' && req.method === 'POST') {
