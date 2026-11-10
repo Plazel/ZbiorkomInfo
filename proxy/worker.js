@@ -26,6 +26,7 @@
 //      PUT /admin/ustawienia {voice, lang, gong, en, msgs, l2, perm} → mKomputer's settings for every driver (null: the driver's
 //        own choice; en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements,
 //        each [pl, en, de, sk, cs]; l2: their second language; perm: what the drivers may do {ann, spec, mic, free});
+//      GET /siec (drivers, administrators) / PUT /admin/siec → the TEST network made in the creator (≤ 900 kB).
 //      Messages: POST /admin/komunikat {text, to: "*" (every driver) | [ids], ack} → sent; GET /admin/komunikaty → the last 100
 //        with each recipient's status {d: delivered, r: read, c: confirmed}; DELETE /admin/komunikat[/<id>] → removed.
 //        The driver: GET /konto/komunikaty → their messages (marked delivered); POST /konto/komunikaty/<id> {c} → read (confirmed).
@@ -174,8 +175,19 @@ async function konta(req, env, cors) {
       await env.KONTA.put('d:' + u.id, t); return J({ ok: true });
     }
   }
+  // the TEST network made in the creator (stops, lines with their timetables, duties): read by the drivers and the
+  // administrators (not by the other accounts), written by the administrators
+  if (p === '/siec' && req.method === 'GET') {
+    if (u.role !== 'admin' && u.role !== 'driver') return J({ error: 'forbidden' }, 403);
+    return new Response((await env.KONTA.get('net:tst')) || '{}', { headers: h });
+  }
   if (p.startsWith('/admin/')) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
+    if (p === '/admin/siec' && req.method === 'PUT') {
+      const t = await req.text(); if (t.length > 900000) return J({ error: 'too large' }, 413);
+      try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || Array.isArray(o)) throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
+      await env.KONTA.put('net:tst', t); return J({ ok: true });
+    }
     if (p === '/admin/ustawienia' && req.method === 'PUT') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       // fields left out of the body keep their stored values
