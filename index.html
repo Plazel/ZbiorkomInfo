@@ -1178,10 +1178,11 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .lineV .mkStops li.end::before{top:50%}.lineV .mkStops li.prev::before{background:#9aa3ab}.lineV .mkStops li.prev::after{content:"";position:absolute;left:calc(var(--u)*2.1 - 4px);top:0;height:50%;width:8px;background:var(--g);z-index:1}
 .lineV .mkStops li.none::before{display:none}
 .lineV .mkStops button{padding-left:calc(var(--u)*4.4)}
-.lineV .mkStops .sym{display:grid;place-items:center;position:absolute;left:calc(var(--u)*2.1);top:50%;transform:translate(-50%,-50%);z-index:2;width:calc(var(--u)*2);height:calc(var(--u)*2);border-radius:50%;background:#ffd400;border:3px solid #fff;box-shadow:0 0 0 2px var(--g)}
-.lineV .mkStops .sym::after{content:"H";font:800 calc(var(--u)*1.05)/1 Roboto,sans-serif;color:#1a6b2a}
-.lineV .mkStops li.cur .sym{width:calc(var(--u)*2.9);height:calc(var(--u)*2.9);box-shadow:0 0 0 3px #fff,0 0 0 6px var(--g)}.lineV .mkStops li.cur .sym::after{font-size:calc(var(--u)*1.5)}
-.lineV .mkStops li.prev .sym{background:#c3c9cf;box-shadow:0 0 0 2px #9aa3ab}.lineV .mkStops li.prev .sym::after{color:#6b747c}
+.lineV .mkStops .sym{display:block;position:absolute;left:calc(var(--u)*2.1);top:50%;transform:translate(-50%,-50%);z-index:2;width:calc(var(--u)*2.3);height:calc(var(--u)*2.3)}
+.lineV .mkStops .sym svg{display:block;width:100%;height:100%;overflow:visible}
+.lineV .mkStops .sym .ms0{fill:#fff;stroke-width:2.5px}.lineV .mkStops .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.lineV .mkStops .sym text.s{font-size:7.8px}
+.lineV .mkStops li.cur .sym{width:calc(var(--u)*3.1);height:calc(var(--u)*3.1)}
+.lineV .mkStops li.prev .sym{filter:grayscale(1);opacity:.75}
 .lineV .mkStops li.cur button{margin-left:0}
 /* the bottom bar */
 .mkBar{display:flex;align-items:stretch;gap:var(--gap);min-width:0;height:calc(var(--u)*4)}
@@ -3244,6 +3245,8 @@ function symKey(r){
     if(!/^S\d/.test(r.n))return {o:1,t:'TRAIN',c:colOf(r)};   // other trains (Krynica: PKP, Polregio): a square with a train
     return {o:1,t:'S',c:colOf(r)}}
   if(r.t==='tram')return {o:2,t:'T',c:SYM_T};
+  if(r.cat==='ferry')return {o:2.5,t:'F',c:'#0277bd'};
+  if(r.t==='trol')return {o:2.7,t:'Tr',c:'#2e9d4f'};
   return {o:3,t:'A',c:SYM_A}}
 function symsOf(routes){const m=new Map();
   routes.forEach(r=>{const k=symKey(r);const id=k.o+k.t;const e=m.get(id)||{o:k.o,t:k.t,cs:[]};if(!e.cs.includes(k.c))e.cs.push(k.c);m.set(id,e)});
@@ -5934,7 +5937,7 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
   const I=(p)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
   // the top bar: the line's symbol and the direction; the body: the map (a third, on the left) and the stops; the bottom bar:
   // MENU, the messages, the announcements on / off, the GPS, the time against the timetable
-  B.innerHTML=`<div class="mk mkRun${store.get('ztm.mkLineV',false)?' lineV':''}">
+  B.innerHTML=`<div class="mk mkRun${store.get('ztm.mkLineV',true)?' lineV':''}">
     <div class="mkTop"><span class="mkLn"></span><b class="mkHead"></b><span class="mkPos"></span><span class="mkClock"><b></b><small></small></span></div>
     <div class="mkMidB"><div class="mkTrack"><i class="mkFill"></i></div><button type="button" class="mkPBack" hidden>‹ ${esc(trS('Powrót'))}</button></div>
     <div class="mkWrap">
@@ -5954,6 +5957,7 @@ function mkRender(){const B=document.getElementById('tdMk');if(!B||TD.view!=='mk
       <div class="mkLate"><b></b></div>
     </div></div>`;
   B.querySelector('.mkLn').replaceChildren(chip(R.r,'',true));B.querySelector('.mkHead').textContent=R.head;
+  {const sv=`<svg viewBox="-11.6 -11.6 23.2 23.2">${(()=>{const k=symKey(R.r);return symSVG({t:k.t,cs:[k.c]},0)})()}</svg>`;B.querySelectorAll('.mkStops .sym').forEach(e=>e.innerHTML=sv)}
   B.querySelector('.mkDuty').textContent=R.duty||'–';B.querySelector('.mkDrv').textContent=ACC.user?ACC.user.id:'–';B.querySelector('.mkDrv').title=ACC.user?ACC.user.name:'';
   B.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mkAct(b.dataset.mk));
   // (a pane open – the menu, the messages, the special announcements: "Powrót" over the map; in the menu's settings a step back)
