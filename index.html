@@ -6389,6 +6389,8 @@ function navApply(){const nav=document.querySelector('nav.rail');if(!nav)return;
   const on=()=>all.filter(b=>!b.hidden&&!b.classList.contains('navOff'));
   let inMore=all.filter(b=>!b.hidden&&b.classList.contains('navOff')&&c.place[b.dataset.nav]==='more');
   if(c.auto&&horiz){const fit=Math.max(3,Math.floor(nav.clientWidth/62));/* (a button needs about 62 px: six on a phone) */let v=on();if(v.length+(inMore.length?1:0)>fit){const keep=fit-1;v.slice(keep).forEach(b=>{if(b.getAttribute('aria-current')==='page'&&keep>0){}b.classList.add('navOver')})}}
+  // (the side rail on a low screen: what would fall below its bottom edge goes into "Więcej", always)
+  if(!horiz){const v=on();if(v.length){const bh=v[0].offsetHeight+2,av=nav.clientHeight-parseFloat(getComputedStyle(nav).paddingTop)-4,fit=Math.max(3,Math.floor(av/bh));if(v.length+(inMore.length?1:0)>fit)v.slice(fit-1).forEach(b=>b.classList.add('navOver'))}}
   const over=all.filter(b=>b.classList.contains('navOver'));{const h=!(inMore.length||over.length);if(more.hidden!==h)more.hidden=h}   // (set only when it changes: the observer below would call this again)
   more.classList.toggle('cur',[...inMore,...over].some(b=>b.getAttribute('aria-current')==='page'))}
 function navMoreOpen(){const M=document.getElementById('navMore'),nav=document.querySelector('nav.rail');if(!M.hidden){M.hidden=true;return}
