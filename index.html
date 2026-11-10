@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794343332;
+const APP_BUILD=1794343606;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3910,8 +3910,10 @@ const GD_TRN_PL={cs:[[/^Hlavní nádraží$/,'Dworzec Główny'],[/^Nádraží (
     [/^(.+)-Hospital$/,'Szpital $1'],[/^(.+)krankenhaus$/i,'Szpital $1'],[/^Hafen$/,'Port'],[/^(.+) Hafen$/,'$1, port'],[/^Rathaus$/,'Ratusz'],[/^(.+)schule$/i,'Szkoła $1'],[/^Friedhof$/,'Cmentarz'],[/^(.+)friedhof$/i,'Cmentarz $1'],[/^(.+)-?Platz$/,'Plac $1']]};
 function gdTrnPl(name,nl){for(const [re,t] of GD_TRN_PL[nl]||[]){if(re.test(name))return t&&name.replace(re,t)}return null}
 // mKomputer, by the administrator's choice: the stations (railway and bus), the ferry terminal and the airport also named in English – nothing else
+// ("Stacja" a railway station only alone at the end or as "stacja kolejowa": not "Stacja Paliw", "Stacja Pomp", "Stacja Narciarska"…)
+const GD_RAILST=/\bStacja\b(?:\s+kolejowa)?\s*\)?\s*$/i;
 function gdEnStation(name){if(/^Sucharskiego/.test(name))return null;
-  if(!/\bPKP\b|\bSKM\b|\bPKM\b|\bDworzec\b|\bDw\.|\bStacja\b|Port Lotniczy|Lotnisko|Terminal Promowy|\bProm\b/i.test(name))return null;
+  if(!/\bPKP\b|\bSKM\b|\bPKM\b|\bDworzec\b|\bDw\.|Port Lotniczy|Lotnisko|Terminal Promowy|\bProm\b/i.test(name)&&!GD_RAILST.test(name))return null;
   const g=GD_TRN[name]&&GD_TRN[name].en;if(g)return g;   /* (as in mSIP: the Polish part in Polish, the English one in English) */
   const E=t=>[[t,'en']];
   if(/Port Lotniczy|Lotnisko/i.test(name))return E('Airport');if(/Terminal Promowy|\bProm\b/i.test(name))return E('Ferry Terminal');
@@ -3919,7 +3921,7 @@ function gdEnStation(name){if(/^Sucharskiego/.test(name))return null;
   if(/Dworzec Wsch|Dw\. Wsch/.test(name))return E('East Station');if(/Dworzec Zach|Dw\. Zach/.test(name))return E('West Station');
   if(/Dworzec (PKS|Autobusowy)/i.test(name))return E('Bus Station');
   const m=name.match(/^(.*?)\s*\b(PKP|SKM|PKM)\b/);if(m){const pl=m[1].replace(/\bDworzec\b|\bDw\./g,'').replace(/[-–\s]+$/,'').trim();return pl?[[pl,'pl'],['railway station','en']]:E('Railway Station')}
-  if(/\bDworzec\b|\bStacja\b/.test(name))return E('Station');return null}
+  if(/\bDworzec\b/.test(name)||GD_RAILST.test(name))return E('Station');return null}
 function gdSegs0(kind,name,isLast,req,zc){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);else if(gdGongId()==='word'&&GD_STOPW[l])out.push([GD_STOPW[l],l,0]);out.push([gdNameSaid(name,nl),nl,1]);
   const tr=l!=='pl'&&nl==='pl'&&store.get('ztm.gdTrans',false)&&!gdNoTrn(name,l)&&GD_TRN[name]&&GD_TRN[name][l];
