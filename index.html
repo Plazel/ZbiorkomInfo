@@ -83,7 +83,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size
 :root{--alert:#c4161c}@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--alert:#ff6b6b}}:root[data-theme="dark"]{--alert:#ff6b6b}
 .alertDlg .alertBox{width:min(640px,100%);grid-template-rows:auto minmax(0,1fr);background:var(--bg);color:var(--fg);border-color:var(--line);--d-line:var(--line)}.alertDlg .alertBox .depX{color:var(--muted)}.alertBox h3{margin:0 0 6px;color:var(--alert);font-size:1.1rem}.alertBox .aItem+.aItem{margin-top:20px;padding-top:16px;border-top:1px solid var(--d-line)}
 .alertBox p{margin:0 0 8px;white-space:pre-line}.alertBox a{font-weight:500}
-.dRow.dAlert{display:flex;align-items:center;gap:calc(var(--rowh)*.25);overflow:hidden;color:var(--d-alert,#ff5a5a);cursor:pointer}
+.dAlertWide{grid-column:1/-1;height:var(--rowh)}.dFill{grid-column:1/-1;background:var(--d-bg)}.dRow.dAlert{display:flex;align-items:center;gap:calc(var(--rowh)*.25);overflow:hidden;color:var(--d-alert,#ff5a5a);cursor:pointer}
 .dAlert svg{flex:none;width:calc(var(--rowh)*.5);height:calc(var(--rowh)*.5)}.dAlert .aMq{flex:1;overflow:hidden;white-space:nowrap;min-width:0}
 .dAlert .aMq>span{display:inline-block;padding-left:100%;font-size:calc(var(--rowh)*.42);font-weight:600;animation:aMq var(--d,20s) linear infinite;animation-delay:var(--dl,0s)}
 @keyframes aMq{to{transform:translateX(-100%)}}@media (prefers-reduced-motion:reduce){.dAlert .aMq>span{animation:none;padding-left:0}}
@@ -4996,7 +4996,7 @@ function depPanelCode(p){const L=(DEP.data[p]||[]),names=new Set((p===0?depCfg.s
 function depRender(){const m=depEl();if(m.hidden)return;
   DEP.poles=true;m.classList.remove('nocode');
   m.classList.toggle('light',depCfg.theme==='light'||(depCfg.theme==='page'&&pageLight()));
-  const box=document.getElementById('depPanels');const np=depCfg.split?2:1;box.replaceChildren();
+  const box=document.getElementById('depPanels');const np=depCfg.split?2:1;box.replaceChildren();DEP.wideAl=null;box.style.gridTemplateRows='';
   const now=new Date();const nowM=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
   let any=false;
   for(let p=0;p<np;p++){const sts=depStops(p);
@@ -5016,13 +5016,15 @@ function depRender(){const m=depEl();if(m.hidden)return;
         const tm=document.createElement('div');tm.className='dTime';tm.innerHTML=brdTime(d,nowM,(sts[0]&&sts[0].c)||city)+(d.t>=1440&&d.t-nowM>=60?'<small class="dDay">'+esc(dayShort(Math.floor(d.t/1440)))+'</small>':'');   // (another day: its date by the time)
         const c=document.createElement('div');c.className='dCode';c.innerHTML=(d.pole?POLE+esc(d.pole):'')+(pc.multi&&d.stn?'<span class="dStn">'+esc(d.stn)+'</span>':'');
         row.append(de,c,tm);row.classList.add('tap');row.onclick=()=>openRunOnMap(d,(DEP.schRaw||[])[p]);rows.append(row)});
-      if(al)rows.append(depAlertRow(ag))}
+      if(al){if(np===2)DEP.wideAl=DEP.wideAl||ag;else rows.append(depAlertRow(ag))}}
     box.append(P);
     if(pc.show&&pc.multi){let w=0;P.querySelectorAll('.dCode').forEach(c=>{w=Math.max(w,c.scrollWidth)});const hc=P.querySelector('.dHead .c');w=Math.max(w,hc?hc.scrollWidth:0);
       P.style.setProperty('--c-code',Math.min(w+8,P.clientWidth*.42)+'px')}
     // a destination too long for its place slides slowly to its end and back (instead of being cut off)
     P.querySelectorAll('.dDest').forEach(de=>{const over=de.scrollWidth-de.clientWidth;if(over<=2)return;const t=de.textContent;de.textContent='';
       const sp=document.createElement('span');sp.className='mq';sp.textContent=t;sp.style.setProperty('--mq',(-over-4)+'px');sp.style.setProperty('--mqd',Math.max(4,over/22+2)+'s');de.append(sp)})}
+  // (two boards side by side: one bar of notices under both, across the page)
+  if(DEP.wideAl){const a=depAlertRow(DEP.wideAl);a.classList.add('dAlertWide');const f=document.createElement('div');f.className='dFill';box.append(a,f);box.style.gridTemplateRows='auto auto 1fr';box.querySelectorAll('.dP .dRows').forEach(r=>r.style.setProperty('--nrows',Math.max(1,depCfg.rows-1)))}   // (the row each board kept for the notices: given to the shared bar)
   m.classList.toggle('empty',!depCfg.stops.length);
   const cs=[...new Set([...depCfg.stops,...(depCfg.split?depCfg.stops2:[])].map(s=>s.c))].map(c=>CITIES[c]?CITIES[c][0]:c);
   document.getElementById('depStat').textContent=cs.join(', ');
@@ -5687,16 +5689,21 @@ function mkFull(on){MK.fs=on;const D=document.getElementById('toolsDr');D.classL
   try{if(on&&D.requestFullscreen&&!document.fullscreenElement)D.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}
   mkRender()}
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&MK.fs){MK.fs=false;document.getElementById('toolsDr').classList.remove('mkFs');document.documentElement.classList.remove('mkFsOn');if(TD.view==='mk')mkRender()}});
-// GPS: the stop the vehicle is at (within 35 m of a stop up to four ahead) or has left (50 m from the stop it was at); the
-// run follows it and the stop is announced – unless the driver is choosing a stop (the arrows) or has just set one by hand
+// GPS – the same rule as mSIP's (gdProgress): the nearest piece of the route between two stops (from the stop it is at, up to
+// four ahead; the whole run at the first fix), "at" a stop within 40 m of it, else on the way to the next; only forwards, each
+// stop announced once; far from the route (over 500 m) the place kept. Not while the driver is choosing a stop (the arrows), nor
+// for 20 s after one set by hand
 function mkGps(on){if(!on||!navigator.geolocation){if(MK.watch!=null){navigator.geolocation.clearWatch(MK.watch);MK.watch=null}MK.fix=null;return}
   if(MK.watch!=null)return;
-  MK.watch=navigator.geolocation.watchPosition(p=>{const R=MK.run;if(!R)return;const la=p.coords.latitude,lo=p.coords.longitude;MK.fix={acc:p.coords.accuracy,d:null};
-    const S=R.ps.map(id=>IDX.stops[id]),last=S.length-1,k=R.p>>1,at=R.p%2===0;const dist=q=>S[q]?distM(la,lo,S[q][2],S[q][3]):1e9;
-    let best=-1,bd=36;for(let q=k;q<=Math.min(last,k+4);q++){const v=dist(q);if(v<bd&&!(q===k&&!at)){bd=v;best=q}}
-    const nx=at?Math.min(k+1,last):Math.min(k+1,last);MK.fix.d=dist(at&&best<0?k:nx);
-    let np=R.p;if(best>=0&&2*best!==R.p&&(best>k||at===false&&best===k+1))np=2*best;else if(at&&best<0&&dist(k)>50&&k<last)np=2*k+1;
-    if(np!==R.p&&MK.sel==null&&Date.now()-(MK.man||0)>20000){R.p=np;mkSaveRun();mkSay(np%2?'next':'at')}if(TD.view==='mk')mkUpd()},
+  MK.watch=navigator.geolocation.watchPosition(p=>{const R=MK.run;if(!R)return;const h=[p.coords.latitude,p.coords.longitude];MK.fix={acc:p.coords.accuracy,d:null};
+    const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,cs=Math.cos(h[0]*Math.PI/180),xy=S=>[(S[3]-h[1])*cs*111320,(S[2]-h[0])*110540];
+    const fresh=!R.fixed,j0=R.p>>1;let bj=j0,bd=1e9;
+    for(let j=fresh?0:j0;j<(fresh?last:Math.min(last,j0+4));j++){const a=xy(P[j]),b=xy(P[j+1]),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy,u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0,d=Math.hypot(a[0]+u*dx,a[1]+u*dy);if(d<bd-1){bd=d;bj=j}}
+    if(bd<=(fresh?150:500)&&(!fresh||(p.coords.accuracy||0)<100)){R.fixed=true;   // (the first place: only close to the route and a good fix)
+      const dA=Math.hypot(...xy(P[bj])),dB=Math.hypot(...xy(P[Math.min(last,bj+1)]));
+      const np=dB<40?2*Math.min(last,bj+1):dA<40?2*bj:Math.min(2*last,2*bj+1);MK.fix.d=np%2?dB:Math.min(dA,dB);
+      if((np>R.p||fresh&&np!==R.p)&&MK.sel==null&&Date.now()-(MK.man||0)>20000){R.p=np;mkSaveRun();mkSay(np%2?'next':'at')}}
+    if(TD.view==='mk')mkUpd()},
     e=>{MK.fix=null;if(TD.view==='mk')mkUpd()},{enableHighAccuracy:true,maximumAge:2000,timeout:20000})}
 // choosing the run: the line (by its number), then its run of today
 function mkPickRender(B){const P=MK.pick;
