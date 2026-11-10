@@ -717,6 +717,13 @@ ROWS = [
     ("kursów", "trips", "Fahrten", "spojov", "spojů"),
     ("np. Dworzec", "e.g. Station", "z. B. Bahnhof", "napr. Stanica", "např. Nádraží"),
     ("Kreator", "Creator", "Editor", "Tvorca", "Tvůrce"),
+    ("Klikaj przystanki", "Click stops", "Haltestellen anklicken", "Klikať zastávky", "Klikat zastávky"),
+    ("Rysuj trasę", "Draw the route", "Strecke zeichnen", "Kresliť trasu", "Kreslit trasu"),
+    ("Wyczyść trasę", "Clear the route", "Strecke leeren", "Vymazať trasu", "Vymazat trasu"),
+    ("Kliknij przystanek na mapie, aby dodać go na koniec trasy. Przeciągnij, aby przesunąć mapę.", "Click a stop on the map to add it at the end of the route. Drag to move the map.", "Klicke auf eine Haltestelle, um sie ans Ende der Strecke anzufügen. Ziehe, um die Karte zu verschieben.", "Kliknutím na zastávku ju pridáte na koniec trasy. Ťahaním posuniete mapu.", "Kliknutím na zastávku ji přidáte na konec trasy. Tažením posunete mapu."),
+    ("Rysuj trasę po mapie – przystanki leżące na niej zostaną dodane w kolejności. Zbędne usuniesz z listy.", "Draw the route on the map – the stops along it are added in order. Remove the ones you don't need from the list.", "Zeichne die Strecke auf der Karte – die Haltestellen daran werden der Reihe nach hinzugefügt. Überflüssige entfernst du aus der Liste.", "Nakreslite trasu na mape – zastávky na nej sa pridajú v poradí. Nepotrebné odstránite zo zoznamu.", "Nakreslete trasu na mapě – zastávky na ní se přidají v pořadí. Nepotřebné odstraníte ze seznamu."),
+    ("Nie znaleziono przystanków na narysowanej trasie.", "No stops found along the drawn route.", "Keine Haltestellen an der gezeichneten Strecke gefunden.", "Na nakreslenej trase sa nenašli žiadne zastávky.", "Na nakreslené trase nebyly nalezeny žádné zastávky."),
+    ("Dodano przystanków:", "Stops added:", "Hinzugefügte Haltestellen:", "Pridané zastávky:", "Přidané zastávky:"),
 ]
 
 WEEKDAYS = {
