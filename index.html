@@ -43,7 +43,7 @@ select.sselN{display:none!important}
 /* the notices' bar: one row at a time (rot), all of them when opened */
 .alertBar .abVp{flex:1 1 auto;width:100%;min-width:0}.alertBar.rot:not(.open) .abVp{height:41px;overflow:hidden}.alertBar.rot:not(.open) .abVp ul{display:block}.alertBar.rot:not(.open) li{height:41px}.alertBar.rot:not(.open) li button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:0!important;height:41px;padding:0;line-height:41px}.alertBar.open .abVp{max-height:50vh;overflow:auto}.alertBar .abExp{flex:none;width:auto;border:0;background:none;color:inherit;cursor:pointer;padding:6px;display:grid;place-items:center}.alertBar.open .abExp svg{transform:rotate(180deg)}
 .alertBox details.aItem>summary{list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:8px}.alertBox details.aItem>summary::-webkit-details-marker{display:none}.alertBox details.aItem>summary h3{flex:1}.alertBox details.aItem>summary::after{content:'';flex:none;width:9px;height:9px;margin-top:6px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg);color:var(--muted);transition:transform .2s}.alertBox details.aItem[open]>summary::after{transform:rotate(-135deg);margin-top:10px}.alertBox details.aItem:not([open]) h3{margin-bottom:0}
-@media (max-width:700px){.lineWarn>div{max-height:9.8em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.lineWarn.lwRep>div{max-height:none;-webkit-mask-image:none;mask-image:none}}
+@media (max-width:700px){.lineWarn.lwCut>div{max-height:9.8em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}.lineWarn.lwRep>div{max-height:none;-webkit-mask-image:none;mask-image:none}}
 .chip.rail.r2{padding:0;letter-spacing:-.02em}   /* (M1, U2, S9: round, the wide letters not stretching it) */
 .nw{white-space:nowrap}
 .alertBox .aItem h3 b{color:var(--fg);margin-right:.15em}.alertBox .aTxt p{margin:0 0 .55em}.alertBox .aTxt p:last-child{margin-bottom:.7em}
@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794354289;
+const APP_BUILD=1794354435;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2055,6 +2055,14 @@ function lineWarnRep(r){if(r.t==='repl')return '';const rep=IDX.routes.filter(x=
   return `<div class="lineWarn lwRep" role="note">${WARN_ICO}<div>${it}</div></div>`}
 // the operator's own notices about the line (Berlin: BVG's), in place of the note made from the timetable: each notice's
 // heading and its sentences about this line (all of it: a click)
+// on a narrow screen a long notice block is cut off (faded) – but only when what is hidden is more than a line and a half;
+// a notice ending a line below the limit is shown whole
+function lwFit(el){const d=el.firstElementChild&&el.lastElementChild;if(!d||el.classList.contains('lwRep'))return;el.classList.remove('lwCut');
+  if(!matchMedia('(max-width:700px)').matches)return;const lh=parseFloat(getComputedStyle(d).lineHeight)||parseFloat(getComputedStyle(d).fontSize)*1.4,lim=parseFloat(getComputedStyle(d).fontSize)*9.8;
+  if(d.scrollHeight>lim+lh*1.6)el.classList.add('lwCut')}
+{const fitAll=()=>document.querySelectorAll('.lineWarn').forEach(lwFit);
+  new MutationObserver(ms=>{if(ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1&&(n.matches('.lineWarn')||n.querySelector&&n.querySelector('.lineWarn')))))requestAnimationFrame(fitAll)}).observe(document.documentElement,{childList:true,subtree:true});
+  addEventListener('resize',()=>requestAnimationFrame(fitAll))}
 function lineWarnLive(r){const g=alertGrp(city);if(!g)return;ztmAlerts(g).then(A=>{if(location.hash!=='#l'+r.id&&!(document.getElementById('hc')&&document.querySelector('.lhead')))return;
   const re=new RegExp('(^|[\\s(,])'+r.n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(?=$|[\\s,.:)])');
   // (a notice without its lines given – ZTM Gdańsk's –: the line named after "linia", "tramwaje", "autobusy"… in its heading or text)
