@@ -579,6 +579,11 @@ ROWS = [
     ("W dół", "Down", "Nach unten", "Dole", "Dolů"),
     ("Pasek", "Bar", "Leiste", "Lišta", "Lišta"),
     ("Ukryj", "Hide", "Ausblenden", "Skryť", "Skrýt"),
+    ("mKomputer", "mComputer", "mBordcomputer", "mPočítač", "mPočítač"),
+    ("Numer linii lub brygady (np. 8/3)", "Line or duty number (e.g. 8/3)", "Linien- oder Dienstnummer (z. B. 8/3)", "Číslo linky alebo turnusu (napr. 8/3)", "Číslo linky nebo pořadí (např. 8/3)"),
+    ("Przewoźnik tej linii nie udostępnia brygad.", "This line's operator does not publish duties.", "Der Betreiber dieser Linie veröffentlicht keine Dienste.", "Dopravca tejto linky nezverejňuje turnusy.", "Dopravce této linky nezveřejňuje pořadí."),
+    ("Brak danych o brygadach na dziś.", "No duty data for today.", "Keine Dienstdaten für heute.", "Žiadne údaje o turnusoch na dnes.", "Žádná data o pořadích na dnes."),
+    ("Nie ma takiej brygady dziś.", "No such duty today.", "Diesen Dienst gibt es heute nicht.", "Taký turnus dnes nie je.", "Takové pořadí dnes není."),
 ]
 
 WEEKDAYS = {
