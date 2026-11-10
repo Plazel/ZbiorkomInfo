@@ -612,6 +612,7 @@ ROWS = [
     ("Zapisano.", "Saved.", "Gespeichert.", "Uložené.", "Uloženo."),
     ("Menu", "Menu", "Menü", "Menu", "Menu"),
     ("Zapowiedzi", "Announcements", "Ansagen", "Hlásenia", "Hlášení"),
+    ("Ustawienia mKomputera", "mComputer settings", "mBordcomputer-Einstellungen", "Nastavenia mPočítača", "Nastavení mPočítače"),
 ]
 
 WEEKDAYS = {
