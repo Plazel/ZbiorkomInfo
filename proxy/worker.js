@@ -60,6 +60,7 @@ async function sayDict() {
   } catch (e) { SAY.t = Date.now() - 540000; }
   return SAY;
 }
+const NATIVE24 = { 'pl-PL-ZofiaNeural': 1 };
 const xml = s => s.replace(/[<>&'"]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[c]));
 
 async function byd(req, cors) {
@@ -100,7 +101,9 @@ async function tts(req, env, ctx, cors) {
   // (a text with such a name: its sounds are part of its place in the cache, so a name put right is heard at once)
   const D = await sayDict(); const said = D.re ? [...new Set(text.match(D.re) || [])].map(w => w + '=' + D.map[w]).join(',') : '';
   const rate = D.tempo[voice] || '-5%';
-  const key = new Request('https://tts.cache/az2/' + (rate !== '-5%' ? 'r' + encodeURIComponent(rate) + '/' : '') + (said ? 'say/' + encodeURIComponent(said) + '/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
+  // (Zofia: in her own 24 kHz, at a higher bit rate – raised to 48 kHz she was heard crackling now and then; her recordings kept apart)
+  const fmt = NATIVE24[voice] ? 'audio-24khz-160kbitrate-mono-mp3' : 'audio-48khz-96kbitrate-mono-mp3';
+  const key = new Request('https://tts.cache/' + (NATIVE24[voice] ? 'az3' : 'az2') + '/' + (rate !== '-5%' ? 'r' + encodeURIComponent(rate) + '/' : '') + (said ? 'say/' + encodeURIComponent(said) + '/' : '') + encodeURIComponent(voice) + '/' + encodeURIComponent(text));
   const cache = caches.default;
   let res = await cache.match(key), err = '';
   const keep = (buf, by) => { const r = new Response(buf, { headers: { 'Content-Type': 'audio/mpeg', 'Cache-Control': 'public, max-age=31536000', 'X-Voice-By': by } }); ctx.waitUntil(cache.put(key, r.clone())); return r; };
@@ -112,7 +115,7 @@ async function tts(req, env, ctx, cors) {
       const r = await fetch(`https://${env.AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1`, {
         method: 'POST', body: ssml,
         headers: { 'Ocp-Apim-Subscription-Key': env.AZURE_KEY, 'Content-Type': 'application/ssml+xml',
-          'X-Microsoft-OutputFormat': 'audio-48khz-96kbitrate-mono-mp3', 'User-Agent': 'ZbiorkomInfo' } });
+          'X-Microsoft-OutputFormat': fmt, 'User-Agent': 'ZbiorkomInfo' } });
       if (r.ok) res = keep(await r.arrayBuffer(), 'Microsoft Azure'); else err += 'azure: ' + r.status + ' ' + (await r.text()).slice(0, 200) + '; ';
     } catch (e) { err += 'azure: ' + e.message + '; '; }
   }

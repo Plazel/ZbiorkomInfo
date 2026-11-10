@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794352805;
+const APP_BUILD=1794353045;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3824,7 +3824,7 @@ let GD_SAYD=null;const gdSayP=()=>GD_SAYD||(GD_SAYD=fetch('data/wymowa.json',{ca
 const gdHash=s=>{let h=5381;for(let i=0;i<s.length;i++)h=(h*33^s.charCodeAt(i))>>>0;return h.toString(36)};
 const gdTtsUrl=(t,l,D)=>{if(!RT_PROXY)return null;const v=GD_VOICE[l],tp=D&&D.tempo[v];
   const said=D&&D.re?[...new Set(t.match(D.re)||[])].map(w=>w+'='+D.map[w]).join(','):'';
-  return RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(v)+'&t='+encodeURIComponent(t)+(tp?'&r='+encodeURIComponent(tp):'')+(said?'&s='+gdHash(said):'')};
+  return RT_PROXY.replace(/\/?$/,'/')+'tts?v='+encodeURIComponent(v)+'&t='+encodeURIComponent(t)+(tp?'&r='+encodeURIComponent(tp):'')+(said?'&s='+gdHash(said):'')+(v==='pl-PL-ZofiaNeural'?'&f=24':'')};   // (Zofia's recordings in her own 24 kHz: new addresses, the old crackling ones not replayed)
 const GD_TQ={n:0,q:[]};
 function gdTtsQ(fn){return new Promise((res,rej)=>{const run=()=>{GD_TQ.n++;fn().then(res,rej).finally(()=>{GD_TQ.n--;const nx=GD_TQ.q.shift();if(nx)nx()})};GD_TQ.n<2?run():GD_TQ.q.push(run)})}
 function gdWav(text,l){const k=GD_VOICE[l]+'|'+text;
@@ -3891,6 +3891,10 @@ function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{
     ord=d=>d<20?U[d]:T[Math.floor(d/10)]+(d%10?' '+U[d%10]:'');
     n=n.replace(/(^|[^\p{L}\d])([12]?\d|3[01])(?:\s*-?\s*go)?\.?\s+(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)(?!\p{L})/giu,(m,a,d,mo)=>+d>=1&&+d<=31?a+ord(+d)+' '+mo.toLowerCase():m)
     .replace(/(^|[^\p{L}\d])([1-9]\d?)(?:\s*-?\s*(?:go|ej))?\.?\s+(pułku|batalionu|dywizjonu|korpusu|szwadronu|regimentu|dywizji|brygady|armii|kompanii|eskadry|flotylli)(?!\p{L})/giu,(m,a,d,u)=>{const f=/^(dywizji|brygady|armii|kompanii|eskadry|flotylli)$/i.test(u),o=ord(+d);return a+(f?o.replace(/ego\b/g,'ej'):o)+' '+u.toLowerCase()})}
+  // ("25-lecia Solidarności": the number joined to the word – "dwudziestopięciolecia")
+  if(nl==='pl'){const U=['','jedno','dwu','trzy','cztero','pięcio','sześcio','siedmio','ośmio','dziewięcio'],N=['dziesięcio','jedenasto','dwunasto','trzynasto','czternasto','piętnasto','szesnasto','siedemnasto','osiemnasto','dziewiętnasto'],
+    T=['','','dwudziesto','trzydziesto','czterdziesto','pięćdziesięcio','sześćdziesięcio','siedemdziesięcio','osiemdziesięcio','dziewięćdziesięcio'],pre=d=>d===100?'stu':d===1000?'tysiąc':d<10?U[d]:d<20?N[d-10]:d<100?T[Math.floor(d/10)]+U[d%10]:'';
+    n=n.replace(/(^|[^\p{L}\d])(\d{1,4})\s*-?\s*(lecia|lecie|leciu|leciem)(?!\p{L})/giu,(m,a,d,w)=>{const p=pre(+d);return p?a+p+w.toLowerCase():m})}
   if(nl==='pl'){const cap=(w,c)=>c===c.toUpperCase()?w[0].toUpperCase()+w.slice(1):w;n=n.replace(/(^|[^\p{L}])([Dd])w\.\s*/gu,(m,a,c)=>a+cap('dworzec',c)+' ')
     .replace(/(^|[^\p{L}])([Aa])ut\.\s*/gu,(m,a,c)=>a+cap('autobusowy',c)+' ').replace(/(^|[^\p{L}])([Pp])rzyst\.\s*/gu,(m,a,c)=>a+cap('przystanek',c)+' ').replace(/\s{2,}/g,' ').trim()}
   // (German names: the abbreviations said in full – Flensburg: "Förde-Park Abzweigung", "Sankt Pauli", "Park and Ride Exe",
@@ -6209,18 +6213,21 @@ function mkMapDraw(){const S=MKM.st;if(!S||!S.C.isConnected)return;const C=S.C,w
   // the route: behind the vehicle grey, ahead in the line's colour
   const line=(pts,col,wd)=>{if(pts.length<2)return;x.beginPath();pts.forEach((q,i)=>{const p=px(q[0],q[1]);i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])});x.strokeStyle=col;x.lineWidth=wd/f;x.lineJoin=x.lineCap='round';x.stroke()};
   const G=S.G;line(G,light?'rgba(255,255,255,.9)':'rgba(0,0,0,.6)',10);line(G.slice(S.si),brand,6.5);line(G.slice(0,S.si+1).concat(S.sd<1600?[S.me]:[]),'#8a938d',6.5);
-  // the stops: small rings; the next stop big and yellow
-  S.P.forEach((St,i)=>{const p=px(St[2],St[3]);if(Math.hypot(p[0],p[1])>rad+20)return;x.beginPath();x.arc(p[0],p[1],(i===S.nx?10:5)/f,0,7);x.fillStyle=i===S.nx?'#ffcc00':i<=S.k?'#8a938d':'#fff';x.fill();x.lineWidth=2.5/f;x.strokeStyle='#0b0d0c';x.stroke()});
+  // the stops passed: small grey rings (the ones ahead: their signs, upright, drawn below)
+  S.P.forEach((St,i)=>{if(i>S.k)return;const p=px(St[2],St[3]);if(Math.hypot(p[0],p[1])>rad+20)return;x.beginPath();x.arc(p[0],p[1],5/f,0,7);x.fillStyle='#8a938d';x.fill();x.lineWidth=2.5/f;x.strokeStyle='#0b0d0c';x.stroke()});
   if(S.gps&&S.acc){const ra=S.acc*256*2**z/(40075016*Math.cos(S.me[0]*Math.PI/180));if(ra>14&&ra<Math.max(w,h)){x.beginPath();x.arc(0,0,ra,0,7);x.fillStyle='rgba(66,165,245,.16)';x.fill()}}
   x.restore();
-  // the next stop off the map: an arrow at the edge pointing to it
-  {const St=S.P[S.nx],q=px(St[2],St[3]).map(v=>v*f),sx=vx+q[0]*Math.cos(rot)-q[1]*Math.sin(rot),sy=vy+q[0]*Math.sin(rot)+q[1]*Math.cos(rot);
-    if(sx<10||sy<10||sx>w-10||sy>h-10){const a=Math.atan2(sy-vy,sx-vx),t=Math.min((sx>vx?(w-18-vx):(vx-18))/Math.abs(Math.cos(a)||1e-9),(sy>vy?(h-18-vy):(vy-18))/Math.abs(Math.sin(a)||1e-9));
-      x.save();x.translate(vx+Math.cos(a)*t,vy+Math.sin(a)*t);x.rotate(a);x.beginPath();x.moveTo(12,0);x.lineTo(-8,-9);x.lineTo(-8,9);x.closePath();x.fillStyle='#ffcc00';x.fill();x.lineWidth=2;x.strokeStyle='#0b0d0c';x.stroke();x.restore()}}
+  // the stops ahead: the stop's sign of the map (A, T…), upright, the next one larger
+  {const R=MK.run&&MK.run.r,img=R?mkSymImg(R):null;if(img&&img.complete&&img.naturalWidth)for(let i=S.P.length-1;i>S.k;i--){const St=S.P[i],q=px(St[2],St[3]).map(v=>v*f),sx=vx+q[0]*Math.cos(rot)-q[1]*Math.sin(rot),sy=vy+q[0]*Math.sin(rot)+q[1]*Math.cos(rot);
+    if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;const sz=i===S.nx?34:26;x.drawImage(img,sx-sz/2,sy-sz/2,sz,sz)}}
   // the vehicle: an arrow pointing up (the way ahead)
   x.save();x.translate(vx,vy);x.beginPath();x.moveTo(0,-16);x.lineTo(11,12);x.lineTo(0,6);x.lineTo(-11,12);x.closePath();x.fillStyle=S.gps?'#1e88e5':brand;x.fill();x.lineWidth=3;x.strokeStyle='#fff';x.stroke();x.restore();
 }
 // what changes every second (and after each step)
+// (a route's stop sign as a picture for the map, made once)
+function mkSymImg(r){const k=symKey(r),key=k.t+k.c;MKM.sym=MKM.sym||{};let im=MKM.sym[key];if(im)return im;im=new Image();
+  im.onload=()=>{if(TD.view==='mk'&&typeof mkMapDraw==='function')try{mkMapDraw()}catch(e){}};
+  im.src='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11.6 -11.6 23.2 23.2" width="96" height="96"><style>.ms0,.ms1,circle,rect{fill:#fff;stroke-width:2.5px}text{font:900 12.6px Roboto,Arial,sans-serif;text-anchor:middle}</style>'+symSVG({t:k.t,cs:[k.c]},0)+'</svg>');return MKM.sym[key]=im}
 function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500);const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.querySelector('.mkRun'))return;
   const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,T=R.off.map(o=>R.t0+o),p=R.p,k=p>>1,at=p%2===0,j=at?k:Math.min(k+1,last);
   const hm=t=>{const m=Math.round(t)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
