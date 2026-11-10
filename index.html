@@ -5670,6 +5670,12 @@ function mkOpen(){if(!MK.run&&MK.restore&&MK.restore.c===city){const r=IDX.route
 function mkNav(){const drv=!!(ACC.user&&ACC.mode==='driver');window.ACC_DRV=drv;document.querySelectorAll('nav.rail .railMk').forEach(b=>b.hidden=!drv);
   document.querySelectorAll('nav.rail .railA11y').forEach(b=>b.hidden=drv||!store.get('ztm.a11y',false));
   if(drv&&GUIDE.open)closeGuide();if(!drv&&TD.view==='mk')closeTool()}
+// the top bar's menus: one open at a time – opening one (or the search) closes the others
+{const M=[['cityBtn','cityMenu'],['langBtn','langMenu'],['accTop','accMenu'],['setBtn','setPanel']];
+  const shut=keep=>M.forEach(([b,p])=>{if(b===keep)return;const P=document.getElementById(p),B=document.getElementById(b);if(P&&!P.hidden){P.hidden=true;if(B)B.setAttribute('aria-expanded','false')}});
+  document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#cityBtn,#langBtn,#accTop,#setBtn,#gsMob');if(!b)return;shut(b.id);
+    if(b.id!=='gsMob'&&typeof gsShow==='function'){try{gsShow([])}catch(x){}}},true);
+  document.addEventListener('focusin',e=>{if(e.target&&e.target.id==='gsIn')shut(null)})}
 // ---- the Hub: per city, the chosen stops' boards (live where the city has it), the notices, small timetables
 const HUB={timer:0,run:0,open:false};
 const hubCfg=()=>{const h=ACC.data.hub=ACC.data.hub||{};return h[city]=h[city]||{stops:[],mini:[]}};
