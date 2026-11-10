@@ -1615,7 +1615,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794341913;
+const APP_BUILD=1794342364;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6491,6 +6491,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
     P: '########.. #.......#. #........#*6 #.......#. ########.. #.........*9',
     R: '########.. #.......#. #........#*6 #.......#. ########.. #....#.... #.....#...*2 #......#..*2 #.......#.*2 #........#*2',
     S: '..######.. .#......#. #........# #.........*5 .#........ ..######.. ........#. .........#*5 #........# .#......#. ..######..',
+    M: '#........# ##......## #.#....#.# #..#..#..# #...##...# #........#*14',
     X: '#........#*2 .#......#.*2 ..#....#..*2 ...#..#...*2 ....##....*3 ...#..#...*2 ..#....#..*2 .#......#.*2 #........#*2',
   };
 
@@ -6566,6 +6567,9 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
            lcaron: { p: ['#', '#'], x: 3 } } },
   };
   const NUM = { glyphs: build(N_SK, null, 19, 2, 1), gap: 2 };
+  // a capital the number face has not drawn: its large skeleton stretched to the full height (never the small size, which is
+  // for lower-case letters)
+  const numG = ch => NUM.glyphs[ch] || (() => { const r = (typeof DISP_SK !== 'undefined' && DISP_SK[ch]) || (L_SK[ch] && parse(L_SK[ch])); if (!r || ch !== ch.toUpperCase() || !/\p{L}/u.test(ch)) return null; return NUM.glyphs[ch] = embolden(toBmp(widen(shrinkOrGrow(r, 19), 10)), 2, 1); })();
 
   /* ---- Night lines: squared digits and a small N sitting on the baseline ---- */
   const SQ_SK = {
@@ -6859,7 +6863,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
         for (const ch of lineTxt.slice(1)) parts.push({ g: SQ[ch], y: 2 });
       } else for (const ch of lineTxt) {
         if (isLower(ch)) { const sm = small(ch); if (sm) parts.push(sm); else skipped.push(ch); }
-        else if (NUM.glyphs[ch]) parts.push({ g: NUM.glyphs[ch], y: 2 });
+        else if (numG(ch)) parts.push({ g: numG(ch), y: 2 });
         else if (FONTS.L.glyphs[ch]) parts.push({ g: FONTS.L.glyphs[ch], y: 6 });
         else skipped.push(ch);
       }
