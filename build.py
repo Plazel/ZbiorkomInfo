@@ -345,7 +345,11 @@ def build_routes(groups, meta_of):
             # frequency on the first weekday; a line running only on other days (e.g. Warsaw's C lines around
             # 1 November) is judged on its busiest day instead
             dcnt = collections.Counter(day for day, lf, rows, _t in tl)
-            dsel = 'w0' if dcnt.get('w0') else (dcnt.most_common(1)[0][0] if dcnt else 'w0')
+            # (the first weekday that is not a public holiday – on 11 November the "weekday" w0 runs the Sunday timetable,
+            # and nearly every line came out as infrequent, uncoloured)
+            _hol = pl_holidays(TODAY.year) | pl_holidays(TODAY.year + 1)
+            _wk = [k for k in ('w%d' % i for i in range(WEEKS_N)) if dcnt.get(k) and DAYS.get(k) not in _hol]
+            dsel = _wk[0] if _wk else ('w0' if dcnt.get('w0') else (dcnt.most_common(1)[0][0] if dcnt else 'w0'))
             for day, lf, rows, _t in tl:
                 if day == dsel:
                     for x in rows[:-1]: cnt[x[0]] += 1
