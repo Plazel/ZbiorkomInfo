@@ -909,7 +909,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gnTop{flex:none;display:flex;align-items:center;gap:.8em;padding:.45em .8em;background:var(--bH);color:var(--sF);border-bottom:2px solid var(--sL);min-width:0}
 .gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:calc(var(--gs)*2.4);min-width:calc(var(--gs)*2.4);padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:calc(var(--gs)*1.05);line-height:1}.gnTop .mb.circle,.gnTop .mb.sq{width:calc(var(--gs)*2.4);padding:0}.gnTop .mb.circle{border-radius:50%}.gnTop .mb.one{font-size:calc(var(--gs)*1.45)}
 .gnTop .gtt{flex:1;min-width:0;display:flex;flex-direction:column}.gnTop .gtt small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
-.gnTop .gtt b{font-size:1.3em;font-weight:800;line-height:1.08;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gnTop .gtt b{font-size:1.3em;font-weight:800;line-height:1.08;text-transform:uppercase;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gnTop .inf{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:.05em}.gnTop .inf small{font-size:.5em;color:var(--sM);text-transform:uppercase;letter-spacing:.06em;font-weight:700}.gnTop .inf b{font-size:.95em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05}
 .gnTop .gsClock{flex:none;margin-left:.3em;font-size:1.25em;font-weight:800;font-variant-numeric:tabular-nums}
 .gnMain{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
@@ -941,21 +941,21 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnTr{min-height:0;display:flex;flex-direction:column}
 /* the transfers: the heading and every row as high as a row of the route */
 .gnTrH{flex:none;display:flex;align-items:center;gap:.6em;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;background:var(--bR);border-bottom:1px solid var(--bS);font-size:calc(var(--gs)*.72)}
-.gnTrH small{font-size:.8em;font-weight:700;color:var(--sF)}
-.gnTrH b{min-width:0;font-size:.8em;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sM)}
+.gnTrH small{font-size:1em;font-weight:700;color:var(--sF)}
+.gnTrH b{min-width:0;font-size:1em;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sM)}
 .gnTrL{flex:1;min-height:0;overflow:auto}
 /* a transfer: the line, its direction, the stop it leaves from when another one, the platform and the time – the last two
    always in columns of their own width, the same in every row */
 .gnTrR{display:grid;grid-template-columns:calc(var(--gs)*1.6) minmax(0,1fr) auto 3.4em 4.4em;gap:.6em;align-items:center;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;border-bottom:1px solid var(--bS);background:var(--bR);font-size:calc(var(--gs)*.72)}
 .gnTrR[data-k]{cursor:pointer}.gnTrR[data-k]:hover{filter:brightness(.96)}
 .gnTrR .dh{min-width:0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gnTrR .ds{min-width:0;max-width:12em;font-size:.82em;color:var(--sM);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+.gnTrR .ds{min-width:0;max-width:12em;font-size:1em;color:var(--sM);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 .gnTrR .dpo{display:flex;align-items:center;gap:.2em;font-weight:700;color:var(--sM);font-variant-numeric:tabular-nums}
 .gnTrR .dt{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnTrE{flex:1;display:flex;align-items:center;justify-content:center;padding:1em;text-align:center;color:var(--sM);font-size:.7em}
 .gnFoot{flex:none;padding:.35em .7em;border-top:1px solid var(--sL);background:var(--bR);color:var(--sM);font-size:.55em}
 .gnFoot.gnTst{display:flex;align-items:center;gap:.6em}.gnFoot.gnTst span{flex:1;text-align:center}.gnTst button{font:inherit;font-weight:600;padding:4px 10px;border:1px solid var(--sL);background:var(--sB);color:var(--sF);cursor:pointer}.gnTst button:disabled{opacity:.35;cursor:default}
-@media (orientation:portrait) and (max-width:900px){.gdSip.gn{--gs:clamp(16px,4.3vw,24px)}#gdPick{--gs:clamp(20px,5.2vw,28px);--rh:calc(var(--gs)*2.2)}#gdPick button,#gdPick li.gdSub{font-size:calc(var(--gs)*.86)}#gdPick .chip{height:calc(var(--gs)*1.4)!important;min-width:calc(var(--gs)*1.4)!important;font-size:calc(var(--gs)*.62)!important}#gdPick .chip.sq,#gdPick .chip.tram,#gdPick .chip.nt,#gdPick .chip.circle,#gdPick .chip.rail{width:calc(var(--gs)*1.4)!important;max-width:calc(var(--gs)*1.4)!important}#gdPick button{grid-template-columns:3.3em calc(var(--gs)*1.6) minmax(0,1fr) 2.8em}.gnTop{flex-wrap:wrap;row-gap:.25em}.gnTop .gtt{flex:1 1 calc(100% - var(--gs)*3.4)}.gnTop .inf{flex:none}.gnTop .gsClock{margin-left:auto}.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:1.05em;-webkit-line-clamp:3}.gnTop{gap:.55em;padding:.4em .55em}.gnTop .inf b{font-size:.85em}.gnTop .gsClock{font-size:1.05em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}}
+@media (orientation:portrait) and (max-width:900px){.gdSip.gn{--gs:clamp(17px,4.8vw,26px)}#gdPick{--gs:clamp(20px,5.2vw,28px);--rh:calc(var(--gs)*2.2)}#gdPick button,#gdPick li.gdSub{font-size:calc(var(--gs)*.86)}#gdPick .chip{height:calc(var(--gs)*1.4)!important;min-width:calc(var(--gs)*1.4)!important;font-size:calc(var(--gs)*.62)!important}#gdPick .chip.sq,#gdPick .chip.tram,#gdPick .chip.nt,#gdPick .chip.circle,#gdPick .chip.rail{width:calc(var(--gs)*1.4)!important;max-width:calc(var(--gs)*1.4)!important}#gdPick button{grid-template-columns:3.3em calc(var(--gs)*1.6) minmax(0,1fr) 2.8em}.gnTop{flex-wrap:wrap;row-gap:.25em}.gnTop .gtt{flex:1 1 calc(100% - var(--gs)*3.4)}.gnTop .inf{flex:none}.gnTop .gsClock{margin-left:auto}.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:1.05em;-webkit-line-clamp:3}.gnTop{gap:.55em;padding:.4em .55em}.gnTop .inf b{font-size:.85em}.gnTop .gsClock{font-size:1.05em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}}
 .gsTrn{font-size:.55em;font-weight:400;color:var(--sM);margin-left:.4em;white-space:nowrap}.gdWrap:has(.gdSip:not([hidden])) .gdStat{display:none}
 @media (max-width:760px){.guideModal{left:0;bottom:calc(60px + env(safe-area-inset-bottom,0px))}}
 .jpModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);display:grid;grid-template-columns:min(520px,48vw) 1fr}
@@ -1691,7 +1691,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794419725;
+const APP_BUILD=1794419850;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
