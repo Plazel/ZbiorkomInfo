@@ -1636,7 +1636,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794354947;
+const APP_BUILD=1794404539;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5730,7 +5730,14 @@ async function route(){
     else if((m=h.match(/^k([A-Za-z0-9_]+)-(\d+)-(\d+)$/)))await renderComboStop(m[1],+m[2],+m[3]);
     else if((m=h.match(/^s([^|]+)(?:\|(.+))?$/)))await renderStopPage(decodeURIComponent(m[1]),m[2]?decodeURIComponent(m[2]):'');
     else renderBoard();
-  }catch(err){app.innerHTML=`<p class="loading err">Nie udało się wczytać danych</p>`}
+  }catch(err){console.error('route',err);
+    // (the data stored on the phone may come from different days – a file kept from yesterday next to one of today's: the stored
+    // copies thrown away and the page loaded once more, wholly from the network, before the error is shown)
+    let last=0;try{last=+sessionStorage.getItem('ztm.dataRetry')||0}catch(e){}
+    if(Date.now()-last>60000&&'caches' in window){try{sessionStorage.setItem('ztm.dataRetry',String(Date.now()))}catch(e){}
+      try{const ks=await caches.keys();for(const k of ks){const c=await caches.open(k);for(const q of await c.keys())if(/\/data\//.test(q.url))await c.delete(q)}}catch(e){}
+      location.reload();return}
+    app.innerHTML=`<p class="loading err">Nie udało się wczytać danych</p>`}
   window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',route);
