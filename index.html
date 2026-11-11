@@ -901,7 +901,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 /* as the departure boards (Tablica): the line and its direction on the plain header with the clock; rows in turn light and
    lighter, a grey band for the column heads and the stop being reached; no colour of its own */
 .gnTop{flex:none;display:flex;align-items:center;gap:.8em;padding:.45em .8em;background:var(--sH);color:var(--sF);border-bottom:2px solid var(--sL);min-width:0}
-.gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:2.3em;min-width:2.3em;padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:1.05em;line-height:1}.gnTop .mb.circle{border-radius:50%;width:2.3em;padding:0}.gnTop .mb.one{font-size:1.25em;height:1.95em;min-width:1.95em}.gnTop .mb.one.circle{width:1.95em}
+.gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:calc(var(--gs)*2.4);min-width:calc(var(--gs)*2.4);padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:calc(var(--gs)*1.05);line-height:1}.gnTop .mb.circle,.gnTop .mb.sq{width:calc(var(--gs)*2.4);padding:0}.gnTop .mb.circle{border-radius:50%}.gnTop .mb.one{font-size:calc(var(--gs)*1.45)}
 .gnTop .gtt{flex:1;min-width:0;display:flex;flex-direction:column}.gnTop .gtt small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
 .gnTop .gtt b{font-size:1.3em;font-weight:800;line-height:1.08;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gnTop .inf{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:.05em}.gnTop .inf small{font-size:.5em;color:var(--sM);text-transform:uppercase;letter-spacing:.06em;font-weight:700}.gnTop .inf b{font-size:.95em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05}
@@ -916,20 +916,20 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .rl{flex:none;align-self:stretch;position:relative;width:var(--rw);margin:-4px 0}
 .gnRow .rl::before{content:"";position:absolute;left:50%;top:0;bottom:-1px;width:calc(var(--gs)*.26);transform:translateX(-50%);background:var(--sR)}
 .gnRow.top .rl::before{top:50%}.gnRow.prev .rl::before{bottom:50%;background:var(--sM)}
-.gnRow .sym{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;width:calc(var(--gs)*1.45);height:calc(var(--gs)*1.45)}.gnRow .sym svg{display:block;width:100%;height:100%;overflow:visible}
-.gnRow .sym .ms0{fill:#fff;stroke-width:2.5px}.gnRow .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.gnRow .sym text.s{font-size:7.8px}
+.gnRow .sym{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;width:calc(var(--gs)*1.05);height:calc(var(--gs)*1.05)}.gnRow .sym svg{display:block;width:100%;height:100%;overflow:visible}
+.gnRow .sym .dot,.mkStops .sym .dot{fill:#fff;stroke:#14171a;stroke-width:4.5px}.gnRow .sym .dot{fill:var(--bR);stroke:var(--sR)}.gnRow.now .sym .dot{fill:var(--bH)}.gnRow .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.gnRow .sym text.s{font-size:7.8px}
 .gnRow .nm{flex:1;min-width:0;display:flex;align-items:center;gap:.4em}
 .gnRow .nm b{min-width:0;font-weight:700;line-height:1.08;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gnRow .nm .hand{flex:none;width:1.1em;height:1.1em;color:currentColor}
 .gnRow .chs{flex:0 1 auto;min-width:0;max-width:52%;display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;align-content:center}
 .gnRow .chs .chip,.gnTrR .chip{flex:none;box-sizing:border-box;height:calc(var(--gs)*1.05)!important;min-width:calc(var(--gs)*1.05)!important;padding:0 2px!important;font-size:calc(var(--gs)*.5)!important;line-height:1}
 .gnRow .chs .chip.tram,.gnRow .chs .chip.nt,.gnRow .chs .chip.circle,.gnRow .chs .chip.rail,.gnTrR .chip.tram,.gnTrR .chip.nt,.gnTrR .chip.circle,.gnTrR .chip.rail{border-radius:50%;width:calc(var(--gs)*1.05)!important;padding:0!important}
-.gnRow .chs .chip.sq{width:calc(var(--gs)*1.05)!important;padding:0!important}.gnTrR .chip.sq{width:calc(var(--gs)*1.25)!important;padding:0!important}.gnRow .chs .chip.one,.gnTrR .chip.one{font-size:calc(var(--gs)*.64)!important}
+.gnRow .chs{--cw:calc(var(--gs)*1.05)}.gnTrR{--cw:calc(var(--gs)*1.25)}.gdSip.gn .gnRow .chs .chip.sq,.gdSip.gn .gnTrR .chip.sq{width:var(--cw)!important;min-width:0!important;max-width:var(--cw)!important;height:var(--cw)!important;padding:0!important;overflow:hidden;letter-spacing:-.04em}
 .gnRow.now{height:calc(var(--rh)*2);min-height:0;font-size:calc(var(--gs)*.9);background:var(--bH)!important;border-bottom-color:var(--bS)}
-.gnRow.now .sym{width:calc(var(--gs)*1.85);height:calc(var(--gs)*1.85)}.gnRow.now .tl{color:var(--sF);font-weight:800}
+.gnRow.now .sym{width:calc(var(--gs)*1.4);height:calc(var(--gs)*1.4)}.gnRow.now .tl{color:var(--sF);font-weight:800}
 .gnRow.now .nm{flex-direction:column;align-items:flex-start;gap:0}.gnRow.now .nm small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
-.gnRow.now .nm b{font-size:1.35em;font-weight:800}.gnRow .pf{flex:none;display:flex;align-items:center;gap:.25em;font-weight:700;font-variant-numeric:tabular-nums}
-.gnRow.prev{background:var(--bR)!important;color:var(--sM);min-height:0;height:var(--rh);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{filter:grayscale(1);width:calc(var(--gs)*1.15);height:calc(var(--gs)*1.15)}
+.gnRow.now .nm b{font-size:1.35em;font-weight:800}.gnRow .nmL{display:flex;align-items:center;gap:.35em;min-width:0}.gnRow .pf{flex:none;display:flex;align-items:center;gap:.25em;font-weight:700;font-variant-numeric:tabular-nums}
+.gnRow.prev{background:var(--bR)!important;color:var(--sM);min-height:0;height:var(--rh);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{width:calc(var(--gs)*.9);height:calc(var(--gs)*.9)}.gnRow.prev .sym .dot{stroke:var(--sM)}
 .gnRow.sel{outline:3px solid var(--sF);outline-offset:-3px}
 .gnTr{min-height:0;display:flex;flex-direction:column}
 /* the transfers: the heading and every row as high as a row of the route */
@@ -1152,7 +1152,7 @@ header.top #gdTTop:not([hidden]){display:inline-grid}header.top #gdTTop{font:700
 .gdPick button>small{margin-left:0;display:flex;align-items:center;gap:.2em;justify-content:flex-start;font-weight:700;font-variant-numeric:tabular-nums}
 .gdPick .chip{transform:none!important;box-sizing:border-box;height:calc(var(--gs)*1.25)!important;min-width:calc(var(--gs)*1.25)!important;padding:0 2px!important;font-size:calc(var(--gs)*.58)!important;line-height:1}
 .gdPick .chip.sq,.gdPick .chip.tram,.gdPick .chip.nt,.gdPick .chip.circle,.gdPick .chip.rail{width:calc(var(--gs)*1.25)!important;padding:0!important}.gdPick .chip.tram,.gdPick .chip.nt,.gdPick .chip.circle,.gdPick .chip.rail{border-radius:50%}
-.gdPick .chip.one{font-size:calc(var(--gs)*.7)!important}
+.gdPick .chip.sq{min-width:0!important;max-width:calc(var(--gs)*1.25)!important;overflow:hidden;letter-spacing:-.04em}
 header.top #gdTTop,header.top #gdLocTop,header.top #topLoc{width:38px;height:38px;box-sizing:border-box;place-items:center;padding:0;margin:0}header.top #topLoc:not([hidden]){display:inline-grid}
 html.gdOn header.top #gdLocTop:not([hidden]){display:inline-grid}.gdTop #gdLoc{display:none!important}.gdWrap:has(.gdNone) .gdTop{display:none}header.top #gdLocTop[aria-pressed="true"]{color:var(--accent,#d71920)}
 @media (max-width:460px){header.top #gdTTop,header.top #gdLocTop,header.top #topLoc{width:34px;height:34px}}
@@ -1230,7 +1230,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .lineV .mkStops button{padding-left:calc(var(--u)*4.4)}
 .lineV .mkStops .sym{display:block;position:absolute;left:calc(var(--u)*2.1);top:50%;transform:translate(-50%,-50%);z-index:2;width:calc(var(--u)*2.3);height:calc(var(--u)*2.3)}
 .lineV .mkStops .sym svg{display:block;width:100%;height:100%;overflow:visible}
-.lineV .mkStops .sym .ms0{fill:#fff;stroke-width:2.5px}.lineV .mkStops .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.lineV .mkStops .sym text.s{font-size:7.8px}
+.lineV .mkStops .sym .ms0{fill:#fff;stroke-width:2.5px}.mkStops .sym{width:calc(var(--u)*1.6)!important;height:calc(var(--u)*1.6)!important}.mkStops li.cur .sym{width:calc(var(--u)*2.1)!important;height:calc(var(--u)*2.1)!important}.lineV .mkStops .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.lineV .mkStops .sym text.s{font-size:7.8px}
 .lineV .mkStops li.cur .sym{width:calc(var(--u)*3.1);height:calc(var(--u)*3.1)}
 .lineV .mkStops li.prev .sym{filter:grayscale(1)}
 .lineV .mkStops li.cur button{margin-left:0}
@@ -1684,7 +1684,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794413421;
+const APP_BUILD=1794413938;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4291,7 +4291,16 @@ const gdReq=j=>{const R=GUIDE.run;return !!(R&&R.req&&R.ps&&R.req.has(R.ps[j]))}
 async function gdReqLoad(R){if(!R||!R.r||!R.ps||R.req)return;R.ps.forEach(id=>{if(IDX.stops[id])gdTrLoad(id)});R.req=new Set();try{const D=await loadRoute(R.r.id);const ps=new Set(R.ps);let best=null,bn=-1;
     (D.dirs||[]).forEach(d=>{const n=d.stops.filter(x=>ps.has(x[0])).length;if(n>bn){bn=n;best=d}});
     if(best)best.stops.forEach(x=>{if(x[2]&&ps.has(x[0]))R.req.add(x[0])});if(R.req.size&&GUIDE.run===R)gdTick()}catch(e){}}
-function gdChoose(run){if(run.tst)gdTSave(run);else store.set('ztm.gdTRun',null);document.getElementById('gdSip').classList.toggle('tst',!!run.tst);gdReqLoad(run);gdZonesLoad();if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
+// a transfer tapped: its ride shown in the mSIP, the ride left a step of the history – the browser's back button returns to it
+GUIDE.runStack=[];
+function gdSwitch(run){GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.trSel=null;GUIDE.redraw=null;GUIDE.run=run;gdReqLoad(run);gdBackBtn();gdTick()}
+async function gdOpenTransfer(d){let x=d;
+  if(!x.ps){   // (a live time: the ride from the timetable it belongs to – the same line and direction, the nearest time)
+    let L=[];for(const [k,sh] of depDayKeys()){try{L.push(...await depFor({n:d.stn||d.st,c:city,poles:[]},k,sh))}catch(e){}}
+    const t=d.sch!=null?d.sch:d.t;x=L.filter(q=>q.ps&&q.r.n===d.r.n&&(!d.sid||q.sid===d.sid)).sort((a,b)=>(gdSameHead(d.head,a.head)?0:1)-(gdSameHead(d.head,b.head)?0:1)||Math.abs(a.t-t)-Math.abs(b.t-t))[0];if(!x)return}
+  if(!GUIDE.run)return;GUIDE.runStack.push(GUIDE.run);try{history.pushState({ov:'guide',gd:1,gs:GUIDE.runStack.length},'',location.href)}catch(e){}
+  gdSwitch({r:x.r,ps:x.ps,off:x.off,t0:x.t0,head:x.head,fromStop:true})}
+function gdChoose(run){GUIDE.runStack=[];if(run.tst)gdTSave(run);else store.set('ztm.gdTRun',null);document.getElementById('gdSip').classList.toggle('tst',!!run.tst);gdReqLoad(run);gdZonesLoad();if(store.get('ztm.gdAuto',false)&&!GUIDE.voice)document.getElementById('gdVoice').click();if(!GUIDE.run){GUIDE.backStop=GUIDE.stopSel;try{history.pushState({ov:'guide',gd:1},'',location.href)}catch(e){}}GUIDE.stopSel=null;GUIDE.lastHd=null;GUIDE.annMax=-1;GUIDE.nxMax=-1;GUIDE.run=run;GUIDE.j=0;GUIDE.lastAnn='';GUIDE.choice=null;document.getElementById('gdPick').innerHTML='';gdBackBtn();gdTick()}
 // the areas of the stops that belong to a city (the Tricity's cities and their suburbs together; Krynica with the stops of its
 // lines outside it; Nowy Sącz with those of RX1)
 const gdCityAreas=c=>new Set(['gda','sop','gdy','wej','all'].includes(c)?['gda','sop','gdy','wej','oth']:c==='km'?['km','kmx']:c==='ns'?['ns','kmx','km']:[c]);
@@ -4433,8 +4442,8 @@ function gdProgress(h,src,q){{const pk0=document.getElementById('gdPick');if(pk0
   R.src=bd>500&&src!=='me'?'':src==='veh'&&R.vts?gdAgo(R.vts):src==='me'?'GPS':trS(src==='veh'?(tri?'Położenie pojazdu na żywo (GPS pojazdu)':'Położenie pojazdu na żywo (GTFS-RT)'):src==='tt'?'Położenie według rozkładu jazdy':'Położenie według GPS telefonu');R.srcAgo=bd<=500&&src==='veh'&&!!R.vts;
   // as many stops between as fit on the screen
   sip.hidden=false;const hd=Math.min(last,cur!=null?cur:next);
-  if(!sip.dataset.tap){sip.dataset.tap=1;sip.addEventListener('click',e=>{const r=e.target.closest('.gbR,.gnTrR[data-k]');if(!r||!GUIDE.run)return;const E=GD_BRD[GUIDE.run.ps[Math.min(GUIDE.lastHd,GUIDE.run.ps.length-1)]];
-    const d=E&&E.list&&E.list[+r.dataset.k];if(d){NAV_SILENT=true;try{closeGuide()}finally{NAV_SILENT=false}openRunOnMap(d,E.list)}})}
+  if(!sip.dataset.tap){sip.dataset.tap=1;sip.addEventListener('click',e=>{const r=e.target.closest('.gnTrR[data-k]');if(!r||!GUIDE.run)return;const E=GD_BRD[GUIDE.run.ps[Math.min(GUIDE.lastHd,GUIDE.run.ps.length-1)]];
+    const d=E&&E.list&&E.list[+r.dataset.k];if(d)gdOpenTransfer(d)})}
   if(true)for(let k=hd+1;k<=Math.min(last,hd+2);k++)gdBoardLoad(R.ps[k]);   // ready before the ride gets there
   const draw=()=>{for(let m=6;m>=1;m--){sip.innerHTML=gdSipHtml(R,P,cur,next,m);const b=sip.querySelector('.gsBody');if(!b||b.scrollHeight<=b.clientHeight+1)break}};GUIDE.redraw={R,f:draw};
   // the animation (settings): when the ride moves on, the stop left fades away and the stops above slide down into place
@@ -4500,13 +4509,13 @@ function gdTrRows(R,sid,tAt,nowM,clickable){const E=gdBoardLoad(sid);if(!E.list)
 function gdSipNew(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=R.tst?R.simM:(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
   const lag=Math.max(0,nowM-T[hd]);const mins=j=>{const m=T[j]+lag-nowM;return m<1?'&lt; 1 min':Math.round(m)+' min'};
-  const s0=depStyle(R.r);const k0=symKey(R.r),sym=`<span class="sym"><svg viewBox="-11.6 -11.6 23.2 23.2" aria-hidden="true">${symSVG({t:k0.t,cs:[k0.c]},0)}</svg></span>`;
+  const s0=depStyle(R.r);const sym=`<span class="sym"><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle class="dot" r="8.5"/></svg></span>`;
   const adm=!!(ACC.user&&ACC.mode==='admin');const ts=adm&&GUIDE.trSel;const sel=ts&&ts.run===R&&Date.now()-ts.t<20000&&ts.j>=hd&&ts.j<=last?ts.j:hd;
   const chs=j=>{if(!store.get('ztm.gdChips',true))return '';const t=gdTransfers(R.ps[j],R.r,T[j]+lag);return t?`<span class="chs">${t}</span>`:''};
   const to=Math.min(last,hd+MID),rows=[];const hand=j=>gdReq(j)?HAND:'';
   for(let j=to;j>hd;j--)rows.push(`<button type="button" data-j="${j}" class="gnRow${adm?' pick':''}${j===to&&to===last?' top':''}${j===sel&&sel!==hd?' sel':''}"><span class="tl">${mins(j)}</span><span class="rl">${sym}</span><span class="nm"><b>${esc(P[j][0])}</b>${hand(j)}</span>${chs(j)}</button>`);
   const rl=R.r.t==='rail';const lbl=trS(hd===last?(rl?'Stacja końcowa':'Przystanek końcowy'):cur!=null?(rl?'Stacja':'Przystanek'):(rl?'Następna stacja':'Następny przystanek'));
-  rows.push(`<button type="button" data-j="${hd}" class="gnRow now${adm?' pick':''}${hd===last?' top':''}"><span class="tl">${cur==null?mins(hd):''}</span><span class="rl">${sym}</span><span class="nm"><small>${esc(lbl)}</small><b>${esc(P[hd][0])}</b>${hand(hd)}</span>${chs(hd)}</button>`);
+  rows.push(`<button type="button" data-j="${hd}" class="gnRow now${adm?' pick':''}${hd===last?' top':''}"><span class="tl">${cur==null?mins(hd):''}</span><span class="rl">${sym}</span><span class="nm"><small>${esc(lbl)}</small><span class="nmL"><b>${esc(P[hd][0])}</b>${hand(hd)}</span></span>${chs(hd)}</button>`);
   if(hd>0)rows.push(`<div data-j="${hd-1}" class="gnRow prev"><span class="tl"></span><span class="rl">${sym}</span><span class="nm"><b>${esc(P[hd-1][0])}</b></span></div>`);
   const trs=gdTrRows(R,R.ps[sel],T[sel]+lag,nowM,sel===hd);
   return `<div class="gnTop"><span class="mb ${s0.shape}${sqCls(R.r)}${String(R.r.n).length===1?' one':''}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
@@ -4549,7 +4558,7 @@ setInterval(()=>{if(!GUIDE.open||GUIDE.run&&GUIDE.run.tst)return;{const R=GUIDE.
   bs.forEach(b=>b.onclick=()=>{store.set('ztm.gdVoice',b.dataset.gv);mark()})})();   // (the voice changed: heard at the next announcement, no sample of a stop now)
 // back to choosing the ride: the departures of the stop it was chosen from, else the user's own position; the browser's
 // back button does the same (a ride chosen is a step of the history)
-function gdBack(){document.getElementById('gdSip').classList.remove('tst');store.set('ztm.gdTRun',null);if(GUIDE.ret){gdReturn();return}const st=GUIDE.backStop;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.lastHd=null;document.getElementById('gdSip').hidden=true;document.getElementById('gdPick').innerHTML='';
+function gdBack(){GUIDE.runStack=[];document.getElementById('gdSip').classList.remove('tst');store.set('ztm.gdTRun',null);if(GUIDE.ret){gdReturn();return}const st=GUIDE.backStop;GUIDE.run=null;GUIDE.choice=null;GUIDE.lastAnn='';GUIDE.lastHd=null;document.getElementById('gdSip').hidden=true;document.getElementById('gdPick').innerHTML='';
   try{speechSynthesis.cancel()}catch(e){}gdBackBtn();
   if(st){GUIDE.stopSel=st;if(GUIDE.setLoc)GUIDE.setLoc(false);gdShowDeps(st,trS('Wybierz kurs, którego trasę chcesz wyświetlić'))}else{GUIDE.stopSel=null;if(GUIDE.setLoc)GUIDE.setLoc(true);gdTick()}}
 // the new look: a stop of the route tapped shows its transfers (for 20 s, or until the ride gets there); the look switched
@@ -5815,6 +5824,7 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
       else if(want==='dep')await openDep();else if(want==='jp')await openJP();else if(want==='guide')openGuide();else if(want==='takt'||want==='bryg'||want==='hub'||want==='adm'||want==='mkadm'||want==='msgadm'||want==='krt'||want==='dbd'||want==='mk')openTool(want);
       else{if(GUIDE.open)closeGuide();if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool()}}
     if(want==='guide'&&GUIDE.open&&GUIDE.run&&!st.gd)gdBack();
+    else if(want==='guide'&&GUIDE.open&&st.gd&&GUIDE.runStack&&GUIDE.runStack.length>(st.gs||0)){let r;while(GUIDE.runStack.length>(st.gs||0))r=GUIDE.runStack.pop();if(r)gdSwitch(r)}
     if(want==='map'){if(st.run&&!RUN.d){const r=IDX.routes.find(x=>x.id===st.run.id);if(r)await openRunOnMap(Object.assign({r,sch:true,t:st.run.t0},st.run),[])}
       else if(!st.run&&RUN.d)closeRun()}
     if(want==='map'&&st.pop){await new Promise(r=>setTimeout(r,120));reopenStopPop(st.pop)}}
@@ -6313,7 +6323,7 @@ function mkRender(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1
       <div class="mkLate"><b></b></div>
     </div></div>`;
   B.querySelector('.mkLn').replaceChildren(chip(R.r,'',true));B.querySelector('.mkHead').textContent=R.head;
-  {const sv=`<svg viewBox="-11.6 -11.6 23.2 23.2">${(()=>{const k=symKey(R.r);return symSVG({t:k.t,cs:[k.c]},0)})()}</svg>`;B.querySelectorAll('.mkStops .sym').forEach(e=>e.innerHTML=sv)}
+  {const sv='<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle class="dot" r="8.5"/></svg>';B.querySelectorAll('.mkStops .sym').forEach(e=>e.innerHTML=sv)}
   B.querySelector('.mkDuty').textContent=R.duty||'–';B.querySelector('.mkDrv').textContent=ACC.user?ACC.user.id:'–';B.querySelector('.mkDrv').title=ACC.user?ACC.user.name:'';
   B.querySelectorAll('[data-mk]').forEach(b=>b.onclick=()=>mkAct(b.dataset.mk));
   // (a pane open – the menu, the messages, the special announcements: "Powrót" over the map; in the menu's settings a step back)
@@ -6381,17 +6391,14 @@ function mkMapDraw(){const S=MKM.st;if(!S||!S.C.isConnected)return;const C=S.C,w
   const G=S.G;line(G,light?'rgba(255,255,255,.9)':'rgba(0,0,0,.6)',10);line(G.slice(S.si),brand,6.5);line(G.slice(0,S.si+1).concat(S.sd<1600?[S.me]:[]),'#8a938d',6.5);
   if(S.gps&&S.acc){const ra=S.acc*256*2**z/(40075016*Math.cos(S.me[0]*Math.PI/180));if(ra>14&&ra<Math.max(w,h)){x.beginPath();x.arc(0,0,ra,0,7);x.fillStyle='rgba(66,165,245,.16)';x.fill()}}
   x.restore();
-  // every stop: the stop's sign of the map (A, T…), upright, always shown; the next one larger, those passed in grey
-  {const R=MK.run&&MK.run.r,img=R?mkSymImg(R):null;if(img&&img.complete&&img.naturalWidth)for(let i=S.P.length-1;i>=0;i--){const St=S.P[i],q=px(St[2],St[3]).map(v=>v*f),sx=vx+q[0]*Math.cos(rot)-q[1]*Math.sin(rot),sy=vy+q[0]*Math.sin(rot)+q[1]*Math.cos(rot);
-    if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;const sz=i===S.nx?34:26;x.save();if(i<S.nx&&i!==S.k)x.filter='grayscale(1)';x.drawImage(img,sx-sz/2,sy-sz/2,sz,sz);x.restore()}}
+  // every stop: a plain dot, always shown; the next one larger, those passed in grey
+  {for(let i=S.P.length-1;i>=0;i--){const St=S.P[i],q=px(St[2],St[3]).map(v=>v*f),sx=vx+q[0]*Math.cos(rot)-q[1]*Math.sin(rot),sy=vy+q[0]*Math.sin(rot)+q[1]*Math.cos(rot);
+    if(sx<-20||sy<-20||sx>w+20||sy>h+20)continue;const rr=i===S.nx?10:7;x.beginPath();x.arc(sx,sy,rr,0,7);x.fillStyle='#fff';x.fill();x.lineWidth=i===S.nx?4.5:3.5;x.strokeStyle=i<S.nx&&i!==S.k?'#8a938d':'#14171a';x.stroke()}}
   // the vehicle: an arrow pointing up (the way ahead)
   x.save();x.translate(vx,vy);x.beginPath();x.moveTo(0,-16);x.lineTo(11,12);x.lineTo(0,6);x.lineTo(-11,12);x.closePath();x.fillStyle=S.gps?'#1e88e5':brand;x.fill();x.lineWidth=3;x.strokeStyle='#fff';x.stroke();x.restore();
 }
 // what changes every second (and after each step)
 // (a route's stop sign as a picture for the map, made once)
-function mkSymImg(r){const k=symKey(r),key=k.t+k.c;MKM.sym=MKM.sym||{};let im=MKM.sym[key];if(im)return im;im=new Image();
-  im.onload=()=>{if(TD.view==='mk'&&typeof mkMapDraw==='function')try{mkMapDraw()}catch(e){}};
-  im.src='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-11.6 -11.6 23.2 23.2" width="96" height="96"><style>.ms0,.ms1,circle,rect{fill:#fff;stroke-width:2.5px}text{font:900 12.6px Roboto,Arial,sans-serif;text-anchor:middle}</style>'+symSVG({t:k.t,cs:[k.c]},0)+'</svg>');return MKM.sym[key]=im}
 function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500);const B=document.getElementById('tdMk'),R=MK.run;if(!B||!R||!B.querySelector('.mkRun'))return;
   const P=R.ps.map(id=>IDX.stops[id]),last=P.length-1,T=R.off.map(o=>R.t0+o),p=R.p,k=p>>1,at=p%2===0,j=at?k:Math.min(k+1,last);
   const hm=t=>{const m=Math.round(t)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
