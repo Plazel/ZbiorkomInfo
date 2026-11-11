@@ -934,7 +934,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .chs{--cw:calc(var(--gs)*1.05)}.gnTrR{--cw:calc(var(--gs)*1.25)}.gdSip.gn .gnRow .chs .chip.sq,.gdSip.gn .gnTrR .chip.sq{width:var(--cw)!important;min-width:0!important;max-width:var(--cw)!important;height:var(--cw)!important;padding:0!important;overflow:hidden;letter-spacing:-.04em}
 .gnRow.now{height:calc(var(--rh)*2);min-height:0;font-size:calc(var(--gs)*.9);background:var(--bH)!important;border-bottom-color:var(--bS)}
 .gnRow.now .sym{width:calc(var(--gs)*1.4);height:calc(var(--gs)*1.4)}.gnRow.now .tl{color:var(--sF);font-weight:800}
-.gnRow.now .nm{flex-direction:column;align-items:flex-start;gap:0}.gnRow.now .nm small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
+.gnRow.now .nm{position:relative;flex-direction:row;align-items:center;gap:0}.gnRow.now .nm small{position:absolute;left:0;bottom:calc(100% + .1em);white-space:nowrap;font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
 .gnRow.now .nm b{font-size:1.35em;font-weight:800}.gnRow .nmL{display:flex;align-items:center;gap:.35em;min-width:0}.gnRow .pf{flex:none;display:flex;align-items:center;gap:.25em;font-weight:700;font-variant-numeric:tabular-nums}
 .gnRow.prev{background:var(--bR)!important;color:var(--sM);min-height:0;height:var(--rh);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{width:calc(var(--gs)*.9);height:calc(var(--gs)*.9)}.gnRow.prev .sym .dot{stroke:var(--sM)}
 .gnRow.sel{outline:3px solid var(--sF);outline-offset:-3px}
@@ -950,7 +950,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnTrR[data-k]{cursor:pointer}.gnTrR[data-k]:hover{filter:brightness(.96)}
 .gnTrR .dh{min-width:0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gnTrR .ds{min-width:0;max-width:12em;font-size:1em;color:var(--sM);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
-.gnTrR .dpo{display:flex;align-items:center;gap:.2em;font-weight:700;color:var(--sM);font-variant-numeric:tabular-nums}
+.gnTrR .dpo{display:flex;align-items:center;gap:.2em;font-weight:400;color:var(--sM);font-variant-numeric:tabular-nums}
 .gnTrR .dt{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnTrE{flex:1;display:flex;align-items:center;justify-content:center;padding:1em;text-align:center;color:var(--sM);font-size:.7em}
 .gnFoot{flex:none;padding:.35em .7em;border-top:1px solid var(--sL);background:var(--bR);color:var(--sM);font-size:.55em}
@@ -1156,7 +1156,7 @@ header.top #gdTTop:not([hidden]){display:inline-grid}header.top #gdTTop{font:700
 .gdPick button:hover{background:rgba(127,127,127,.08)}
 .gdPick button>span:first-child{font-weight:800!important}.gdPick button>span:first-child small{font-weight:500;color:var(--muted)}
 .gdPick .gpH{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gdPick button>small{margin-left:0;display:flex;align-items:center;gap:.2em;justify-content:flex-start;font-weight:700;font-variant-numeric:tabular-nums}
+.gdPick button>small{margin-left:0;display:flex;align-items:center;gap:.2em;justify-content:flex-start;font-weight:400;font-variant-numeric:tabular-nums}
 .gdPick .chip{transform:none!important;box-sizing:border-box;height:calc(var(--gs)*1.25)!important;min-width:calc(var(--gs)*1.25)!important;padding:0 2px!important;font-size:calc(var(--gs)*.58)!important;line-height:1}
 .gdPick .chip.sq,.gdPick .chip.tram,.gdPick .chip.nt,.gdPick .chip.circle,.gdPick .chip.rail{width:calc(var(--gs)*1.25)!important;padding:0!important}.gdPick .chip.tram,.gdPick .chip.nt,.gdPick .chip.circle,.gdPick .chip.rail{border-radius:50%}
 .gdPick .chip.sq{min-width:0!important;max-width:calc(var(--gs)*1.25)!important;overflow:hidden;letter-spacing:-.04em}
@@ -1691,7 +1691,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794419850;
+const APP_BUILD=1794422603;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5045,6 +5045,8 @@ async function depLiveBYD(st){if(!RT_PROXY)return null;const M=await bydMap();
     if(m){used.add(m);out.push({...m,t,st:m.t,live:true,delay:Math.round((t-m.t)*60),lastT:t})}
     else out.push({t,st:t,r,head:e.sDestino||'',pole:e.pole,live:true,delay:0,lastT:t})});
   return out}
+// the live data's shortened directions written out as in the timetables ("Łostowice Świętokrz." – Łostowice Świętokrzyska)
+const fixHead=h=>String(h).replace(/(^|\s)Świętokrz\.?(?=\s|$)/u,'$1Świętokrzyska');
 async function depLive(st){
   if(st.c==='byd')return depLiveBYD(st);
   if(RT_GTFS[st.c])return RT_LOCAL?depLiveRT(st):depLiveGT(st);
@@ -5058,7 +5060,7 @@ async function depLive(st){
       const r=IDX.routes.find(x=>x.n===n&&areaOf(x)==='tri')||{id:'rt'+n,n,t:/^\d{1,2}$/.test(n)?'tram':/^N/.test(n)?'night':'bus',c:['gda']};
       const th=Date.parse(d.theoreticalTime);const live=d.status==='REALTIME'&&!!d.estimatedTime;
       // the delay as the difference of the two times the API gives (its delayInSeconds is for the vehicle's last stop)
-      out.push({t:(t-base)/60000,sch:isFinite(th)?(th-base)/60000:null,r,head:d.headsign||'',pole,sid,stn:st.n,live,trip:d.scheduledTripStartTime,apiD:d.delayInSeconds,delay:live&&isFinite(th)?Math.round((t-th)/1000):0,lastT:(t-base)/60000})})}));
+      out.push({t:(t-base)/60000,sch:isFinite(th)?(th-base)/60000:null,r,head:fixHead(d.headsign||''),pole,sid,stn:st.n,live,trip:d.scheduledTripStartTime,apiD:d.delayInSeconds,delay:live&&isFinite(th)?Math.round((t-th)/1000):0,lastT:(t-base)/60000})})}));
   if(!ok){RT_DEAD=Date.now()+120000;return null}   // no way through: try again in two minutes
   await fixDelays(out);
   return out}
