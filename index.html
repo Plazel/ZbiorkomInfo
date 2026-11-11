@@ -896,7 +896,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 /* the new mSIP (as the mKomputer): the line and its direction on a green bar; the route on the left – the stops ahead, the next one
    large and green, the one left behind dashed –, the transfers of the stop (the next one, or the one tapped) on the right;
    upright on a phone the route above, the transfers below */
-.gdSip.gn{--rh:calc(var(--gs)*1.95);background:var(--sB);border:1px solid var(--sL);gap:0;font-size:var(--gs)}
+.gdSip.gn{--rh:calc(var(--gs)*1.95);background:var(--bR);border:1px solid var(--sL);gap:0;font-size:var(--gs)}
 .gdSip.gn .chip,.gdSip.gn .chip:hover,.gdSip.gn .mb:hover{transform:none!important;transition:none!important;filter:none!important;cursor:inherit}
 /* as the departure boards (Tablica): the line and its direction on the plain header with the clock; rows in turn light and
    lighter, a grey band for the column heads and the stop being reached; no colour of its own */
@@ -911,7 +911,6 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 /* a row of the route: the time, the rail with the stop's sign (one column of the same width in every row, the line through its
    middle), the name, the transfer lines (on more rows when many), the platform */
 .gnRow{--rw:calc(var(--gs)*1.9);position:relative;flex:none;min-height:var(--rh);display:flex;align-items:center;gap:calc(var(--gs)*.45);padding:3px calc(var(--gs)*.5) 3px calc(var(--gs)*.3);box-sizing:border-box;border:0;border-bottom:1px solid var(--bS);background:var(--bR);color:var(--sF);font:inherit;font-size:calc(var(--gs)*.72);text-align:left;width:100%}
-.gnRow:nth-child(even){background:var(--bR2)}
 button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .tl{flex:none;width:calc(var(--gs)*3.1);text-align:right;color:var(--sM);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnRow .rl{flex:none;align-self:stretch;position:relative;width:var(--rw);margin:-4px 0}
@@ -926,29 +925,28 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .chs .chip,.gnTrR .chip{flex:none;box-sizing:border-box;height:calc(var(--gs)*1.05)!important;min-width:calc(var(--gs)*1.05)!important;padding:0 2px!important;font-size:calc(var(--gs)*.5)!important;line-height:1}
 .gnRow .chs .chip.tram,.gnRow .chs .chip.nt,.gnRow .chs .chip.circle,.gnRow .chs .chip.rail,.gnTrR .chip.tram,.gnTrR .chip.nt,.gnTrR .chip.circle,.gnTrR .chip.rail{border-radius:50%;width:calc(var(--gs)*1.05)!important;padding:0!important}
 .gnRow .chs .chip.sq{width:calc(var(--gs)*1.05)!important;padding:0!important}.gnTrR .chip.sq{width:calc(var(--gs)*1.25)!important;padding:0!important}.gnRow .chs .chip.one,.gnTrR .chip.one{font-size:calc(var(--gs)*.64)!important}
-.gnRow.now{min-height:calc(var(--rh)*1.6);font-size:calc(var(--gs)*.9);background:var(--bH)!important;border-bottom-color:var(--bS)}
+.gnRow.now{height:calc(var(--rh)*2);min-height:0;font-size:calc(var(--gs)*.9);background:var(--bH)!important;border-bottom-color:var(--bS)}
 .gnRow.now .sym{width:calc(var(--gs)*1.85);height:calc(var(--gs)*1.85)}.gnRow.now .tl{color:var(--sF);font-weight:800}
 .gnRow.now .nm{flex-direction:column;align-items:flex-start;gap:0}.gnRow.now .nm small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
 .gnRow.now .nm b{font-size:1.35em;font-weight:800}.gnRow .pf{flex:none;display:flex;align-items:center;gap:.25em;font-weight:700;font-variant-numeric:tabular-nums}
-.gnRow.prev{background:transparent!important;color:var(--sM);min-height:calc(var(--rh)*.8);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{filter:grayscale(1);width:calc(var(--gs)*1.15);height:calc(var(--gs)*1.15)}
+.gnRow.prev{background:var(--bR)!important;color:var(--sM);min-height:calc(var(--rh)*.8);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{filter:grayscale(1);width:calc(var(--gs)*1.15);height:calc(var(--gs)*1.15)}
 .gnRow.sel{outline:3px solid var(--sF);outline-offset:-3px}
 .gnTr{min-height:0;display:flex;flex-direction:column}
 /* the transfers: the heading and every row as high as a row of the route */
-.gnTrH{flex:none;display:flex;align-items:center;gap:.6em;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;background:var(--bH);border-bottom:1px solid var(--bS);font-size:calc(var(--gs)*.72)}
+.gnTrH{flex:none;display:flex;align-items:center;gap:.6em;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;background:var(--bR);border-bottom:1px solid var(--bS);font-size:calc(var(--gs)*.72)}
 .gnTrH small{font-size:.8em;font-weight:700;color:var(--sF)}
 .gnTrH b{min-width:0;font-size:.8em;font-weight:800;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sM)}
 .gnTrL{flex:1;min-height:0;overflow:auto}
 /* a transfer: the line, its direction, the stop it leaves from when another one, the platform and the time – the last two
    always in columns of their own width, the same in every row */
 .gnTrR{display:grid;grid-template-columns:calc(var(--gs)*1.6) minmax(0,1fr) auto 3.4em 4.4em;gap:.6em;align-items:center;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;border-bottom:1px solid var(--bS);background:var(--bR);font-size:calc(var(--gs)*.72)}
-.gnTrR:nth-child(even){background:var(--bR2)}
 .gnTrR[data-k]{cursor:pointer}.gnTrR[data-k]:hover{filter:brightness(.96)}
 .gnTrR .dh{min-width:0;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gnTrR .ds{min-width:0;max-width:12em;font-size:.82em;color:var(--sM);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 .gnTrR .dpo{display:flex;align-items:center;gap:.2em;font-weight:700;color:var(--sM);font-variant-numeric:tabular-nums}
 .gnTrR .dt{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnTrE{flex:1;display:flex;align-items:center;justify-content:center;padding:1em;text-align:center;color:var(--sM);font-size:.7em}
-.gnFoot{flex:none;padding:.35em .7em;border-top:1px solid var(--sL);background:var(--sH);color:var(--sM);font-size:.55em}
+.gnFoot{flex:none;padding:.35em .7em;border-top:1px solid var(--sL);background:var(--bR);color:var(--sM);font-size:.55em}
 .gnFoot.gnTst{display:flex;align-items:center;gap:.6em}.gnFoot.gnTst span{flex:1;text-align:center}.gnTst button{font:inherit;font-weight:600;padding:4px 10px;border:1px solid var(--sL);background:var(--sB);color:var(--sF);cursor:pointer}.gnTst button:disabled{opacity:.35;cursor:default}
 @media (orientation:portrait) and (max-width:900px){.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:1.05em}.gnTop{gap:.6em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}}
 .gsTrn{font-size:.55em;font-weight:400;color:var(--sM);margin-left:.4em;white-space:nowrap}.gdWrap:has(.gdSip:not([hidden])) .gdStat{display:none}
@@ -1670,7 +1668,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794410349;
+const APP_BUILD=1794411962;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
