@@ -1691,7 +1691,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794419397;
+const APP_BUILD=1794419725;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5840,7 +5840,11 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
 // the top bar on a narrow screen: what does not fit goes into the list of the "⋯" button (from the end: the theme, full screen,
 // language, settings, account…); everything back in its place first whenever the width or the buttons shown change
 {const W=document.getElementById('topMoreW'),M=document.getElementById('topMoreMenu'),B=document.getElementById('topMore'),H=document.querySelector('header.top');const moved=[];let busy=false;
-  const lbl=el=>{const b=el.matches('button')?el:el.querySelector('button');if(!b)return;const t=b.title||b.getAttribute('aria-label')||(b.id==='themeBtn'?trS('Motyw'):'');const sp=document.createElement('span');sp.className='mlbl';sp.textContent=t.replace(/(\.\s| – ).*$/,'');b.append(sp)};
+  // (each button's name beside it, read again whenever the button changes – the theme button redraws itself, the language's
+  // name changes with the language)
+  const txt=b=>(b.title||b.getAttribute('aria-label')||(b.id==='themeBtn'?trS('Motyw'):'')).replace(/(\.\s| – ).*$/,'');
+  const lbl=el=>{const b=el.matches('button')?el:el.querySelector('button');if(!b)return;let sp=b.querySelector(':scope>.mlbl');if(!sp){sp=document.createElement('span');sp.className='mlbl';b.append(sp)}const t=txt(b);if(sp.textContent!==t)sp.textContent=t};
+  const relabel=()=>moved.forEach(([el])=>lbl(el));new MutationObserver(()=>{if(!busy)relabel()}).observe(M,{childList:true,subtree:true,attributes:true,attributeFilter:['title','aria-label']});
   const over=()=>{const r=H.getBoundingClientRect();return [...H.querySelectorAll('.themebar>*:not([hidden])')].some(e=>e.getBoundingClientRect().right>r.right-2)||H.scrollWidth>H.clientWidth+1};
   const fit=()=>{if(busy)return;busy=true;try{M.hidden=true;B.setAttribute('aria-expanded','false');
       while(moved.length){const [el,ph]=moved.pop();el.querySelectorAll('.mlbl').forEach(x=>x.remove());ph.replaceWith(el)}W.hidden=true;
@@ -5851,7 +5855,7 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
       if(!moved.length)W.hidden=true}finally{busy=false}};
   const close=()=>{M.hidden=true;B.setAttribute('aria-expanded','false');M.querySelectorAll('.langMenu,.setPanel').forEach(x=>{x.hidden=true});M.querySelectorAll('[aria-expanded]').forEach(x=>x.setAttribute('aria-expanded','false'))};
   B.onclick=e=>{e.stopPropagation();if(M.hidden){M.hidden=false;B.setAttribute('aria-expanded','true')}else close()};
-  M.addEventListener('click',e=>{if(e.target.closest('[role^=menuitem]'))setTimeout(close,0);else if(e.target.closest('#themeBtn'))setTimeout(close,150)});
+  M.addEventListener('click',e=>{const path=e.composedPath();if(path.some(n=>n.getAttribute&&/^menuitem/.test(n.getAttribute('role')||'')))setTimeout(close,0);else if(path.some(n=>n.id==='themeBtn'))setTimeout(close,150)});
   document.addEventListener('pointerdown',e=>{if(!M.hidden&&!W.contains(e.target)&&!e.target.closest('.setPanel,.langMenu'))close()});
   let raf=0;const later=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(fit)};
   addEventListener('resize',later);new MutationObserver(ms=>{if(!busy&&ms.some(m=>m.attributeName==='hidden'&&m.target!==M&&m.target!==W&&!M.contains(m.target)&&!m.target.closest('.langMenu,.setPanel,.accMenu,.cityMenu,.gsList')))later()}).observe(document.querySelector('.themebar'),{attributes:true,subtree:true,attributeFilter:['hidden']});
