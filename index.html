@@ -905,7 +905,8 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 /* the new mSIP (as the mKomputer): the line and its direction on a green bar; the route on the left – the stops ahead, the next one
    large and green, the one left behind dashed –, the transfers of the stop (the next one, or the one tapped) on the right;
    upright on a phone the route above, the transfers below */
-.gdSip.gn{--gnG:#2e7d32;background:var(--bg);border:0;gap:8px;font-size:var(--gs)}
+.gdSip.gn{--gnG:var(--brand);background:var(--bg);border:0;gap:8px;font-size:var(--gs)}
+.gdSip.gn .chip,.gdSip.gn .chip:hover,.gdSip.gn .mb:hover{transform:none!important;transition:none!important;filter:none!important;cursor:inherit}
 .gnTop{flex:none;display:flex;align-items:center;gap:.8em;padding:.5em .8em;background:var(--gnG);color:#fff;min-width:0}
 .gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:2.4em;min-width:2.4em;padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:1em;line-height:1;box-shadow:0 0 0 2px rgba(255,255,255,.92)}.gnTop .mb.circle{border-radius:50%;width:2.4em;padding:0}
 .gnTop .gtt{flex:1;min-width:0;display:flex;flex-direction:column}.gnTop .gtt small{font-size:.5em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
@@ -915,37 +916,45 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gnTop .veh{flex:none;font-size:.55em;opacity:.9}
 .gnMain{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
 .gnMain .gsBody{display:flex;flex-direction:column;gap:6px;overflow:hidden;min-height:0}
-.gnRow{position:relative;flex:none;min-height:2.6em;display:flex;align-items:center;gap:.6em;padding:.25em .7em;box-sizing:border-box;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:inherit;font-size:.72em;text-align:left;cursor:pointer;width:100%}
-.gnRow::before{content:"";position:absolute;left:calc(.7em + 1.05em - 3px);top:-7px;bottom:-7px;width:6px;background:var(--gnG);z-index:0}
-.gnRow.top::before{top:50%}.gnRow.prev::before{bottom:50%;background:var(--muted)}
-.gnRow .sym{position:relative;z-index:1;flex:none;width:2.1em;height:2.1em}.gnRow .sym svg{display:block;width:100%;height:100%;overflow:visible}
+/* a row of the route: the time, then the rail with the stop's sign (one column of the same width in every row, the line through
+   its middle), the name, the transfer lines (on two rows when many), the platform */
+.gnRow{--rw:calc(var(--gs)*1.9);position:relative;flex:none;min-height:calc(var(--gs)*1.95);display:flex;align-items:center;gap:calc(var(--gs)*.45);padding:4px calc(var(--gs)*.5) 4px calc(var(--gs)*.3);box-sizing:border-box;border:1px solid var(--line);background:var(--panel);color:var(--fg);font:inherit;font-size:calc(var(--gs)*.72);text-align:left;width:100%}
+button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
+.gnRow .tl{flex:none;width:calc(var(--gs)*3.1);text-align:right;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
+.gnRow .rl{flex:none;align-self:stretch;position:relative;width:var(--rw);margin:-5px 0}
+.gnRow .rl::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:calc(var(--gs)*.26);transform:translateX(-50%);background:var(--gnG)}
+.gnRow.top .rl::before{top:50%}.gnRow.prev .rl::before{bottom:50%;background:var(--muted)}
+.gnRow .sym{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;width:calc(var(--gs)*1.45);height:calc(var(--gs)*1.45)}.gnRow .sym svg{display:block;width:100%;height:100%;overflow:visible}
 .gnRow .sym .ms0{fill:#fff;stroke-width:2.5px}.gnRow .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.gnRow .sym text.s{font-size:7.8px}
-.gnRow .tl{flex:none;min-width:3.6em;text-align:right;color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
 .gnRow .nm{flex:1;min-width:0;display:flex;align-items:center;gap:.4em}
 .gnRow .nm b{min-width:0;font-weight:700;text-transform:uppercase;line-height:1.08;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .gnRow .nm .hand{flex:none;width:1.1em;height:1.1em;color:currentColor}
-.gnRow .chs{flex:0 1 auto;min-width:0;display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;justify-content:flex-end;max-width:45%}.gnRow .chs .chip{font-size:.75em;flex:none}
-.gnRow.now{min-height:4.4em;font-size:.9em;background:var(--gnG);border-color:var(--gnG);color:#fff}
-.gnRow.now::before{background:#fff}.gnRow.now .sym{width:2.6em;height:2.6em;margin-left:-.25em}.gnRow.now .tl{color:#fff;font-weight:800}
+.gnRow .chs{flex:0 1 auto;min-width:0;max-width:52%;display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;align-content:center}.gnRow .chs .chip,.gnTrR .chip{flex:none;box-sizing:border-box;height:calc(var(--gs)*1.05)!important;min-width:calc(var(--gs)*1.05)!important;padding:0 2px!important;font-size:calc(var(--gs)*.5)!important;line-height:1}
+.gnRow .chs .chip.tram,.gnRow .chs .chip.nt,.gnRow .chs .chip.circle,.gnTrR .chip.tram,.gnTrR .chip.nt,.gnTrR .chip.circle{width:calc(var(--gs)*1.05)!important;padding:0!important}
+.gnTrR .chip{height:calc(var(--gs)*1.25)!important;min-width:calc(var(--gs)*1.25)!important;font-size:calc(var(--gs)*.58)!important}.gnTrR .chip.tram,.gnTrR .chip.nt,.gnTrR .chip.circle{width:calc(var(--gs)*1.25)!important}
+.gnRow.now{min-height:calc(var(--gs)*3.2);font-size:calc(var(--gs)*.9);background:var(--gnG);border-color:var(--gnG);color:#fff}
+.gnRow.now .rl::before{background:#fff}.gnRow.now .sym{width:calc(var(--gs)*1.85);height:calc(var(--gs)*1.85)}.gnRow.now .tl{color:#fff;font-weight:800}
 .gnRow.now .nm{flex-direction:column;align-items:flex-start;gap:0}.gnRow.now .nm small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
 .gnRow.now .nm b{font-size:1.35em;font-weight:800}.gnRow .pf{flex:none;display:flex;align-items:center;gap:.25em;font-weight:700;font-variant-numeric:tabular-nums}
-.gnRow.prev{background:transparent;border-style:dashed;color:var(--muted);cursor:default;min-height:2.1em;font-size:.6em}.gnRow.prev .sym{filter:grayscale(1)}
-.gnRow.sel{outline:3px solid var(--fg);outline-offset:-3px}.gnRow.now.sel{outline-color:#fff}
+.gnRow.prev{background:transparent;border-style:dashed;color:var(--muted);min-height:calc(var(--gs)*1.5);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{filter:grayscale(1);width:calc(var(--gs)*1.15);height:calc(var(--gs)*1.15)}
+.gnRow.sel{outline:3px solid var(--fg);outline-offset:-3px}
 .gnTr{min-height:0;display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel)}
-.gnTrH{flex:none;display:flex;align-items:center;gap:.6em;padding:.45em .7em;border-bottom:1px solid var(--line)}
-.gnTrH span{flex:1;min-width:0;display:flex;flex-direction:column}.gnTrH small{font-size:.45em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-.gnTrH b{font-size:.9em;font-weight:800;text-transform:uppercase;line-height:1.08;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.gnTrH em{flex:none;font-style:normal;font-size:.62em;color:var(--muted);font-variant-numeric:tabular-nums}
+.gnTrH{flex:none;display:flex;align-items:baseline;gap:.6em;padding:.45em .7em;border-bottom:1px solid var(--line)}
+.gnTrH small{font-size:.5em;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.gnTrH b{min-width:0;font-size:.6em;font-weight:800;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gnTrL{flex:1;min-height:0;overflow:auto}
-.gnTrR{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:.6em;align-items:center;min-height:2.5em;padding:.25em .7em;box-sizing:border-box;border-bottom:1px solid var(--line);font-size:.68em}
+/* a transfer: the line, its direction, the stop it leaves from when another one, the platform and the time – the last two
+   always in columns of their own width, the same in every row */
+.gnTrR{display:grid;grid-template-columns:2.4em minmax(0,1fr) auto 3.4em 4.4em;gap:.6em;align-items:center;min-height:2.5em;padding:.25em .7em;box-sizing:border-box;border-bottom:1px solid var(--line);font-size:.68em}
 .gnTrR[data-k]{cursor:pointer}.gnTrR[data-k]:hover{background:rgba(127,127,127,.1)}
-.gnTrR .dh{min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gnTrR .dh small{display:block;font-weight:400;font-size:.75em;color:var(--muted)}
+.gnTrR .dh{min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gnTrR .ds{min-width:0;max-width:12em;font-size:.82em;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
 .gnTrR .dpo{display:flex;align-items:center;gap:.2em;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
-.gnTrR .dt{display:flex;align-items:baseline;gap:.5em;justify-content:flex-end;font-variant-numeric:tabular-nums;white-space:nowrap}.gnTrR .dt b{font-size:1.2em;font-weight:800}.gnTrR .dt span{font-size:.8em;color:var(--muted)}
+.gnTrR .dt{text-align:right;font-size:1.15em;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnTrE{flex:1;display:flex;align-items:center;justify-content:center;padding:1em;text-align:center;color:var(--muted);font-size:.7em}
 .gnFoot{flex:none;padding:.35em .7em;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:.55em}
 .gnFoot.gsTst{display:flex;align-items:center;gap:.6em}.gnFoot.gsTst span{flex:1;text-align:center}
-@media (orientation:portrait) and (max-width:900px){.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh}}
+@media (orientation:portrait) and (max-width:900px){.gnRow .chs{max-width:58%}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh}.gnRow .tl{width:calc(var(--gs)*2.6)}}
 .gdLook{margin-left:6px}
 .gsDeps{flex:1;min-height:calc(var(--gs)*5.2);overflow:hidden;background:var(--sB);border-top:2px solid var(--sL);display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-content:start}.gbT{grid-column:1/-1}
 .gbT{font-size:calc(var(--gs)*.55);color:var(--sM);padding:5px 14px;background:var(--sH)}
@@ -1681,7 +1690,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794408040;
+const APP_BUILD=1794409715;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4490,26 +4499,26 @@ function gdSipHtml(R,P,cur,next,MID){const sip=document.getElementById('gdSip');
 // a line with its direction and platform, the first time as on the boards and the next two in minutes
 function gdTrRows(R,sid,tAt,nowM,clickable){const E=gdBoardLoad(sid);if(!E.list){clearTimeout(GUIDE.trWait);GUIDE.trWait=setTimeout(()=>{if(GUIDE.run===R&&gdNewLook())gdRedraw()},1200);return null}const here=IDX.stops[sid][0],G=new Map();
   E.list.forEach((d,i)=>{if(d.r.n===R.r.n||d.t<tAt+gdChangeMin(sid,d.sid)||d.t>tAt+60)return;const st=d.stn||d.st||here,k=d.r.n+'|'+d.head+'|'+(d.pole||'')+'|'+st;
-    let g=G.get(k);if(!g)G.set(k,g={d,i,st,ts:[]});if(g.ts.length<3&&!g.ts.includes(Math.round(d.t-nowM)))g.ts.push(Math.round(d.t-nowM))});
-  return [...G.values()].slice(0,12).map(g=>{const d=g.d,tn=gdTrnText(d.head),nx=g.ts.slice(1).map(m=>Math.max(0,m));
-    return `<div class="gnTrR"${clickable?` data-k="${g.i}" role="button" tabindex="0"`:''}>${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}${g.st!==here?`<small>${esc(g.st)}</small>`:''}</span><span class="dpo">${d.pole?POLE+esc(d.pole):''}</span><span class="dt"><b${d.live?' class="live"':''}>${g.ts[0]<1?'&lt; 1 min':g.ts[0]+' min'}</b>${nx.length?`<span>${nx.join(', ')} min</span>`:''}</span></div>`}).join('')||''}
+    if(!G.has(k))G.set(k,{d,i,st,m:Math.max(0,Math.round(d.t-nowM))})});   // (only the first departure of each)
+  return [...G.values()].slice(0,14).map(g=>{const d=g.d,tn=gdTrnText(d.head);
+    return `<div class="gnTrR"${clickable?` data-k="${g.i}" role="button" tabindex="0"`:''}>${chip(d.r,'small',true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="ds">${g.st!==here?esc(g.st):''}</span><span class="dpo">${d.pole?POLE+esc(d.pole):''}</span><span class="dt${d.live?' live':''}">${g.m<1?'&lt; 1 min':g.m+' min'}</span></div>`}).join('')||''}
 function gdSipNew(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
   const base=new Date();base.setHours(0,0,0,0);const nowM=R.tst?R.simM:(Date.now()-base)/60000;const T=R.off.map(o=>R.t0+o);
   const lag=Math.max(0,nowM-T[hd]);const mins=j=>{const m=T[j]+lag-nowM;return m<1?'&lt; 1 min':Math.round(m)+' min'};
   const s0=depStyle(R.r);const k0=symKey(R.r),sym=`<span class="sym"><svg viewBox="-11.6 -11.6 23.2 23.2" aria-hidden="true">${symSVG({t:k0.t,cs:[k0.c]},0)}</svg></span>`;
-  const ts=GUIDE.trSel;const sel=ts&&ts.run===R&&Date.now()-ts.t<20000&&ts.j>=hd&&ts.j<=last?ts.j:hd;
+  const adm=!!(ACC.user&&ACC.mode==='admin');const ts=adm&&GUIDE.trSel;const sel=ts&&ts.run===R&&Date.now()-ts.t<20000&&ts.j>=hd&&ts.j<=last?ts.j:hd;
   const chs=j=>{if(!store.get('ztm.gdChips',true))return '';const t=gdTransfers(R.ps[j],R.r,T[j]+lag);return t?`<span class="chs">${t}</span>`:''};
   const to=Math.min(last,hd+MID),rows=[];const hand=j=>gdReq(j)?HAND:'';const pf=j=>{const n=(IDX.stops[R.ps[j]]||[])[1];return n?`<span class="pf">${POLE}${esc(n)}</span>`:''};
-  for(let j=to;j>hd;j--)rows.push(`<button type="button" data-j="${j}" class="gnRow${j===to&&to===last?' top':''}${j===sel?' sel':''}">${sym}<span class="tl">${mins(j)}</span><span class="nm"><b>${esc(P[j][0])}</b>${hand(j)}</span>${chs(j)}</button>`);
+  for(let j=to;j>hd;j--)rows.push(`<button type="button" data-j="${j}" class="gnRow${adm?' pick':''}${j===to&&to===last?' top':''}${j===sel&&sel!==hd?' sel':''}"><span class="tl">${mins(j)}</span><span class="rl">${sym}</span><span class="nm"><b>${esc(P[j][0])}</b>${hand(j)}</span>${chs(j)}</button>`);
   const rl=R.r.t==='rail';const lbl=trS(hd===last?(rl?'Stacja końcowa':'Przystanek końcowy'):cur!=null?(rl?'Stacja':'Przystanek'):(rl?'Następna stacja':'Następny przystanek'));
-  rows.push(`<button type="button" data-j="${hd}" class="gnRow now${hd===last?' top':''}">${sym}<span class="tl">${cur==null?mins(hd):''}</span><span class="nm"><small>${esc(lbl)}</small><b>${esc(P[hd][0])}</b>${hand(hd)}</span>${pf(hd)}</button>`);
-  if(hd>0)rows.push(`<div data-j="${hd-1}" class="gnRow prev">${sym}<span class="tl"></span><span class="nm"><b>${esc(P[hd-1][0])}</b></span></div>`);
+  rows.push(`<button type="button" data-j="${hd}" class="gnRow now${adm?' pick':''}${hd===last?' top':''}"><span class="tl">${cur==null?mins(hd):''}</span><span class="rl">${sym}</span><span class="nm"><small>${esc(lbl)}</small><b>${esc(P[hd][0])}</b>${hand(hd)}</span>${pf(hd)}</button>`);
+  if(hd>0)rows.push(`<div data-j="${hd-1}" class="gnRow prev"><span class="tl"></span><span class="rl">${sym}</span><span class="nm"><b>${esc(P[hd-1][0])}</b></span></div>`);
   const trs=gdTrRows(R,R.ps[sel],T[sel]+lag,nowM,sel===hd);
   return `<div class="gnTop"><span class="mb ${s0.shape}${sqCls(R.r)}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
 <div class="gtt"><small>${esc(trS('Kierunek'))}</small><b>${esc(R.head)}${gdTrnText(R.head)?` <small class="gsTrn">${esc(gdTrnText(R.head))}</small>`:''}</b></div>
 ${hd<last?`<span class="ta"><span>${esc(trS('Przyjazd na pętlę'))}</span><b>${fmtT(T[last]+lag)}</b></span>`:''}${R.vlabel?`<span class="veh">${esc(trS('Pojazd'))} <b>${esc(R.vlabel)}</b></span>`:''}<b class="gsClock">${R.tst?fmtT(Math.floor(R.simM)):gdClock()}</b></div>
 <div class="gnMain"><div class="gsBody">${rows.join('')}</div>
-<div class="gnTr"><div class="gnTrH"><span><small>${esc(trS('Przesiadki'))}</small><b>${esc(P[sel][0])}</b></span><em>${sel===hd&&cur!=null?'':mins(sel)}</em></div>
+<div class="gnTr"><div class="gnTrH"><small>${esc(trS('Przesiadki'))}</small>${sel!==hd?`<b>${esc(P[sel][0])}</b>`:''}</div>
 ${trs==null?`<div class="gnTrE">${esc(trS('Wczytywanie…'))}</div>`:trs?`<div class="gnTrL">${trs}</div>`:`<div class="gnTrE">${esc(trS('Brak przesiadek'))}</div>`}</div></div>
 ${R.tst?`<div class="gnFoot gsTst"><button type="button" data-tn="-1"${R.p>0?'':' disabled'}>◀ ${esc(trS('Wstecz'))}</button><span>${esc(R.src||'')}</span><button type="button" data-tn="1"${R.p<2*last?'':' disabled'}>${esc(trS('Dalej'))} ▶</button></div>`:`<div class="gnFoot"><span class="gsSrc">${esc(R.src||'')}</span>${GUIDE.voice&&GDV.by?' · '+esc(trS('Głos'))+': '+esc(GDV.by):''}</div>`}`}
 function gdSipOld(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last,cur!=null?cur:next);
@@ -4566,7 +4575,7 @@ function gdBack(){document.getElementById('gdSip').classList.remove('tst');store
   if(st){GUIDE.stopSel=st;if(GUIDE.setLoc)GUIDE.setLoc(false);gdShowDeps(st,trS('Wybierz kurs, którego trasę chcesz wyświetlić'))}else{GUIDE.stopSel=null;if(GUIDE.setLoc)GUIDE.setLoc(true);gdTick()}}
 // the new look: a stop of the route tapped shows its transfers (for 20 s, or until the ride gets there); the look switched
 function gdRedraw(){const R=GUIDE.run;if(!R)return;if(R.tst)gdTstDraw();else if(GUIDE.redraw&&GUIDE.redraw.R===R&&!GUIDE.anim)GUIDE.redraw.f();else gdTick()}
-document.getElementById('gdSip').addEventListener('click',e=>{const r=e.target.closest('.gnRow[data-j]:not(.prev)');if(!r||!GUIDE.run)return;GUIDE.trSel={run:GUIDE.run,j:+r.dataset.j,t:Date.now()};gdRedraw();setTimeout(()=>{if(GUIDE.trSel&&Date.now()-GUIDE.trSel.t>=19900)gdRedraw()},20100)});
+document.getElementById('gdSip').addEventListener('click',e=>{const r=e.target.closest('.gnRow.pick[data-j]');if(!r||!GUIDE.run||!(ACC.user&&ACC.mode==='admin'))return;GUIDE.trSel={run:GUIDE.run,j:+r.dataset.j,t:Date.now()};gdRedraw();setTimeout(()=>{if(GUIDE.trSel&&Date.now()-GUIDE.trSel.t>=19900)gdRedraw()},20100)});
 document.getElementById('gdLook').onclick=()=>{store.set('ztm.gdNew',!gdNewLook());gdBackBtn();gdRedraw()};
 function gdBackBtn(){const b=document.getElementById('gdBack');if(b)b.hidden=!GUIDE.run;{const l=document.getElementById('gdLook');if(l){l.hidden=!GUIDE.run;l.textContent=trS(gdNewLook()?'Stary wygląd':'Nowy wygląd')}}const m=document.getElementById('gdOnMap');if(m)m.hidden=!GUIDE.run;const v=document.getElementById('gdVoice');if(v)v.hidden=!GUIDE.run}   // (the voice: only with a ride chosen)
 // the chosen ride on the map: its vehicle and its timetable (the map's reduced view)
@@ -5052,7 +5061,7 @@ async function depLive(st){
       const r=IDX.routes.find(x=>x.n===n&&areaOf(x)==='tri')||{id:'rt'+n,n,t:/^\d{1,2}$/.test(n)?'tram':/^N/.test(n)?'night':'bus',c:['gda']};
       const th=Date.parse(d.theoreticalTime);const live=d.status==='REALTIME'&&!!d.estimatedTime;
       // the delay as the difference of the two times the API gives (its delayInSeconds is for the vehicle's last stop)
-      out.push({t:(t-base)/60000,sch:isFinite(th)?(th-base)/60000:null,r,head:d.headsign||'',pole,stn:st.n,live,trip:d.scheduledTripStartTime,apiD:d.delayInSeconds,delay:live&&isFinite(th)?Math.round((t-th)/1000):0,lastT:(t-base)/60000})})}));
+      out.push({t:(t-base)/60000,sch:isFinite(th)?(th-base)/60000:null,r,head:d.headsign||'',pole,sid,stn:st.n,live,trip:d.scheduledTripStartTime,apiD:d.delayInSeconds,delay:live&&isFinite(th)?Math.round((t-th)/1000):0,lastT:(t-base)/60000})})}));
   if(!ok){RT_DEAD=Date.now()+120000;return null}   // no way through: try again in two minutes
   await fixDelays(out);
   return out}
