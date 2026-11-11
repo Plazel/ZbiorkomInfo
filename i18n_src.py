@@ -835,6 +835,8 @@ ROWS = [
     ("Nr służbowy", "Staff no.", "Dienstnr.", "Služobné č.", "Služební č."),
     ("Zapowiedź linii i kierunku", "Announce the line and destination", "Linie und Richtung ansagen", "Hlásenie linky a smeru", "Hlášení linky a směru"),
     ('Brak przesiadek','No connections','Keine Umstiege','Žiadne prestupy','Žádné přestupy'),
+    ('Przetłumacz','Translate','Übersetzen','Preložiť','Přeložit'),
+    ('Pokaż oryginał','Show original','Original anzeigen','Zobraziť originál','Zobrazit originál'),
 ]
 
 WEEKDAYS = {
