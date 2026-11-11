@@ -199,6 +199,10 @@ span.chip{cursor:inherit}
 /* line view */
 .crumb{display:inline-flex;gap:6px;align-items:center;font-size:.9rem;color:var(--muted);margin-bottom:14px;cursor:pointer;background:none;border:0;padding:0}
 .crumb:hover{color:var(--fg)}
+/* the buttons back (top left: "← Wybór kursu", "← Wszystkie linie"…): a box as high as the icons of the top bar, black type */
+.crumb{height:38px;box-sizing:border-box;padding:0 12px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font-size:.9rem;font-weight:500}
+.crumb:hover{background:var(--panel);color:var(--fg)}
+@media (max-width:760px){.crumb{height:34px;padding:0 10px}}
 .lhead{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid var(--line)}
 .lhead svg{width:40px;height:40px}
 .lhead .meta{margin-left:auto;text-align:right;font-size:.95rem}
@@ -716,7 +720,13 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .dTime small.dDay{display:block;font-size:.5em;font-weight:600;opacity:.75;line-height:1}
 /* full screen: the bar of the stop's name and the clock larger, the column heads' bar smaller */
 .depModal.kiosk .dTitle{min-height:calc(var(--rowh)*.8);padding-top:calc(var(--rowh)*.1);padding-bottom:calc(var(--rowh)*.1)}.depModal.kiosk .dTitle b,.depModal.kiosk .dTitle .dClock{font-size:calc(var(--rowh)*.42)}
-.depModal.kiosk .dHead{height:calc(var(--rowh)*.55)}.depModal.kiosk .dHead .l,.depModal.kiosk .dHead .c{font-size:calc(var(--rowh)*.24)}
+.depModal.kiosk .dHead{height:calc(var(--rowh)*.55)}
+/* the board on the page (not full screen): the type and the rows as in the mSIP – a row 1.95 of its unit high, all its type .72 */
+.depModal:not(.kiosk) .dDest,.depModal:not(.kiosk) .dTime,.depModal:not(.kiosk) .dCode{font-size:calc(var(--rowh)*.37)!important}
+.depModal:not(.kiosk) .dHead{height:var(--rowh)!important}.depModal:not(.kiosk) .dHead .l,.depModal:not(.kiosk) .dHead .c{font-size:calc(var(--rowh)*.37)!important}
+.depModal:not(.kiosk) .dTitle{min-height:var(--rowh)}.depModal:not(.kiosk) .dTitle b,.depModal:not(.kiosk) .dTitle .dClock{font-size:calc(var(--rowh)*.44)!important}
+.depModal:not(.kiosk) .dBadge{height:calc(var(--rowh)*.64);min-width:calc(var(--rowh)*.64);font-size:calc(var(--rowh)*.3)}.depModal:not(.kiosk) .dBadge.circle,.depModal:not(.kiosk) .dBadge.rect{width:calc(var(--rowh)*.64)}
+.depModal:not(.kiosk) .dBadge.len3,.depModal:not(.kiosk) .dBadge.len3.circle{font-size:calc(var(--rowh)*.27)}.depModal:not(.kiosk) .dBadge.len4{font-size:calc(var(--rowh)*.22)}.depModal.kiosk .dHead .l,.depModal.kiosk .dHead .c{font-size:calc(var(--rowh)*.24)}
 .depExit{display:none}
 .depModal.kiosk .depExit{display:inline-block}
 .depModal.kiosk #depFull{display:none}
@@ -1691,7 +1701,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794422874;
+const APP_BUILD=1794425213;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5141,7 +5151,8 @@ function depLayout(){const m=depEl();if(m.hidden)return;
   // the title and header take about 1.6 rows: the rows share the rest
   // narrow screens: the rows as large as the width allows (the boards then scroll), so the type stays readable
   // on the page: compact, the size of the page's other boards; full screen: the rows filling the screen, to be read from afar
-  const rowh=!m.classList.contains('kiosk')?(pe.clientWidth<760?38:42):pe.clientWidth<760?Math.max(40,Math.min(64,pe.clientWidth/7)):Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));
+  const gsz=matchMedia('(orientation:portrait) and (max-width:900px)').matches?Math.max(17,Math.min(26,innerWidth*.048)):Math.max(16,Math.min(32,innerWidth*.026,innerHeight*.034));   // (the mSIP's unit: its rows and type)
+  const rowh=!m.classList.contains('kiosk')?gsz*1.95:pe.clientWidth<760?Math.max(40,Math.min(64,pe.clientWidth/7)):Math.max(26,Math.min(h/(depCfg.rows+1.6),w/7.5));
   m.style.setProperty('--rowh',rowh+'px');m.style.setProperty('--nrows',depCfg.rows);
   m.style.setProperty('--c-badge',(rowh*1.15)+'px');m.style.setProperty('--c-time',(rowh*2.3)+'px');m.style.setProperty('--c-code',Math.max(rowh*.9,codeW(rowh))+'px')}
 // the platform column is as wide as its heading in the chosen language (e.g. "Nástupište")

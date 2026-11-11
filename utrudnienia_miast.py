@@ -57,6 +57,18 @@ def pub_dt(s):
     except Exception: return None
 
 
+def prague_page(url, text):
+    h = get(url)
+    row = lambda k: (lambda m: plain(m.group(1)).replace('\n', ' ').strip() if m else '')(re.search(r'(?is)<th[^>]*>\s*%s\s*</th>\s*<td[^>]*>(.*?)</td>' % k, h))
+    kind, why = row('Druh události'), row('Důvod')
+    m = re.search(r'(?is)<h2>\s*Popis události\s*</h2>(.*?)(?:<p>\s*Více informací|<div class="block-side|</article>|<footer)', h)
+    desc = plain(m.group(1)) if m else ''
+    desc = '\n'.join(x for x in desc.split('\n') if x.strip() and x.strip() not in ('/',) and 'přímo do vašeho e' not in x and not re.match(r'^\*?\*?Více informací', x))
+    head = '\n'.join(x for x in ('**Druh události:** ' + kind if kind else '', '**Důvod:** ' + why if why else '') if x)
+    body = desc if desc and desc not in text else text
+    return '\n'.join(x for x in (head, body if body != text or not desc else text) if x).strip()[:3000] or text
+
+
 def prague(data):
     try: names = {r['n'] for r in json.load(open(os.path.join(data, 'index.json'), encoding='utf-8'))['routes'] if 'prg' in r.get('c', [])}
     except Exception: names = set()
@@ -73,6 +85,11 @@ def prague(data):
             text = '\n'.join(re.sub(r';?\s*Dotčené linky:.*$', '', x) for x in text.split('\n') if not re.match(r'^(Linky:|Dotčené linky:)', x) and 'přímo do vašeho e' not in x)
             text = '\n'.join(x for x in text.split('\n') if x.strip() and not re.match(r'^[\d.: ]+-\s*([\d.: ]+|do odvolání)$', x.strip()))   # (the period alone: shown from start and end)
             if feed == 'rss-vyluky' and s0 and s0 > NOW: continue   # (planned closures: only those already in force)
+            # (the feed gives no more than the period and the lines: the kind of the event, its cause and its description read
+            # from the notice's own page – "Druh události", "Důvod", "Popis události")
+            if it['link']:
+                try: text = prague_page(it['link'], text)
+                except Exception: pass
             res.append({'id': feed[4:] + ':' + re.sub(r'\D', '', it['link'])[-9:], 'lines': [l for l in lines if l in names] or lines,
                         'title': it['title'], 'text': text, 'start': iso(s0), 'end': iso(e0), 'url': it['link']})
     return 'https://pid.cz/zmeny/', res
