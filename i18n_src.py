@@ -834,6 +834,10 @@ ROWS = [
     ("E-mail", "E-mail", "E-Mail", "E-mail", "E-mail"),
     ("Nr służbowy", "Staff no.", "Dienstnr.", "Služobné č.", "Služební č."),
     ("Zapowiedź linii i kierunku", "Announce the line and destination", "Linie und Richtung ansagen", "Hlásenie linky a smeru", "Hlášení linky a směru"),
+    ('Stary wygląd','Old look','Altes Aussehen','Starý vzhľad','Starý vzhled'),
+    ('Nowy wygląd','New look','Neues Aussehen','Nový vzhľad','Nový vzhled'),
+    ('Przyjazd na pętlę','Arrival at the terminus','Ankunft an der Endstelle','Príchod na konečnú','Příjezd na konečnou'),
+    ('Brak przesiadek','No connections','Keine Umstiege','Žiadne prestupy','Žádné přestupy'),
 ]
 
 WEEKDAYS = {
