@@ -900,7 +900,7 @@ input[type=checkbox]:not([role=switch]):focus-visible{outline:2px solid var(--ac
 .gdSip.gn .chip,.gdSip.gn .chip:hover,.gdSip.gn .mb:hover{transform:none!important;transition:none!important;filter:none!important;cursor:inherit}
 /* as the departure boards (Tablica): the line and its direction on the plain header with the clock; rows in turn light and
    lighter, a grey band for the column heads and the stop being reached; no colour of its own */
-.gnTop{flex:none;display:flex;align-items:center;gap:.8em;padding:.45em .8em;background:var(--sH);color:var(--sF);border-bottom:2px solid var(--sL);min-width:0}
+.gnTop{flex:none;display:flex;align-items:center;gap:.8em;padding:.45em .8em;background:var(--bH);color:var(--sF);border-bottom:2px solid var(--sL);min-width:0}
 .gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:calc(var(--gs)*2.4);min-width:calc(var(--gs)*2.4);padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:calc(var(--gs)*1.05);line-height:1}.gnTop .mb.circle,.gnTop .mb.sq{width:calc(var(--gs)*2.4);padding:0}.gnTop .mb.circle{border-radius:50%}.gnTop .mb.one{font-size:calc(var(--gs)*1.45)}
 .gnTop .gtt{flex:1;min-width:0;display:flex;flex-direction:column}.gnTop .gtt small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
 .gnTop .gtt b{font-size:1.3em;font-weight:800;line-height:1.08;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -915,7 +915,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .tl{flex:none;width:calc(var(--gs)*3.1);text-align:right;color:var(--sM);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnRow .rl{flex:none;align-self:stretch;position:relative;width:var(--rw);margin:-4px 0}
 .gnRow .rl::before{content:"";position:absolute;left:50%;top:0;bottom:-1px;width:calc(var(--gs)*.26);transform:translateX(-50%);background:var(--sR)}
-.gnRow.top .rl::before{top:50%}.gnRow.prev .rl::before{bottom:50%;background:var(--sM)}
+.gnRow.top .rl::before{top:50%}.gnRow.now .rl::before{bottom:50%}.gnRow.now.top .rl::before{display:none}.gnRow.prev .rl::before{bottom:50%;background:var(--sM)}
 .gnRow .sym{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;width:calc(var(--gs)*1.05);height:calc(var(--gs)*1.05)}.gnRow .sym svg{display:block;width:100%;height:100%;overflow:visible}
 .gnRow .sym .dot,.mkStops .sym .dot{fill:#fff;stroke:#14171a;stroke-width:4.5px}.gnRow .sym .dot{fill:var(--bR);stroke:var(--sR)}.gnRow.now .sym .dot{fill:var(--bH)}.gnRow .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.gnRow .sym text.s{font-size:7.8px}
 .gnRow .nm{flex:1;min-width:0;display:flex;align-items:center;gap:.4em}
@@ -948,7 +948,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnTrE{flex:1;display:flex;align-items:center;justify-content:center;padding:1em;text-align:center;color:var(--sM);font-size:.7em}
 .gnFoot{flex:none;padding:.35em .7em;border-top:1px solid var(--sL);background:var(--bR);color:var(--sM);font-size:.55em}
 .gnFoot.gnTst{display:flex;align-items:center;gap:.6em}.gnFoot.gnTst span{flex:1;text-align:center}.gnTst button{font:inherit;font-weight:600;padding:4px 10px;border:1px solid var(--sL);background:var(--sB);color:var(--sF);cursor:pointer}.gnTst button:disabled{opacity:.35;cursor:default}
-@media (orientation:portrait) and (max-width:900px){.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:1.05em}.gnTop{gap:.6em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}}
+@media (orientation:portrait) and (max-width:900px){.gdSip.gn,.gdPick{--gs:clamp(19px,5.4vw,30px)}.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:.95em;-webkit-line-clamp:3}.gnTop{gap:.55em;padding:.4em .55em}.gnTop .inf b{font-size:.85em}.gnTop .gsClock{font-size:1.05em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}}
 .gsTrn{font-size:.55em;font-weight:400;color:var(--sM);margin-left:.4em;white-space:nowrap}.gdWrap:has(.gdSip:not([hidden])) .gdStat{display:none}
 @media (max-width:760px){.guideModal{left:0;bottom:calc(60px + env(safe-area-inset-bottom,0px))}}
 .jpModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);display:grid;grid-template-columns:min(520px,48vw) 1fr}
@@ -1684,7 +1684,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794413938;
+const APP_BUILD=1794416080;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4516,7 +4516,6 @@ function gdSipNew(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last
   for(let j=to;j>hd;j--)rows.push(`<button type="button" data-j="${j}" class="gnRow${adm?' pick':''}${j===to&&to===last?' top':''}${j===sel&&sel!==hd?' sel':''}"><span class="tl">${mins(j)}</span><span class="rl">${sym}</span><span class="nm"><b>${esc(P[j][0])}</b>${hand(j)}</span>${chs(j)}</button>`);
   const rl=R.r.t==='rail';const lbl=trS(hd===last?(rl?'Stacja końcowa':'Przystanek końcowy'):cur!=null?(rl?'Stacja':'Przystanek'):(rl?'Następna stacja':'Następny przystanek'));
   rows.push(`<button type="button" data-j="${hd}" class="gnRow now${adm?' pick':''}${hd===last?' top':''}"><span class="tl">${cur==null?mins(hd):''}</span><span class="rl">${sym}</span><span class="nm"><small>${esc(lbl)}</small><span class="nmL"><b>${esc(P[hd][0])}</b>${hand(hd)}</span></span>${chs(hd)}</button>`);
-  if(hd>0)rows.push(`<div data-j="${hd-1}" class="gnRow prev"><span class="tl"></span><span class="rl">${sym}</span><span class="nm"><b>${esc(P[hd-1][0])}</b></span></div>`);
   const trs=gdTrRows(R,R.ps[sel],T[sel]+lag,nowM,sel===hd);
   return `<div class="gnTop"><span class="mb ${s0.shape}${sqCls(R.r)}${String(R.r.n).length===1?' one':''}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
 <div class="gtt"><small>${esc(trS('Kierunek'))}</small><b>${esc(R.head)}${gdTrnText(R.head)?` <small class="gsTrn">${esc(gdTrnText(R.head))}</small>`:''}</b></div>
