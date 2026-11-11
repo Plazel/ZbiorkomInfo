@@ -1719,7 +1719,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794435770;
+const APP_BUILD=1794435994;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4502,6 +4502,8 @@ function gdProgress(h,src,q){{const pk0=document.getElementById('gdPick');if(pk0
 // town of the area), other than the ride's own line; only those that call there about the time the ride does (from 5 minutes
 // before to 45 after: no day lines at night, no night lines by day)
 const GD_TR={};
+// (the trips to the depots of Gdańsk – Baza Hallera, Baza Rudniki – are not for passengers: never offered as a change)
+const GD_DEPOT=/\bBaza\s+(Hallera|Rudniki)\b/i;
 function gdTrLoad(sid){if(GD_TR[sid])return GD_TR[sid];const S=IDX.stops[sid];
   // (also the trains of a station next to the stop, whatever its name: "Stocznia SKM" – "Gdańsk Stocznia", "Dworzec Główny" –
   // "Gdańsk Główny"; its platforms within 250 m, or 400 m for a stop named after the station: "… SKM", "… PKP", "Dworzec …")
@@ -4509,7 +4511,7 @@ function gdTrLoad(sid){if(GD_TR[sid])return GD_TR[sid];const S=IDX.stops[sid];
   const cand=IDX.routes.filter(x=>inCityOf(x,city)&&((x.sn||[]).includes(S[0])||x.t==='rail'&&(x.sn||[]).some(n=>nearN.has(n))));GD_TR[sid]={ok:false,list:[]};
   (async()=>{const out=[];for(const r of cand){let L;try{L=await loadRoute(r.id)}catch(e){continue}const T=[];let near=false;
       (L.dirs||[]).forEach(d=>{const ks=new Set();d.stops.forEach((x,k)=>{const X=IDX.stops[x[0]];if(!X)return;const m=distM(X[2],X[3],S[2],S[3]);if(X[0]===S[0]&&m<400||r.t==='rail'&&nearN.has(X[0])&&m<=RAIL_M)ks.add(k)});if(!ks.size)return;near=true;
-        for(const [key,sh] of depDayKeys())planOf(d,key).forEach(([tt,pi])=>{const pr=d.prof[pi];if(!pr)return;const ps=d.pats[pr[0]];ps.forEach((k,q)=>{if(ks.has(k))T.push(tt+sh+pr[1][q])})})});
+        for(const [key,sh] of depDayKeys())planOf(d,key).forEach(([tt,pi])=>{const pr=d.prof[pi];if(!pr)return;const ps=d.pats[pr[0]];{const e=d.stops[ps[ps.length-1]],X=e&&IDX.stops[e[0]];if(X&&GD_DEPOT.test(X[0]))return}ps.forEach((k,q)=>{if(ks.has(k))T.push(tt+sh+pr[1][q])})})});
       if(near)out.push({r,T})}
     GD_TR[sid]={ok:true,list:out}})();
   return GD_TR[sid]}
@@ -4546,7 +4548,7 @@ function gdSipHtml(R,P,cur,next,MID){const sip=document.getElementById('gdSip');
 // the transfers of a stop for the new look: the departures of other lines after the ride gets there (an hour ahead), one row
 // a line with its direction and platform, the first time as on the boards and the next two in minutes
 function gdTrRows(R,sid,tAt,nowM,clickable){const E=gdBoardLoad(sid);if(!E.list){clearTimeout(GUIDE.trWait);GUIDE.trWait=setTimeout(()=>{if(GUIDE.run===R)gdRedraw()},1200);return null}const here=IDX.stops[sid][0],G=new Map();
-  E.list.forEach((d,i)=>{if(d.r.n===R.r.n||d.t<tAt+gdChangeMin(sid,d.sid)||d.t>tAt+60)return;const st=d.stn||d.st||here,k=d.r.n+'|'+d.head+'|'+(d.pole||'')+'|'+st;
+  E.list.forEach((d,i)=>{if(d.r.n===R.r.n||GD_DEPOT.test(d.head||'')||d.t<tAt+gdChangeMin(sid,d.sid)||d.t>tAt+60)return;const st=d.stn||d.st||here,k=d.r.n+'|'+d.head+'|'+(d.pole||'')+'|'+st;
     if(!G.has(k))G.set(k,{d,i,st,m:Math.max(0,Math.round(d.t-nowM))})});   // (only the first departure of each)
   return [...G.values()].slice(0,14).map(g=>{const d=g.d,tn=gdTrnText(d.head);
     return `<div class="gnTrR"${clickable?` data-k="${g.i}" role="button" tabindex="0"`:''}>${chip(d.r,'small'+(String(d.r.n).length===1?' one':''),true).outerHTML}<span class="dh">${esc(d.head)}${tn?` <small class="gsTrn">${esc(tn)}</small>`:''}</span><span class="ds">${g.st!==here?esc(g.st):''}</span><span class="dpo">${d.pole?POLE+esc(d.pole):''}</span><span class="dt${d.live?' live':''}">${g.m<1?'&lt; 1 min':g.m+' min'}</span></div>`}).join('')||''}
