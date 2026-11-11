@@ -1355,8 +1355,8 @@ def city_kind(area, short, rtype):
         if re.fullmatch(r'7\d\d', short): return 'repl'
     if area in ('ldz', 'fl') and short.startswith('N'): return 'night'
     if area in ('wro', 'lub', 'bts'):
+        if re.fullmatch(r'N\d+', short) or (area == 'wro' and re.fullmatch(r'2[45]\d|206', short)): return 'night'   # Wrocław's night buses 206, 24x, 25x; night trolleybuses (N44…) among the night lines
         if rtype in ('11', '800'): return 'trol'   # Lublin's and Bratislava's trolleybuses
-        if re.fullmatch(r'N\d+', short) or (area == 'wro' and re.fullmatch(r'2[45]\d|206', short)): return 'night'   # Wrocław's night buses 206, 24x, 25x
         if area == 'bts' and re.fullmatch(r'X\d+', short): return 'repl'   # Bratislava: replacement lines X…
     if area == 'prg':
         if rtype == '11': return 'trol'
@@ -1496,6 +1496,7 @@ for area, A in NEW_AREAS.items():
             if area == 'prg' and r['id'] in rmeta: r['cat'] = {'1': 'metro', '7': 'cable', '4': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))
             if area == 'waw' and r['id'] in rmeta and rmeta[r['id']][1] == '1': r['cat'] = 'metro'   # Warszawa: the metro (M1, M2) apart from the trains (S)
             if area in ('ber', 'ham') and r['id'] in rmeta: r['cat'] = {'400': 'metro', '402': 'metro', '1000': 'ferry', '1200': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))   # U-Bahn, ferries
+            if area == 'bts': r['f'] = False   # Bratislava: only DPB's own colours (below), its grey lines grey
             if area == 'prg': r['f'] = bool(r.get('avg')) and r['avg'] <= 15   # Prague: colour only the lines running every 15 minutes or more often (7–18 h)
         for r in ROUTES_OUT[n0:]:
             if r['n'] in AREA_LINE_COLORS and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True; r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]   # (Berlin, Hamburg: not the replacement bus S1)
