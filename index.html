@@ -1636,7 +1636,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794404539;
+const APP_BUILD=1794404920;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -1740,7 +1740,7 @@ function sections(){
 function comboEx(){let g=null;try{const A=autoGroups();const all=[...(A.tr||[]),...(A.v||[])];g=all.find(x=>x.length>1&&x.length<=3)||all[0]}catch(e){}
   return g&&g.length>1?g.join('+'):'3+6+7'}
 function renderBoard(){
-  document.title='ZbiorkomInfo – '+CITIES[city][0];setBrand();
+  document.title='ZbiorkomInfo – '+CITIES[city][0];if(typeof setBrand==='function')setBrand();
   app.innerHTML=`${city==='km'?`<div class="infoBox warn infoFold" role="note" tabindex="0" aria-expanded="false" onclick="this.setAttribute('aria-expanded',this.getAttribute('aria-expanded')!=='true')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M12 3L22 20H2z"/><path d="M12 9v4.6"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/></svg><div><b>Uwaga dotycząca komunikacji gminy Krynica-Zdrój</b><p>Ze względu na brak dostępu do aktualnych i pozbawionych błędów merytorycznych rozkładów jazdy dla linii organizowanych przez Krynicę-Zdrój rozkłady linii od 10 do 18 mogą zawierać błędy. Numeracja linii służy jedynie lepszej organizacji strony i nie jest stosowana przez przewoźnika. Przy sprawdzaniu rozkładów zaleca się korzystanie z wyszukiwarki połączeń i linii łączonych.</p></div></div>`:''}<h1 class="boardH">Rozkłady jazdy ${esc(CITIES[city][1])}</h1>
   <div id="board"></div>
   <section class="section" id="combo"><div class="shead">${comboHeadIcon()}<div><h2>Linie łączone</h2></div></div>
@@ -5755,7 +5755,10 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
 // the section open before a reload (map, board, planner…) opens again (kept in the session, and for 12 hours in the browser's
 // storage: some browsers and embedded pages start every load with a new, empty session)
 const NAV0=(()=>{let v='';try{v=sessionStorage.getItem('ztm.nav')||''}catch(e){}if(!v){const k=store.get('ztm.nav',null);if(Array.isArray(k)&&Date.now()-k[1]<43200000)v=k[0]}return v})();
-(window.EMBEDDED_DATA?Promise.resolve(EMBEDDED_DATA.index):fetch('data/index.json').then(r=>r.json())).then(async j=>{IDX=j;hideRoutes();nightTrams();setByName();setCorridors();await route();if(typeof alertBar==='function')alertBar();
+(window.EMBEDDED_DATA?Promise.resolve(EMBEDDED_DATA.index):fetch('data/index.json').then(r=>r.json())).then(async j=>{
+  // (the data may come from the phone's store at once – before the page's later scripts have been read: wait for them first)
+  if(document.readyState==='loading')await new Promise(r=>document.addEventListener('DOMContentLoaded',r,{once:true}));
+  IDX=j;hideRoutes();nightTrams();setByName();setCorridors();await route();if(typeof alertBar==='function')alertBar();
   NAV_READY=true;{const hs=location.hash.slice(1),hv=Object.keys(NAV_HASH).find(k=>NAV_HASH[k]===hs);const v0=hv||(location.hash&&!hv?'':NAV0);   // (an address of a section opens it; a timetable's address its timetable)
     if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click();else NAV_PEND=v0}}})   // (a section of the account's not there yet: opened once logged in)
  .catch(()=>{app.innerHTML='<p class="loading err">Nie udało się wczytać rozkładów</p>'});
@@ -8280,6 +8283,7 @@ var BRAND={},BRAND_DEF='#d71920',FAV_SVG;
 function setBrand(){const md=document.documentElement.dataset.mode,c=md==='admin'?'#1565c0':md==='driver'?'#2e7d32':(BRAND&&BRAND[city])||BRAND_DEF;   // (the account's mode: its colour)
   document.documentElement.style.setProperty('--brand',c);
 }
+setBrand();
 
 /* language button: the current language's icon; the menu lists the languages in their own names */
 // one menu at a time: a button that opens a menu (settings, language, city, export) first closes any other one that is open

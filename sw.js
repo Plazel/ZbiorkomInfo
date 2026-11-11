@@ -9,7 +9,7 @@ self.addEventListener('fetch', e => {
   // (the page and its data asked of the server every time, not taken from the browser's cache for up to 10 minutes:
   // an unchanged file costs only a short "not modified" answer)
   const fresh = /\.(json|html)$|\/$/.test(u.pathname) ? new Request(r, { cache: 'no-cache' }) : r;
-  const net = () => fetch(fresh).then(res => { if (res.ok) { const cp = res.clone(); caches.open(C).then(c => c.put(r, cp)); } return res; });
+  const net = () => fetch(fresh).then(res => { if (res.status === 200) { const cp = res.clone(); caches.open(C).then(c => c.put(r, cp)); } return res; });
   // the timetables' data (the index, the lines, the maps, the duties): the stored copy at once, the server asked meanwhile for the
   // next time – the page opens without waiting for several MB; the notices, the live data, version.json and the page: the network first
   if (/\/data\//.test(u.pathname) && !/alerts_|_live|\/rt\/|version\.json|wymowa\.json/.test(u.pathname)) {
