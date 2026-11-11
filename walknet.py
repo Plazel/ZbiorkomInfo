@@ -76,7 +76,7 @@ def build(out, area, stops, log=print):
 
 
 AREAS = {'tri': lambda a: a in ('gda', 'sop', 'gdy'), 'km': lambda a: a in ('km', 'kmx'), 'byd': lambda a: a == 'byd', 'ns': lambda a: a == 'ns',
-         'poz': lambda a: a == 'poz', 'krk': lambda a: a == 'krk', 'waw': lambda a: a == 'waw', 'wej': lambda a: a == 'wej', 'ldz': lambda a: a == 'ldz', 'fl': lambda a: a == 'fl', 'prg': lambda a: a == 'prg', 'ber': lambda a: a == 'ber', 'ham': lambda a: a == 'ham'}
+         'poz': lambda a: a == 'poz', 'krk': lambda a: a == 'krk', 'waw': lambda a: a == 'waw', 'wej': lambda a: a == 'wej', 'ldz': lambda a: a == 'ldz', 'fl': lambda a: a == 'fl', 'prg': lambda a: a == 'prg', 'ber': lambda a: a == 'ber', 'ham': lambda a: a == 'ham', 'wro': lambda a: a == 'wro', 'lub': lambda a: a == 'lub', 'bts': lambda a: a == 'bts'}
 
 
 def build_all(out, areas=None, log=print):

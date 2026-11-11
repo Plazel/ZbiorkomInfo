@@ -837,6 +837,14 @@ ROWS = [
     ('Brak przesiadek','No connections','Keine Umstiege','Žiadne prestupy','Žádné přestupy'),
     ('Przetłumacz','Translate','Übersetzen','Preložiť','Přeložit'),
     ('Pokaż oryginał','Show original','Original anzeigen','Zobraziť originál','Zobrazit originál'),
+("Wrocław", "Wrocław", "Breslau", "Vroclav", "Vratislav"),
+("we Wrocławiu", "in Wrocław", "in Breslau", "vo Vroclave", "ve Vratislavi"),
+("w Lublinie", "in Lublin", "in Lublin", "v Lubline", "v Lublinu"),
+("Bratysława", "Bratislava", "Bratislava", "Bratislava", "Bratislava"),
+("w Bratysławie", "in Bratislava", "in Bratislava", "v Bratislave", "v Bratislavě"),
+("Dolnośląskie", "Lower Silesian Province", "Niederschlesien", "Dolnosliezske", "Dolnoslezské"),
+("Lubelskie", "Lublin Province", "Lublin", "Lublinské", "Lublinské"),
+("Słowacja", "Slovakia", "Slowakei", "Slovensko", "Slovensko"),
 ]
 
 WEEKDAYS = {

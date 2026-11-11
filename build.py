@@ -35,6 +35,11 @@ SOURCES = {
     # timetable, so it is looked up on the Transparenzportal when the build starts
     'ber':   'https://www.vbb.de/vbbgtfs',
     'ham':   None,
+    # Wrocław (the city's open data: the file's address is looked up in the portal's catalogue when the build starts, this one
+    # if that fails), Lublin (ZTM Lublin, converted to GTFS by mkuran.pl, CC0) and Bratislava (DPB, its GTFS at a fixed address)
+    'wro':   'https://www.wroclaw.pl/open-data/87b09b32-f076-4475-8ec9-6020ed1f9ac0/OtwartyWroclaw_rozklad_jazdy_GTFS.zip',
+    'lub':   'https://mkuran.pl/gtfs/lublin.zip',
+    'bts':   'https://www.arcgis.com/sharing/rest/content/items/aba12fd2cbac4843bc7406151bc66106/data',
 }
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARGS = [a for a in sys.argv[1:] if not a.startswith('--')]
@@ -103,6 +108,26 @@ for key in ('ber', 'ham'):
     try:
         if fetch_src(key, z): de_miasta.cut(z, os.path.join(SCR, key), key); os.remove(z)
     except Exception as e: print('%s: pominięty (%s)' % (key, e))
+# Wrocław, Lublin, Bratislava: without their file (and no copy kept) only these cities are left out
+def wro_url():
+    """the current GTFS file of Wrocław, from the open data portal's catalogue (CKAN)"""
+    for api in ('https://www.wroclaw.pl/open-data/api/3/action/package_show?id=rozkladjazdytransportupublicznegoplik_data',
+                'https://www.wroclaw.pl/open-data/api/action/package_show?id=rozkladjazdytransportupublicznegoplik_data'):
+        try:
+            req = urllib.request.Request(api, headers={'User-Agent': 'rozklady-trojmiasto/1.0'})
+            with urllib.request.urlopen(req, timeout=60) as r: res = json.load(r)['result']['resources']
+            for x in res:
+                if re.search(r'GTFS.*\.zip$', x.get('url') or '', re.I): return x['url']
+        except Exception as e: print('Wrocław: katalog %s niedostępny (%s)' % (api, e))
+    return None
+_u = wro_url()
+if _u: SOURCES['wro'] = _u
+for key in ('wro', 'lub', 'bts'):
+    z = os.path.join(SCR, key + '.zip')
+    try:
+        if fetch_src(key, z): zipfile.ZipFile(z).extractall(os.path.join(SCR, key)); os.remove(z)
+        else: print('%s: pominięty (brak pliku)' % key)
+    except Exception as e: print('%s: pominięty (%s)' % (key, e))
 if _lost:
     print('BRAK DANYCH (i brak zachowanej kopii): %s – dane bez zmian, ponowna próba za godzinę' % ', '.join(_lost))
     os.makedirs(OUT, exist_ok=True); write_missing(); shutil.rmtree(SCR, ignore_errors=True); sys.exit(0)
@@ -131,11 +156,20 @@ def nearest(wds):
 # the timetable shows the nearest weekday, Saturday and Sunday counting from today (like the ZTM website)
 WEEKS_N = 3
 WINDOW_DAYS = 7 * WEEKS_N
-# weeks counted from today; in each: the first weekday, the Saturday and the Sunday -> keys w0 s0 h0, w1 s1 h1, ...
+def pl_holidays(y):
+    a = y % 19; b = y // 100; c = y % 100; d = (19 * a + b - b // 4 - (b - (8 * b + 13) // 25) + 15) % 30
+    e = (32 + 2 * (b % 4) + 2 * (c // 4) - d - c % 4) % 7; f = d + e - 7 * ((a + 11 * d + 22 * e) // 451) + 114
+    easter = datetime.date(y, f // 31, f % 31 + 1)
+    fixed = [(1, 1), (1, 6), (5, 1), (5, 3), (8, 15), (11, 1), (11, 11), (12, 24), (12, 25), (12, 26)]
+    return {datetime.date(y, m, d_).strftime('%Y%m%d') for m, d_ in fixed} | {(easter + datetime.timedelta(days=k)).strftime('%Y%m%d') for k in (0, 1, 60)}
+# weeks counted from today; in each: the first weekday that is not a public holiday (built on 11 November, a Wednesday off in
+# Poland, the week's weekday timetable was that holiday's and the real one showed as Thursday's special timetable), the
+# Saturday and the Sunday -> keys w0 s0 h0, w1 s1 h1, ...
 WEEKS = []; DAYS = {}
 for wi in range(WEEKS_N):
     days = [TODAY + datetime.timedelta(days=7 * wi + i) for i in range(7)]
-    rep = {'w': next(d for d in days if d.weekday() < 5), 's': next(d for d in days if d.weekday() == 5), 'h': next(d for d in days if d.weekday() == 6)}
+    _wh = pl_holidays(TODAY.year) | pl_holidays(TODAY.year + 1)
+    rep = {'w': next((d for d in days if d.weekday() < 5 and d.strftime('%Y%m%d') not in _wh), next(d for d in days if d.weekday() < 5)), 's': next(d for d in days if d.weekday() == 5), 'h': next(d for d in days if d.weekday() == 6)}
     WEEKS.append({'from': days[0].strftime('%Y%m%d'), 'to': days[-1].strftime('%Y%m%d'), **{k: v.strftime('%Y%m%d') for k, v in rep.items()}})
     for k, v in rep.items(): DAYS[k + str(wi)] = v.strftime('%Y%m%d')
 OPEND = {}
@@ -431,7 +465,7 @@ def choose(by, op=None, fri=False):
             d0 = datetime.datetime.strptime(wk['from'], '%Y%m%d').date()
             for i in range(7):
                 dd = (d0 + datetime.timedelta(days=i)).strftime('%Y%m%d')
-                if dd == rep or dtype(dd) != 'w' or (rk, dd) not in by: continue
+                if dd == rep or dtype(dd) != 'w' or dd in _wh or (rk, dd) not in by: continue   # (a holiday: its own day type, never a special weekday)
                 if set(by[(rk, dd)]) != reps:
                     for tid in by[(rk, dd)]: chosen.setdefault(tid, []).append((rk, 'X%d:%s' % (wi, dd)))
                     if fri and datetime.datetime.strptime(dd, '%Y%m%d').weekday() == 4:
@@ -963,12 +997,6 @@ for r in ROUTES_OUT[n0:]:
 
 
 # ---------------- Krynica-Zdrój and Muszyna: no open data, timetables written down from the PDFs (reczne/) ----------------
-def pl_holidays(y):
-    a = y % 19; b = y // 100; c = y % 100; d = (19 * a + b - b // 4 - (b - (8 * b + 13) // 25) + 15) % 30
-    e = (32 + 2 * (b % 4) + 2 * (c // 4) - d - c % 4) % 7; f = d + e - 7 * ((a + 11 * d + 22 * e) // 451) + 114
-    easter = datetime.date(y, f // 31, f % 31 + 1)
-    fixed = [(1, 1), (1, 6), (5, 1), (5, 3), (8, 15), (11, 1), (11, 11), (12, 24), (12, 25), (12, 26)]
-    return {datetime.date(y, m, d_).strftime('%Y%m%d') for m, d_ in fixed} | {(easter + datetime.timedelta(days=k)).strftime('%Y%m%d') for k in (0, 1, 60)}
 MANUAL = os.path.join(HERE, 'reczne', 'krynica_muszyna.json')
 if os.path.exists(MANUAL):
     KMD = json.load(open(MANUAL, encoding='utf-8'))
@@ -1244,6 +1272,9 @@ NEW_AREAS = {
     'prg': {'op': 'PID Praha', 'feeds': [('prg', 'G')], 'rk': 'pg'},
     'ber': {'op': 'VBB Berlin', 'feeds': [('ber', 'B')], 'rk': 'be'},
     'ham': {'op': 'hvv Hamburg', 'feeds': [('ham', 'H')], 'rk': 'hh'},
+    'wro': {'op': 'MPK Wrocław', 'feeds': [('wro', 'R')], 'rk': 'wr'},
+    'lub': {'op': 'ZTM Lublin', 'feeds': [('lub', 'U')], 'rk': 'lu'},
+    'bts': {'op': 'DPB Bratislava', 'feeds': [('bts', 'X')], 'rk': 'ba'},
 }
 def wej_name(n):
     """MZK Wejherowo writes the pole and the on-request mark into the name ("Bolszewo Słowackiego 01", "… n/ż")"""
@@ -1291,6 +1322,10 @@ def city_pole(area, r):
     if area == 'fl': return fl_name(r['stop_name'])[1]   # Flensburg: B1, B2… where the stop's name has it
     if area == 'ldz': return (r.get('stop_code') or '').strip()   # Łódź: the stop's own four-digit number (0081)
     if area == 'poz': return (r.get('stop_code') or '').strip()   # Poznań: the stop's whole code (RKAP71), as on its poles
+    if area == 'lub': return (r.get('stop_code') or '').strip()   # Lublin: the stop's pole number (01, 02…) as in the feed
+    if area in ('wro', 'bts'):   # (only the platform the feed gives: Bratislava A, B…)
+        v = (r.get('platform_code') or '').strip()
+        return v if re.fullmatch(r'[0-9A-Za-z]{1,3}', v) else ''
     if area == 'prg': return (r.get('platform_code') or '').strip()   # Praha: A, B, C… (rail: the platform)
     if area in ('ber', 'ham'):   # the platform as given ("Pos. 5" -> 5, "2", "A"), else the stop's own number; else none
         v = re.sub(r'^(Pos\.|Gleis|Steig)\s*', '', (r.get('platform_code') or '').strip())
@@ -1319,6 +1354,10 @@ def city_kind(area, short, rtype):
         if re.fullmatch(r'6\d\d', short): return 'night'
         if re.fullmatch(r'7\d\d', short): return 'repl'
     if area in ('ldz', 'fl') and short.startswith('N'): return 'night'
+    if area in ('wro', 'lub', 'bts'):
+        if rtype in ('11', '800'): return 'trol'   # Lublin's and Bratislava's trolleybuses
+        if re.fullmatch(r'N\d+', short) or (area == 'wro' and re.fullmatch(r'2[45]\d|206', short)): return 'night'   # Wrocław's night buses 206, 24x, 25x
+        if area == 'bts' and re.fullmatch(r'X\d+', short): return 'repl'   # Bratislava: replacement lines X…
     if area == 'prg':
         if rtype == '11': return 'trol'
         if re.fullmatch(r'9\d\d', short): return 'night'
@@ -1352,6 +1391,7 @@ for area, A in NEW_AREAS.items():
                 if area == 'ldz' and re.fullmatch(r'o?[PR]\d+', short): continue   # Łódź: staff and works lines, not for passengers
                 if area == 'prg' and not (rt['route_type'] == '2' and re.fullmatch(r'S\d+', short)) and (rt.get('is_regional') == '1' or rt['route_type'] == '2' or re.match(r'(MHD|BB\d|IKEA)', short)): continue   # Prague: the city lines and the Esko (S) trains
                 rk = A['rk'] + re.sub(r'\W', '', short)
+                if area in ('wro', 'lub', 'bts'): rk = A['rk'] + re.sub(r'[^0-9A-Za-z]', lambda m: '_%x' % ord(m.group()), short)   # (Šk, Biała: plain file names)
                 if area == 'ham': short = re.sub(r'\s*\(Shuttle\)$', '', short)   # (Hamburg: "386(Shuttle)" shown as 386; its id kept)
                 if area in ('ber', 'ham') and rt['route_type'] in ('3', '700', '702') and short in DE_RAIL_NAMES[area]: rk += 'E'   # (bus S1 apart from train S1)
                 tid = pre + ':' + r['trip_id']
@@ -1447,6 +1487,11 @@ for area, A in NEW_AREAS.items():
                 c = (r.get('route_color') or '').strip()
                 if r['route_type'] in ('109', '400') and re.fullmatch(r'[0-9A-Fa-f]{6}', c):
                     AREA_LINE_COLORS.setdefault(r['route_short_name'].strip(), ('#' + c.lower(), '#fff' if (r.get('route_text_color') or 'FFFFFF').upper() == 'FFFFFF' else '#222'))
+        if area == 'bts':   # Bratislava: each line in its own colour, as DPB gives it in the feed; its grey lines (898989) keep the page's grey
+            for r in rd(SCR + '/bts/routes.txt'):
+                c = (r.get('route_color') or '').strip().upper()
+                if re.fullmatch(r'[0-9A-F]{6}', c) and c != '898989':
+                    AREA_LINE_COLORS.setdefault(r['route_short_name'].strip(), ('#' + c.lower(), '#fff' if (r.get('route_text_color') or 'FFFFFF').upper() == 'FFFFFF' else '#222'))
         for r in ROUTES_OUT[n0:]:   # Prague: metro and the funicular in sections of their own
             if area == 'prg' and r['id'] in rmeta: r['cat'] = {'1': 'metro', '7': 'cable', '4': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))
             if area == 'waw' and r['id'] in rmeta and rmeta[r['id']][1] == '1': r['cat'] = 'metro'   # Warszawa: the metro (M1, M2) apart from the trains (S)
@@ -1497,7 +1542,7 @@ for f in files:
             if x: need.add(x.split('|')[0]); SH_T.setdefault(x.split('|')[0], set()).add(_j.get('t'))
 SHAPES = collections.defaultdict(list); VSH = {}
 for pre, path in (('g', SCR + '/gtfs/x/shapes.txt'), ('y', SCR + '/gdy/shapes.txt'), ('r', SCR + '/tr/shapes.txt'),
-                  ('Ps', SCR + '/poz/shapes.txt'), ('KAs', SCR + '/krkA/shapes.txt'), ('KTs', SCR + '/krkT/shapes.txt'), ('Ws', SCR + '/waw/shapes.txt'), ('Js', SCR + '/wej/shapes.txt'), ('Ls', SCR + '/ldz/shapes.txt'), ('Fs', SCR + '/fl/shapes.txt'), ('Gs', SCR + '/prg/shapes.txt'), ('Bs', SCR + '/ber/shapes.txt'), ('Hs', SCR + '/ham/shapes.txt')):
+                  ('Ps', SCR + '/poz/shapes.txt'), ('KAs', SCR + '/krkA/shapes.txt'), ('KTs', SCR + '/krkT/shapes.txt'), ('Ws', SCR + '/waw/shapes.txt'), ('Js', SCR + '/wej/shapes.txt'), ('Ls', SCR + '/ldz/shapes.txt'), ('Fs', SCR + '/fl/shapes.txt'), ('Gs', SCR + '/prg/shapes.txt'), ('Bs', SCR + '/ber/shapes.txt'), ('Hs', SCR + '/ham/shapes.txt'), ('Rs', SCR + '/wro/shapes.txt'), ('Us', SCR + '/lub/shapes.txt'), ('Xs', SCR + '/bts/shapes.txt')):
     if not os.path.exists(path): continue
     for r in rd(path):
         k = pre + r['shape_id']
@@ -1873,7 +1918,7 @@ print('Schemat sieci:', len(MAPD), 'linii,', os.path.getsize(OUT + '/map.json') 
 # (base_ns.json), each loaded only when shown
 BASE = OUT + '/base.json'
 _st = list(json.load(open(OUT + '/index.json', encoding='utf-8'))['stops'].values())
-for path, sel, core in ((BASE, lambda v: v[4] not in ('km', 'kmx', 'byd', 'ns', 'poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham'), (54.30, 54.62, 18.35, 18.85)),
+for path, sel, core in ((BASE, lambda v: v[4] not in ('km', 'kmx', 'byd', 'ns', 'poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham', 'wro', 'lub', 'bts'), (54.30, 54.62, 18.35, 18.85)),
                         # the big cities: their centres in detail, the suburbs coarser (a whole city in detail would be too big a file)
                         (OUT + '/base_poz.json', lambda v: v[4] == 'poz', (52.37, 52.45, 16.85, 16.99)),
                         (OUT + '/base_krk.json', lambda v: v[4] == 'krk', (50.025, 50.095, 19.88, 20.03)),
@@ -1885,6 +1930,9 @@ for path, sel, core in ((BASE, lambda v: v[4] not in ('km', 'kmx', 'byd', 'ns', 
                         (OUT + '/base_prg.json', lambda v: v[4] == 'prg', (50.05, 50.11, 14.38, 14.48)),
                         (OUT + '/base_ber.json', lambda v: v[4] == 'ber', (52.48, 52.56, 13.30, 13.48)),
                         (OUT + '/base_ham.json', lambda v: v[4] == 'ham', (53.53, 53.58, 9.93, 10.06)),
+                        (OUT + '/base_wro.json', lambda v: v[4] == 'wro', (51.08, 51.13, 16.98, 17.08)),
+                        (OUT + '/base_lub.json', lambda v: v[4] == 'lub', (51.22, 51.27, 22.52, 22.60)),
+                        (OUT + '/base_bts.json', lambda v: v[4] == 'bts', (48.13, 48.17, 17.08, 17.15)),
                         (OUT + '/base_ns.json', lambda v: v[4] == 'ns', (49.57, 49.67, 20.62, 20.76))):   # Nowy Sącz: the city in detail
     if not ('--podklad' in sys.argv or not os.path.exists(path) or (datetime.datetime.now().timestamp() - os.path.getmtime(path)) > 30 * 86400): continue
     pts = [v for v in _st if sel(v)]
@@ -1993,9 +2041,9 @@ if EMBED:
                'base_km': json.load(open(OUT + '/base_km.json', encoding='utf-8')) if os.path.exists(OUT + '/base_km.json') else None,
                'base_byd': json.load(open(OUT + '/base_byd.json', encoding='utf-8')) if os.path.exists(OUT + '/base_byd.json') else None,
                'base_ns': json.load(open(OUT + '/base_ns.json', encoding='utf-8')) if os.path.exists(OUT + '/base_ns.json') else None,
-               **{'base_' + a: json.load(open(OUT + '/base_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham') if os.path.exists(OUT + '/base_' + a + '.json')},
+               **{'base_' + a: json.load(open(OUT + '/base_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham', 'wro', 'lub', 'bts') if os.path.exists(OUT + '/base_' + a + '.json')},
                # Poznań, Kraków, Warszawa: network maps and packed route files
-               'maps': {a: json.load(open(OUT + '/map_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham') if os.path.exists(OUT + '/map_' + a + '.json')},
+               'maps': {a: json.load(open(OUT + '/map_' + a + '.json', encoding='utf-8')) for a in ('poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham', 'wro', 'lub', 'bts') if os.path.exists(OUT + '/map_' + a + '.json')},
                'rp': {f[:-5]: json.load(open(OUT + '/rp/' + f, encoding='utf-8')) for f in os.listdir(OUT + '/rp')} if os.path.isdir(OUT + '/rp') else {},
                'schema': {f[7:-5]: json.load(open(OUT + '/' + f, encoding='utf-8')) for f in sorted(os.listdir(OUT)) if f.startswith('schema_') and f.endswith('.json')} or None,
                'r': {f[:-5]: json.load(open(OUT + '/r/' + f, encoding='utf-8')) for f in os.listdir(OUT + '/r')},
