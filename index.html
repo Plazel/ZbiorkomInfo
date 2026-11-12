@@ -1524,14 +1524,14 @@ const colOf=r=>r.k||(AREA_COLORS[areaOf(r)]||{})[r.n]||colorFor(r.n);
 const txtOf=r=>(r.kt&&(r.f||r.t==='rail'))?r.kt:'#fff';
 const DAYNAMES={w:'Dni robocze',f:'Dni robocze wolne od szkoły',p:'Piątki',s:'Soboty',h:'Niedziele i święta'};
 // a special day (x): one weekday with a timetable of its own, shown as a yellow column with its date
-let XD_CUR=null,XD_FRI=false,XP_CUR=null;
+let XD_CUR=null,XD_FRI=false,XP_CUR=null,XD_NEW=false;
 // the special day a Friday in every week the data holds (Berlin, Hamburg: the night to Saturday runs through): Fridays as a
 // day of their own, not a special timetable
 const xFri=Ls=>{const W=(IDX.weeks||[]).length;if(W<2)return false;const isFri=d=>d&&new Date(+d.slice(0,4),+d.slice(4,6)-1,+d.slice(6)).getDay()===5;
   for(let w=0;w<W;w++){let d=null;for(const L of Ls){d=L&&L.dates&&L.dates['x'+w];if(d)break}if(!isFri(d))return false}return true};
 const fmtX=d=>d?['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'][new Date(+d.slice(0,4),+d.slice(4,6)-1,+d.slice(6)).getDay()]+' '+d.slice(6)+'.'+d.slice(4,6)+'.'+d.slice(0,4):'';
-Object.defineProperty(DAYNAMES,'x',{get:()=>XD_FRI?'Piątki':XD_CUR?fmtX(XD_CUR):'Rozkład specjalny',enumerable:true});
-const xdOf=Ls=>{for(const L of Ls){const d=L&&L.dates&&L.dates['x'+WEEK];if(d)return d}return null};
+Object.defineProperty(DAYNAMES,'x',{get:()=>XD_FRI?'Piątki':XD_CUR?(XD_NEW?'Od '+XD_CUR.slice(6)+'.'+XD_CUR.slice(4,6)+'.'+XD_CUR.slice(0,4):fmtX(XD_CUR)):'Rozkład specjalny',enumerable:true});   // (a new timetable from that day on, not a one-off day: "Od 16.11.2026")
+const xdOf=Ls=>{XD_NEW=false;for(const L of Ls){const d=L&&L.dates&&L.dates['x'+WEEK];if(d){XD_NEW=!!L.dates['xn'+WEEK];return d}}return null};
 // day columns of a line: a line with its own timetable for school-free weekdays (key f, e.g. RAFATEX) gets a fourth column
 let hideX=false;   // read from the browser's storage with the other settings (store is defined further on)
 // a special day whose departures at this stop are those of an ordinary day (the special timetable differs elsewhere on the
@@ -1599,6 +1599,7 @@ function trS(t){
     else if(x=/^Wpisz linie oddzielone plusem, np\. (\S+), aby/.exec(c))r=W.hint.replace('$1',x[1]);
     else if(x=/^Zaznaczony odjazd to najbliższy kurs dzisiaj\. Rozkład wg otwartych danych (.+?), ważny od (\S+) do (\S+?)\.?$/.exec(c))r=W.mark.replace('$1',x[1]).replace('$2',x[2]).replace('$3',x[3]);
     else if(x=/^np\. (.+)$/.exec(c))r=W.eg+' '+x[1];
+    else if(x=/^Od (\d\d\.\d\d\.\d{4})$/.exec(c))r=({en:'From ',de:'Ab ',sk:'Od ',cs:'Od '})[LANG]+x[1];
     else if(x=/^Miasto: (.+)$/.exec(c))r=W.city+': '+trS(x[1]);
     else if(x=/^([^\s:]{1,15}): ((?:Kurs |Nie kursuje )[\s\S]+)$/.exec(c))r=x[1]+': '+trS(x[2]);   // a note of one line in a combined timetable
     else{let o=c;for(const [pp,tt] of I18N.ph[LANG])if(o.includes(pp))o=o.split(pp).join(tt);
@@ -1720,7 +1721,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794518874;
+const APP_BUILD=1794527505;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}

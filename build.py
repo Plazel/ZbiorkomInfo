@@ -285,7 +285,12 @@ def build_routes(groups, meta_of):
                 base = sig([it for it in keep if it[0] == 'w' + wi])
                 for dd in sorted(by_d):
                     if sig(by_d[dd]) != base:
-                        keep += [('x' + wi,) + tuple(it[1:]) for it in by_d[dd]]; m['dates']['x' + wi] = dd; break
+                        keep += [('x' + wi,) + tuple(it[1:]) for it in by_d[dd]]; m['dates']['x' + wi] = dd
+                        # the same as the next week's weekdays: not a one-off day but a new timetable from that day on
+                        # (the page names the column "od 16.11" instead of a special day)
+                        nx = [it for it in keep if it[0] == 'w%d' % (int(wi) + 1)]
+                        if nx and sig(nx) == sig(by_d[dd]): m['dates']['xn' + wi] = 1
+                        break
             tl_all = keep
         dirs = collections.defaultdict(list)
         for item in tl_all:
