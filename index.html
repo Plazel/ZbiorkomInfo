@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794501470;
+const APP_BUILD=1794501647;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3690,7 +3690,7 @@ function updateVarPanel(){
   [...MAP.hl].forEach(id=>{if(!(id in MAP.varOf))MAP.varOf[id]='main';else if(!tools&&MAP.varOf[id]==null)MAP.varOf[id]='main'});
   MAP.lastId=[...MAP.hl].pop()||null;
   const ids=MAP.stopHL?[]:[...MAP.hl].filter(id=>lineLets(id).length);
-  if(!ids.length){box.hidden=true;box.innerHTML='';return}
+  if(!ids.length||!tools&&MAP.combo&&MAP.combo===[...MAP.hl].sort().join()){box.hidden=true;box.innerHTML='';return}
   // with the tools and several lines: all of them in a list that folds away; otherwise the line chosen last
   const list=tools&&ids.length>1?ids.slice().reverse():[ids.includes(MAP.lastId)?MAP.lastId:ids[ids.length-1]];
   box.innerHTML=(list.length>1?`<button type="button" class="varFold" aria-expanded="${!MAP.varFold}">Warianty linii (${list.length}) ${MAP.varFold?'▾':'▴'}</button>`:'')+
@@ -5689,6 +5689,7 @@ async function showLineOnMap(rids){const ids=String(rids).split(',').filter(id=>
   await openMap();await new Promise(ok=>setTimeout(ok,80));
   if(ids.some(id=>IDX.routes.find(x=>x.id===id).t==='night')&&!MAP.night){const cb=document.getElementById('mapNight');cb.checked=true;cb.dispatchEvent(new Event('change'))}
   await setMapView('osm');const ok=ids.filter(id=>MAP.byId[id]&&MAP.data.routes[id]);if(!ok.length)return;
+  MAP.combo=ok.length>1?ok.slice().sort().join():null;if(MAP.combo)ok.forEach(id=>MAP.varOf[id]='main');   // (a combination: the main routes, no variant panel)
   MAP.hl=new Set(ok);applyHL();
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;ok.flatMap(id=>MAP.data.routes[id].g).forEach(c=>c.forEach(([x,y])=>{x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}));
   if(x0>x1)return;const svg=document.getElementById('mapSvg');const ar=(svg.clientHeight||1)/(svg.clientWidth||1);
