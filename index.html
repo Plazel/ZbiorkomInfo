@@ -1236,7 +1236,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 .mkStops button:active{background-image:linear-gradient(rgba(0,0,0,.07),rgba(0,0,0,.07))}
 .mkStops .t{flex:none;font-variant-numeric:tabular-nums;font-weight:500;color:var(--muted)}
 .mkStops b{flex:1;min-width:0;font-weight:700;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mkStops i{flex:none;font-style:normal;font-size:.5em;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:.25em .6em;border-radius:0;background:#ffcc00;color:#231a00}.mkStops i:empty{display:none}.mkStops .pf{flex:none;display:flex;align-items:center;gap:.3em;margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;font-size:.85em;opacity:.85}.mkStops .pf[hidden]{display:none}.mkStops .pf svg{height:1.1em;width:auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}.mkStops .pf rect{fill:currentColor;fill-opacity:.25}
+.mkStops i{flex:none;display:inline-flex;align-items:center;font-style:normal;line-height:0}.mkStops i .hand{width:.85em;height:.85em;margin-left:.2em;vertical-align:0}.mkStops i:empty{display:none}.mkStops .pf{flex:none;display:flex;align-items:center;gap:.3em;margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;font-size:.85em;opacity:.85}.mkStops .pf[hidden]{display:none}.mkStops .pf svg{height:1.1em;width:auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}.mkStops .pf rect{fill:currentColor;fill-opacity:.25}
 .mkStops li.end b::after{content:" ◼";font-size:.6em;vertical-align:.15em;opacity:.6}
 .mkStops li.cur button{background:var(--g);border-color:var(--g);color:#fff;font-size:calc(var(--u)*2.15)}.mkStops li.cur .t{color:#fff;opacity:.9}.mkStops li.cur b{font-weight:800}
 .mkStops li.cur:not(.at) button{background:color-mix(in srgb,var(--g) 82%,#000)}
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794508316;
+const APP_BUILD=1794508410;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6506,7 +6506,7 @@ function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500
   // (and two more above and two below, out of sight under the list's edges: the scrolling brings them in, never from nowhere)
   const rows=[j+6,j+5,j+4,j+3,j+2,j+1,j,j-1,j-2,j-3],bt=B.querySelectorAll('.mkStops button');
   rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last,v=i-2;b.parentNode.className=(v<0?'nx buf bt'+(-v):v>5?'prev buf bb'+(v-5):v===4?'cur'+(at?' at':''):v===5?'prev vb':'nx'+(v===0?' vt':''))+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
-    b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').textContent=ok&&q>=j&&gdReq(q)?trS('na żądanie'):'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
+    b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').innerHTML=ok&&q>=j&&gdReq(q)?HAND:'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
   // (passing stops: the whole list scrolls as one – every row moved by the same distance, as many rows as stops passed, forward
   // or back – and glides back into place; rows from beyond the list come in from under its edge)
   {const ol=B.querySelector('.mkStops'),vis=[...ol.querySelectorAll('li:not(.buf)')],tv=vis.map(l=>l.offsetTop),hA=vis.length>1?(tv[tv.length-1]-tv[0])/(vis.length-1):60;ol.style.setProperty('--rh',hA+'px');
