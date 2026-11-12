@@ -1456,6 +1456,8 @@ for area, A in NEW_AREAS.items():
             short, rtype = rmeta[rk]
             meta_of[rk] = {'id': rk, 'n': short, 't': city_kind(area, short, rtype), 'op': A['op'], 'dates': dates[rk]}
         if area == 'fl' and not os.path.exists(SCR + '/fl/shapes.txt'): street_shapes(groups, 'Flensburg')   # only if the feed has no shapes
+        if area == 'lub':   # Lublin (mkuran.pl): no direction_id in the feed – each trip oriented against its line's most common pattern
+            for rk in list(groups): groups[rk] = fix_dirs(groups[rk])
         n0 = len(ROUTES_OUT); build_routes(groups, meta_of)
         for r in ROUTES_OUT[n0:]: r['c'] = [area]; NEW_ROUTE_IDS[area].append(r['id'])
         for r in ROUTES_OUT[n0:]:   # night trams (Poznań 2xx, Kraków 62, 64, 69): night lines, drawn round like trams

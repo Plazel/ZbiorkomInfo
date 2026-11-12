@@ -934,7 +934,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .rl::before{content:"";position:absolute;left:50%;top:0;bottom:-1px;width:calc(var(--gs)*.26);transform:translateX(-50%);background:var(--sR)}
 .gnRow.top .rl::before{top:50%}.gnRow.now .rl::before{bottom:50%}.gnRow.now.top .rl::before{display:none}.gnRow.prev .rl::before{bottom:50%;background:var(--sM)}
 .gnRow .sym{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;width:calc(var(--gs)*1.05);height:calc(var(--gs)*1.05)}.gnRow .sym svg{display:block;width:100%;height:100%;overflow:visible}
-.gnRow .sym .dot,.mkStops .sym .dot{fill:#fff;stroke:#14171a;stroke-width:4.5px}.gnRow .sym .dot{fill:var(--bR);stroke:var(--sR)}.gnRow.now .sym .dot{fill:var(--sR)}.gnRow .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.gnRow .sym text.s{font-size:7.8px}
+.gnRow .sym .dot,.mkStops .sym .dot{fill:#fff;stroke:#14171a;stroke-width:4.5px}.gnRow .sym .dot{fill:var(--bR);stroke:var(--sR)}.gnRow.now .sym .dot{fill:var(--bR)}.gnRow .sym text{font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}.gnRow .sym text.s{font-size:7.8px}
 .gnRow .nm{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:calc(var(--gs)*.2)}.gnRow .nm .nmL{max-width:100%}
 .gnRow .nm b{min-width:0;font-weight:700;line-height:1.05;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.gnRow .nm:has(.chs) b{line-height:1.15}
 .gnRow .nm .hand{flex:none;width:1.1em;height:1.1em;color:currentColor}
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794486154;
+const APP_BUILD=1794501329;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
