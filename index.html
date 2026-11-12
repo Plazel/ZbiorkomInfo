@@ -884,7 +884,7 @@ nav.rail .navMore button{flex-direction:column!important;justify-content:center!
 .bgTrips tr.oth td{color:var(--muted)}
 /* ---- journey planner ---- */
 .guideModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);overflow:auto}
-.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}.gdWrap:fullscreen{background:var(--bg);height:100vh;width:100vw;overflow:auto}
+.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}.gdWrap:fullscreen{background:var(--bg);height:100vh;width:100vw;overflow:auto}.gdWrap:fullscreen .gdTop,.gdWrap:fullscreen #gdStat{display:none!important}
 .gdTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gdBack{margin:0 6px 0 0;height:40px}.gdSrch,.gdSet{position:relative}.gdSp{flex:1}
 .gdLoc:focus,.gdLoc:focus-visible{outline:none}
 .gdIco[aria-expanded=true]{background:var(--panel)}
@@ -917,17 +917,17 @@ nav.rail .navMore button{flex-direction:column!important;justify-content:center!
 .gdSip.gn .chip,.gdSip.gn .chip:hover,.gdSip.gn .mb:hover{transform:none!important;transition:none!important;filter:none!important;cursor:inherit}
 /* as the departure boards (Tablica): the line and its direction on the plain header with the clock; rows in turn light and
    lighter, a grey band for the column heads and the stop being reached; no colour of its own */
-.gnTop{flex:none;display:flex;align-items:center;gap:.8em;padding:.45em .8em;background:var(--bH);color:var(--sF);border-bottom:2px solid var(--sL);min-width:0}
-.gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:calc(var(--gs)*2.4);min-width:calc(var(--gs)*2.4);padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:calc(var(--gs)*1.05);line-height:1}.gnTop .mb.circle,.gnTop .mb.sq{width:calc(var(--gs)*2.4);padding:0}.gnTop .mb.circle{border-radius:50%}.gnTop .mb.one{font-size:calc(var(--gs)*1.45)}
+.gnTop{flex:none;display:flex;align-items:center;gap:.7em;padding:.3em .7em;background:var(--bH);color:var(--sF);border-bottom:2px solid var(--sL);min-width:0}
+.gnTop .mb{flex:none;display:grid;place-items:center;box-sizing:border-box;height:calc(var(--gs)*1.8);min-width:calc(var(--gs)*1.8);padding:0 .2em;font-family:'Roboto Condensed',Roboto,sans-serif;font-weight:700;font-size:calc(var(--gs)*.82);line-height:1}.gnTop .mb.circle,.gnTop .mb.sq{width:calc(var(--gs)*1.8);padding:0}.gnTop .mb.circle{border-radius:50%}.gnTop .mb.one{font-size:calc(var(--gs)*1.1)}
 .gnTop .gtt{flex:1;min-width:0;display:flex;flex-direction:column}.gnTop .gtt small{font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
-.gnTop .gtt b{font-size:1.3em;font-weight:800;line-height:1.08;text-transform:uppercase;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.gnTop .inf{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:.05em}.gnTop .inf small{font-size:.5em;color:var(--sM);text-transform:uppercase;letter-spacing:.06em;font-weight:700}.gnTop .inf b{font-size:.95em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05}
-.gnTop .gsClock{flex:none;margin-left:.3em;font-size:1.25em;font-weight:800;font-variant-numeric:tabular-nums}
+.gnTop .gtt b{font-size:1.05em;font-weight:800;line-height:1.08;text-transform:uppercase;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gnTop .inf{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:.05em}.gnTop .inf small{font-size:.5em;color:var(--sM);text-transform:uppercase;letter-spacing:.06em;font-weight:700}.gnTop .inf b{font-size:.8em;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05}
+.gnTop .gsClock{flex:none;margin-left:.3em;font-size:1em;font-weight:800;font-variant-numeric:tabular-nums}
 .gnMain{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
 .gnMain .gsBody{display:flex;flex-direction:column;gap:0;overflow:hidden;min-height:0;border-right:2px solid var(--sL)}
 /* a row of the route: the time, the rail with the stop's sign (one column of the same width in every row, the line through its
    middle), the name, the transfer lines (on more rows when many), the platform */
-.gnRow{--rw:calc(var(--gs)*1.9);position:relative;flex:none;min-height:var(--rh);height:auto;display:flex;align-items:center;gap:calc(var(--gs)*.45);padding:calc(var(--gs)*.34) calc(var(--gs)*.5) calc(var(--gs)*.34) calc(var(--gs)*.3);box-sizing:border-box;border:0;background:var(--bR);color:var(--sF);font:inherit;font-size:calc(var(--gs)*.72);text-align:left;width:100%}
+.gnRow{--rw:calc(var(--gs)*1.4);position:relative;flex:none;min-height:var(--rh);height:auto;display:flex;align-items:center;gap:calc(var(--gs)*.45);padding:calc(var(--gs)*.34) calc(var(--gs)*.5) calc(var(--gs)*.34) calc(var(--gs)*.3);box-sizing:border-box;border:0;background:var(--bR);color:var(--sF);font:inherit;font-size:calc(var(--gs)*.72);text-align:left;width:100%}
 button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .tl{flex:none;width:calc(var(--gs)*3.1);text-align:right;color:var(--sM);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
 .gnRow .rl{flex:none;align-self:stretch;position:relative;width:var(--rw);margin:calc(var(--gs)*-.34 - 1px) 0}
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794483731;
+const APP_BUILD=1794485178;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
