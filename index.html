@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794518442;
+const APP_BUILD=1794518874;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2067,7 +2067,8 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   if(b&&L){const o=L.hidden;L.hidden=!o;b.setAttribute('aria-expanded',String(o));return}
   if(li){WEEK=+li.dataset.wk;route();return}
   if(L&&!L.hidden){L.hidden=true;const bb=document.getElementById('weekSel');if(bb)bb.setAttribute('aria-expanded','false')}});
-function tripsOf(d,day){const k=day+WEEK;if(d.plans)return d.tp&&d.tp[k]!==undefined?d.plans[d.tp[k]]:[];return (d.trips&&d.trips[day])||[]}
+// (a line with no special day of its own in a week where another line of a combination has one: its weekday runs that day)
+function tripsOf(d,day){let k=day+WEEK;if(day==='x'&&d.tp&&d.tp[k]===undefined)k='w'+WEEK;if(d.plans)return d.tp&&d.tp[k]!==undefined?d.plans[d.tp[k]]:[];return (d.trips&&d.trips[day])||[]}
 function weekDate(day){if(day==='x')return XD_CUR;if(day==='p')return XP_CUR;const w=(IDX.weeks||[])[WEEK];return w?w[day]:(IDX.days||{})[day]}   // no date for f (school-free weekdays)
 // where the timetable comes from, for the note under it
 // the note under a timetable; the MPGK Krynica-Zdrój lines get a note of their own (their timetables are copied from PDFs)
