@@ -448,7 +448,7 @@ span.chip{cursor:inherit}
 #mapLabels .msp{font-weight:700;fill:var(--muted)}
 #mapLabels .mss text{stroke:none;font-family:Roboto,"Segoe UI",sans-serif;font-weight:900;font-size:12.5px;text-anchor:middle}
 #mapLabels .mss text.s{font-size:7.8px;font-weight:900}
-#mapLabels .ms0{fill:#fff;stroke-width:2.5px}
+#mapLabels .ms0{fill:#fff;stroke-width:2.5px}#mapLabels .mk{fill:var(--bg);stroke-width:2.5px}:root:not([data-theme=dark]) #mapLabels .mk{fill:#fff}
 #mapMe,#mapFind{pointer-events:none}
 .findRing{fill:none;stroke:var(--brand,#d71920);animation:findP 1.6s ease-out infinite}@keyframes findP{0%{stroke-opacity:1}100%{stroke-opacity:.25}}
 .mapPop{position:absolute;z-index:6;width:min(320px,calc(100% - 16px));background:var(--bg);color:var(--fg);border:1px solid var(--line);box-shadow:0 8px 28px rgba(0,0,0,.22)}
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794508049;
+const APP_BUILD=1794508316;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
