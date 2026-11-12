@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794515671;
+const APP_BUILD=1794518442;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7483,12 +7483,13 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
     if (top && bottom && state.rows2 === 'equal') {
       // both rows in one face, laid out so that nothing of the upper row (an ogonek under it) comes near the lower
       // row (its accents above): at least one blank row between them, two where there is room, the whole centred
+      // with a blank row left above and below
       const marksOf = txt => { const it = shape(txt, 'S').items; return {
         acc: it.some(i => i.marks && i.marks.some(m => m !== 'ogonek' && m !== 'lcaron')) ? 3 : 0,
         og: it.some(i => i.marks && i.marks.includes('ogonek')) ? 2 : 0 }; };
       const mt = marksOf(top), mb = marksOf(bottom);
       const place = eh => { for (const gap of [2, 1]) { const tot = mt.acc + eh + mt.og + gap + mb.acc + eh + mb.og;
-        if (tot <= H) { const c1 = Math.floor((H - tot) / 2) + mt.acc; return [c1, c1 + eh + mt.og + gap + mb.acc]; } } return null; };
+        if (tot <= H - 2) { const c1 = 1 + Math.floor((H - 2 - tot) / 2) + mt.acc; return [c1, c1 + eh + mt.og + gap + mb.acc]; } } return null; };
       const opts = [];
       for (const eh of [9, 8, 7, 6]) { const pl = place(eh); if (!pl) continue;
         for (const f of [.45, .39, .33]) for (const sp of [2, 1]) opts.push([dispFont(eh, 1, f), sp, pl]); }
