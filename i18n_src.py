@@ -757,7 +757,7 @@ ROWS = [
     ("Dolny wiersz", "Lower row", "Untere Zeile", "Dolný riadok", "Dolní řádek"),
     ("np. 6", "e.g. 74", "z. B. 12", "napr. 3", "např. 199"),
     ("np. Jelitkowo", "e.g. Baker Street", "z. B. Teufelsbrück (F)", "napr. Petržalka", "např. Želivského"),
-    ("puste = jeden duży napis", "empty = one big line", "leer = eine große Zeile", "prázdne = jeden veľký nápis", "prázdné = jeden velký nápis"),
+    ("np. przez Politechnikę", "e.g. via King's Cross", "z. B. über Hauptbahnhof", "napr. cez Patrónku", "např. přes Anděl"),
     ("Dolny wiersz przy dwóch", "Lower row of two", "Untere von zwei Zeilen", "Dolný z dvoch riadkov", "Dolní ze dvou řádků"),
     ("Mniejszy", "Smaller", "Kleiner", "Menší", "Menší"),
     ("Taki sam jak górny", "Same as the upper", "Wie die obere", "Rovnaký ako horný", "Stejný jako horní"),
@@ -851,6 +851,12 @@ ROWS = [
 ("Prom", "Ferry", "Fähre", "Trajekt", "Přívoz"),
 ("Lew", "Lion", "Löwe", "Lev", "Lev"),
 ("Sosna", "Pine", "Kiefer", "Borovica", "Borovice"),
+    ("Eksportuj", "Export", "Exportieren", "Exportovať", "Exportovat"),
+    ("jako JPG", "as JPG", "als JPG", "ako JPG", "jako JPG"),
+    ("jako GIF", "as GIF", "als GIF", "ako GIF", "jako GIF"),
+    ("tylko gdy tablica ma zmienny tekst", "only when the board has changing text", "nur bei wechselndem Text", "len keď má tabuľa meniaci sa text", "jen když má tabule měnící se text"),
+    ("Trwa przygotowywanie pliku", "Preparing the file", "Datei wird vorbereitet", "Pripravuje sa súbor", "Připravuje se soubor"),
+    ("Nie udało się utworzyć pliku.", "Could not create the file.", "Die Datei konnte nicht erstellt werden.", "Súbor sa nepodarilo vytvoriť.", "Soubor se nepodařilo vytvořit."),
 ]
 
 WEEKDAYS = {
