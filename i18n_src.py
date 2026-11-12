@@ -857,6 +857,17 @@ ROWS = [
     ("tylko gdy tablica ma zmienny tekst", "only when the board has changing text", "nur bei wechselndem Text", "len keď má tabuľa meniaci sa text", "jen když má tabule měnící se text"),
     ("Trwa przygotowywanie pliku", "Preparing the file", "Datei wird vorbereitet", "Pripravuje sa súbor", "Připravuje se soubor"),
     ("Nie udało się utworzyć pliku.", "Could not create the file.", "Die Datei konnte nicht erstellt werden.", "Súbor sa nepodarilo vytvoriť.", "Soubor se nepodařilo vytvořit."),
+    ("S-Bahn", "S-Bahn", "S-Bahn", "S-Bahn", "S-Bahn"),
+    ("U-Bahn", "U-Bahn", "U-Bahn", "U-Bahn", "U-Bahn"),
+    ("Prom (F)", "Ferry (F)", "Fähre (F)", "Prievoz (F)", "Přívoz (F)"),
+    ("Metro (Warszawa)", "Metro (Warsaw)", "Metro (Warschau)", "Metro (Varšava)", "Metro (Varšava)"),
+    ("Metro (Praga)", "Metro (Prague)", "Metro (Prag)", "Metro (Praha)", "Metro (Praha)"),
+    ("Objazd", "Diversion", "Umleitung", "Obchádzka", "Objížďka"),
+    ("Oba", "Both", "Beide", "Oba", "Oba"),
+    ("Kolejne klatki", "Further frames", "Weitere Bilder", "Ďalšie snímky", "Další snímky"),
+    ("Pierwsza klatka to tekst z pól powyżej.", "The first frame is the text in the fields above.", "Das erste Bild ist der Text in den Feldern oben.", "Prvá snímka je text z polí vyššie.", "První snímek je text z polí výše."),
+    ("Usuń klatkę", "Remove frame", "Bild entfernen", "Odstrániť snímku", "Odstranit snímek"),
+    ("Dodaj klatkę", "Add a frame", "Bild hinzufügen", "Pridať snímku", "Přidat snímek"),
 ]
 
 WEEKDAYS = {
