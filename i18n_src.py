@@ -845,6 +845,12 @@ ROWS = [
 ("Dolnośląskie", "Lower Silesian Province", "Niederschlesien", "Dolnosliezske", "Dolnoslezské"),
 ("Lubelskie", "Lublin Province", "Lublin", "Lublinské", "Lublinské"),
 ("Słowacja", "Slovakia", "Slowakei", "Slovensko", "Slovensko"),
+("Kolorowy", "Coloured", "Farbig", "Farebný", "Barevný"),
+("Kontrast", "Contrast", "Kontrast", "Kontrast", "Kontrast"),
+("Znicz", "Grave candle", "Grablicht", "Kahanec", "Hřbitovní svíčka"),
+("Prom", "Ferry", "Fähre", "Trajekt", "Přívoz"),
+("Lew", "Lion", "Löwe", "Lev", "Lev"),
+("Sosna", "Pine", "Kiefer", "Borovica", "Borovice"),
 ]
 
 WEEKDAYS = {
