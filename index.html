@@ -53,7 +53,7 @@ select.sselN{display:none!important}
 <title>ZbiorkomInfo</title>
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><meta name="theme-color" content="#ffffff"><meta name="mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%225%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M3%206h15v3.6L8.2%2022.4H18V26H2.6v-3.6l9.8-12.8H3z%22%20fill%3D%22%23111%22%2F%3E%3Crect%20x%3D%2221.5%22%20y%3D%226%22%20width%3D%225%22%20height%3D%2220%22%20fill%3D%22%23d71920%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;900&family=Roboto+Condensed:wght@600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Roboto+Condensed:wght@400;500;600;700;800&display=swap">
 <style>
 /* Layout: timetable board — section label + icon left, wrapping chip grid right; line and stop views follow the IMHD two-column pattern */
 :root{
@@ -884,7 +884,7 @@ nav.rail .navMore button{flex-direction:column!important;justify-content:center!
 .bgTrips tr.oth td{color:var(--muted)}
 /* ---- journey planner ---- */
 .guideModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);overflow:auto}
-.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}
+.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}.gdWrap:fullscreen{background:var(--bg);height:100vh;width:100vw;overflow:auto}
 .gdTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gdBack{margin:0 6px 0 0;height:40px}.gdSrch,.gdSet{position:relative}.gdSp{flex:1}
 .gdLoc:focus,.gdLoc:focus-visible{outline:none}
 .gdIco[aria-expanded=true]{background:var(--panel)}
@@ -905,7 +905,7 @@ nav.rail .navMore button{flex-direction:column!important;justify-content:center!
 .gdPick small{color:var(--muted);margin-left:auto;white-space:nowrap}
 .gdSip{--sB:#232629;--sH:#000;--sF:#fff;--sM:#aeb4ba;--sR:#fff;--sL:#3a3f44;--sA:#ffd23f}
 :root:not([data-theme=dark]) .gdSip{--sB:#eef0f2;--sH:#fff;--sF:#14171a;--sM:#5c6670;--sR:#14171a;--sL:#d5d9de;--sA:#b25e00}
-.gdSip{flex:1;display:flex;flex-direction:column;background:var(--sB);color:var(--sF);border:1px solid var(--sL);font-family:Roboto,"Segoe UI",sans-serif;min-height:0;overflow:hidden;--gs:clamp(16px,min(2.6vw,3.4vh),32px)}
+.gdSip{flex:1;display:flex;flex-direction:column;background:var(--sB);color:var(--sF);border:1px solid var(--sL);font-family:Roboto,"Segoe UI",sans-serif;min-height:0;overflow:hidden;--gs:clamp(16px,min(2.4vw,4.4vh),64px)}
 .gsBar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 14px;background:var(--sH);color:var(--sM);font-size:calc(var(--gs)*.55)}.gsBar b{color:var(--sF);font-size:calc(var(--gs)*.8);font-variant-numeric:tabular-nums}
 .gsBody{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column}
 .gsBody{justify-content:flex-start}
@@ -940,7 +940,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .nm .hand{flex:none;width:1.1em;height:1.1em;color:currentColor}
 /* (the lines to change to: a row under the stop's name, the name itself never cut short by them; too many for the row: smaller) */
 .gnRow .chs{flex:none;max-width:100%;overflow:hidden;display:flex;gap:calc(var(--gs)*.14);flex-wrap:wrap;justify-content:flex-start;align-items:center}
-.gnRow.now{padding-top:calc(var(--gs)*.85);padding-bottom:calc(var(--gs)*.85)}   /* (room for its row of lines under the name, which stays level with the dot) */
+.gnRow.now{padding-top:calc(var(--gs)*.85);padding-bottom:calc(var(--gs)*.85)}.gnRow.now .rl{margin:calc(var(--gs)*-.85 - 1px) 0}   /* (room for its row of lines under the name, which stays level with the dot) */
 .gnRow .chs.two{--cw:calc(var(--gs)*.66)!important}.gdSip.gn .gnRow .chs.two .chip{height:var(--cw)!important;min-width:var(--cw)!important;font-size:calc(var(--cw)*.52)!important}.gdSip.gn .gnRow .chs.two .chip.tram,.gdSip.gn .gnRow .chs.two .chip.nt,.gdSip.gn .gnRow .chs.two .chip.circle,.gdSip.gn .gnRow .chs.two .chip.rail{width:var(--cw)!important}
 .gnTrR .chip{flex:none;box-sizing:border-box;height:calc(var(--gs)*1.05)!important;min-width:calc(var(--gs)*1.05)!important;padding:0 2px!important;font-size:calc(var(--gs)*.5)!important;line-height:1}.gnRow .chs .chip{flex:none;box-sizing:border-box;height:var(--cw)!important;min-width:var(--cw)!important;padding:0 2px!important;font-size:calc(var(--cw)*.5)!important;line-height:1}
 .gnRow .chs .chip.tram,.gnRow .chs .chip.nt,.gnRow .chs .chip.circle,.gnRow .chs .chip.rail{border-radius:50%;width:var(--cw)!important;padding:0!important}.gnTrR .chip.tram,.gnTrR .chip.nt,.gnTrR .chip.circle,.gnTrR .chip.rail{border-radius:50%;width:calc(var(--gs)*1.05)!important;padding:0!important}
@@ -1161,7 +1161,7 @@ header.top #gdTTop:not([hidden]){display:inline-grid}header.top #gdTTop{font:700
 .gdPick li.past button{opacity:.55}
 /* the choice of the ride, as the new mSIP and the departure boards: the stop a band of its own, a row each departure as high as
    a row of the mSIP – the time, the line, the direction, the platform in a column of its own */
-.gdPick{--gs:clamp(16px,min(2.6vw,3.4vh),32px);--rh:calc(var(--gs)*1.95);font-family:Roboto,"Segoe UI",sans-serif}
+.gdPick{--gs:clamp(16px,min(2.4vw,4.4vh),56px);--rh:calc(var(--gs)*1.95);font-family:Roboto,"Segoe UI",sans-serif}
 .gdPick ul{border:1px solid var(--line);background:var(--bg)}
 .gdPick li{border-top:0;border-bottom:1px solid var(--line)}.gdPick li:last-child{border-bottom:0}
 .gdPick li.gdSub{display:flex;align-items:center;min-height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;background:rgba(127,127,127,.16);color:var(--fg);font-size:calc(var(--gs)*.72);font-weight:800}
@@ -1470,7 +1470,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
   <div class="gdTop"><button type="button" class="crumb gdBack" id="gdBack" hidden>← Wybór kursu</button><button type="button" class="gdLoc gdIco" id="gdLoc" aria-pressed="true" title="Moja lokalizacja" aria-label="Moja lokalizacja"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
    <div hidden><button type="button" id="gdFind"></button><div id="gdFindBox"><input id="gdQ"><ul id="gdAc"></ul></div></div>
    <span class="gdSp"></span>
-   <div class="gdBtns"><button type="button" class="gdIco" id="gdOnMap" hidden title="Pokaż pojazd na mapie" aria-label="Pokaż pojazd na mapie"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></button><button type="button" class="gdIco" id="gdVoice" aria-pressed="false" title="Zapowiedzi głosowe" aria-label="Zapowiedzi głosowe"></button></div></div>
+   <div class="gdBtns"><button type="button" class="gdIco" id="gdOnMap" hidden title="Pokaż pojazd na mapie" aria-label="Pokaż pojazd na mapie"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg></button><button type="button" class="gdIco" id="gdFull" aria-pressed="false" title="Tryb pełnoekranowy" aria-label="Tryb pełnoekranowy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><button type="button" class="gdIco" id="gdVoice" aria-pressed="false" title="Zapowiedzi głosowe" aria-label="Zapowiedzi głosowe"></button></div></div>
   <p class="gdStat" id="gdStat"></p>
   <div class="gdPick" id="gdPick"></div>
   <div class="gdSip" id="gdSip" hidden></div>
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794483027;
+const APP_BUILD=1794483731;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4549,7 +4549,7 @@ const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0'
 // (a row keeps its height: transfer lines too many for one row are made smaller and put on two)
 // (the current stop: its lines under the name, the name level with the dot; more than one row of them: the row grows to hold them)
 function gdChsFit(root){}   // (the lines now wrap in the row's own flow)
-function gdSipHtml(R,P,cur,next,MID){const sip=document.getElementById('gdSip');if(sip)sip.classList.add('gn');return gdSipNew(R,P,cur,next,MID)}
+function gdSipHtml(R,P,cur,next,MID){const sip=document.getElementById('gdSip');if(sip){sip.classList.add('gn');const r=R&&R.r;if(r&&(r.f||r.t==='rail'))sip.style.setProperty('--sR',colOf(r));else sip.style.removeProperty('--sR')}return gdSipNew(R,P,cur,next,MID)}
 // the transfers of a stop for the new look: the departures of other lines after the ride gets there (an hour ahead), one row
 // a line with its direction and platform, the first time as on the boards and the next two in minutes
 function gdTrRows(R,sid,tAt,nowM,clickable){const E=gdBoardLoad(sid);if(!E.list){clearTimeout(GUIDE.trWait);GUIDE.trWait=setTimeout(()=>{if(GUIDE.run===R)gdRedraw()},1200);return null}const here=IDX.stops[sid][0],G=new Map();
@@ -4576,6 +4576,10 @@ ${hd<last?`<span class="inf"><small>${esc(trS('Przyjazd'))}</small><b>${fmtT(T[l
 ${trs==null?`<div class="gnTrE">${esc(trS('Wczytywanie…'))}</div>`:trs?`<div class="gnTrL">${trs}</div>`:`<div class="gnTrE">${esc(trS('Brak przesiadek'))}</div>`}</div></div>
 ${R.tst?`<div class="gnFoot gnTst"><button type="button" data-tn="-1"${R.p>0?'':' disabled'}>◀ ${esc(trS('Wstecz'))}</button><span>${esc(R.src||'')}</span><button type="button" data-tn="1"${R.p<2*last?'':' disabled'}>${esc(trS('Dalej'))} ▶</button></div>`:`<div class="gnFoot"><span class="gsSrc">${esc(R.src||'')}</span>${GUIDE.voice&&GDV.by?' · '+esc(trS('Głos'))+': '+esc(GDV.by):''}</div>`}`}
 a11ySet(true);   // (mSIP: always there)
+// mSIP full screen (the button by the map's; Esc or the button again leaves it)
+{const b=document.getElementById('gdFull');b.onclick=()=>{const w=document.querySelector('#guideModal .gdWrap');try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else if(w.requestFullscreen)w.requestFullscreen().catch(()=>{})}catch(e){}};
+  document.addEventListener('fullscreenchange',()=>{const on=!!document.fullscreenElement&&document.fullscreenElement.matches('#guideModal .gdWrap');b.setAttribute('aria-pressed',String(on));setTimeout(()=>{try{GUIDE.redraw&&GUIDE.redraw()}catch(e){}window.dispatchEvent(new Event('resize'))},120)});
+  if(!document.fullscreenEnabled)b.hidden=true}
 document.getElementById('gdVoice').onclick=()=>{GUIDE.voice=!GUIDE.voice;if(GUIDE.voice){[GD_GONG,GD_AUD].forEach(a=>{try{a.muted=true;if(a===GD_AUD&&!a.src)a.src=GD_GONG.src;const p_=a.play();const un=()=>{a.pause();try{a.currentTime=0}catch(e){}a.muted=false};p_?p_.then(un,un):un()}catch(e){}});gdVoiceLoad(gdLang());if(gdNameLang()!==gdLang())gdVoiceLoad(gdNameLang());gdKeepAwake(true)}else gdKeepAwake(false);gdVoiceBtn();if(GUIDE.voice&&GUIDE.run){GUIDE.lastAnn='';GUIDE.annMax=-1;GUIDE.nxMax=-1;gdTick()}};
 (()=>{const q=document.getElementById('gdQ'),ac=document.getElementById('gdAc'),box=document.getElementById('gdFindBox'),fb=document.getElementById('gdFind'),lb=document.getElementById('gdLoc');let L=[],k=-1,VS=null;
   const pop=(b,el,on)=>{el.hidden=!on;b.setAttribute('aria-expanded',String(on))};
