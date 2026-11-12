@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794508454;
+const APP_BUILD=1794508986;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6506,9 +6506,10 @@ function mkUpd(){if(!MK.stD)MK.stD=setTimeout(()=>{MK.stD=0;mkStatusTick()},1500
   G.title=G.ariaLabel=gs==='off'?trS('GPS wyłączony'):gs==='wait'?trS('Szukanie GPS…'):'GPS ±'+Math.round(MK.fix.acc||0)+' m';
   // the stops: from the top the four after the next one (the farthest first), the next / present one larger, under it the one before
   // (and two more above and two below, out of sight under the list's edges: the scrolling brings them in, never from nowhere)
+  if(!R.req&&R.r&&R.ps){R.req=new Set();loadRoute(R.r.id).then(D=>{const ps=new Set(R.ps);let best=null,bn=-1;(D.dirs||[]).forEach(d=>{const n=d.stops.filter(x=>ps.has(x[0])).length;if(n>bn){bn=n;best=d}});if(best)best.stops.forEach(x=>{if(x[2]&&ps.has(x[0]))R.req.add(x[0])})}).catch(()=>{})}   // (the stops on request of this run)
   const rows=[j+6,j+5,j+4,j+3,j+2,j+1,j,j-1,j-2,j-3],bt=B.querySelectorAll('.mkStops button');
   rows.forEach((q,i)=>{const b=bt[i],ok=q>=0&&q<=last,v=i-2;b.parentNode.className=(v<0?'nx buf bt'+(-v):v>5?'prev buf bb'+(v-5):v===4?'cur'+(at?' at':''):v===5?'prev vb':'nx'+(v===0?' vt':''))+(ok?'':' none')+(ok&&q===last?' end':'');b.dataset.q=ok?q:'';b.disabled=!ok;
-    b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').innerHTML=ok&&q>=j&&gdReq(q)?HAND:'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
+    b.querySelector('.t').textContent=ok?hm(T[q]):'';b.querySelector('b').textContent=ok?P[q][0]:'';b.querySelector('i').innerHTML=ok&&q>=j&&R.req&&R.req.has(R.ps[q])?HAND:'';{const pf=b.querySelector('.pf'),n=ok?String(P[q][1]||'').trim():'';pf.hidden=!n;pf.lastChild.textContent=n}});
   // (passing stops: the whole list scrolls as one – every row moved by the same distance, as many rows as stops passed, forward
   // or back – and glides back into place; rows from beyond the list come in from under its edge)
   {const ol=B.querySelector('.mkStops'),vis=[...ol.querySelectorAll('li:not(.buf)')],tv=vis.map(l=>l.offsetTop),hA=vis.length>1?(tv[tv.length-1]-tv[0])/(vis.length-1):60;ol.style.setProperty('--rh',hA+'px');
