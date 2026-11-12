@@ -1487,6 +1487,8 @@ for area, A in NEW_AREAS.items():
                 c = (r.get('route_color') or '').strip()
                 if r['route_type'] in ('109', '400') and re.fullmatch(r'[0-9A-Fa-f]{6}', c):
                     AREA_LINE_COLORS.setdefault(r['route_short_name'].strip(), ('#' + c.lower(), '#fff' if (r.get('route_text_color') or 'FFFFFF').upper() == 'FFFFFF' else '#222'))
+        if area == 'bts' and os.path.exists('bts_kolory.json'):   # Bratislava: the line colours as imhd.sk shows them (a table kept with the code), before the feed's
+            for k, v in json.load(open('bts_kolory.json', encoding='utf-8')).items(): AREA_LINE_COLORS.setdefault(k, (v[0], v[1]))
         if area == 'bts':   # Bratislava: each line in its own colour, as DPB gives it in the feed; its grey lines (898989) keep the page's grey
             for r in rd(SCR + '/bts/routes.txt'):
                 c = (r.get('route_color') or '').strip().upper()
@@ -1542,8 +1544,9 @@ for f in files:
         for x in [dd.get('_shape')] + list(dd.get('_vshapes', [])):
             if x: need.add(x.split('|')[0]); SH_T.setdefault(x.split('|')[0], set()).add(_j.get('t'))
 SHAPES = collections.defaultdict(list); VSH = {}
-for pre, path in (('g', SCR + '/gtfs/x/shapes.txt'), ('y', SCR + '/gdy/shapes.txt'), ('r', SCR + '/tr/shapes.txt'),
-                  ('Ps', SCR + '/poz/shapes.txt'), ('KAs', SCR + '/krkA/shapes.txt'), ('KTs', SCR + '/krkT/shapes.txt'), ('Ws', SCR + '/waw/shapes.txt'), ('Js', SCR + '/wej/shapes.txt'), ('Ls', SCR + '/ldz/shapes.txt'), ('Fs', SCR + '/fl/shapes.txt'), ('Gs', SCR + '/prg/shapes.txt'), ('Bs', SCR + '/ber/shapes.txt'), ('Hs', SCR + '/ham/shapes.txt'), ('Rs', SCR + '/wro/shapes.txt'), ('Us', SCR + '/lub/shapes.txt'), ('Xs', SCR + '/bts/shapes.txt')):
+SHAPE_SRC = (('g', SCR + '/gtfs/x/shapes.txt'), ('y', SCR + '/gdy/shapes.txt'), ('r', SCR + '/tr/shapes.txt'),
+                  ('Ps', SCR + '/poz/shapes.txt'), ('KAs', SCR + '/krkA/shapes.txt'), ('KTs', SCR + '/krkT/shapes.txt'), ('Ws', SCR + '/waw/shapes.txt'), ('Js', SCR + '/wej/shapes.txt'), ('Ls', SCR + '/ldz/shapes.txt'), ('Fs', SCR + '/fl/shapes.txt'), ('Gs', SCR + '/prg/shapes.txt'), ('Bs', SCR + '/ber/shapes.txt'), ('Hs', SCR + '/ham/shapes.txt'), ('Rs', SCR + '/wro/shapes.txt'), ('Us', SCR + '/lub/shapes.txt'), ('Xs', SCR + '/bts/shapes.txt'))
+for pre, path in SHAPE_SRC:
     if not os.path.exists(path): continue
     for r in rd(path):
         k = pre + r['shape_id']
@@ -1552,13 +1555,16 @@ for k, v in SHAPES.items():
     v.sort(); SHAPES[k] = [[round(x[0], 5), round(x[1], 5)] for x in simplify([(x[1], x[2]) for x in v])]
 # the courses laid exactly onto the OpenStreetMap streets and tram tracks (dopasuj.py); trains keep their own shapes
 MATCH_AREA = {'g': 'Trójmiasto', 'y': 'Trójmiasto', 'Ps': 'Poznań', 'KAs': 'Kraków', 'KTs': 'Kraków', 'Ws': 'Warszawa', 'Js': 'Wejherowo',
-              'Ls': 'Łódź', 'Fs': 'Flensburg', 'Gs': 'Praga'}
+              'Ls': 'Łódź', 'Fs': 'Flensburg', 'Gs': 'Praga', 'Rs': 'Wrocław', 'Us': 'Lublin', 'Xs': 'Bratysława'}
 if '--no-match' not in sys.argv:
     try:
         import dopasuj
-        _pre = lambda k: next((p for p in sorted(MATCH_AREA, key=len, reverse=True) if k.startswith(p)), None)
+        # (every feed's shapes – a city added later too, under its own prefix – except the trains' 'r' and Berlin's and
+        # Hamburg's, whose feeds give their courses exactly)
+        _all = [p for p, _ in SHAPE_SRC if p not in ('r', 'Bs', 'Hs')]
+        _pre = lambda k: next((p for p in sorted(_all, key=len, reverse=True) if k.startswith(p)), None)
         _keys = [k for k in SHAPES if _pre(k) and not (SH_T.get(k, set()) & {'rail'})]
-        dopasuj.match_all(SHAPES, _keys, lambda k: MATCH_AREA[_pre(k)], os.path.join(HERE, 'reczne', 'dopasowanie_cache.json'))
+        dopasuj.match_all(SHAPES, _keys, lambda k: MATCH_AREA.get(_pre(k), _pre(k)), os.path.join(HERE, 'reczne', 'dopasowanie_cache.json'))
     except Exception as e: print('Dopasowanie do dróg pominięte:', e)
 SHAPES.update(KM_SHAPES)
 print('Kształty tras:', len(SHAPES))
