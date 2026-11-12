@@ -11,7 +11,7 @@ import collections, csv, datetime, io, json, os, shutil, urllib.request, zipfile
 
 AREAS = {   # area -> [(feed key used by the page, static GTFS: folder in the build's scratch directory or a URL)]
     'waw': [('W', 'https://api.zbiorkom.live/api6-open/warsaw/gtfs/default')],
-    'ldz': [('L', 'ldz')],
+    'ldz': [('L', 'https://api.zbiorkom.live/api6-open/lodz/gtfs/default')],   # (its realtime feed names zbiorkom.live's own trips)
     'poz': [('P', 'poz')],
     'krk': [('KA', 'krkA'), ('KT', 'krkT')],
     'prg': [('G', 'prg')],
