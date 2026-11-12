@@ -249,6 +249,13 @@ def street_shapes(groups, label, trams=()):
             k = KM_KEY.setdefault(json.dumps(pts), 'k%d' % len(KM_KEY)); KM_SHAPES[k] = pts; SHAPE_OF[(rk, ids)] = k
 
 
+def _psig(it):
+    """a trip as a passenger sees it: direction, stops and times, without technical stops (no boarding, no alighting –
+    e.g. Zajezdnia Wrzeszcz T1/T2), which do not make a timetable different"""
+    rows = [x for x in it[3] if not (str(x[2]) == '1' and str(x[3]) == '1')] or it[3]
+    return (it[2], tuple((x[0], x[1]) for x in rows))
+
+
 def build_routes(groups, meta_of):
     """groups: {route_key: [(day, lf, dir, rows)]} rows=[(sid, minute, pickup, drop)]"""
     # every run without a course of its own (no shape in its feed, none matched) along the streets – trams along their
@@ -263,7 +270,7 @@ def build_routes(groups, meta_of):
         # the week's weekday timetable becomes column x<week>; the others are dropped
         # Fridays (choose(fri=True)): column p<week> when its trips differ from the weekday's
         if any(str(it[0]).startswith('P') for it in tl_all):
-            sig = lambda items: sorted((it[2], tuple(x[0] for x in it[3]), it[3][0][1]) for it in items)
+            sig = lambda items: sorted(_psig(it) for it in items)
             fr = collections.defaultdict(lambda: collections.defaultdict(list))
             for it in tl_all:
                 if str(it[0]).startswith('P'): wi, dd = it[0][1:].split(':'); fr[wi][dd].append(it)
@@ -275,7 +282,7 @@ def build_routes(groups, meta_of):
                     if sig(by_d[dd]) != base:
                         tl_all += [('p' + wi,) + tuple(it[1:]) for it in by_d[dd]]; m['dates']['p' + wi] = dd; break
         if any(str(it[0]).startswith('X') for it in tl_all):
-            sig = lambda items: sorted((it[2], tuple(x[0] for x in it[3]), it[3][0][1]) for it in items)
+            sig = lambda items: sorted(_psig(it) for it in items)
             keep = [it for it in tl_all if not str(it[0]).startswith('X')]
             cand = collections.defaultdict(lambda: collections.defaultdict(list))
             for it in tl_all:
