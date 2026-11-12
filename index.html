@@ -940,7 +940,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow .nm .hand{flex:none;width:1.1em;height:1.1em;color:currentColor}
 /* (the lines to change to: a row under the stop's name, the name itself never cut short by them; too many for the row: smaller) */
 .gnRow .chs{flex:none;max-width:100%;overflow:hidden;display:flex;gap:calc(var(--gs)*.14);flex-wrap:wrap;justify-content:flex-start;align-items:center}
-.gnRow.now .chs{position:absolute;left:0;top:calc(100% + .2em);width:max-content}.gnRow.now:has(.chs){padding-bottom:calc(var(--gs)*1.45)}   /* (room for its row of lines under the name, which stays level with the dot) */
+.gnRow.now .chs{position:absolute;left:0;top:calc(100% + .2em);width:max-content}.gnRow.now:has(.chs){padding-top:calc(var(--gs)*1.45);padding-bottom:calc(var(--gs)*1.45)}   /* (room for its row of lines under the name, which stays level with the dot) */
 .gnRow .chs.two{--cw:calc(var(--gs)*.66)!important}.gdSip.gn .gnRow .chs.two .chip{height:var(--cw)!important;min-width:var(--cw)!important;font-size:calc(var(--cw)*.52)!important}.gdSip.gn .gnRow .chs.two .chip.tram,.gdSip.gn .gnRow .chs.two .chip.nt,.gdSip.gn .gnRow .chs.two .chip.circle,.gdSip.gn .gnRow .chs.two .chip.rail{width:var(--cw)!important}
 .gnTrR .chip{flex:none;box-sizing:border-box;height:calc(var(--gs)*1.05)!important;min-width:calc(var(--gs)*1.05)!important;padding:0 2px!important;font-size:calc(var(--gs)*.5)!important;line-height:1}.gnRow .chs .chip{flex:none;box-sizing:border-box;height:var(--cw)!important;min-width:var(--cw)!important;padding:0 2px!important;font-size:calc(var(--cw)*.5)!important;line-height:1}
 .gnRow .chs .chip.tram,.gnRow .chs .chip.nt,.gnRow .chs .chip.circle,.gnRow .chs .chip.rail{border-radius:50%;width:var(--cw)!important;padding:0!important}.gnTrR .chip.tram,.gnTrR .chip.nt,.gnTrR .chip.circle,.gnTrR .chip.rail{border-radius:50%;width:calc(var(--gs)*1.05)!important;padding:0!important}
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794482586;
+const APP_BUILD=1794482808;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4548,7 +4548,7 @@ const gdAgo=t=>{const d=Math.max(0,Math.round((Date.now()-t)/1000));return trS('
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 // (a row keeps its height: transfer lines too many for one row are made smaller and put on two)
 // (the current stop: its lines under the name, the name level with the dot; more than one row of them: the row grows to hold them)
-function gdChsFit(root){root.querySelectorAll('.gnRow.now .chs').forEach(c=>{const row=c.closest('.gnRow');row.style.paddingBottom='';c.style.maxWidth=Math.max(60,row.getBoundingClientRect().right-c.parentElement.getBoundingClientRect().left-10)+'px';const over=c.getBoundingClientRect().bottom-row.getBoundingClientRect().bottom+6;if(over>0)row.style.paddingBottom='calc(var(--gs)*1.45 + '+over+'px)'})}
+function gdChsFit(root){root.querySelectorAll('.gnRow.now .chs').forEach(c=>{const row=c.closest('.gnRow');row.style.paddingBottom='';row.style.paddingTop='';c.style.maxWidth=Math.max(60,row.getBoundingClientRect().right-c.parentElement.getBoundingClientRect().left-10)+'px';const over=c.getBoundingClientRect().bottom-row.getBoundingClientRect().bottom+6;if(over>0){row.style.paddingBottom='calc(var(--gs)*1.45 + '+over+'px)';row.style.paddingTop='calc(var(--gs)*1.45 + '+over+'px)'}})}
 function gdSipHtml(R,P,cur,next,MID){const sip=document.getElementById('gdSip');if(sip)sip.classList.add('gn');return gdSipNew(R,P,cur,next,MID)}
 // the transfers of a stop for the new look: the departures of other lines after the ride gets there (an hour ahead), one row
 // a line with its direction and platform, the first time as on the boards and the next two in minutes
