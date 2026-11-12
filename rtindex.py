@@ -10,12 +10,14 @@ Warszawa's realtime feed (zbiorkom.live) refers to its own static GTFS, so that 
 import collections, csv, datetime, io, json, os, shutil, urllib.request, zipfile
 
 AREAS = {   # area -> [(feed key used by the page, static GTFS: folder in the build's scratch directory or a URL)]
-    'waw': [('W', 'https://cdn.zbiorkom.live/gtfs/warsaw.zip')],
+    'waw': [('W', 'https://api.zbiorkom.live/api6-open/warsaw/gtfs/default')],
     'ldz': [('L', 'ldz')],
     'poz': [('P', 'poz')],
     'krk': [('KA', 'krkA'), ('KT', 'krkT')],
     'prg': [('G', 'prg')],
     'ber': [('B', 'ber')],
+    'lub': [('U', 'lub')],
+    'wro': [('R', 'wro')],
 }
 
 

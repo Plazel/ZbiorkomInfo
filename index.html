@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794501647;
+const APP_BUILD=1794502090;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2074,7 +2074,7 @@ function weekDate(day){if(day==='x')return XD_CUR;if(day==='p')return XP_CUR;con
 // the note under a timetable: only where it comes from, "Źródło: ZTM Gdańsk", the name a link to the source's page
 const SRC_OF=[[o=>o==='ZTM Gdańsk','ZTM Gdańsk','https://ckan.multimediagdansk.pl/dataset/tristar'],[o=>o==='ZKM Gdynia','ZKM Gdynia','https://zkmgdynia.pl'],
   [o=>o==='ZDMiKP Bydgoszcz','mkuran.pl','https://mkuran.pl/gtfs/'],[o=>o==='ZTM Poznań','ZTM Poznań','https://www.ztm.poznan.pl/pl/dla-deweloperow/'],
-  [o=>o==='MPK Łódź','ZDiT Łódź','https://otwarte.miasto.lodz.pl'],[o=>o==='MPK Wrocław','Otwarte dane Wrocławia','https://www.wroclaw.pl/open-data/'],[o=>o==='ZTM Lublin','mkuran.pl','https://mkuran.pl/gtfs/'],[o=>o==='DPB Bratislava','DPB (data.bratislava.sk)','https://data.bratislava.sk/pages/gtfs_navod'],[o=>o==='PID Praha','PID','https://pid.cz/o-systemu/opendata/'],
+  [o=>o==='MPK Łódź','ZDiT Łódź','https://otwarte.miasto.lodz.pl'],[o=>o==='MPK Wrocław'||o==='ZTM Lublin','zbiorkom.live','https://zbiorkom.live'],[o=>o==='DPB Bratislava','DPB (data.bratislava.sk)','https://data.bratislava.sk/pages/gtfs_navod'],[o=>o==='PID Praha','PID','https://pid.cz/o-systemu/opendata/'],
   [o=>o==='Aktiv Bus Flensburg','gtfs.de','https://gtfs.de'],[o=>o==='VBB Berlin','VBB','https://www.vbb.de/vbb-services/api-open-data/datensaetze/'],[o=>o==='hvv Hamburg','hvv (Transparenzportal Hamburg)','https://suche.transparenz.hamburg.de/?q=hvv%20gtfs'],[o=>o==='MZK Wejherowo','mkuran.pl','https://mkuran.pl/gtfs/'],
   [o=>o==='ZTP Kraków','ZTP Kraków','https://gtfs.ztp.krakow.pl'],[o=>o==='ZTM Warszawa','mkuran.pl','https://mkuran.pl/gtfs/'],
   [o=>o==='MPK Nowy Sącz','MPK Nowy Sącz','https://www.mpk.nowysacz.pl'],[o=>/^Zapopradzie/.test(o),'Zapopradzie','https://zapopradzie.pl'],
@@ -4248,7 +4248,7 @@ async function gdVehicles(){if(['gda','sop','gdy','all'].includes(city)){
   return out}
 const RV_CACHE={};
 // zbiorkom.live's open API (api.zbiorkom.live/api6-open, CORS open): the vehicles of Warszawa and Łódź, and of ZKM Gdynia
-const ZB_OPEN={waw:'warsaw',ldz:'lodz'};
+const ZB_OPEN={waw:'warsaw',ldz:'lodz',lub:'lublin',wro:'wroclaw'};
 // Berlin (VBB publishes no vehicle positions, only the trips' times at all their stops, live): each running trip placed between
 // the last stop it has left and the next one by those times (as in Bydgoszcz: the timetable moved by the delay)
 const TU_VEH={ber:true};
@@ -4292,7 +4292,7 @@ function bydRunDelays(V){const now=Date.now();const todo=V.filter(v=>{const c=BY
   todo.forEach(v=>{const c=BYD_RUN.get(v._run.runK);BYD_RUN.set(v._run.runK,{dl:c?c.dl:0,t:now});const X=IDX.stops[v._run.bId];if(!X)return;
     depLiveBYD({n:X[0],c:'byd',poles:X[1]?[X[1]]:[]}).then(L=>{if(!L)return;
       L.forEach(e=>V.forEach(w=>{if(w._run.r.n===e.r.n&&IDX.stops[w._run.bId]&&IDX.stops[w._run.bId][0]===X[0]&&Math.abs(e.st-w._run.sch)<=1.5)BYD_RUN.set(w._run.runK,{dl:e.delay/60,t:Date.now()})}))}).catch(()=>{})})}
-const ZB_BOX={tricity:'18.1,54.25,18.9,54.8',warsaw:'20.3,51.85,21.75,52.65',lodz:'19.0,51.5,19.85,52.0'};
+const ZB_BOX={tricity:'18.1,54.25,18.9,54.8',warsaw:'20.3,51.85,21.75,52.65',lodz:'19.0,51.5,19.85,52.0',lublin:'22.35,51.1,22.8,51.4',wroclaw:'16.75,50.95,17.3,51.25'};
 const ZB_CACHE={};
 // (the stops are named "Dworzec …" here, "Dw. …" in the feed: dworce_nazwy.py)
 const dwFull=t=>t.replace(/(^|[^\p{L}.])Dw\.\s*(?=\p{L})/gu,'$1Dworzec ');
@@ -4998,7 +4998,7 @@ async function rtFetch(id){const order=RT_WAY!==null?[RT_WAY,...RT_WAYS.keys()].
 // the ZTM poles (stop ids) of a chosen stop
 const ztmIds=st=>Object.entries(IDX.stops).filter(([sid,S])=>/^\d+$/.test(sid)&&S[0]===st.n&&['gda','sop','gdy','oth'].includes(S[4])&&(!st.poles||!st.poles.length||st.poles.includes(S[1]||''))).map(([sid,S])=>[sid,S[1]||'']);
 // Poznań, Kraków, Warszawa, Łódź and Praga: GTFS-Realtime, read by serwer.py on this computer (their servers send no CORS header)
-const RT_GTFS={poz:'poz',krk:'krk',waw:'waw',ldz:'ldz',prg:'prg',ber:'ber'};
+const RT_GTFS={poz:'poz',krk:'krk',waw:'waw',ldz:'ldz',prg:'prg',ber:'ber',lub:'lub',wro:'wro'};
 async function depLiveRT(st){const a=RT_GTFS[st.c];if(!a||!RT_LOCAL)return null;
   const ids=Object.entries(IDX.stops).filter(([sid,S])=>S[0]===st.n&&S[4]===st.c&&(!st.poles||!st.poles.length||st.poles.includes(S[1]||''))).map(([sid])=>sid);
   if(!ids.length)return null;
@@ -5010,7 +5010,9 @@ async function depLiveRT(st){const a=RT_GTFS[st.c];if(!a||!RT_LOCAL)return null;
   catch(e){return null}}
 // ---- without the local server (e.g. on GitHub Pages): the GTFS-Realtime feeds are fetched through the worker (RT_PROXY)
 // and read here; data/rt/<area>.json (rtindex.py) tells which line and run of the timetable each trip_id is
-const RT_FEEDS={waw:[['W','https://cdn.zbiorkom.live/gtfs-rt/warsaw.pb']],ldz:[['L','https://cdn.zbiorkom.live/gtfs-rt/lodz.pb']],
+// (zbiorkom.live's open API: Warszawa, Łódź, Lublin, Wrocław – its old cdn addresses answer 404)
+const RT_FEEDS={waw:[['W','https://api.zbiorkom.live/api6-open/warsaw/gtfsRealtime/default/tripUpdates']],ldz:[['L','https://api.zbiorkom.live/api6-open/lodz/gtfsRealtime/default/tripUpdates']],
+  lub:[['U','https://api.zbiorkom.live/api6-open/lublin/gtfsRealtime/default/tripUpdates']],wro:[['R','https://api.zbiorkom.live/api6-open/wroclaw/gtfsRealtime/default/tripUpdates']],
   poz:[['P','https://www.ztm.poznan.pl/pl/dla-deweloperow/getGtfsRtFile?file=trip_updates.pb']],
   krk:[['KA','https://gtfs.ztp.krakow.pl/TripUpdates_A.pb'],['KT','https://gtfs.ztp.krakow.pl/TripUpdates_T.pb']],
   prg:[['G','https://api.golemio.cz/v2/vehiclepositions/gtfsrt/trip_updates.pb']],
@@ -5035,7 +5037,7 @@ function rtParse(buf){const b=new Uint8Array(buf),td=new TextDecoder(),out=[];
 const RT_CACHE={};
 // fetched straight from the page (CORS open), not through the proxy: VBB limits each address to 7 requests a minute, which
 // the proxy's one address would spend for everyone
-const RT_DIRECT=/gtfsrt\.vbb\.de/;
+const RT_DIRECT=/gtfsrt\.vbb\.de|api\.zbiorkom\.live/;
 async function rtFeedGet(url){const c=RT_CACHE[url];if(c&&Date.now()-c.t<(RT_DIRECT.test(url)?60000:20000))return c.p;   // (VBB's whole feed: 1.5 MB a fetch, so once a minute)
   const p=(async()=>{for(const w of [...(RT_PROXY&&!RT_DIRECT.test(url)?[RT_PROXY+'?url='+encodeURIComponent(url)]:[]),url]){try{const ac=new AbortController();const to=setTimeout(()=>ac.abort(),9000);
       const r=await fetch(w,{cache:'no-store',signal:ac.signal});clearTimeout(to);if(!r.ok)continue;return rtParse(await r.arrayBuffer())}catch(e){}}throw new Error('rt')})();
@@ -5202,6 +5204,7 @@ const ALERT_IC='<svg viewBox="0 0 24 24" width="26" height="26" fill="currentCol
 // alerts (Warszawa and Łódź through zbiorkom.live's open API, Kraków from ZTP)
 const ALERT_SRC={tri:[['ztm']],waw:[['rt','https://api.zbiorkom.live/api6-open/warsaw/gtfsRealtime/default/serviceAlerts']],
   ldz:[['rt','https://api.zbiorkom.live/api6-open/lodz/gtfsRealtime/default/serviceAlerts']],
+  lub:[['rt','https://api.zbiorkom.live/api6-open/lublin/gtfsRealtime/default/serviceAlerts']],wro:[['rt','https://api.zbiorkom.live/api6-open/wroclaw/gtfsRealtime/default/serviceAlerts']],
   krk:[['rt','https://gtfs.ztp.krakow.pl/ServiceAlerts_A.pb',1],['rt','https://gtfs.ztp.krakow.pl/ServiceAlerts_T.pb',1]],
   ber:[['bvg','data/alerts_ber.json']],
   // the operators' own notices, from their pages and feeds, taken by the build (utrudnienia_miast.py)
@@ -5509,7 +5512,7 @@ function depRender(){const m=depEl();if(m.hidden)return;
   document.getElementById('depStat').textContent=cs.join(', ');
   const live=DEP.src.includes('live'),sch=DEP.src.includes('sch');
   // the note: live where it is; in cities with live data that could not be had here, how to get it; elsewhere: timetables
-  const cities_=[...depCfg.stops,...(depCfg.split?depCfg.stops2:[])].map(x=>x.c||city);const rtCity=cities_.some(c=>['gda','sop','gdy','all','poz','krk','waw','ldz','prg'].includes(c));
+  const cities_=[...depCfg.stops,...(depCfg.split?depCfg.stops2:[])].map(x=>x.c||city);const rtCity=cities_.some(c=>['gda','sop','gdy','all','poz','krk','waw','ldz','prg','lub','wro'].includes(c));
   document.getElementById('depSrc').textContent='';
   depLayout()}
 function depTickClock(){document.querySelectorAll('#depPanels .dClock').forEach(c=>c.innerHTML=depClockHTML())}

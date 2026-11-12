@@ -35,10 +35,10 @@ SOURCES = {
     # timetable, so it is looked up on the Transparenzportal when the build starts
     'ber':   'https://www.vbb.de/vbbgtfs',
     'ham':   None,
-    # Wrocław (the city's open data: the file's address is looked up in the portal's catalogue when the build starts, this one
-    # if that fails), Lublin (ZTM Lublin, converted to GTFS by mkuran.pl, CC0) and Bratislava (DPB, its GTFS at a fixed address)
-    'wro':   'https://www.wroclaw.pl/open-data/87b09b32-f076-4475-8ec9-6020ed1f9ac0/OtwartyWroclaw_rozklad_jazdy_GTFS.zip',
-    'lub':   'https://mkuran.pl/gtfs/lublin.zip',
+    # Wrocław and Lublin from zbiorkom.live's open API (the same trips its realtime feeds name; Wrocław's own portal refuses
+    # the build's downloads), Bratislava (DPB, its GTFS at a fixed address)
+    'wro':   'https://api.zbiorkom.live/api6-open/wroclaw/gtfs/default',
+    'lub':   'https://api.zbiorkom.live/api6-open/lublin/gtfs/default',
     'bts':   'https://www.arcgis.com/sharing/rest/content/items/aba12fd2cbac4843bc7406151bc66106/data',
 }
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -109,19 +109,6 @@ for key in ('ber', 'ham'):
         if fetch_src(key, z): de_miasta.cut(z, os.path.join(SCR, key), key); os.remove(z)
     except Exception as e: print('%s: pominięty (%s)' % (key, e))
 # Wrocław, Lublin, Bratislava: without their file (and no copy kept) only these cities are left out
-def wro_url():
-    """the current GTFS file of Wrocław, from the open data portal's catalogue (CKAN)"""
-    for api in ('https://www.wroclaw.pl/open-data/api/3/action/package_show?id=rozkladjazdytransportupublicznegoplik_data',
-                'https://www.wroclaw.pl/open-data/api/action/package_show?id=rozkladjazdytransportupublicznegoplik_data'):
-        try:
-            req = urllib.request.Request(api, headers={'User-Agent': 'rozklady-trojmiasto/1.0'})
-            with urllib.request.urlopen(req, timeout=60) as r: res = json.load(r)['result']['resources']
-            for x in res:
-                if re.search(r'GTFS.*\.zip$', x.get('url') or '', re.I): return x['url']
-        except Exception as e: print('Wrocław: katalog %s niedostępny (%s)' % (api, e))
-    return None
-_u = wro_url()
-if _u: SOURCES['wro'] = _u
 for key in ('wro', 'lub', 'bts'):
     z = os.path.join(SCR, key + '.zip')
     try:
@@ -1310,11 +1297,15 @@ def seq_pole(area, name, sid):
             d[sid] = 'B%d' % k
         else: d[sid] = '%02d' % (len(d) + 1)
     return d[sid]
+def zb_name(s):
+    m = re.match(r'^(.*\S)\s+(\d{2}|\d{5}|\d{8})$', re.sub(r'\s+', ' ', s).strip())
+    return (m.group(1), m.group(2)) if m else (re.sub(r'\s+', ' ', s).strip(), '')
 def city_name(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[0]
     if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
         return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', re.sub(r'\s*\(Berlin,?\s*\)', '', r['stop_name']))).strip())
     if area == 'fl': return fl_name(r['stop_name'])[0]
+    if area in ('lub', 'wro'): return zb_name(r['stop_name'])[0]
     return re.sub(r'\s+', ' ', r['stop_name']).strip()   # ("Kaliskiego  - Akademicka": one space)
 def city_pole(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[1]
@@ -1322,7 +1313,7 @@ def city_pole(area, r):
     if area == 'fl': return fl_name(r['stop_name'])[1]   # Flensburg: B1, B2… where the stop's name has it
     if area == 'ldz': return (r.get('stop_code') or '').strip()   # Łódź: the stop's own four-digit number (0081)
     if area == 'poz': return (r.get('stop_code') or '').strip()   # Poznań: the stop's whole code (RKAP71), as on its poles
-    if area == 'lub': return (r.get('stop_code') or '').strip()   # Lublin: the stop's pole number (01, 02…) as in the feed
+    if area in ('lub', 'wro'): return zb_name(r['stop_name'])[1]   # zbiorkom.live: the pole's number ends the name ("Zbożowa 02", "ZOO 24404")
     if area in ('wro', 'bts'):   # (only the platform the feed gives: Bratislava A, B…)
         v = (r.get('platform_code') or '').strip()
         return v if re.fullmatch(r'[0-9A-Za-z]{1,3}', v) else ''
@@ -1456,8 +1447,6 @@ for area, A in NEW_AREAS.items():
             short, rtype = rmeta[rk]
             meta_of[rk] = {'id': rk, 'n': short, 't': city_kind(area, short, rtype), 'op': A['op'], 'dates': dates[rk]}
         if area == 'fl' and not os.path.exists(SCR + '/fl/shapes.txt'): street_shapes(groups, 'Flensburg')   # only if the feed has no shapes
-        if area == 'lub':   # Lublin (mkuran.pl): no direction_id in the feed – each trip oriented against its line's most common pattern
-            for rk in list(groups): groups[rk] = fix_dirs(groups[rk])
         n0 = len(ROUTES_OUT); build_routes(groups, meta_of)
         for r in ROUTES_OUT[n0:]: r['c'] = [area]; NEW_ROUTE_IDS[area].append(r['id'])
         for r in ROUTES_OUT[n0:]:   # night trams (Poznań 2xx, Kraków 62, 64, 69): night lines, drawn round like trams
