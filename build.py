@@ -206,8 +206,57 @@ def rail_city(name):
         if name.startswith(pre): return c
     return 'oth'
 
+# ---------------- street courses for lines whose feed has no shapes ----------------
+KM_SHAPES, KM_KEY = {}, {}
+def street_shapes(groups, label, trams=()):
+    """routes between consecutive stops on the OpenStreetMap roads (drogi.py; trams also along tram tracks), kept in
+    reczne/drogi_cache.json so only new or moved stop pairs are routed again; gives each run of stops its course"""
+    pairs = {}
+    for rk, tl in groups.items():
+        for *_x, rows in tl:
+            if (rk, tuple(x[0] for x in rows)) in SHAPE_OF: continue   # (a run with its course from the feed or matched already)
+            for a, b in zip(rows, rows[1:]):
+                if a[0] != b[0]: pairs.setdefault((a[0], b[0]), rk in trams)
+    try:
+        import drogi
+        _cp = os.path.join(HERE, 'reczne', 'drogi_cache.json')
+        _cache = json.load(open(_cp, encoding='utf-8')) if os.path.exists(_cp) else {}
+        _key = lambda a, b, t: ('t|' if t else '') + '%s|%s|%s|%s' % (a, b, STOPS[a][2:4], STOPS[b][2:4])
+        legs = {pr: _cache[_key(*pr, t)] for pr, t in pairs.items() if _key(*pr, t) in _cache}
+        for tram in (False, True):
+            miss = {pr for pr, t in pairs.items() if t == tram and _key(*pr, t) not in _cache}
+            if not miss: continue
+            pos = {sid: STOPS[sid][2:4] for pr in miss for sid in pr}
+            router = None
+            if tram:
+                lats = [q[0] for q in pos.values()]; lons = [q[1] for q in pos.values()]
+                router = drogi.TileRouter((min(lats) - .01, max(lats) + .01, min(lons) - .015, max(lons) + .015), log=lambda m: print(label + ',', m), costs=dict(drogi.COST, transit=.9))
+            new, odd = drogi.road_legs(miss, pos, log=lambda m: print(label + ',', m), router=router)
+            legs.update(new); _cache.update({_key(*pr, tram): v for pr, v in new.items()})
+        json.dump(_cache, open(_cp, 'w', encoding='utf-8'), separators=(',', ':'))
+        print('%s: przebieg po ulicach dla %d z %d odcinków' % (label, len(legs), len(pairs)))
+    except Exception as e:
+        print('%s: bez przebiegu po ulicach (%s)' % (label, e)); return
+    for rk, tl in groups.items():
+        for *_x, rows in tl:
+            ids = tuple(x[0] for x in rows)
+            if (rk, ids) in SHAPE_OF: continue
+            pts = []
+            for a, b in zip(ids, ids[1:]):
+                if a == b: continue
+                seg = legs.get((a, b)) or [STOPS[a][2:4], STOPS[b][2:4]]
+                pts += seg if not pts else seg[1:]
+            k = KM_KEY.setdefault(json.dumps(pts), 'k%d' % len(KM_KEY)); KM_SHAPES[k] = pts; SHAPE_OF[(rk, ids)] = k
+
+
 def build_routes(groups, meta_of):
     """groups: {route_key: [(day, lf, dir, rows)]} rows=[(sid, minute, pickup, drop)]"""
+    # every run without a course of its own (no shape in its feed, none matched) along the streets – trams along their
+    # tracks – never stop to stop in straight lines; in every city, the ones added later too (trains keep the feed's)
+    _road = {rk: tl for rk, tl in groups.items() if (meta_of.get(rk) or {}).get('t') != 'rail'}
+    if any((rk, tuple(x[0] for x in rows)) not in SHAPE_OF for rk, tl in _road.items() for *_x, rows in tl):
+        _ops = sorted({(meta_of.get(rk) or {}).get('op') or '?' for rk in _road})
+        street_shapes(_road, ', '.join(_ops[:2]) + (' …' if len(_ops) > 2 else ''), trams={rk for rk in _road if (meta_of.get(rk) or {}).get('t') == 'tram'})
     for key, tl_all in groups.items():
         m = meta_of[key]; rid_key = key
         # special days: of the candidate weekdays of a week (keys X<week>:<date>) the first whose departures differ from
@@ -885,46 +934,6 @@ try:
 except Exception as e: print('Linia R: pominięto (%s)' % e)
 
 
-# ---------------- street courses for lines whose feed has no shapes ----------------
-KM_SHAPES, KM_KEY = {}, {}
-def street_shapes(groups, label, trams=()):
-    """routes between consecutive stops on the OpenStreetMap roads (drogi.py; trams also along tram tracks), kept in
-    reczne/drogi_cache.json so only new or moved stop pairs are routed again; gives each run of stops its course"""
-    pairs = {}
-    for rk, tl in groups.items():
-        for *_x, rows in tl:
-            for a, b in zip(rows, rows[1:]):
-                if a[0] != b[0]: pairs.setdefault((a[0], b[0]), rk in trams)
-    try:
-        import drogi
-        _cp = os.path.join(HERE, 'reczne', 'drogi_cache.json')
-        _cache = json.load(open(_cp, encoding='utf-8')) if os.path.exists(_cp) else {}
-        _key = lambda a, b, t: ('t|' if t else '') + '%s|%s|%s|%s' % (a, b, STOPS[a][2:4], STOPS[b][2:4])
-        legs = {pr: _cache[_key(*pr, t)] for pr, t in pairs.items() if _key(*pr, t) in _cache}
-        for tram in (False, True):
-            miss = {pr for pr, t in pairs.items() if t == tram and _key(*pr, t) not in _cache}
-            if not miss: continue
-            pos = {sid: STOPS[sid][2:4] for pr in miss for sid in pr}
-            router = None
-            if tram:
-                lats = [q[0] for q in pos.values()]; lons = [q[1] for q in pos.values()]
-                router = drogi.TileRouter((min(lats) - .01, max(lats) + .01, min(lons) - .015, max(lons) + .015), log=lambda m: print(label + ',', m), costs=dict(drogi.COST, transit=.9))
-            new, odd = drogi.road_legs(miss, pos, log=lambda m: print(label + ',', m), router=router)
-            legs.update(new); _cache.update({_key(*pr, tram): v for pr, v in new.items()})
-        json.dump(_cache, open(_cp, 'w', encoding='utf-8'), separators=(',', ':'))
-        print('%s: przebieg po ulicach dla %d z %d odcinków' % (label, len(legs), len(pairs)))
-    except Exception as e:
-        print('%s: bez przebiegu po ulicach (%s)' % (label, e)); return
-    for rk, tl in groups.items():
-        for *_x, rows in tl:
-            ids = tuple(x[0] for x in rows)
-            if (rk, ids) in SHAPE_OF: continue
-            pts = []
-            for a, b in zip(ids, ids[1:]):
-                if a == b: continue
-                seg = legs.get((a, b)) or [STOPS[a][2:4], STOPS[b][2:4]]
-                pts += seg if not pts else seg[1:]
-            k = KM_KEY.setdefault(json.dumps(pts), 'k%d' % len(KM_KEY)); KM_SHAPES[k] = pts; SHAPE_OF[(rk, ids)] = k
 
 
 # ---------------- Bydgoszcz: ZDMiKP ----------------
