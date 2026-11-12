@@ -884,7 +884,7 @@ nav.rail .navMore button{flex-direction:column!important;justify-content:center!
 .bgTrips tr.oth td{color:var(--muted)}
 /* ---- journey planner ---- */
 .guideModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);overflow:auto}
-.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}.gdWrap:fullscreen{background:var(--bg);height:100vh;width:100vw;overflow:auto}.gdWrap:fullscreen .gdTop,.gdWrap:fullscreen #gdStat{display:none!important}
+.guideModal[hidden]{display:none}.gdWrap{display:flex;flex-direction:column;height:100%;min-height:420px;box-sizing:border-box;padding:10px 12px;gap:8px}.gdWrap:fullscreen{background:var(--bg);height:100vh;width:100vw;overflow:auto}.gdWrap:fullscreen .gdTop,.gdWrap:fullscreen #gdStat,.gdWrap:fullscreen .gsSrc{display:none!important}
 .gdTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.gdBack{margin:0 6px 0 0;height:40px}.gdSrch,.gdSet{position:relative}.gdSp{flex:1}
 .gdLoc:focus,.gdLoc:focus-visible{outline:none}
 .gdIco[aria-expanded=true]{background:var(--panel)}
@@ -956,7 +956,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnTrH{flex:none;display:flex;align-items:center;gap:.6em;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;background:var(--bR);font-size:calc(var(--gs)*.72)}
 .gnTrH small{font-size:1em;font-weight:700;color:var(--sF)}
 .gnTrH b{min-width:0;font-size:1em;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--sM)}
-.gnTrL{flex:1;min-height:0;overflow:auto}
+.gnTrL{flex:1;min-height:0;overflow:hidden}
 /* a transfer: the line, its direction, the stop it leaves from when another one, the platform and the time – the last two
    always in columns of their own width, the same in every row */
 .gnTrR{display:grid;grid-template-columns:calc(var(--gs)*1.6) minmax(0,1fr) auto 3.4em 4.4em;gap:.6em;align-items:center;min-height:var(--rh);padding:calc(var(--gs)*.25) calc(var(--gs)*.5);box-sizing:border-box;background:var(--bR);font-size:calc(var(--gs)*.72)}
@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794485178;
+const APP_BUILD=1794486154;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4548,7 +4548,8 @@ const gdAgo=t=>{const d=Math.max(0,Math.round((Date.now()-t)/1000));return trS('
 const gdClock=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 // (a row keeps its height: transfer lines too many for one row are made smaller and put on two)
 // (the current stop: its lines under the name, the name level with the dot; more than one row of them: the row grows to hold them)
-function gdChsFit(root){}   // (the lines now wrap in the row's own flow)
+// (the transfers: no scrolling – only the rows that fit whole are shown)
+function gdChsFit(root){const L=root.querySelector('.gnTrL');if(!L)return;const b=L.getBoundingClientRect().bottom+1;L.querySelectorAll('.gnTrR').forEach(r=>{r.style.display='';if(r.getBoundingClientRect().bottom>b)r.style.display='none'})}
 function gdSipHtml(R,P,cur,next,MID){const sip=document.getElementById('gdSip');if(sip){sip.classList.add('gn');const r=R&&R.r;if(r&&(r.f||r.t==='rail'))sip.style.setProperty('--sR',colOf(r));else sip.style.removeProperty('--sR')}return gdSipNew(R,P,cur,next,MID)}
 // the transfers of a stop for the new look: the departures of other lines after the ride gets there (an hour ahead), one row
 // a line with its direction and platform, the first time as on the boards and the next two in minutes
