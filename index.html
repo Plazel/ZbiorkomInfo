@@ -1720,7 +1720,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794501329;
+const APP_BUILD=1794501470;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2383,7 +2383,7 @@ const comboHeadIcon=()=>IDX&&IDX.routes.some(r=>inCity(r)&&(r.t==='tram'||r.nt))
 function comboHeader(C,extra,back){
   return back?`<button class="crumb" type="button" data-go="${back}">← Wspólna trasa</button>`+cHead(C,extra):`<button class="crumb" type="button" data-go="">← Wszystkie linie</button>`+cHead(C,extra)}
 function cHead(C,extra){return `
-  <div class="lhead">${comboIcon(C.rs)}<span id="hc" style="display:flex;gap:8px;flex-wrap:wrap"></span>${withWeek(extra)}
+  <div class="lhead">${comboIcon(C.rs)}<span id="hc" style="display:flex;gap:8px;flex-wrap:wrap"></span>${withWeek(extra,{id:C.rs.map(r=>r.id).join(',')})}
    </div>`;
 }
 function fillChips(C){const hc=document.getElementById('hc');C.rs.forEach(r=>hc.appendChild(chip(r,'big')))}
@@ -5684,12 +5684,13 @@ document.querySelector('.logo')?.addEventListener('click',()=>{if(MAP.open)close
 // "Pokaż przystanek na mapie": the map window over the page, centred on the stop, with its line picked out
 // "Pokaż linię na mapie": the map with only this line, fitted to its course
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-showmap]');if(b)showLineOnMap(b.dataset.showmap)});
-async function showLineOnMap(rid){const r=IDX.routes.find(x=>x.id===rid);if(!r)return;
+// one line, or the lines of a combination (ids joined by commas) – each shown whole
+async function showLineOnMap(rids){const ids=String(rids).split(',').filter(id=>IDX.routes.some(x=>x.id===id));if(!ids.length)return;
   await openMap();await new Promise(ok=>setTimeout(ok,80));
-  if(r.t==='night'&&!MAP.night){const cb=document.getElementById('mapNight');cb.checked=true;cb.dispatchEvent(new Event('change'))}
-  await setMapView('osm');if(!MAP.byId[rid]||!MAP.data.routes[rid])return;
-  MAP.hl=new Set([rid]);applyHL();
-  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;MAP.data.routes[rid].g.forEach(c=>c.forEach(([x,y])=>{x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}));
+  if(ids.some(id=>IDX.routes.find(x=>x.id===id).t==='night')&&!MAP.night){const cb=document.getElementById('mapNight');cb.checked=true;cb.dispatchEvent(new Event('change'))}
+  await setMapView('osm');const ok=ids.filter(id=>MAP.byId[id]&&MAP.data.routes[id]);if(!ok.length)return;
+  MAP.hl=new Set(ok);applyHL();
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;ok.flatMap(id=>MAP.data.routes[id].g).forEach(c=>c.forEach(([x,y])=>{x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}));
   if(x0>x1)return;const svg=document.getElementById('mapSvg');const ar=(svg.clientHeight||1)/(svg.clientWidth||1);
   let w=Math.max(x1-x0,(y1-y0)/ar)*1.12+2;const h=w*ar;MAP.vb={x:(x0+x1)/2-w/2,y:(y0+y1)/2-h/2,w,h};applyVB();renderLabels()}
 // a stop (or one platform) brought into view close up and marked with a ring, until the map is clicked
