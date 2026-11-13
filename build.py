@@ -190,10 +190,7 @@ TOWNS_OTHER = ('Pruszcz', 'Kowale', 'Banino', 'Borkowo', 'Czaple', 'Jankowo', 'O
 
 def split_name(n):
     n = ' '.join(n.replace('""', '"').split())
-    # a town written twice at the start ("Pruszcz Gdański Pruszcz Gdański Dworzec 01" in ZTM's feed): once
-    w = n.split()
-    for k in (3, 2, 1):
-        if len(w) > 2 * k and w[:k] == w[k:2 * k]: n = ' '.join(w[k:]); break
+    # (a town written twice – "Pruszcz Gdański Pruszcz Gdański Dworzec" – is the stop's official name: kept as it is)
     m = re.match(r'^(.*?)\s+(\d{2})$', n)
     return (m.group(1), m.group(2)) if m else (n, '')
 
