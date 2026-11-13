@@ -868,6 +868,8 @@ ROWS = [
     ("Pierwsza klatka to tekst z pól powyżej.", "The first frame is the text in the fields above.", "Das erste Bild ist der Text in den Feldern oben.", "Prvá snímka je text z polí vyššie.", "První snímek je text z polí výše."),
     ("Usuń klatkę", "Remove frame", "Bild entfernen", "Odstrániť snímku", "Odstranit snímek"),
     ("Dodaj klatkę", "Add a frame", "Bild hinzufügen", "Pridať snímku", "Přidat snímek"),
+("Rozkład:", "Timetable:", "Fahrplan:", "Cestovný poriadok:", "Jízdní řád:"),
+("Okres obowiązywania rozkładu", "Period the timetable is valid for", "Gültigkeitszeitraum des Fahrplans", "Obdobie platnosti cestovného poriadku", "Období platnosti jízdního řádu"),
 ]
 
 WEEKDAYS = {

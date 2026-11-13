@@ -141,7 +141,7 @@ def nearest(wds):
         d = TODAY + datetime.timedelta(days=i)
         if d.weekday() in wds: return d.strftime('%Y%m%d')
 # the timetable shows the nearest weekday, Saturday and Sunday counting from today (like the ZTM website)
-WEEKS_N = 3
+WEEKS_N = 6   # (six weeks ahead: the page groups them into the periods a timetable is valid for)
 WINDOW_DAYS = 7 * WEEKS_N
 def pl_holidays(y):
     a = y % 19; b = y // 100; c = y % 100; d = (19 * a + b - b // 4 - (b - (8 * b + 13) // 25) + 15) % 30
@@ -292,12 +292,12 @@ def build_routes(groups, meta_of):
                 base = sig([it for it in keep if it[0] == 'w' + wi])
                 for dd in sorted(by_d):
                     if sig(by_d[dd]) != base:
-                        keep += [('x' + wi,) + tuple(it[1:]) for it in by_d[dd]]; m['dates']['x' + wi] = dd
-                        # the same as the next week's weekdays: not a one-off day but a new timetable from that day on
-                        # (the page names the column "od 16.11" instead of a special day)
+                        # the same as the next week's weekdays: not a one-off day but a new timetable from that day on;
+                        # no special column then, only its first day (xn<week>): the page splits its periods there
+                        # ("12.11 – 15.11", "od 16.11") and takes the next week's plans for the days from it on
                         nx = [it for it in keep if it[0] == 'w%d' % (int(wi) + 1)]
-                        if nx and sig(nx) == sig(by_d[dd]): m['dates']['xn' + wi] = 1
-                        break
+                        if nx and sig(nx) == sig(by_d[dd]): m['dates']['xn' + wi] = dd; break
+                        keep += [('x' + wi,) + tuple(it[1:]) for it in by_d[dd]]; m['dates']['x' + wi] = dd; break
             tl_all = keep
         dirs = collections.defaultdict(list)
         for item in tl_all:
