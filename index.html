@@ -1736,7 +1736,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794593687;
+const APP_BUILD=1794594489;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4776,13 +4776,13 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   if(!d.trip&&['gda','sop','gdy','all'].includes(city)){try{const V=await gpsVehicles();const b0=new Date();b0.setHours(0,0,0,0);
     const vid=d.veh&&/^z/.test(d.veh)?d.veh.slice(1):null;const veh=V&&(vid&&V.find(x=>String(x.vehicleId)===vid)||V.find(x=>String(x.routeShortName)===d.r.n&&Math.abs((Date.parse(x.scheduledTripStartTime)-b0)/60000-d.t0)<=2&&gdSameHead(x.headsign,d.head)));if(veh)d.trip=veh.scheduledTripStartTime}catch(e){}}
   // elsewhere (GTFS-RT vehicle positions: Poznań, Kraków, Praga): the run's vehicle by its id from the guide, or by line and start time
-  let rtOnly=false;
+  let rtOnly=false,gdLive=false;
   const tri=['gda','sop','gdy','all'].includes(city);
   if((!tri&&(VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city]||TU_VEH[city]))||(tri&&!d.trip)){try{const V=await gdVehicles();const R={r:d.r,ps:d.ps,off:d.off,head:d.head,t0:d.t0};
     let v=d.veh&&V&&V.find(x=>x.id===d.veh);
     if(!v&&V){const C=V.filter(x=>x.line===d.r.n&&!x.start&&(x.up?zbOnRun(R,x)&&gdSameHead(x.head,d.head):Math.abs(x.t0-d.t0)<=3&&gdOnRun(R,x))).sort((a,b)=>(a.up?0:Math.abs(a.t0-d.t0))-(b.up?0:Math.abs(b.t0-d.t0)));v=C[0];if(v)d.veh=v.id}
-    if(v&&!v.start){gps=[v.lat,v.lon];rtOnly=true;RUN.fixT=v.ts||Date.now();d.vlabel=v.label||'';if(v.brig)d.brig=v.brig;if(v.model)d.vmodel=v.model;if(v.delay!=null)dl=v.delay/60}}catch(e){}}
-  if(d.trip){try{const V=await gpsVehicles();const veh=V&&V.find(x=>String(x.routeShortName)===d.r.n&&x.scheduledTripStartTime===d.trip);if(veh){gps=[veh.lat,veh.lon];RUN.fixT=Date.parse(veh.generated)||GPS.t;d.vlabel=veh.vehicleCode!=null?String(veh.vehicleCode):'';if(!d.vmodel&&d.vlabel){try{const F=await ztmFleet();const f=F[d.vlabel];if(f)d.vmodel=[f.brand,f.model].filter(Boolean).join(' ')}catch(_){}}d.brig=veh.vehicleService?String(veh.vehicleService).replace(/^(\d+)-(\d+)$/,(_,a,b)=>(+a)+'/'+(+b)):'';const pd=await posDelay(d,veh);if(pd!=null)dl=pd/60}}catch(e){}}
+    if(v&&!v.start){gps=[v.lat,v.lon];rtOnly=true;if(v.tid)d.tid=v.tid;RUN.fixT=v.ts||Date.now();d.vlabel=v.label||'';if(v.brig)d.brig=v.brig;if(v.model)d.vmodel=v.model;if(v.delay!=null)dl=v.delay/60}}catch(e){}}
+  if(d.trip){try{const V=await gpsVehicles();const veh=gdVehOf(V,d.r.n,d.trip,d.head);if(veh){gps=[veh.lat,veh.lon];RUN.fixT=Date.parse(veh.generated)||GPS.t;d.vlabel=veh.vehicleCode!=null?String(veh.vehicleCode):'';if(!d.vmodel&&d.vlabel){try{const F=await ztmFleet();const f=F[d.vlabel];if(f)d.vmodel=[f.brand,f.model].filter(Boolean).join(' ')}catch(_){}}d.brig=veh.vehicleService?String(veh.vehicleService).replace(/^(\d+)-(\d+)$/,(_,a,b)=>(+a)+'/'+(+b)):'';const pd=await vehDelay(veh);if(pd!=null){dl=pd/60;gdLive=true}}}catch(e){}}
   // Bydgoszcz (no vehicle positions published): the delay from the boards at the stops (ZDMiKP's live departures) for the
   // next stops of the run; the vehicle's place by the timetable moved by it
   let bydLive=false;
@@ -4791,7 +4791,9 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
     for(let q=j;q<Math.min(S.length,j+3);q++){const X=IDX.stops[d.ps[q]];if(!X)continue;
       const L=await depLiveBYD({n:X[0],c:'byd',poles:X[1]?[X[1]]:[]});const m=L&&L.find(e=>e.r.n===d.r.n&&Math.abs(e.st-S[q])<=1.5);
       if(m){dl=m.delay/60;bydLive=true;break}}}catch(e){}}
-  const T=d.off.map(o=>d.t0+o+dl);const P=d.ps.map(id=>IDX.stops[id]);
+  // GTFS-RT cities: the times at the stops from the trip updates, as on the boards (the vehicle's position only places it)
+  let tuD=null;if(!tri&&RT_FEEDS[RT_GTFS[city]]){try{tuD=await runTuDelays(d)}catch(e){}}
+  const T=d.off.map((o,j)=>d.t0+o+(tuD&&tuD[j]!=null?tuD[j]/60:dl));const P=d.ps.map(id=>IDX.stops[id]);
   let pos=gps;if(!pos){let j=T.findIndex(t=>t>nowM);if(j<0)j=T.length;
     if(j===0)pos=[P[0][2],P[0][3]];else if(j>=T.length)pos=[P[T.length-1][2],P[T.length-1][3]];
     else{const f=Math.max(0,Math.min(1,(nowM-T[j-1])/Math.max(.1,T[j]-T[j-1])));pos=[P[j-1][2]+(P[j][2]-P[j-1][2])*f,P[j-1][3]+(P[j][3]-P[j-1][3])*f]}}
@@ -4800,7 +4802,7 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
     const u=Math.max(0,Math.min(1,((xy[0]-A[0])*dx+(xy[1]-A[1])*dy)/l2));const ex=A[0]+u*dx-xy[0],ey=A[1]+u*dy-xy[1],dd=ex*ex+ey*ey;
     if(dd<bd-1e-12&&(!gps||T[j]>=nowM-20)){bd=dd;segJ=j;segU=u;ang=Math.atan2(dy,dx)*180/Math.PI}}
   // GTFS-RT: the delay from where the vehicle is (the timetable's time at that point against now), the times ahead by it
-  let rtDelay=false;if(rtOnly&&segJ!=null){const S=d.off.map(o=>d.t0+o);const est=S[segJ-1]+segU*(S[segJ]-S[segJ-1]);dl=Math.max(-5,nowM-est);S.forEach((t,k)=>T[k]=t+dl);rtDelay=true;RUN.pos&&(RUN.pos.dl=dl)}
+  let rtDelay=false;if(rtOnly&&segJ!=null&&!tuD){const S=d.off.map(o=>d.t0+o);const est=S[segJ-1]+segU*(S[segJ]-S[segJ-1]);dl=Math.max(-5,nowM-est);S.forEach((t,k)=>T[k]=t+dl);rtDelay=true;RUN.pos&&(RUN.pos.dl=dl)}
   // on the line as drawn: the nearest point of the line's course (within about 300 m), the arrow along it
   const M=MAP.data&&MAP.data.routes[d.r.id];let sxy=xy;const CG=RUN.e?[RUN.e.g]:M&&M.g;
   const cut=RUN.e?runCut(d,xy,segJ):null;
@@ -4817,9 +4819,10 @@ async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);r
   // the stops still ahead, with their times
   let pn=document.getElementById('runPanel');if(!pn){pn=document.createElement('div');pn.id='runPanel';pn.className='runPanel';const mb=document.querySelector('.mapBody');mb.insertBefore(pn,mb.querySelector('.mapArea'))}
   document.getElementById('mapModal').classList.add('run');
-  const s0=depStyle(d.r);const m=Math.round(dl);const live=(d.live||gps||bydLive)&&(!rtOnly||rtDelay);
+  const s0=depStyle(d.r);let m=Math.round(dl);const live=!!tuD||(d.live||gps||bydLive)&&(!rtOnly||rtDelay)&&(!tri||!gps||gdLive);   // (ZTM Gdańsk's vehicle seen but no delay worked out: "na żywo", not a guess)
   // as on the guide's display: the line of the route, the stops passed dimmed, the next one marked; times with the delay
   const nx=gps&&segJ!=null?segJ:Math.max(0,T.findIndex(t=>t>=nowM-.25));const last=d.ps.length-1;   // (the vehicle seen: the next stop by its position)
+  if(tuD){const v=tuD[Math.min(nx,last)];if(v!=null)m=Math.round(v/60)}   // (the delay shown: at the next stop, as on its board)
   // (the stops on request marked with the hand, as everywhere)
   const RQ=(()=>{try{const L=CACHE[d.r.id],D=L&&L.dirs[d.di];return new Set(D?D.stops.filter(x=>x[2]).map(x=>x[0]):[])}catch(e){return new Set()}})();
   const rows=d.ps.map((id,j)=>{const X=IDX.stops[id]||['',''];const pl=d.t0+d.off[j];const ch=Math.round(T[j])!==Math.round(pl);
@@ -5079,6 +5082,26 @@ async function rtFeedGet(url){const c=RT_CACHE[url];if(c&&Date.now()-c.t<(RT_DIR
   RT_CACHE[url]={t:Date.now(),p};p.catch(()=>{delete RT_CACHE[url]});return p}
 const RT_IX={};
 function rtIndex(area){return RT_IX[area]||(RT_IX[area]=fetch('data/rt/'+area+'.json').then(r=>{if(!r.ok)throw 0;return r.json()}).catch(e=>{delete RT_IX[area];throw e}))}
+// a GTFS-RT trip update's delay at stop k of its run: the last update at or before that stop (by stop id, or by its place in
+// the run); none there: the trip's own delay, unless the updates are all for later stops (the vehicle past it). The one rule
+// for the boards and for the run on the map, so both show the same times
+function tuDelayAt(e,fk,seq0,ids,t0,off,k,b0){let dl=null,pos=-1,later=false;
+  e.upd.forEach(u=>{let j=-1;if(u.sid)j=ids.indexOf(fk+u.sid);if(j<0&&u.seq!=null&&seq0!=null)j=u.seq-seq0;if(!(j>=0&&j<ids.length))return;
+    if(j>k){later=true;return}
+    if(j>=pos){const sch=b0/1000+(t0+off[j])*60;const v=u.t?u.t-sch:u.d;if(v!=null){dl=v;pos=j}}});
+  if(dl==null&&!later&&e.delay!=null)dl=e.delay;
+  return {dl,later}}
+// the delays of a run (opened on the map) at each of its stops, from the same trip updates the boards read
+async function runTuDelays(d){const area=RT_GTFS[city],feeds=RT_FEEDS[area];if(!feeds||!d.ps||!d.off)return null;const IXa=await rtIndex(area);
+  const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime();
+  for(const [fk,url] of feeds){let ents;try{ents=await rtFeedGet(url)}catch(e){continue}const ix=(IXa.f||{})[fk]||{};
+    let e=d.tid&&ents.find(q=>q.tid===d.tid&&ix[q.tid]);
+    if(!e)e=ents.find(q=>{const x=ix[q.tid];if(!x||x[0]!==d.r.n)return false;const dd=(((x[1]-d.t0)%1440)+1440)%1440;if(dd>1&&dd<1439)return false;
+      return !q.upd.some(u=>u.sid)||q.upd.some(u=>u.sid&&d.ps.includes(fk+u.sid))});
+    if(!e)continue;const x=ix[e.tid];
+    const out=d.ps.map((id,k)=>{const v=tuDelayAt(e,fk,x[2],d.ps,d.t0,d.off,k,b0).dl;return v!=null&&v>=-900?Math.round(v):null});
+    return out.some(v=>v!=null)?out:null}
+  return null}
 async function depLiveGT(st){const area=RT_GTFS[st.c],feeds=RT_FEEDS[area];if(!feeds)return null;
   let IXa;try{IXa=await rtIndex(area)}catch(e){return null}
   const byN=new Map(IDX.routes.filter(r=>inCityOf(r,st.c)&&(r.sn||[]).includes(st.n)).map(r=>[r.n,r]));if(!byN.size)return null;
@@ -5094,12 +5117,8 @@ async function depLiveGT(st){const area=RT_GTFS[st.c],feeds=RT_FEEDS[area];if(!f
         if(k<0)return;if(!best||Math.abs(t0-nowM)<Math.abs(best.t0-nowM))best={d,ps,off,k,t0}}));
       if(!best)continue;const {d,ps,off,k,t0}=best;
       // the delay: the last update at or before this stop (by stop id, or by its place in the run)
-      let dl=null,pos=-1,later=false;
-      e.upd.forEach(u=>{let j=-1;if(u.sid){j=ps.findIndex(si=>d.stops[si][0]===fk+u.sid)}if(j<0&&u.seq!=null)j=u.seq-x[2];if(j<0||j>=ps.length)return;
-        if(j>k){later=true;return}
-        if(j>=pos){const sch=b0/1000+(t0+off[j])*60;const v=u.t?u.t-sch:u.d;if(v!=null){dl=v;pos=j}}});
-      if(dl==null){if(later)continue;   // the vehicle is past this stop
-        if(e.delay!=null)dl=e.delay;else continue}
+      let {dl,later}=tuDelayAt(e,fk,x[2],ps.map(si=>d.stops[si][0]),t0,off,k,b0);
+      if(dl==null)continue;   // (none, or the vehicle past this stop)
       if(dl<-900)continue;
       const tS=t0+off[k],t=tS+dl/60;if(t<nowM-1||t>nowM+120)continue;
       out.push({t,st:tS,r,head:sName(d.stops[ps[ps.length-1]][0]),pole:(IDX.stops[d.stops[ps[k]][0]]||[])[1]||'',live:true,delay:Math.round(dl),lastT:t,di:L.dirs.indexOf(d),ps:ps.map(i=>d.stops[i][0]),t0,off,k})}}
@@ -5158,43 +5177,52 @@ async function gpsVehicles(){if(GPS.v&&Date.now()-GPS.t<5000)return GPS.v;if(GPS
       const r=await fetch(w,{cache:'no-store',signal:ac.signal});clearTimeout(to);if(!r.ok)continue;const j=await r.json();
       if(j&&Array.isArray(j.vehicles)){GPS.v=j.vehicles;GPS.t=Date.now();return GPS.v}}catch(e){}}return null})();
   try{return await GPS.p}finally{GPS.p=null}}
-async function posDelay(dep,veh){const r=dep.r;let L;try{L=await loadRoute(r.id)}catch(e){return null}
-  const base=new Date();base.setHours(0,0,0,0);const tS=(Date.parse(veh.scheduledTripStartTime)-base)/60000;
-  const at=(Date.parse(veh.generated)||Date.now());const nowM=(at-base)/60000;
-  const cs=Math.cos(veh.lat*Math.PI/180);const xy=S=>[(S[3]-veh.lon)*cs*111320,(S[2]-veh.lat)*110540];
-  let best=null;const exp=nowM-(+veh.delay||0)/60;
-  // the run: the one whose time at this stop is the API's scheduled time (its start time may differ by a minute or two)
-  for(const [key,sh] of depDayKeys())L.dirs.forEach(d=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(Math.abs(t0-tS)>5)return;const [pat,off]=d.prof[pi];const ps=d.pats[pat];
-    const k=ps.findIndex((si,j)=>j<ps.length-1&&sName(d.stops[si][0])===dep.stn&&(!dep.pole||(IDX.stops[d.stops[si][0]]||[])[1]===dep.pole)&&Math.abs(t0+off[j]-dep.sch)<.6);
-    if(k<0)return;
-    for(let j=0;j<ps.length-1;j++){const A=IDX.stops[d.stops[ps[j]][0]],B=IDX.stops[d.stops[ps[j+1]][0]];if(!A||!B)continue;
-      const a=xy(A),b=xy(B),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0;
-      const dist=Math.hypot(a[0]+u*dx,a[1]+u*dy);
-      if(dist>400)return;const t=t0+off[j]+(off[j+1]-off[j])*u;const sc=dist+60*Math.abs(t-exp);   // where the route passes the same place twice: the point at the time the vehicle's own delay points to
-      if(!best||sc<best.sc)best={dist,sc,t,t0}}}));
-  if(!best)return null;
-  if(nowM<best.t0)return 0;   // waiting at the first stop before its time
-  return Math.round((nowM-best.t)*60)}
+// ZTM Gdańsk: a vehicle's delay – one value for every view (the boards, the planner, the run on the map): the timetable's
+// time at the point of its run where the vehicle is, against the time it sent that position. Its run: the line's run that
+// starts when the feed says, going where its headsign says (both directions can have runs starting at the same minute).
+// Worked out once per position sent (cached by vehicle and time), so every view gets the very same number
+const VDL=new Map();
+function vehDelay(veh){const key=veh.vehicleId+'|'+veh.generated;let c=VDL.get(key);if(c)return c;
+  c=(async()=>{const n=String(veh.routeShortName);const R=IDX.routes.filter(x=>x.n===n&&areaOf(x)==='tri');if(!R.length)return null;
+    const base=new Date();base.setHours(0,0,0,0);const tS=(Date.parse(veh.scheduledTripStartTime)-base)/60000;if(!isFinite(tS))return null;
+    const nowM=((Date.parse(veh.generated)||Date.now())-base)/60000;const fd=isFinite(+veh.delay)?+veh.delay:null;const exp=nowM-(fd||0)/60;
+    const cs=Math.cos(veh.lat*Math.PI/180);const xy=S=>[(S[3]-veh.lon)*cs*111320,(S[2]-veh.lat)*110540];const head=fixHead(veh.headsign||'');
+    const runs=[];
+    for(const r of R){let L;try{L=await loadRoute(r.id)}catch(e){continue}
+      for(const [k,sh] of depDayKeys())L.dirs.forEach(d=>planOf(d,k).forEach(([tt,pi])=>{const t0=tt+sh;if(Math.abs(t0-tS)>5)return;const [pat,off]=d.prof[pi];const ps=d.pats[pat];
+        runs.push({d,ps,off,t0,same:gdSameHead(head,sName(d.stops[ps[ps.length-1]][0]))})}))}
+    const use=head?runs.filter(x=>x.same):runs;   // (no run going where its headsign says – a replacement line, a changed route: the feed's own value)
+    let best=null;
+    use.forEach(({d,ps,off,t0})=>{const pen=Math.abs(t0-tS)*30;
+      for(let j=0;j<ps.length-1;j++){const A=IDX.stops[d.stops[ps[j]][0]],B=IDX.stops[d.stops[ps[j+1]][0]];if(!A||!B)continue;
+        const a=xy(A),b=xy(B),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0;
+        const dist=Math.hypot(a[0]+u*dx,a[1]+u*dy);if(dist>400)continue;const t=t0+off[j]+(off[j+1]-off[j])*u;
+        const sc=dist+60*Math.abs(t-exp)+pen;   // (a route passing one place twice: the point at the time the feed's delay points to)
+        if(!best||sc<best.sc)best={sc,t,t0,end:j===ps.length-2&&(1-u)*Math.sqrt(l2)<150}}});
+    if(!best||best.end)return fd;   // (at its last stop: the run done, nothing to measure)
+    let v=nowM<best.t0?0:Math.round((nowM-best.t)*60);   // (waiting at the first stop before its time: on time)
+    if(fd!=null&&Math.abs(v-fd)>600)v=fd;   // far from the feed's own delay: a wrong place on the route, the feed's value
+    return v})().catch(()=>null);
+  VDL.set(key,c);if(VDL.size>800){const it=VDL.keys();for(let q=0;q<400;q++)VDL.delete(it.next().value)}return c}
+// the vehicle of a run (line, start time, headsign) in ZTM Gdańsk's GPS list
+function gdVehOf(V,n,trip,head){const vs=(V||[]).filter(v=>String(v.routeShortName)===n&&v.scheduledTripStartTime===trip);
+  return vs.length>1&&head?vs.find(v=>gdSameHead(fixHead(v.headsign||''),head))||null:vs[0]||null}
 async function fixDelays(out){const lv=out.filter(d=>d.live&&d.trip&&d.sch!=null);if(!lv.length)return;
   let V=null;try{V=await gpsVehicles()}catch(e){}if(!V)return;
   // a run no vehicle is on yet (its vehicle still on the run before, maybe going the other way): the API still gives an
   // "estimated" time, guessed from the timetable – shown as the timetable's time, not as a live one
   const base0=new Date();base0.setHours(0,0,0,0);const nowM0=(Date.now()-base0)/60000;
   // a line's two directions can have runs starting at the same minute: the vehicle also by its headsign
-  await Promise.all(lv.map(async d=>{const vs=V.filter(v=>String(v.routeShortName)===d.r.n&&v.scheduledTripStartTime===d.trip);
-    const veh=vs.length>1?vs.find(v=>gdSameHead(fixHead(v.headsign||''),d.head)):vs[0];if(vs.length&&!veh)return;
+  await Promise.all(lv.map(async d=>{const any=V.some(v=>String(v.routeShortName)===d.r.n&&v.scheduledTripStartTime===d.trip);const veh=gdVehOf(V,d.r.n,d.trip,d.head);if(any&&!veh)return;
     if(!veh){const t0=(Date.parse(d.trip)-base0)/60000;if(isFinite(t0)&&t0>nowM0-1){d.live=false;d.t=d.sch;d.delay=0;d.lastT=d.t}return}
-    if(!d.r.id||String(d.r.id).startsWith('rt'))return;
-    const pd=await posDelay(d,veh);if(pd==null)return;
-    if(Math.abs(pd-d.delay)>600&&Math.abs(pd-(+veh.delay||0))>600)return;   // far from both the API's and the vehicle's own delay: a wrong match, the API's value kept
-    d.delay=pd;d.t=d.sch+pd/60;d.lastT=d.t}))}
+    const pd=await vehDelay(veh);if(pd==null)return;d.delay=pd;d.t=d.sch+pd/60;d.lastT=d.t}))}
 // ZTM Gdańsk's live list empty at a stop (it sometimes is, at night above all) while its vehicles run: each run's delay
 // from its vehicle's own GPS position (the vehicle found by line, start time and headsign)
 async function depGpsLive(st,a){if(!['gda','sop','gdy','all'].includes(st.c||city)||!a||!a.length)return null;let V=null;try{V=await gpsVehicles()}catch(e){}if(!V||!V.length)return null;
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;const out=[];
   await Promise.all(a.filter(d=>d.t0!=null&&d.r&&d.r.id&&d.t>=nowM-3&&d.t<=nowM+90).map(async d=>{
     const veh=V.find(v=>String(v.routeShortName)===d.r.n&&Math.abs((Date.parse(v.scheduledTripStartTime)-base)/60000-d.t0)<=1.5&&gdSameHead(v.headsign,d.head));if(!veh)return;
-    const pd=await posDelay({r:d.r,stn:typeof d.st==='string'?d.st:st.n,pole:d.pole,sch:d.t},veh);if(pd==null)return;
+    const pd=await vehDelay(veh);if(pd==null)return;
     const t=d.t+pd/60;if(t<nowM-.5)return;out.push(Object.assign({},d,{t,st:d.t,sch:d.t,live:true,delay:pd,lastT:t,trip:veh.scheduledTripStartTime}))}));
   return out.length?out.sort((x,y)=>x.t-y.t):null}
 // first the timetable (shown at once), then the live departures where they can be had (they replace it when they come)
