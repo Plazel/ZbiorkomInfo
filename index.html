@@ -1733,7 +1733,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794529039;
+const APP_BUILD=1794529359;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7254,26 +7254,24 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
       '.##########.',
     ]),
     detour: toBmp([
-      '........#.........',
-      '.......###........',
-      '......#####.......',
-      '.....#######......',
-      '....#########.....',
-      '...###########....',
-      '.......###........',
-      '.......###........',
-      '.......####.......',
-      '........####......',
-      '.........####.....',
-      '..........###.....',
-      '..........###.....',
-      '.........####.....',
-      '........####......',
-      '.......####.......',
-      '.......###........',
-      '.......###........',
-      '.......###........',
-      '.......###........',
+      '.################.',
+      '##################',
+      '########..########',
+      '#######....#######',
+      '######......######',
+      '#####........#####',
+      '########..########',
+      '########..########',
+      '#########..#######',
+      '##########..######',
+      '##########..######',
+      '#########..#######',
+      '########..########',
+      '########..########',
+      '########..########',
+      '########..########',
+      '##################',
+      '.################.',
     ]),
   };
 
@@ -7509,11 +7507,14 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
     }
 
     // 2. Destination text
-    const areaL = boxW ? boxW + 3 : 3;
+    const pic0 = state.picto && PICTOS[state.picto];
+    // the pictogram keeps a fixed place at the left of the text area (right after the number); the text uses the rest
+    const picL = boxW ? boxW + 3 : 3;
+    const areaL = pic0 ? picL + pic0.w + 4 : picL;
     const pic = state.picto && PICTOS[state.picto];
     const picGap = 5;
     const areaR = W - 3;
-    const avail = areaR - areaL - (pic ? pic.w + picGap : 0);
+    const avail = areaR - areaL;
 
     const top = (state.top || '').trim(), bottom = (state.bottom || '').trim();
     const lines = [];
@@ -7597,7 +7598,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
     }
 
     const textW = Math.min(avail, lines.reduce((m, l) => Math.max(m, l.s.w), 0));
-    const groupW = textW + (pic ? (textW ? picGap : 0) + pic.w : 0);
+    const groupW = textW;
     const groupL = state.align === 'left' ? areaL : areaL + Math.floor((areaR - areaL - groupW) / 2);
     const clipR = groupL + textW;
     let overflow = false;
@@ -7610,7 +7611,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
 
     // 3. Pictogram
     if (pic) {
-      const px = textW ? groupL + textW + picGap : groupL;
+      const px = picL;
       blit(grid, pic, px, Math.floor((H - pic.h) / 2), WHITE, W);
     }
     const uniq = [...new Set(skipped)];
@@ -7662,7 +7663,7 @@ function dbdPaint(){const cv=document.getElementById('dbdMx');if(!cv)return;cons
   dbdDots(cv,DPB.W,DPB.H,(x,y)=>res.grid[y*DPB.W+x],Math.max(100,cv.parentNode.clientWidth-24));
   const N=document.getElementById('dbdNotes');N.textContent='';res.notes.forEach(n=>{const s=document.createElement('span');const P='Pominięto nieobsługiwane znaki: ';s.textContent=n.startsWith(P)?trS('Pominięto nieobsługiwane znaki:')+' '+n.slice(P.length):trS(n);N.append(s)});
   const st=document.getElementById('dbdAS');if(st)st.textContent=o.length>1?trS('Teraz wyświetlany:')+' '+(DBD.ai%o.length+1)+' / '+o.length:trS('Dopisz co najmniej jeden tekst, aby wiersz zaczął się zmieniać.');
-  const cur2=dbdList().find(b=>b.id===S.id),m=document.getElementById('dbdSt');if(m)m.textContent=trS(!cur2?'Nowa tablica, niezapisana':JSON.stringify(dbdCfg())!==DBD.snap?'Niezapisane zmiany':'Zapisano');
+  const cur2=dbdList().find(b=>b.id===S.id),m=document.getElementById('dbdSt');if(m)m.textContent=(!cur2?'':trS(JSON.stringify(dbdCfg())!==DBD.snap?'Niezapisane zmiany':'Zapisano'));
   const sv=document.getElementById('dbdSave');if(sv){sv.textContent=trS(cur2?'Zapisz zmiany':'Zapisz');document.getElementById('dbdSaveNew').hidden=!cur2}}
 function dbdKeep(){try{store.set('ztm.dbd',DBD.st)}catch(e){}}
 const dbdTitle=b=>((b.line?b.line+' → ':'')+([b.top,b.bottom].map(t=>String(t||'').trim()).filter(Boolean).join(' / ')||trS('bez kierunku'))).toUpperCase();
