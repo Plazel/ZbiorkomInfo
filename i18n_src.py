@@ -870,6 +870,12 @@ ROWS = [
     ("Dodaj klatkę", "Add a frame", "Bild hinzufügen", "Pridať snímku", "Přidat snímek"),
 ("Rozkład:", "Timetable:", "Fahrplan:", "Cestovný poriadok:", "Jízdní řád:"),
 ("Okres obowiązywania rozkładu", "Period the timetable is valid for", "Gültigkeitszeitraum des Fahrplans", "Obdobie platnosti cestovného poriadku", "Období platnosti jízdního řádu"),
+("Zmiana tekstu co", "Change text every", "Textwechsel alle", "Zmena textu každých", "Změna textu každých"),
+("Kolejne teksty obu wierszy zmieniają się razem: najpierw pierwsze, potem drugie itd.", "The further texts of both rows change together: first the first ones, then the second ones, and so on.", "Die weiteren Texte beider Zeilen wechseln gemeinsam: zuerst die ersten, dann die zweiten usw.", "Ďalšie texty oboch riadkov sa menia spolu: najprv prvé, potom druhé atď.", "Další texty obou řádků se mění společně: nejprve první, pak druhé atd."),
+("Dodaj kolejny tekst", "Add another text", "Weiteren Text hinzufügen", "Pridať ďalší text", "Přidat další text"),
+("Kolejny tekst", "Next text", "Nächster Text", "Ďalší text", "Další text"),
+("Usuń tekst", "Remove text", "Text entfernen", "Odstrániť text", "Odstranit text"),
+("tylko gdy wiersz ma kilka tekstów", "only when a row has several texts", "nur wenn eine Zeile mehrere Texte hat", "len keď má riadok viac textov", "jen když má řádek více textů"),
 ]
 
 WEEKDAYS = {
