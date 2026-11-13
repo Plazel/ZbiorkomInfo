@@ -394,6 +394,7 @@ span.chip{cursor:inherit}
 #schLines path.gm.on{display:inline;stroke-width:calc(var(--schw,.08)*1.7)}
 #schLab .bl{cursor:pointer}
 #schLab .bl text{stroke:none;font-family:var(--font-line);font-weight:600;text-anchor:middle}
+#schBg path{stroke:none!important;pointer-events:none}#schBg .bg-w{fill:#cde1f1}#schBg .bg-f{fill:#dbe9d0}#schBg .bg-g{fill:#e4eed8}#schBg .bg-b{fill:#f1e6c2}:root[data-theme=dark] #schBg .bg-w{fill:#1b3144}:root[data-theme=dark] #schBg .bg-f{fill:#1d2f22}:root[data-theme=dark] #schBg .bg-g{fill:#223427}:root[data-theme=dark] #schBg .bg-b{fill:#40392a}
 #schLab .bl tspan.c{stroke:#fff;paint-order:stroke;stroke-linejoin:round}
 #schLab .bl.dim{opacity:.25}
 #schLab text{fill:var(--fg);font-family:var(--font-body);font-weight:500;paint-order:stroke;stroke:var(--panel);stroke-linejoin:round}
@@ -971,7 +972,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnTrE{flex:1;display:flex;align-items:center;justify-content:center;padding:1em;text-align:center;color:var(--sM);font-size:.7em}
 .gnFoot{flex:none;padding:.35em .7em;border-top:1px solid var(--sL);background:var(--bR);color:var(--sM);font-size:.55em}
 .gnFoot.gnTst{display:flex;align-items:center;gap:.6em}.gnFoot.gnTst span{flex:1;text-align:center}.gnTst button{font:inherit;font-weight:600;padding:4px 10px;border:1px solid var(--sL);background:var(--sB);color:var(--sF);cursor:pointer}.gnTst button:disabled{opacity:.35;cursor:default}
-@media (orientation:portrait) and (max-width:900px){.gdSip.gn{--gs:clamp(17px,4.8vw,26px)}#gdPick{--gs:clamp(20px,5.2vw,28px);--rh:calc(var(--gs)*2.2)}#gdPick button,#gdPick li.gdSub{font-size:calc(var(--gs)*.86)}#gdPick .chip{height:calc(var(--gs)*1.4)!important;min-width:calc(var(--gs)*1.4)!important;font-size:calc(var(--gs)*.62)!important}#gdPick .chip.sq,#gdPick .chip.tram,#gdPick .chip.nt,#gdPick .chip.circle,#gdPick .chip.rail{width:calc(var(--gs)*1.4)!important;max-width:calc(var(--gs)*1.4)!important}#gdPick button{grid-template-columns:3.3em calc(var(--gs)*1.6) minmax(0,1fr) 2.8em}.gnTop{flex-wrap:wrap;row-gap:.25em}.gnTop .gtt{flex:1 1 calc(100% - var(--gs)*3.4)}.gnTop .inf{flex:none}.gnTop .gsClock{margin-left:auto}.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:1.05em;-webkit-line-clamp:3}.gnTop{gap:.55em;padding:.4em .55em}.gnTop .inf b{font-size:.85em}.gnTop .gsClock{font-size:1.05em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}}
+@media (orientation:portrait) and (max-width:900px){.gdSip.gn{--gs:clamp(17px,4.8vw,26px)}#gdPick{--gs:clamp(20px,5.2vw,28px);--rh:calc(var(--gs)*2.2)}#gdPick button,#gdPick li.gdSub{font-size:calc(var(--gs)*.86)}#gdPick .chip{height:calc(var(--gs)*1.4)!important;min-width:calc(var(--gs)*1.4)!important;font-size:calc(var(--gs)*.62)!important}#gdPick .chip.sq,#gdPick .chip.tram,#gdPick .chip.nt,#gdPick .chip.circle,#gdPick .chip.rail{width:calc(var(--gs)*1.4)!important;max-width:calc(var(--gs)*1.4)!important}#gdPick button{grid-template-columns:3.3em calc(var(--gs)*1.6) minmax(0,1fr) 2.8em}.gnTop{flex-wrap:wrap;row-gap:.25em}.gnTop .gtt{flex:1 1 calc(100% - var(--gs)*3.4)}.gnTop .inf{flex:none}.gnTop .gsClock{margin-left:auto}.gnRow .chs{max-width:58%}.gnTop .gtt b{font-size:1.05em;-webkit-line-clamp:3}.gnTop{gap:.55em;padding:.4em .55em}.gnTop .inf b{font-size:.85em}.gnTop .gsClock{font-size:1.05em}.gnMain{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}.gnMain .gsBody{max-height:56vh;border-right:0;border-bottom:2px solid var(--sL)}.gnRow .tl{width:calc(var(--gs)*2.6)}.gnTop{flex-wrap:nowrap}.gnTop .gtt{flex:1 1 0}.gnTop .inf{display:none}.gnTop .gsClock{margin-left:.4em;align-self:center}.gnRow:not(.now) .nm b{font-size:1.14em}.gnTrR .dh{font-size:1.14em}}
 .gsTrn{font-size:.55em;font-weight:400;color:var(--sM);margin-left:.4em;white-space:nowrap}.gdWrap:has(.gdSip:not([hidden])) .gdStat{display:none}
 @media (max-width:760px){.guideModal{left:0;bottom:calc(60px + env(safe-area-inset-bottom,0px))}}
 .jpModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;background:var(--bg);display:grid;grid-template-columns:min(520px,48vw) 1fr}
@@ -1735,7 +1736,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794570234;
+const APP_BUILD=1794573202;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3129,7 +3130,7 @@ function schGraph(set){
   schOrient({n,e});
   e.forEach(E=>{E.sl=E.l.map((id,li)=>[id,li]);E.l.forEach((id,li)=>{if(E.m[id])E.m[id].forEach(x=>E.sl.push(['m:'+x,li]))})});
   e.forEach(E=>{E.p0=E.p});
-  return SCH.G[key]={n,e};
+  return SCH.G[key]={n,e,bg:src.bg||null};   // (bg: the landscape bent onto the diagram – water, woods, parks, beaches)
 }
 const nrm=(a,b)=>{const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;return [-dy/L,dx/L]};
 function offPl(p,d){   // polyline offset sideways by d, with mitred corners
@@ -3230,7 +3231,10 @@ function drawSchema(){
     G.n[ia].ends.forEach(([k1,s1])=>G.n[ib].ends.forEach(([k2,s2])=>{if(k1===k2)return;const E1=G.e[k1],E2=G.e[k2];
       E1.l.forEach((id,l1)=>{const l2=E2.l.indexOf(id);if(l2<0||!one(ia,id)||!one(ib,id))return;const A=lineEnd(E1,l1,s1,sign,E1.p0),B=lineEnd(E2,l2,s2,sign,E2.p0);const d=schCurve(A,B);if(!d)return;
         add(id,d);if(E1.m[id])E1.m[id].forEach(x=>add('m:'+x,d))})}))});
-  const parts=['<g id="schLines">'];
+  const parts=[];
+  if(G.bg){const pth=a=>{let d='M'+a[0]+' '+a[1];for(let i=2;i<a.length;i+=2)d+='L'+a[i]+' '+a[i+1];return d+'Z'};
+    parts.push('<g id="schBg">'+['f','g','b','w'].map(k=>(G.bg[k]||[]).length?`<path class="bg-${k}" d="${G.bg[k].map(pth).join('')}"/>`:'').join('')+'</g>')}
+  parts.push('<g id="schLines">');
   const nm=ids=>ids.map(i=>schR(i)).filter(Boolean).map(r=>r.n).sort(numSort);
   // grey and night lines: one stroke, its pieces between stops clickable (they pick out the lines running there)
   ['G','N'].forEach(b=>{if(paths[b])parts.push(`<path class="bun" d="${paths[b].join('')}" style="stroke:${BUN[b].c}"/>`)});
