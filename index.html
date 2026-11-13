@@ -1736,7 +1736,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794573862;
+const APP_BUILD=1794573967;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2265,11 +2265,12 @@ async function renderStop(id,di,si){
   drawSL(null);
   // letters for variant trips
   const noteKey={};const letters='abcdefghijklmnoprstuwxyz';const used=[];
-  // letters are fixed for the whole line (L.lt), so they match the variants on the network map
+  // letters by the line's order of variants (L.lt), counted from a among those this direction has
   // a "Kurs przez" note of a run before it joins the main route is left out where every departure has it (nothing to tell apart)
   const allD=DK(L.dirs).flatMap(day=>departures(d,si,day));const t0=allD.length?noteOf(d,allD[0]):'';
-  const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
-  const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const L2=noteKey[tx];if(!used.includes(L2))used.push(L2);return L2};
+  const quiet=t0&&allD.every(x=>noteOf(d,x)===t0)?t0:null;   // (every run here has it: nothing to tell apart, no letter)
+  const dl=(L.lt||[]).filter(t=>t!==quiet&&allD.some(x=>noteOf(d,x)===t));   // the variants of this direction, lettered from a in the line's order
+  const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=dl.indexOf(tx);noteKey[tx]=li>=0?(letters[li]||'*'):(letters[dl.length+Object.keys(noteKey).filter(k=>!dl.includes(k)).length]||'*')}const L2=noteKey[tx];if(!used.includes(L2))used.push(L2);return L2};
   const now=todayType();let nextMarked=false;
   const DAYS=DK(L.dirs),DEPS=nightShift(DAYS,day=>departures(d,si,day));dropSameX(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropSameP(DAYS,DEPS,a=>a.map(x=>x.t+':'+noteOf(d,x)).join(','));dropEmptyDays(DAYS,DEPS);const HS=hourUnion(Object.values(DEPS));
   const cols=DAYS.map(day=>{
@@ -2525,8 +2526,9 @@ function lineSheet(r,L,di,si){
   // letters as in the stop timetable
   const letters='abcdefghijklmnoprstuwxyz';const noteKey={};const used=[];
   const allD=DK(L.dirs).flatMap(day=>departures(d,si,day));const t0=allD.length?noteOf(d,allD[0]):'';
-  const quiet=t0.startsWith('Kurs przez: ')&&allD.every(x=>d.nl&&d.nl[x.pat]>=0&&noteOf(d,x)===t0)?t0:null;
-  const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=L.lt?L.lt.indexOf(tx):-1;noteKey[tx]=li>=0?(letters[li]||'*'):(letters[Object.keys(noteKey).length]||'*')}const l=noteKey[tx];if(!used.includes(l))used.push(l);return l};
+  const quiet=t0&&allD.every(x=>noteOf(d,x)===t0)?t0:null;   // (every run here has it: nothing to tell apart, no letter)
+  const dl=(L.lt||[]).filter(t=>t!==quiet&&allD.some(x=>noteOf(d,x)===t));   // the variants of this direction, lettered from a in the line's order
+  const letterFor=x=>{const tx=noteOf(d,x);if(!tx||tx===quiet)return'';if(!(tx in noteKey)){const li=dl.indexOf(tx);noteKey[tx]=li>=0?(letters[li]||'*'):(letters[dl.length+Object.keys(noteKey).filter(k=>!dl.includes(k)).length]||'*')}const l=noteKey[tx];if(!used.includes(l))used.push(l);return l};
   const cols={},DK0=DK(L.dirs),NS=nightShift(DK0,day=>departures(d,si,day));DK0.forEach(day=>cols[day]=NS[day].map(x=>({t:x.t,lt:letterFor(x)})));dropSameX(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));dropSameP(Object.keys(cols),cols,a=>a.map(x=>x.t+':'+x.lt).join(','));
   // the route: the main run, or where the stop is off it, the run most of its departures take; minutes along it
   let pat=0;
