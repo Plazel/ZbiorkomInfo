@@ -165,7 +165,8 @@ for f in os.listdir(OUT + '/r'): os.remove(OUT + '/r/' + f)
 
 def rd(path): return csv.DictReader(open(path, encoding='utf-8-sig'))
 def tmin(t):
-    h, m, s = map(int, t.split(':')); return h * 60 + m + (1 if s >= 30 else 0)
+    # seconds are dropped, not rounded: printed timetables show 4:21 for 04:21:30 (DPB in Bratislava, imhd.sk)
+    h, m = map(int, t.split(':')[:2]); return h * 60 + m
 def dtype(d):
     wd = datetime.date(int(d[:4]), int(d[4:6]), int(d[6:])).weekday()
     return 'w' if wd < 5 else ('s' if wd == 5 else 'h')
@@ -188,7 +189,11 @@ TOWNS_OTHER = ('Pruszcz', 'Kowale', 'Banino', 'Borkowo', 'Czaple', 'Jankowo', 'O
                'Pierwoszyno', 'Kazimierz', 'Mosty', 'Sopot')
 
 def split_name(n):
-    n = n.strip().replace('""', '"')
+    n = ' '.join(n.replace('""', '"').split())
+    # a town written twice at the start ("Pruszcz Gdański Pruszcz Gdański Dworzec 01" in ZTM's feed): once
+    w = n.split()
+    for k in (3, 2, 1):
+        if len(w) > 2 * k and w[:k] == w[k:2 * k]: n = ' '.join(w[k:]); break
     m = re.match(r'^(.*?)\s+(\d{2})$', n)
     return (m.group(1), m.group(2)) if m else (n, '')
 
@@ -258,6 +263,8 @@ def _psig(it):
 
 def build_routes(groups, meta_of):
     """groups: {route_key: [(day, lf, dir, rows)]} rows=[(sid, minute, pickup, drop)]"""
+    for v in STOPS.values():   # (double spaces in a feed's names: "Kaliskiego  - Akademicka")
+        if isinstance(v[0], str) and '  ' in v[0]: v[0] = ' '.join(v[0].split())
     # stops the feed gives no position for (0, 0 – Łódź's Budy-Zjazdowa): put between their neighbours on a trip, so the map
     # does not show them off the coast of Africa and the planner does not walk there
     _zero = lambda v: not v[2] and not v[3]
