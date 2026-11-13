@@ -1736,7 +1736,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794573967;
+const APP_BUILD=1794593687;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5162,7 +5162,7 @@ async function posDelay(dep,veh){const r=dep.r;let L;try{L=await loadRoute(r.id)
   const base=new Date();base.setHours(0,0,0,0);const tS=(Date.parse(veh.scheduledTripStartTime)-base)/60000;
   const at=(Date.parse(veh.generated)||Date.now());const nowM=(at-base)/60000;
   const cs=Math.cos(veh.lat*Math.PI/180);const xy=S=>[(S[3]-veh.lon)*cs*111320,(S[2]-veh.lat)*110540];
-  let best=null;
+  let best=null;const exp=nowM-(+veh.delay||0)/60;
   // the run: the one whose time at this stop is the API's scheduled time (its start time may differ by a minute or two)
   for(const [key,sh] of depDayKeys())L.dirs.forEach(d=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(Math.abs(t0-tS)>5)return;const [pat,off]=d.prof[pi];const ps=d.pats[pat];
     const k=ps.findIndex((si,j)=>j<ps.length-1&&sName(d.stops[si][0])===dep.stn&&(!dep.pole||(IDX.stops[d.stops[si][0]]||[])[1]===dep.pole)&&Math.abs(t0+off[j]-dep.sch)<.6);
@@ -5170,8 +5170,9 @@ async function posDelay(dep,veh){const r=dep.r;let L;try{L=await loadRoute(r.id)
     for(let j=0;j<ps.length-1;j++){const A=IDX.stops[d.stops[ps[j]][0]],B=IDX.stops[d.stops[ps[j+1]][0]];if(!A||!B)continue;
       const a=xy(A),b=xy(B),dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;const u=l2?Math.max(0,Math.min(1,-(a[0]*dx+a[1]*dy)/l2)):0;
       const dist=Math.hypot(a[0]+u*dx,a[1]+u*dy);
-      if(!best||dist<best.dist)best={dist,t:t0+off[j]+(off[j+1]-off[j])*u,t0}}}));
-  if(!best||best.dist>400)return null;
+      if(dist>400)return;const t=t0+off[j]+(off[j+1]-off[j])*u;const sc=dist+60*Math.abs(t-exp);   // where the route passes the same place twice: the point at the time the vehicle's own delay points to
+      if(!best||sc<best.sc)best={dist,sc,t,t0}}}));
+  if(!best)return null;
   if(nowM<best.t0)return 0;   // waiting at the first stop before its time
   return Math.round((nowM-best.t)*60)}
 async function fixDelays(out){const lv=out.filter(d=>d.live&&d.trip&&d.sch!=null);if(!lv.length)return;
@@ -5179,10 +5180,14 @@ async function fixDelays(out){const lv=out.filter(d=>d.live&&d.trip&&d.sch!=null
   // a run no vehicle is on yet (its vehicle still on the run before, maybe going the other way): the API still gives an
   // "estimated" time, guessed from the timetable – shown as the timetable's time, not as a live one
   const base0=new Date();base0.setHours(0,0,0,0);const nowM0=(Date.now()-base0)/60000;
-  await Promise.all(lv.map(async d=>{const veh=V.find(v=>String(v.routeShortName)===d.r.n&&v.scheduledTripStartTime===d.trip);
+  // a line's two directions can have runs starting at the same minute: the vehicle also by its headsign
+  await Promise.all(lv.map(async d=>{const vs=V.filter(v=>String(v.routeShortName)===d.r.n&&v.scheduledTripStartTime===d.trip);
+    const veh=vs.length>1?vs.find(v=>gdSameHead(fixHead(v.headsign||''),d.head)):vs[0];if(vs.length&&!veh)return;
     if(!veh){const t0=(Date.parse(d.trip)-base0)/60000;if(isFinite(t0)&&t0>nowM0-1){d.live=false;d.t=d.sch;d.delay=0;d.lastT=d.t}return}
     if(!d.r.id||String(d.r.id).startsWith('rt'))return;
-    const pd=await posDelay(d,veh);if(pd==null)return;d.delay=pd;d.t=d.sch+pd/60;d.lastT=d.t}))}
+    const pd=await posDelay(d,veh);if(pd==null)return;
+    if(Math.abs(pd-d.delay)>600&&Math.abs(pd-(+veh.delay||0))>600)return;   // far from both the API's and the vehicle's own delay: a wrong match, the API's value kept
+    d.delay=pd;d.t=d.sch+pd/60;d.lastT=d.t}))}
 // ZTM Gdańsk's live list empty at a stop (it sometimes is, at night above all) while its vehicles run: each run's delay
 // from its vehicle's own GPS position (the vehicle found by line, start time and headsign)
 async function depGpsLive(st,a){if(!['gda','sop','gdy','all'].includes(st.c||city)||!a||!a.length)return null;let V=null;try{V=await gpsVehicles()}catch(e){}if(!V||!V.length)return null;
