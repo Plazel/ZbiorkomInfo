@@ -1736,7 +1736,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794573202;
+const APP_BUILD=1794573657;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5420,7 +5420,7 @@ const AL_CUR={i:null,g:null};
 // a notice that is a piece of news (rebuilding of a track announced, opening hours of an office), not a change in the
 // traffic now: the operator's "other news" page, or no lines given and no word of a change in its heading
 const AL_CHG=/zmian\p{L}* (tras|rozkład|przystank|kurs|w kursowaniu|organizacji)|objazd|zawiesz|wstrzym|utrudni|zamkni|skróc|awari|opóźni|nie kursuj|przeniesi|nieczynn|zastępcz|wyłącz|zdarzeni|wypad|kolizj/iu;
-const alertInfo=a=>/\/aktualnosci\/pozostale\//.test(a.url||a.id||'')||(!(a.lines&&a.lines.length)&&a.de==null&&!a.kind&&!AL_CHG.test(a.o0?a.o0.title:a.title||''));
+const alertInfo=a=>a.info===true||/\/aktualnosci\/pozostale\//.test(a.url||a.id||'')||(!(a.lines&&a.lines.length)&&a.de==null&&!a.kind&&!AL_CHG.test(a.o0?a.o0.title:a.title||''));
 const INFO_IC='<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><circle cx="12" cy="7.6" r=".7" fill="currentColor"/></svg>';
 function alertBar(){const el=document.getElementById('alertBar');if(!el)return;const L=alertsOf(alertGrp(city));
   if(!IDX&&L.length){el.hidden=true;return}   // (before the lines are known the notices would show without their signs: they wait for them)

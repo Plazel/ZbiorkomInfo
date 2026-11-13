@@ -12,7 +12,8 @@
 //    stops; odjazdy.zdmikp.bydgoszcz.pl, plain http and no CORS header), kept 15 seconds.
 //
 // 4. ZTM Gdańsk's notices of disruptions: /alerts returns the notices shown in the red "UWAGA" bar on ztm.gda.pl, each with
-//    its text from its own page (JSON: [{title, url, text}]), kept 2 minutes.
+//    its text from its own page (JSON: [{title, url, text}]), and after them the section "Zmiany na trasach" ({…, info: true,
+//    date, lines}), kept 2 minutes.
 //
 // 5. Accounts (only for people given one): /konto … with the header "Authorization: Bearer <token>". Each account has a long
 //    random token instead of a password; the page keeps it on the device. Only the token's SHA-256 is stored, so the
@@ -85,10 +86,18 @@ async function alerts(cors) {
     const home = await get('https://ztm.gda.pl/');
     const box = (home.match(/class="[^"]*danger-box[^"]*"[\s\S]*?<\/ul>/) || [''])[0];
     const items = [...box.matchAll(/<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g)].map(m => ({ url: m[1], title: strip(m[2]) })).filter(x => x.title).slice(0, 6);
-    out = await Promise.all(items.map(async x => {
+    // the section "Zmiany na trasach" below it: changes announced (a route, a stop moved, a new timetable) – shown on the
+    // page as information (blue), each with the lines named at the start of its heading ("Linie 124, N1, N2, N6: …")
+    const sec = (home.match(/<h2>\s*Zmiany na trasach\s*<\/h2>([\s\S]*?)(?:<div class="grid-item-|Więcej komunikatów)/) || ['', ''])[1];
+    const info = [...sec.matchAll(/<div class="date">([^<]*)<\/div>[\s\S]*?<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?<div class="summary">([\s\S]*?)<\/div>/g)]
+      .map(m => ({ title: strip(m[3]), url: m[2], date: strip(m[1]), sum: strip(m[4]), info: true })).filter(x => x.title && !items.some(y => y.title === x.title)).slice(0, 8);
+    const linesOf = t => { const m = t.match(/^Lini[ae]\s+([^:]+):/); return m ? m[1].split(/\s*,\s*|\s+i\s+|\s+oraz\s+/).map(x => x.trim()).filter(x => /^[A-Z]?\d{1,3}[A-Z]?$|^[A-Z]\d*$/.test(x)) : []; };
+    out = await Promise.all(items.concat(info).map(async x => {
       let text = '';
       if (/^https:\/\/ztm\.gda\.pl\//.test(x.url)) { try { const a = await get(x.url); const c = (a.match(/class="article-content[^"]*">([\s\S]*?)<div class="row">/) || ['', ''])[1]; text = strip(c).slice(0, 2000); } catch (e) {} }
-      return { title: x.title, url: x.url, text };
+      const o = { title: x.title, url: x.url, text: text || x.sum || '' };
+      if (x.info) { o.info = true; o.date = x.date; const l = linesOf(x.title); if (l.length) o.lines = l; }
+      return o;
     }));
   } catch (e) {}
   return new Response(JSON.stringify(out), { status: 200, headers: h });
