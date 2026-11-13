@@ -1729,7 +1729,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794528494;
+const APP_BUILD=1794528706;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6886,7 +6886,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
   /* ---- Line-number font: 20-row digits, heavy strokes ---- */
   const N_SK = {
     0: '..######.. .#......#. #........#*15 .#......#. ..######..',
-    1: '......#... .....##... ....#.#... ...#..#... ..#...#... ......#...*14',
+    1: '......#... .....##... ....#.#... ...#..#... ..#...#... .#....#... ......#...*13',
     2: '..######.. .#......#. #........# .........#*3 ........#. .......#.. ......#... .....#.... ....#..... ...#...... ..#....... .#........ #.........*4 ##########',
     3: '..######.. .#......#. #........# .........#*4 ........#. ...#####.. ........#. .........#*6 #........# .#......#. ..######..',
     4: '.......#.. ......##.. .....#.#..*2 ....#..#..*2 ...#...#..*2 ..#....#..*2 .#.....#..*2 #......#.. ########## .......#..*5',
@@ -6986,7 +6986,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
   /* ---- Night lines: squared digits and a small N sitting on the baseline ---- */
   const SQ_SK = {
     0: '.########. #........#*17 .########.',
-    1: '.....##... ....#.#... ...#..#... ......#...*16',
+    1: '.....##... ....#.#... ...#..#... ..#...#... ......#...*15',
     2: '.########. .........#*8 ########## #.........*8 ##########',
     3: '.########. .........#*8 ..#######. .........#*8 .########.',
     4: '#........#*9 ########## .........#*9',
