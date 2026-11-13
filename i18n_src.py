@@ -748,6 +748,7 @@ ROWS = [
 ("Kolejny tekst", "Next text", "Nächster Text", "Ďalší text", "Další text"),
 ("Usuń tekst", "Remove text", "Text entfernen", "Odstrániť text", "Odstranit text"),
 ("tylko gdy wiersz ma kilka tekstów", "only when a row has several texts", "nur wenn eine Zeile mehrere Texte hat", "len keď má riadok viac textov", "jen když má řádek více textů"),
+("Informacje", "Information", "Informationen", "Informácie", "Informace"),
 ]
 
 WEEKDAYS = {
