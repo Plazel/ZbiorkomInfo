@@ -90,8 +90,12 @@ class Matcher:
             L = math.hypot(b[0] - a[0], b[1] - a[1]) * self.mpp
             got = None
             if L >= 25:
-                corr = min(450.0, max(self.corr, L * .35))
-                got = self._piece([a, b], out[-1] if out else None, corr=corr, soft=corr / 2.5, ratio=(0.9, 1.6), chain=True)
+                # first the near way (a street bending a little between the stops), then a wider one (serpentines on a
+                # hill, a detour round a block or a one-way loop: up to two and a half times the straight line)
+                for corr, soft, ratio in ((min(450.0, max(self.corr, L * .35)), None, (0.9, 1.6)),
+                                          (min(900.0, max(300.0, L * .9)), None, (0.9, 2.6))):
+                    got = self._piece([a, b], out[-1] if out else None, corr=corr, soft=soft or corr / 2.5, ratio=ratio, chain=True)
+                    if got: break
             pts = got if got else [a, b]
             out += pts if not out else pts[1:]
         out = self._despike(out)
@@ -203,7 +207,7 @@ def is_coarse(latlon):
 def match_all(shapes, keys, area_of, cache_path, log=print):
     """shapes: {key: [[lat, lon], …]}; matches those in keys, one road graph per area (area_of(key)); in place"""
     cache = json.load(open(cache_path, encoding='utf-8')) if os.path.exists(cache_path) else {}
-    h = lambda pts: hashlib.md5((json.dumps(pts) + ('|v%d' % VERSION if VERSION > 1 else '') + ('|c1' if is_coarse(pts) else '')).encode()).hexdigest()[:16]
+    h = lambda pts: hashlib.md5((json.dumps(pts) + ('|v%d' % VERSION if VERSION > 1 else '') + ('|c2' if is_coarse(pts) else '')).encode()).hexdigest()[:16]
     todo = collections.defaultdict(list); done = 0
     for k in keys:
         pts = shapes.get(k)
