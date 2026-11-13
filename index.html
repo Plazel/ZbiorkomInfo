@@ -648,7 +648,7 @@ header.top .themebar{max-width:none;margin:0 0 0 auto;padding:0;flex-wrap:nowrap
 .cmg span{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 10px 2px}
 .cmg button,.cmg a[data-city]{border:0;background:none;color:var(--fg);text-align:left;font:inherit;font-size:.95rem;padding:7px 10px;border-radius:6px;cursor:pointer}.cmg a[data-city]{display:block;text-decoration:none}.cmg a[data-city][hidden]{display:none}
 .cmg button:hover,.cmg a[data-city]:hover{background:var(--panel)}
-.cmg [data-city][aria-current="true"]{font-weight:700;box-shadow:inset 3px 0 0 var(--brand,#d71920)}
+.cmg [data-city][aria-current="true"]{font-weight:700}
 nav.rail{position:fixed;left:0;top:0;bottom:0;width:var(--rail-w);z-index:60;background:var(--rail-bg);display:flex;flex-direction:column;align-items:stretch;padding-top:calc(var(--top-h) + 8px);gap:2px;
   padding-left:env(safe-area-inset-left,0px)}
 nav.rail button{border:0;background:none;color:#b9bec5;display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px;font:inherit;font-size:.74rem;font-weight:500;cursor:pointer;position:relative}
@@ -1121,6 +1121,14 @@ header.top .themebar{align-items:center}
 header.top .themebar .plus,header.top #gsMob{width:38px;height:38px;box-sizing:border-box;display:inline-grid;place-items:center;vertical-align:middle;padding:0;margin:0}
 header.top .themebar .setWrap{display:inline-flex;align-items:center}
 header.top #cityBtn{height:38px;box-sizing:border-box}
+/* the city's name next to the logo, without a frame: the two read as one name ("ZbiorkomInfo Trójmiasto ⌄") */
+header.top .logo+.cityPick{margin-left:-6px}
+header.top #cityBtn{border:0!important;background:none!important;box-shadow:none!important;border-radius:6px;padding:0 6px;gap:6px;font-family:var(--font-head,inherit);font-size:1.45rem;font-weight:600;letter-spacing:-.02em;line-height:1;color:var(--fg)}
+header.top #cityBtn>svg:last-child{width:18px;height:18px;opacity:.6;transition:transform .15s}
+header.top #cityBtn[aria-expanded="true"]>svg:last-child{transform:rotate(180deg)}
+header.top #cityBtn:hover #cityName{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+header.top #cityBtn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (max-width:460px){header.top #cityBtn{font-size:1.02rem;padding:0 4px}}
 @media (min-width:901px){header.top #gsIn,header.top #gsBtn{height:38px}header.top #gsMob{display:none}}
 @media (max-width:460px){header.top .themebar .plus,header.top #gsMob,header.top #cityBtn{height:34px}header.top .themebar .plus,header.top #gsMob{width:34px}}
 
@@ -1721,7 +1729,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794527505;
+const APP_BUILD=1794528494;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7126,102 +7134,104 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
       '.....###.....',
     ]),
     sbahn: toBmp([
-      '......#####......',
-      '....#########....',
-      '...###########...',
-      '..####....#####..',
-      '.####......#####.',
-      '.###..####..####.',
-      '####..###########',
-      '#####.....#######',
-      '######.....######',
-      '##########..#####',
-      '####..####..#####',
-      '.####......#####.',
-      '.#####....######.',
-      '..#############..',
-      '...###########...',
-      '....#########....',
-      '......#####......',
+      '.......####.......',
+      '....##########....',
+      '...############...',
+      '..#####....#####..',
+      '.#####......#####.',
+      '.####..####..####.',
+      '.####..##########.',
+      '#####..###########',
+      '######......######',
+      '######......######',
+      '###########..#####',
+      '.##########..####.',
+      '.####..####..####.',
+      '.#####......#####.',
+      '..#####....#####..',
+      '...############...',
+      '....##########....',
+      '.......####.......',
     ]),
     ubahn: toBmp([
-      '#################',
-      '#################',
-      '#################',
-      '####..####..#####',
-      '####..####..#####',
-      '####..####..#####',
-      '####..####..#####',
-      '####..####..#####',
-      '####..####..#####',
-      '####..####..#####',
-      '####..####..#####',
-      '#####......######',
-      '######....#######',
-      '#################',
-      '#################',
-      '#################',
-      '#################',
+      '.################.',
+      '##################',
+      '##################',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '#####..####..#####',
+      '######......######',
+      '#######....#######',
+      '##################',
+      '##################',
+      '.################.',
     ]),
     faehre: toBmp([
-      '..#############..',
-      '.###############.',
-      '#################',
-      '#####.......#####',
-      '#####.......#####',
-      '#####..##########',
-      '#####..##########',
-      '#####......######',
-      '#####......######',
-      '#####..##########',
-      '#####..##########',
-      '#####..##########',
-      '#####..##########',
-      '#################',
-      '#################',
-      '.###############.',
-      '..#############..',
+      '.################.',
+      '##################',
+      '##################',
+      '#####........#####',
+      '#####........#####',
+      '#####..###########',
+      '#####..###########',
+      '#####..###########',
+      '#####......#######',
+      '#####......#######',
+      '#####..###########',
+      '#####..###########',
+      '#####..###########',
+      '#####..###########',
+      '#####..###########',
+      '##################',
+      '##################',
+      '.################.',
     ]),
     metroWaw: toBmp([
-      '###...........###',
-      '####.........####',
-      '#####.......#####',
-      '###.##.....##.###',
-      '###.##.....##.###',
-      '###.##.....##.###',
-      '###.##.....##.###',
-      '###..##...##..###',
-      '###..##...##..###',
-      '###..##...##..###',
-      '###..##...##..###',
-      '###...##.##...###',
-      '###...##.##...###',
-      '###...##.##...###',
-      '###....###....###',
-      '###....###....###',
-      '###.....#.....###',
+      '.################.',
+      '##################',
+      '##################',
+      '####..######..####',
+      '####...####...####',
+      '####....##....####',
+      '####..#....#..####',
+      '####..##..##..####',
+      '####..######..####',
+      '####..######..####',
+      '####..######..####',
+      '####..######..####',
+      '####..######..####',
+      '####..######..####',
+      '####..######..####',
+      '##################',
+      '##################',
+      '.################.',
     ]),
     metroPrg: toBmp([
-      '##.............##',
-      '###...........###',
-      '####.........####',
-      '##.##.......##.##',
-      '##..##.....##..##',
-      '##...##...##...##',
-      '##....##.##....##',
-      '##.....###.....##',
-      '##......#......##',
-      '##.............##',
-      '##.............##',
-      '##.............##',
-      '.##...........##.',
-      '..##.........##..',
-      '...##.......##...',
-      '....##.....##....',
-      '.....##...##.....',
-      '......##.##......',
-      '.......###.......',
-      '........#........',
+      '.##########.',
+      '############',
+      '##..####..##',
+      '##...##...##',
+      '##........##',
+      '##..#..#..##',
+      '##..####..##',
+      '##..####..##',
+      '##..####..##',
+      '##..####..##',
+      '############',
+      '############',
+      '##........##',
+      '###......###',
+      '####....####',
+      '#####..#####',
+      '############',
+      '.##########.',
     ]),
     detour: toBmp([
       '........#.........',
@@ -7458,7 +7468,13 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
         else skipped.push(ch);
       }
       if (parts.length) {
-        const inner = parts.reduce((s, p) => s + p.g.w, 0) + NUM.gap * (parts.length - 1);
+        const inner0 = parts.reduce((s, p) => s + p.g.w, 0) + NUM.gap * (parts.length - 1);
+        // the field is measured by the lit LEDs, not by the glyph boxes: a "1" (blank columns on its left) starts as
+        // close to the field's edge as any other digit
+        const inkCols = g => { const c = []; for (let x = 0; x < g.w; x++) for (let y = 0; y < g.h; y++) if (g.px[y * g.w + x]) { c.push(x); break; } return c; };
+        const c0 = inkCols(parts[0].g), c1 = inkCols(parts[parts.length - 1].g);
+        const lead = c0.length ? c0[0] : 0, trail = c1.length ? parts[parts.length - 1].g.w - 1 - c1[c1.length - 1] : 0;
+        const inner = inner0 - lead - trail;
         // a single character sits in a square field (24 × 24); longer numbers widen the field
         boxW = parts.length === 1 ? Math.max(H, inner + 6) : inner + 6;
         const noBox = state.box === 'off';
@@ -7466,7 +7482,7 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
         if (!noBox) for (let y = 0; y < H; y++) for (let x = 0; x < boxW; x++) grid.set(x, y, state.color);
         // drawn after the text is laid out, so a free-standing number can line up with it
         drawNumber = shift => {
-          let x = Math.floor((boxW - inner) / 2);
+          let x = Math.floor((boxW - inner) / 2) - lead;
           parts.forEach(p => { blit(grid, p.g, x, p.y + shift, digitDark ? null : WHITE, W); x += p.g.w + NUM.gap; });
         };
       }
