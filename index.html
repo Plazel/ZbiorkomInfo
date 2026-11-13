@@ -1733,7 +1733,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794529446;
+const APP_BUILD=1794529502;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7508,12 +7508,12 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
 
     // 2. Destination text
     const pic0 = state.picto && PICTOS[state.picto];
-    // the pictogram keeps a fixed place at the left of the text area (right after the number); the text uses the rest
-    const picL = boxW ? boxW + 3 : 3;
-    const areaL = pic0 ? picL + pic0.w + 4 : picL;
+    // the pictogram keeps a fixed place at the right edge of the board; the text is centred in the rest
+    const areaL = boxW ? boxW + 3 : 3;
+    const picL = pic0 ? W - 3 - pic0.w : W;
     const pic = state.picto && PICTOS[state.picto];
     const picGap = 5;
-    const areaR = W - 3;
+    const areaR = pic0 ? picL - 4 : W - 3;
     const avail = areaR - areaL;
 
     const top = (state.top || '').trim(), bottom = (state.bottom || '').trim();
