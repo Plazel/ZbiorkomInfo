@@ -246,6 +246,10 @@ AREAS = [
 ]
 
 
+# areas drawn with the newer layout (schemat2.py) where the network is small enough for it; the others with LOOM
+MIP_AREAS = {'gda'}
+
+
 def kind_of(r):
     """how a line is drawn, as its badge on the page: night lines dark, lines with a colour (frequent lines, trains,
     every line of Krynica-Zdrój and Muszyna) in colour, the rest grey"""
@@ -286,6 +290,14 @@ def build_all(data_dir, log=print, octi_args=('-g', '60%'), workers=2, areas=Non
         if box_stop: g, cuts = line_graph(data_dir, p, lambda r: '777777', box_stop=box_stop, all_pats=area == 'km')
         else: g, cuts = line_graph(data_dir, p, lambda r: '777777', clip_by=lambda r: r['t'] != 'rail', all_pats=area == 'km')
         if not any(f['geometry']['type'] == 'LineString' for f in g['features']): return job, None
+        if area in MIP_AREAS:
+            # the newer layout (schemat2.py); a network too large for it, or no numpy/scipy: LOOM as before
+            try:
+                import schemat2
+                g2 = schemat2.build(data_dir, p, box_stop=box_stop, clip_by=None if box_stop else (lambda r: r['t'] != 'rail'), kind=kind, log=lambda m: None)
+                if g2: return job, g2
+            except Exception as e:
+                log('Schemat %s „%s”%s: nowy układ pominięty (%s)' % (area, sid, ' (z nocnymi)' if night else '', str(e)[:80]))
         # octi now and then gets stuck on a large graph: then once more with a coarser grid and a shorter search;
         # if that fails too, the diagram of the previous build is kept for this set
         for args, tmo in ((octi_args, 900), (('-g', '80%', '--restr-loc-search', '--loc-search-max-iters', '30'), 900)):

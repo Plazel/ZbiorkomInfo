@@ -394,7 +394,7 @@ span.chip{cursor:inherit}
 #schLines path.gm.on{display:inline;stroke-width:calc(var(--schw,.08)*1.7)}
 #schLab .bl{cursor:pointer}
 #schLab .bl text{stroke:none;font-family:var(--font-line);font-weight:600;text-anchor:middle}
-#schBg path{stroke:none!important;pointer-events:none}#schBg .bg-w{fill:#cde1f1}#schBg .bg-f{fill:#dbe9d0}#schBg .bg-g{fill:#e4eed8}#schBg .bg-b{fill:#f1e6c2}:root[data-theme=dark] #schBg .bg-w{fill:#1b3144}:root[data-theme=dark] #schBg .bg-f{fill:#1d2f22}:root[data-theme=dark] #schBg .bg-g{fill:#223427}:root[data-theme=dark] #schBg .bg-b{fill:#40392a}
+#schBg path{stroke:none!important;pointer-events:none}#schBg .bg-w{fill:#cde1f1!important}#schBg .bg-f{fill:#dbe9d0!important}#schBg .bg-g{fill:#e4eed8!important}#schBg .bg-b{fill:#f1e6c2!important}:root[data-theme=dark] #schBg .bg-w{fill:#1b3144!important}:root[data-theme=dark] #schBg .bg-f{fill:#1d2f22!important}:root[data-theme=dark] #schBg .bg-g{fill:#223427!important}:root[data-theme=dark] #schBg .bg-b{fill:#40392a!important}
 #schLab .bl tspan.c{stroke:#fff;paint-order:stroke;stroke-linejoin:round}
 #schLab .bl.dim{opacity:.25}
 #schLab text{fill:var(--fg);font-family:var(--font-body);font-weight:500;paint-order:stroke;stroke:var(--panel);stroke-linejoin:round}
@@ -1736,7 +1736,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794573657;
+const APP_BUILD=1794573862;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}

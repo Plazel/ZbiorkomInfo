@@ -36,7 +36,7 @@ jobs:
       # remotezip: build.py reads Flensburg's part of the all-Germany gtfs.de file without downloading the whole file
       - name: Biblioteki
         if: steps.gate.outputs.go == '1'
-        run: pip install remotezip
+        run: pip install remotezip numpy scipy   # (numpy, scipy: the schematic diagram's layout – schemat2.py)
       # Flensburg's timetable, cut out of gtfs.de, kept a week (build.py renews it after six days)
       - name: Flensburg (z pamięci podręcznej)
         if: steps.gate.outputs.go == '1'
