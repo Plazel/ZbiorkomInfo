@@ -14,7 +14,7 @@ Użycie:  python3 build.py              (zapisuje do ./data)
                                         normalnie odświeżany raz w miesiącu)
 Wymaga tylko Pythona 3.9+ (bez dodatkowych pakietów).
 """
-import csv, json, os, re, sys, time, collections, datetime, io, shutil, tempfile, urllib.request, zipfile, concurrent.futures, math
+import csv, json, os, re, sys, time, collections, datetime, shutil, tempfile, urllib.request, zipfile, concurrent.futures, math
 
 SOURCES = {
     'ztm':   'https://ckan.multimediagdansk.pl/dataset/c24aa637-3619-4dc2-a171-a23eec8f2172/resource/30e783e4-2bec-4a7d-bb22-ee3e3b26ca96/download/gtfsgoogle.zip',
@@ -258,6 +258,17 @@ def _psig(it):
 
 def build_routes(groups, meta_of):
     """groups: {route_key: [(day, lf, dir, rows)]} rows=[(sid, minute, pickup, drop)]"""
+    # stops the feed gives no position for (0, 0 – Łódź's Budy-Zjazdowa): put between their neighbours on a trip, so the map
+    # does not show them off the coast of Africa and the planner does not walk there
+    _zero = lambda v: not v[2] and not v[3]
+    for tl in groups.values():
+        for *_x, rows in tl:
+            ids = [x[0] for x in rows]
+            for i, sid in enumerate(ids):
+                if sid in STOPS and _zero(STOPS[sid]):
+                    nb = [STOPS[q] for q in (next((x for x in reversed(ids[:i]) if x in STOPS and not _zero(STOPS[x])), None),
+                                             next((x for x in ids[i + 1:] if x in STOPS and not _zero(STOPS[x])), None)) if q]
+                    if nb: STOPS[sid][2] = round(sum(v[2] for v in nb) / len(nb), 5); STOPS[sid][3] = round(sum(v[3] for v in nb) / len(nb), 5)
     # every run without a course of its own (no shape in its feed, none matched) along the streets – trams along their
     # tracks – never stop to stop in straight lines; in every city, the ones added later too (trains keep the feed's)
     _road = {rk: tl for rk, tl in groups.items() if (meta_of.get(rk) or {}).get('t') != 'rail'}
@@ -373,7 +384,7 @@ def build_routes(groups, meta_of):
                     else:
                         pending.append(sid)
                 for j, x in enumerate(pending): merged.insert(last + 1 + j, x)
-            mpos = {s: i for i, s in enumerate(merged)}; main_set = set(main) | set(seg or ())
+            main_set = set(main) | set(seg or ())
             if brk: brk[0] = merged.index(brk_sid)   # (the other routes' stops put in since)
             req = collections.Counter(); tot = collections.Counter()
             for _, _, rows, _t in tl:
@@ -820,7 +831,7 @@ except StopIteration:
 # add_rail(): the trips of the given routes of a GTFS folder as lines; whole runs, or (cut) only their part between two
 # stations. Stations get ids prefix + station + 'p' + platform; area: the area of the lines (a separate one is registered
 # in NEW_ROUTE_IDS for its map files), or a function of the station name.
-SKA_IDS = []; EXTRA_RAIL = collections.defaultdict(list)
+EXTRA_RAIL = collections.defaultdict(list)
 def add_rail(folder, sel, area, prefix, op_default, cut=None, skip_names=(), set_c=True, contig=False, cont=None):
     par, rs_, pl_ = {}, {}, {}
     for r in rd(folder + '/stops.txt'):
@@ -1294,30 +1305,6 @@ def fl_name(n):
     n = re.sub(r'^Flensburg[ ,]+(?=\S)', '', n)   # the city's own name in front of its stops (Schleswig-Holstein data)
     m = re.match(r'^(.*?)\s+B(\d)$', n)
     return (m.group(1).strip(), 'B' + m.group(2)) if m else (n.strip(), '')   # Flensburg's platforms are B1, B2…
-SEQ_POLE = collections.defaultdict(dict)   # Łódź, Flensburg: the poles of a stop numbered 01, 02… in the feed's order
-def _fl_b():
-    """Flensburg: the B numbers each stop's platforms have in the feed"""
-    out = collections.defaultdict(set)
-    try:
-        for r in csv.DictReader(open(os.path.join(SCR, 'fl', 'stops.txt'), encoding='utf-8-sig')):
-            n, b = fl_name(r['stop_name'])
-            if b: out[n].add(b)
-    except Exception: pass
-    return out
-class _Lazy(dict):
-    def get(self, k, d=None):
-        if not self.get_done: self.update(_fl_b()); self.get_done = True
-        return dict.get(self, k, d)
-FL_B = _Lazy(); FL_B.get_done = False
-def seq_pole(area, name, sid):
-    d = SEQ_POLE[(area, name)]
-    if sid not in d:
-        if area == 'fl':   # the platforms without a number in the feed: the next B number the stop does not use yet
-            have = set(d.values()) | FL_B.get(name, set()); k = 1
-            while 'B%d' % k in have: k += 1
-            d[sid] = 'B%d' % k
-        else: d[sid] = '%02d' % (len(d) + 1)
-    return d[sid]
 def zb_name(s):
     m = re.match(r'^(.*\S)\s+(\d{2}|\d{5}|\d{8})$', re.sub(r'\s+', ' ', s).strip())
     return (m.group(1), m.group(2)) if m else (re.sub(r'\s+', ' ', s).strip(), '')
@@ -1387,7 +1374,7 @@ for area, A in NEW_AREAS.items():
     try:
         if area in ('ber', 'ham'):
             DE_RAIL_NAMES[area] = {r['route_short_name'].strip() for r in rd(SCR + '/' + area + '/routes.txt') if r['route_type'] not in ('3', '700', '702', '704', '715')}
-        rot, tmeta, rmeta, tkey = {}, {}, {}, {}
+        rot, tmeta, rmeta = {}, {}, {}
         for fd, pre in A['feeds']:
             P = SCR + '/' + fd
             for r in rd(P + '/stops.txt'):
@@ -1694,7 +1681,6 @@ for f, d in data_all.items():
     json.dump(d, open(f, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 
 # ---------------- network map: drawing geometry and stop positions, computed once here ----------------
-import math
 COS = math.cos(math.radians(54.45))
 def PJ(lat, lon): return (lon * COS * 1000.0, -lat * 1000.0)   # 1 unit ≈ 65 m east-west, 111 m north-south
 # where trains take a way the data's shape does not show: between two stations, along the tracks through the given points.
@@ -2095,5 +2081,10 @@ try:
         for c in r.get('c') or []: _names[c].add(r['n'])
     rtindex.build(SCR, OUT, _names)
 except Exception as e: print('Indeks kursów na żywo: pominięty (%s)' % e)
+# the index cut per area (ixsplit.py): the page loads only its city's lines and stops
+try:
+    import ixsplit
+    print('Indeks wg obszarów:', ixsplit.build(OUT), 'plików')
+except Exception as e: print('Indeks wg obszarów: pominięty (%s)' % e)
 write_missing()
 shutil.rmtree(SCR, ignore_errors=True)
