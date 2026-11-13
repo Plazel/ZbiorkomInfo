@@ -262,7 +262,8 @@ def build_routes(groups, meta_of):
     # does not show them off the coast of Africa and the planner does not walk there
     _zero = lambda v: not v[2] and not v[3]
     for tl in groups.values():
-        for *_x, rows in tl:
+        for it in tl:
+            rows = it[3]   # (not the last item: a train's run carries one more – where it comes from and goes on to)
             ids = [x[0] for x in rows]
             for i, sid in enumerate(ids):
                 if sid in STOPS and _zero(STOPS[sid]):
@@ -538,6 +539,9 @@ for r in rd(P + '/stops.txt'):
     c = ztm_city(n)
     # ZTM prefixes stops in Sopot and Gdynia with the city name; ZKM does not. Drop it so both share names.
     if c in ('sop', 'gdy'): n = re.sub(r'^(Sopot|Gdynia)\s+', '', n)
+    # a town's name twice (ZTM writes the town before the stop's name, also when the name starts with it: "Pruszcz Gdański
+    # Pruszcz Gdański Dworzec", "Bogatka Bogatka II"): once
+    else: n = re.sub(r'^(\S+(?: \S+)?) \1(?= )', r'\1', n)
     STOPS[r['stop_id']] = [n, num, round(float(r['stop_lat']), 5), round(float(r['stop_lon']), 5), c]
 ztm_routes = {r['route_id']: r for r in rd(P + '/routes.txt')}
 zt = json.load(open(SCR + '/ztrips.json', encoding='utf-8'))
