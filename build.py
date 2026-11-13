@@ -1565,15 +1565,15 @@ for k, v in SHAPES.items():
     v.sort(); SHAPES[k] = [[round(x[0], 5), round(x[1], 5)] for x in simplify([(x[1], x[2]) for x in v])]
 # the courses laid exactly onto the OpenStreetMap streets and tram tracks (dopasuj.py); trains keep their own shapes
 MATCH_AREA = {'g': 'Trójmiasto', 'y': 'Trójmiasto', 'Ps': 'Poznań', 'KAs': 'Kraków', 'KTs': 'Kraków', 'Ws': 'Warszawa', 'Js': 'Wejherowo',
-              'Ls': 'Łódź', 'Fs': 'Flensburg', 'Gs': 'Praga', 'Rs': 'Wrocław', 'Us': 'Lublin', 'Xs': 'Bratysława'}
+              'Ls': 'Łódź', 'Fs': 'Flensburg', 'Gs': 'Praga', 'Rs': 'Wrocław', 'Us': 'Lublin', 'Xs': 'Bratysława', 'Bs': 'Berlin', 'Hs': 'Hamburg'}
 if '--no-match' not in sys.argv:
     try:
         import dopasuj
-        # (every feed's shapes – a city added later too, under its own prefix – except the trains' 'r' and Berlin's and
-        # Hamburg's, whose feeds give their courses exactly)
-        _all = [p for p, _ in SHAPE_SRC if p not in ('r', 'Bs', 'Hs')]
+        # (every feed's shapes – a city added later too, under its own prefix – except the trains' 'r'; of Berlin's and
+        # Hamburg's only those that are just their stops joined by straight lines: the others follow the streets already)
+        _all = [p for p, _ in SHAPE_SRC if p != 'r']
         _pre = lambda k: next((p for p in sorted(_all, key=len, reverse=True) if k.startswith(p)), None)
-        _keys = [k for k in SHAPES if _pre(k) and not (SH_T.get(k, set()) & {'rail'})]
+        _keys = [k for k in SHAPES if _pre(k) and not (SH_T.get(k, set()) & {'rail'}) and (_pre(k) not in ('Bs', 'Hs') or dopasuj.is_coarse(SHAPES[k]))]
         dopasuj.match_all(SHAPES, _keys, lambda k: MATCH_AREA.get(_pre(k), _pre(k)), os.path.join(HERE, 'reczne', 'dopasowanie_cache.json'))
     except Exception as e: print('Dopasowanie do dróg pominięte:', e)
 SHAPES.update(KM_SHAPES)

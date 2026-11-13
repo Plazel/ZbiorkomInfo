@@ -18,6 +18,8 @@ CORR = 70.0                              # metres: roads farther from the shape 
 SOFT = 14.0                              # metres: the cost grows with (distance / SOFT)^2
 CONTRA = 6.0                             # cost factor against a one-way street
 VERSION = 2                              # (a new way of matching: every shape matched again)
+COARSE_SEG = 120.0                       # metres: a shape whose segments are mostly longer is only its stops joined by
+                                         # straight lines (Bratislava, Berlin): matched stop to stop, in a wider corridor
 
 
 def to_px(lat, lon):
@@ -56,6 +58,7 @@ class Matcher:
         cum = [0.0]
         for a, b in zip(P, P[1:]): cum.append(cum[-1] + math.hypot(b[0] - a[0], b[1] - a[1]) * self.mpp)
         if cum[-1] < 30: return latlon
+        if is_coarse(latlon): return self._coarse(P)
         n = max(1, round(cum[-1] / CHUNK)); cuts = [0]
         for k in range(1, n):
             t = cum[-1] * k / n; i = min(range(len(cum)), key=lambda j: abs(cum[j] - t))
@@ -79,8 +82,43 @@ class Matcher:
         res = [to_ll(x, y) for x, y in out]
         return [[round(a, 5), round(b, 5)] for a, b in drogi.simplify(res, 1.5)]
 
-    def _piece(self, seg, start_at):
-        mpp = self.mpp; G = 64; CORR, SOFT = self.corr, self.soft
+    def _coarse(self, P):
+        """a shape of straight lines between stops: every line on its own, through the roads in a corridor as wide as
+        a third of its length (a street bending between two stops still fits), no longer than half again as the line"""
+        out = []
+        for a, b in zip(P, P[1:]):
+            L = math.hypot(b[0] - a[0], b[1] - a[1]) * self.mpp
+            got = None
+            if L >= 25:
+                corr = min(450.0, max(self.corr, L * .35))
+                got = self._piece([a, b], out[-1] if out else None, corr=corr, soft=corr / 2.5, ratio=(0.9, 1.6), chain=True)
+            pts = got if got else [a, b]
+            out += pts if not out else pts[1:]
+        out = self._despike(out)
+        res = [to_ll(x, y) for x, y in out]
+        return [[round(a, 5), round(b, 5)] for a, b in drogi.simplify(res, 1.5)]
+
+    def _despike(self, P):
+        """out and back again at a stop lying beside the road (the course reaching for its point): the spike cut off"""
+        mpp = self.mpp
+        def ang(a, b, c):
+            v1 = (a[0] - b[0], a[1] - b[1]); v2 = (c[0] - b[0], c[1] - b[1])
+            n1 = math.hypot(*v1); n2 = math.hypot(*v2)
+            if not n1 or not n2: return 180, 0
+            cs = max(-1, min(1, (v1[0] * v2[0] + v1[1] * v2[1]) / (n1 * n2)))
+            return math.degrees(math.acos(cs)), min(n1, n2) * mpp
+        P = list(P); changed = True
+        while changed and len(P) > 2:
+            changed = False
+            for i in range(1, len(P) - 1):
+                g, short = ang(P[i - 1], P[i], P[i + 1])
+                if g < 40 and short < 150: del P[i]; changed = True; break
+        return P
+
+    def _piece(self, seg, start_at, corr=None, soft=None, ratio=(0.75, 1.3), chain=False):
+        # chain: from the road node the last piece ended at, to a road node near the stop (not to the stop's own point
+        # beside the road: no out-and-back spikes at every stop)
+        mpp = self.mpp; G = 64; CORR, SOFT = corr or self.corr, soft or self.soft
         grid = collections.defaultdict(list)
         for i, (a, b) in enumerate(zip(seg, seg[1:])):
             for gx in range(int(min(a[0], b[0]) - CORR / mpp) // G, int(max(a[0], b[0]) + CORR / mpp) // G + 1):
@@ -111,7 +149,8 @@ class Matcher:
                     cost = dm * 4 + math.hypot(nd[0] - q[0], nd[1] - q[1]) * mpp * c
                     if nd in adj and cost < out.get(nd, (1e18,))[0]: out[nd] = (cost, q)
             return out
-        A = ends(start_at or seg[0], False); B = ends(seg[-1], True)
+        A = {tuple(start_at): (0.0, tuple(start_at))} if chain and start_at is not None and tuple(start_at) in adj else ends(start_at or seg[0], False)
+        B = ends(seg[-1], True)
         if not A or not B: return None
         best = {nd: v[0] for nd, v in A.items()}; prev = {}
         h = [(v[0], nd) for nd, v in A.items()]; heapq.heapify(h); done = set(); found = None
@@ -135,24 +174,36 @@ class Matcher:
         nd = found[1]; path = [nd]
         while nd in prev: nd = prev[nd]; path.append(nd)
         path.reverse()
-        pts = [start_at or A[path[0]][1]] + [tuple(x) for x in path] + [B[path[-1]][1]]
-        if start_at: pts[0] = start_at
+        if chain:
+            pts = ([tuple(start_at)] if start_at is not None and tuple(start_at) != tuple(path[0]) else []) + [tuple(x) for x in path]
+            if len(pts) < 2: pts = [A[path[0]][1], tuple(path[0])] if start_at is None else [tuple(start_at), tuple(path[-1])]
+        else:
+            pts = [start_at or A[path[0]][1]] + [tuple(x) for x in path] + [B[path[-1]][1]]
+            if start_at: pts[0] = start_at
         # sanity: about as long as the shape, and close to it all the way
         ml = sum(math.hypot(b[0] - a[0], b[1] - a[1]) for a, b in zip(pts, pts[1:])) * mpp
-        if not (0.75 * length - 40 <= ml <= 1.3 * length + 60): return None
+        if not (ratio[0] * length - 40 <= ml <= ratio[1] * length + 60): return None
         dens = []
         for a, b in zip(pts, pts[1:]):
             k = max(1, int(math.hypot(b[0] - a[0], b[1] - a[1]) * mpp / 15))
             dens += [(a[0] + (b[0] - a[0]) * j / k, a[1] + (b[1] - a[1]) * j / k) for j in range(k)]
         far = [dist(q) for q in dens]
-        if far and (max(far) > CORR or sum(far) / len(far) > max(22, SOFT * 1.5)): return None
+        if far and (max(far) > CORR or (corr is None and sum(far) / len(far) > max(22, SOFT * 1.5))): return None
         return pts
+
+
+def is_coarse(latlon):
+    """mostly long straight segments: the feed's shape is only its stops joined"""
+    if len(latlon) < 3: return False
+    d = lambda a, b: math.hypot((a[0] - b[0]) * 111200, (a[1] - b[1]) * 111200 * math.cos(math.radians(a[0])))
+    seg = sorted(d(a, b) for a, b in zip(latlon, latlon[1:]))
+    return seg[len(seg) // 2] > COARSE_SEG
 
 
 def match_all(shapes, keys, area_of, cache_path, log=print):
     """shapes: {key: [[lat, lon], …]}; matches those in keys, one road graph per area (area_of(key)); in place"""
     cache = json.load(open(cache_path, encoding='utf-8')) if os.path.exists(cache_path) else {}
-    h = lambda pts: hashlib.md5((json.dumps(pts) + ('|v%d' % VERSION if VERSION > 1 else '')).encode()).hexdigest()[:16]
+    h = lambda pts: hashlib.md5((json.dumps(pts) + ('|v%d' % VERSION if VERSION > 1 else '') + ('|c1' if is_coarse(pts) else '')).encode()).hexdigest()[:16]
     todo = collections.defaultdict(list); done = 0
     for k in keys:
         pts = shapes.get(k)
