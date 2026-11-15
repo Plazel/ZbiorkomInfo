@@ -1781,7 +1781,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794767528;
+const APP_BUILD=1794783197;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2170,9 +2170,10 @@ const SRC_OF=[[o=>o==='ZTM Gdańsk','ZTM Gdańsk','https://ckan.multimediagdansk
   [o=>o==='MPK Nowy Sącz','MPK Nowy Sącz','https://www.mpk.nowysacz.pl'],[o=>/^Zapopradzie/.test(o),'Zapopradzie','https://zapopradzie.pl'],
   [o=>/^MPGK/.test(o),'MPGK Krynica-Zdrój','https://mpgk-krynica.pl'],[o=>o==='RAFATEX','RAFATEX','https://www.rafatex.pl/rozklad.html'],[o=>o==='Gmina Podegrodzie','Komunikacja Gminy Podegrodzie','https://komunikacjapodegrodzie.pl/rozklad-jazdy/'],
   [o=>/^Linia transgraniczna/.test(o),'krynica.org.pl','https://krynica.org.pl'],
-  [o=>!/^(ZTM|ZKM|ZDMiKP|Zapopradzie|MPGK|MPK |RAFATEX|Gmina Podegrodzie|SAD|Linia transgraniczna|ZTP|MZK|Aktiv Bus|PID|VBB|hvv|DPB)/.test(o),'mkuran.pl','https://mkuran.pl/gtfs/']];
+  [o=>o==='NM','TransitMaker',null],   // (a network drawn in TransitMaker – the NM cities)
+  [o=>o!=='NM'&&!/^(ZTM|ZKM|ZDMiKP|Zapopradzie|MPGK|MPK |RAFATEX|Gmina Podegrodzie|SAD|Linia transgraniczna|ZTP|MZK|Aktiv Bus|PID|VBB|hvv|DPB)/.test(o),'mkuran.pl','https://mkuran.pl/gtfs/']];
 function noteP(ops){const u=[...new Set(ops)],seen=new Set(),out=[];
-  for(const [f,n,url] of SRC_OF)if(u.some(f)&&!seen.has(n)){seen.add(n);out.push(`<a href="${url}" target="_blank" rel="noopener">${esc(n)}</a>`)}
+  for(const [f,n,url] of SRC_OF)if(u.some(f)&&!seen.has(n)){seen.add(n);out.push(url?`<a href="${url}" target="_blank" rel="noopener">${esc(n)}</a>`:esc(n))}
   return out.length?trS('Źródło')+': '+out.join(', '):''}
 function emptyMsg(day,ops,running){const ds=weekDate(day);
   if(ds&&IDX.opEnd&&ops.length&&ops.every(op=>IDX.opEnd[op]&&ds>IDX.opEnd[op]))return `Rozkład ${dayLabel(ds)} nie został jeszcze opublikowany.`;
@@ -6183,7 +6184,8 @@ function tdRail(on){store.set('ztm.tools',on);if(typeof MAP!=='undefined'&&MAP.o
 function openTool(v){if(!IDX)return;if(MAP.open)closeMap();if(DEP.open)closeDep();if(JP.open)closeJP();
   TD.view=v;document.getElementById('toolsDr').hidden=false;document.getElementById('tdTakt').hidden=v!=='takt';document.getElementById('tdBryg').hidden=v!=='bryg';document.getElementById('tdHub').hidden=v!=='hub';document.getElementById('tdAdm').hidden=v!=='adm';document.getElementById('tdMkAdm').hidden=v!=='mkadm';document.getElementById('tdMsgAdm').hidden=v!=='msgadm';document.getElementById('tdTm').hidden=v!=='tm';document.getElementById('tdDbd').hidden=v!=='dbd';document.getElementById('tdMk').hidden=v!=='mk';document.getElementById('toolsDr').classList.toggle('mkOn',v==='mk');
   clearInterval(HUB.timer);clearInterval(MSA.timer);navMark();if(v==='takt')tkRender();else if(v==='hub'){hubRender();HUB.timer=setInterval(hubFill,30000)}else if(v==='adm')accAdminRender();else if(v==='mkadm'){mkAdmRender()}else if(v==='msgadm'){msgAdmRender();msgAdmLoad();MSA.timer=setInterval(()=>{if(TD.view==='msgadm')msgAdmLoad()},30000)}else if(v==='mk')mkOpen();else if(v==='tm')tmOpen();else if(v==='dbd')dbdRender();else bgRender()}
-function closeTool(){if(!TD.view)return;if(TD.view==='mk'){if(GUIDE.run&&GUIDE.run===MK.run)GUIDE.run=null;mkGps(false);mkMic(false);if(MK.fs)mkFull(false);mkOvr(false);clearInterval(MK.ibT)}if(TD.view==='adm'){admPoll(false);admDlgClose();const g=document.getElementById('gsIn');if(g){g.value='';g.placeholder=trS('Wyszukaj linię, łączenie linii lub przystanek');g.setAttribute('aria-label',g.placeholder)}}TD.view=null;clearInterval(HUB.timer);clearInterval(MSA.timer);document.getElementById('toolsDr').hidden=true;navMark()}
+function closeTool(){if(!TD.view)return;if(TD.view==='mk'){if(GUIDE.run&&GUIDE.run===MK.run)GUIDE.run=null;mkGps(false);mkMic(false);if(MK.fs)mkFull(false);mkOvr(false);clearInterval(MK.ibT)}if(TD.view==='adm'){admPoll(false);admDlgClose();const g=document.getElementById('gsIn');if(g){g.value='';g.placeholder=trS('Wyszukaj linię, łączenie linii lub przystanek');g.setAttribute('aria-label',g.placeholder)}}TD.view=null;clearInterval(HUB.timer);clearInterval(MSA.timer);document.getElementById('toolsDr').hidden=true;navMark();
+  {const a=document.getElementById('app');if(a){a.classList.remove('pgIn');void a.offsetWidth;a.classList.add('pgIn')}}}   // (back to the timetables: the same short fade-in as between their pages)
 document.getElementById('toolsSw').onchange=ev=>{tdRail(ev.target.checked);setTimeout(()=>{if(typeof persRender==='function')persRender()},60)};
 tdRail(store.get('ztm.tools',false));
 

@@ -296,7 +296,7 @@ async function accSaveNet(quiet){clearTimeout(ACCP.t);ACCP.t=null;const tok=accT
  catch(e){const m='Nie udało się zapisać projektu na koncie: '+e.message+'.';accStat(m);if(!quiet||Date.now()-(ACCP.warn||0)>60000){ACCP.warn=Date.now();say(m)}return false}}
 function accAutoQ(){if(!ACCP.auto||!accTok())return;clearTimeout(ACCP.t);ACCP.t=setTimeout(()=>accSaveNet(true),3000)}
 function saveNow(){clearTimeout(_svT);_svT=null;if(BOOTWAIT)return;if(NOSAVE){if(Date.now()-_netW>20000){_netW=Date.now();say('Zmiany nie są zapisywane (nie odczytano projektu z IndexedDB) – wczytaj projekt z pliku: Plik → Otwórz plik projektu.')}return}let j=null;try{j=JSON.stringify(S)}catch(e){}
- if(j){_svSz=j.length;netStore(j);histPush(j);accAutoQ()}if(typeof scheduleFile==='function')scheduleFile();clearTimeout(ziExport.t);ziExport.t=setTimeout(ziExport,400)}
+ if(j){_svSz=j.length;netStore(j);histPush(j);accAutoQ()}if(typeof scheduleFile==='function')scheduleFile();clearTimeout(ziExport.t);ziExport.t=setTimeout(()=>{(window.requestIdleCallback||(f=>setTimeout(f,0)))(ziExport,{timeout:4000})},1500)}
 // ---- for ZbiorkomInfo: the network as its timetables and map read it – the city, each line's two directions (TAM and its
 // POWRÓT, or TAM reversed) with their stops, the time to each stop (from the line's length, the speeds and the stops'
 // dwell, as in "Tabor i załoga") and the departures from the frequencies (peak / off-peak on working days, the days off at
@@ -310,7 +310,15 @@ function ziAuto(l,P){P=P||FP();const pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.som
   const pathOf=x=>{const F=[];x.segs.forEach((sg,k)=>sg.pts.forEach((q,i)=>{if(k>0&&i===0)return;F.push(q)}));return F};
   const thin=F=>{const o=[];F.forEach(q=>{if(!o.length||mdist(o[o.length-1],q)>=12)o.push(q)});if(F.length&&o[o.length-1]!==F[F.length-1])o.push(F[F.length-1]);return o.map(q=>[+q[0].toFixed(6),+q[1].toFixed(6)])};
   const along=(F,ll)=>{let acc=0,best=1e18,at=0;for(let i=1;i<F.length;i++){const a=F[i-1],b=F[i],L=mdist(a,b);const t=L?Math.max(0,Math.min(1,((ll[0]-a[0])*(b[0]-a[0])+(ll[1]-a[1])*(b[1]-a[1])*Math.cos(a[0]*Math.PI/180)**2)/(((b[0]-a[0])**2)+((b[1]-a[1])**2)*Math.cos(a[0]*Math.PI/180)**2||1))):0;const q=[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],d=mdist(q,ll);if(d<best){best=d;at=acc+L*t}acc+=L}return at};
-  const dir=(x,ids,F,t1)=>{const st=ids.map(stopOf).filter(Boolean);if(st.length<2)return null;const D=plen(F)||1;const dd=st.map(q=>along(F,q.ll));
+  // (the stops lie along the route in order: each one is looked for only ahead of the previous one, within a few times the distance
+  // between them – one pass over the route instead of a pass per stop)
+  const alongAll=(F,st)=>{const n=F.length,cum=new Float64Array(n);for(let i=1;i<n;i++)cum[i]=cum[i-1]+mdist(F[i-1],F[i]);const out=[];let i0=1,prevLL=null;
+    for(const q of st){const ll=q.ll,lim=prevLL?3*mdist(prevLL,ll)+600:Infinity,c0=cum[Math.max(0,i0-1)];let best=1e18,at=c0,bi=i0;
+      for(let i=Math.max(1,i0);i<n;i++){if(cum[i-1]-c0>lim)break;const a=F[i-1],b=F[i],L=cum[i]-cum[i-1],cs=Math.cos(a[0]*Math.PI/180)**2,den=((b[0]-a[0])**2)+((b[1]-a[1])**2)*cs;
+        const t=L&&den?Math.max(0,Math.min(1,((ll[0]-a[0])*(b[0]-a[0])+(ll[1]-a[1])*(b[1]-a[1])*cs)/den)):0,pq=[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t],d=mdist(pq,ll);
+        if(d<best){best=d;at=cum[i-1]+L*t;bi=i}}
+      out.push(at);i0=bi;prevLL=ll}return out};
+  const dir=(x,ids,F,t1)=>{const st=ids.map(stopOf).filter(Boolean);if(st.length<2)return null;const D=plen(F)||1;const dd=F.length>1?alongAll(F,st):st.map(()=>0);
     for(let i=1;i<dd.length;i++)if(dd[i]<dd[i-1])dd[i]=dd[i-1];
     return {st:st.map(q=>({id:q.id,n:String(q.name).replace(NUMRE,'$1'),num:q.num||((String(q.name).match(NUMRE)||[])[2]||''),ll:[+q.ll[0].toFixed(6),+q.ll[1].toFixed(6)]})),off:dd.map(d=>Math.round(t1*d/D)),sh:thin(F)}};
   if(l.par||!l.stops||l.stops.length<2||!l.segs||!l.segs.length)return null;
@@ -726,7 +734,8 @@ function onMoveEnd(){if(!DRAWN||!cullOn())return;const b=viewBox(.15);if(!b)retu
 function buildPaths(vis,CB){
  const paths=[];
  // tryb ograniczonego rysowania (duże sieci): przy małym zbliżeniu punkty trasy są rzadsze (co ~mpp·1,2 m, 8–24 m), bo na ekranie i tak leżą w odległości kilku pikseli
- let ST=8;if(CB){let la=54;outer:for(const l of vis)for(const sg of l.segs)if(sg.pts.length){la=sg.pts[0][0];break outer}
+ // (zawsze, nie tylko przy dużych sieciach: przy małym zbliżeniu gęstsze punkty niczego nie zmieniają na ekranie, a mnożą obliczenia)
+ let ST=8;{let la=54;outer:for(const l of vis)for(const sg of l.segs)if(sg.pts.length){la=sg.pts[0][0];break outer}
   ST=Math.max(8,Math.min(24,Math.round(156543.03*Math.cos(la*Math.PI/180)/Math.pow(2,map.getZoom())*1.2)))}
  const TK=Math.max(1,Math.round(24/ST)),THR=Math.max(9,ST*.75),T2=THR*THR,GAPN=Math.round(96/ST);
  // opcja „Łącz linie tego samego koloru”: linie o tym samym kolorze i stylu tworzą jedną grupę (jeden „tor”) – biegnąc obok siebie
@@ -746,7 +755,10 @@ function buildPaths(vis,CB){
   const pp={l,li,gi,pts,ranges,m,tx,ty,off:new Float32Array(n),flip:new Uint8Array(n),has:new Uint8Array(n)};
   if(MC){pp.dup=new Uint8Array(n);pp.cv=new Uint16Array(n);pp.rk=(dimOf(l)?4e9:0)+(l.id===S.sel?0:2e9)+(100-Math.min(99,l.w||5))*1e6+li} // niższe = ważniejsze (rysuje wspólny odcinek)
   paths.push(pp)});
- const C=Math.max(10,THR),grid=new Map(),GK=(x,y)=>(x+1048576)*4194304+(y+1048576),mpp=156543.03*Math.cos(((paths[0]&&paths[0].pts[0][0])||54)*Math.PI/180)/Math.pow(2,map.getZoom());
+ const C=Math.max(10,THR),grid=new Map();
+ // (klucze siatki – małe liczby całkowite liczone od rogu sieci: szybsze w Map niż duże liczby zmiennoprzecinkowe)
+ let gx0=Infinity,gy0=Infinity,gy1=-Infinity;paths.forEach(p=>p.m.forEach(q=>{const x=Math.floor(q[0]/C),y=Math.floor(q[1]/C);if(x<gx0)gx0=x;if(y<gy0)gy0=y;if(y>gy1)gy1=y}));
+ const GH=(gy1-gy0)+3,GK=(x,y)=>(x-gx0+1)*GH+(y-gy0+1),mpp=156543.03*Math.cos(((paths[0]&&paths[0].pts[0][0])||54)*Math.PI/180)/Math.pow(2,map.getZoom());
  paths.forEach((p,pi)=>p.m.forEach((q,vi)=>{const k=GK(Math.floor(q[0]/C),Math.floor(q[1]/C));let a=grid.get(k);if(!a)grid.set(k,a=[]);a.push(pi,vi)}));
  paths.forEach((p,pi)=>{
   for(let vi=0;vi<p.m.length;vi++){const q=p.m[vi],cx=Math.floor(q[0]/C),cy=Math.floor(q[1]/C);let near=null,rc=null,pm=null,dupf=0,cvl=null; // mapy tworzone dopiero przy pierwszym sąsiedzie (większość punktów leży na pojedynczej linii)
@@ -847,13 +859,20 @@ const tipOf=(p,r,vis,cvA)=>{const l=p.l;if(!p.cv)return'Linia '+l.num;const ids=
  return ns.size>1?'Linie '+[...ns].sort((a,b)=>a.localeCompare(b,'pl',{numeric:true})).join(', '):'Linia '+l.num};
 const pieces=(p,hl)=>{const rs=mergeR(p.ranges);if(!p.dup)return rs;const o=[],sp=!hl&&(p.l.style||'solid')==='solid'; // linie ciągłe dzielone są też tam, gdzie zmienia się zestaw łączonych linii (podpowiedź z numerami)
  rs.forEach(r=>{let i=r.a;while(i<=r.b){if(p.dup[i]){i++;continue}let j=i;while(j<r.b&&!p.dup[j+1]&&(!sp||p.cv[j+1]===p.cv[i]))j++;const a=Math.max(r.a,i-1),b=Math.min(r.b,j+1);if(b>a)o.push({a,b,mode:r.mode,ca:i,cb:j});i=j+1}});return o};
+// the routes worked out for drawing (rozsunięte linie) are kept while nothing that shapes them changes – the zoom, the area drawn,
+// the lines shown and their order, width, colour, style and route (each route's list of points known by identity and length):
+// selecting a line, opening a panel or redrawing for the stops does not repeat the work
+const _pidMap=new WeakMap();let _pidN=0,_pc=null;const pid=o=>{let v=_pidMap.get(o);if(!v){v=++_pidN;_pidMap.set(o,v)}return v};
+function pathsSig(vis,CB){const sg=l=>l.segs.map(x=>pid(x.pts)+':'+x.pts.length+':'+(x.mode||'')).join(';'),MC=!!UI.mc;
+ return [map.getZoom(),CB?[CB.s,CB.w,CB.n,CB.e].map(x=>(+x).toFixed(5)).join(','):'',MC?1:0,MC?S.sel:'',vis.map(l=>{const rt=l.par?S.lines.find(x=>x.id===l.par):null;
+  return [l.id,l.w||5,l.color,l.style||'',l.par||'',MC&&dimOf(l)?1:0,sg(l),rt&&rt!==l?sg(rt):''].join('|')}).join('#')].join('~')}
 function redraw(){
  lineL.clearLayers();
  const CB=cullBox();DRAWN=CB;
  const vis=orderedLines().filter(l=>!l.hidden&&l.segs.length),z=map.getZoom(),sc=256*Math.pow(2,z);
  const toPx=p=>{const s=Math.sin(p[0]*Math.PI/180);return[(p[1]+180)/360*sc,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*sc]};
  const toLL=(x,y)=>[Math.atan(Math.sinh(Math.PI*(1-2*y/sc)))*180/Math.PI,x/sc*360-180];
- const paths=buildPaths(vis,CB);
+ const sig=pathsSig(vis,CB);let paths;if(_pc&&_pc.sig===sig)paths=_pc.paths;else{paths=buildPaths(vis,CB);_pc={sig,paths}}
  paths.forEach(p=>{const P=p.pts.map(toPx),n=P.length;
   p.disp=P.map((q,i)=>{const o=p.off[i];if(Math.abs(o)<.05)return p.pts[i];const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const h=Math.hypot(dx,dy)||1;dx/=h;dy/=h;if(p.flip[i]){dx=-dx;dy=-dy}return toLL(q[0]-dy*o,q[1]+dx*o)})});
  paths.forEach(p=>{const l=p.l,w=l.w||5,sel=l.id===S.sel;if((l.style||'solid')!=='solid')return;
