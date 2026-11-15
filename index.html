@@ -989,7 +989,7 @@ button.gnRow{cursor:default}button.gnRow.pick{cursor:pointer}
 .gnRow.now .nm{position:relative}.gnRow.now .nm small{position:absolute;left:0;bottom:calc(100% + .15em);white-space:nowrap;font-size:.5em;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sM)}
 .gnRow.now .nm b{font-size:1.35em;font-weight:800}.gnRow .nmL{display:flex;align-items:center;gap:.35em;min-width:0}.gnRow .pf{flex:none;display:flex;align-items:center;gap:.25em;font-weight:700;font-variant-numeric:tabular-nums}
 .gnRow.prev{background:var(--bR)!important;color:var(--sM);min-height:0;height:var(--rh);font-size:calc(var(--gs)*.6)}.gnRow.prev .sym{width:calc(var(--gs)*.9);height:calc(var(--gs)*.9)}.gnRow.prev .sym .dot{stroke:var(--sM)}
-.gnRow.sel{outline:3px solid var(--sF);outline-offset:-3px}
+.gnRow.sel{outline:none}   /* (no frame round a clicked stop: the transfers on the side say which one) */
 .gnTr{min-height:0;display:flex;flex-direction:column}
 /* the transfers: the heading and every row as high as a row of the route */
 .gnTrH{flex:none;display:flex;align-items:center;gap:.6em;height:var(--rh);padding:0 calc(var(--gs)*.5);box-sizing:border-box;background:var(--bR);font-size:calc(var(--gs)*.72)}
@@ -1781,7 +1781,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794783197;
+const APP_BUILD=1794784955;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4119,7 +4119,8 @@ const gdSKM=name=>/\bSKM\b/.test(name)||gdTri()&&(/\bPKM\b/.test(name)||/^Toruń
 // stations, the stops at railway stations, and every stop of a train; not "Uniwersytet Medyczny" and the like
 const GD_STN=/\b(PKP|SKM|PKM|PKS|Dworzec|Dw\.|Lotnisko|Port Lotniczy|Terminal|Prom|Przeprawa|Przystań|(?<!Nowy )Port|Marina|Stacja|Hbf|Bf|Bahnhof|Flughafen|Fähre|Fähranleger|Hafen|nádraží|nádr\.|letiště|přístaviště|stanica|letisko|prístav|Airport|Station)\b/i;
 const gdNoTrn=(name,l)=>!(GD_STN.test(name)||(GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'));
-const gdTrnText=name=>{const l=gdLang();if(l==='pl'||gdNameLang()!=='pl'||!true||gdNoTrn(name,l))return '';const t=GD_TRN[name]&&GD_TRN[name][l];return t?t.map(x=>x[0]).join(' '):''};
+// (on the screen: what the station is in the language chosen, beside the name – the Polish part is the name itself)
+const gdTrnText=name=>{const l=gdLang();if(l==='pl'||gdNameLang()!=='pl'||gdNoTrn(name,l))return '';const t=(l==='en'&&gdRailEn(name))||gdStnParts(name,l);if(!t)return '';let o=t.filter(x=>x[1]!=='pl').map(x=>x[0]).join(' ');o=o&&o[0].toUpperCase()+o.slice(1);return o&&o!==name?o:''};
 // how some names are said (the spelling stays on the screen)
 const GD_SAY=[[/Groddecka/g,'Grodeka'],[/Traugutta/g,'Trauguta'],[/Westerplatte/g,'Westerplate'],
   // abbreviations in the names said in full
@@ -4216,9 +4217,25 @@ function gdEnStation(name){if(/^Sucharskiego/.test(name))return null;
   if(/Dworzec (PKS|Autobusowy)/i.test(name))return E('Bus Station');
   const m=name.match(/^(.*?)\s*\b(PKP|SKM|PKM)\b/);if(m){const pl=m[1].replace(/\bDworzec\b|\bDw\./g,'').replace(/[-–\s]+$/,'').trim();return pl?[[pl,'pl'],['railway station','en']]:E('Railway Station')}
   if(/\bDworzec\b/.test(name)||GD_RAILST.test(name))return E('Station');return null}
+// what a station is, in each language (for the names not in the dictionary): the place in Polish, then the kind of station
+const GD_STW={en:{main:'Main Station',cen:'Central Station',east:'East Station',west:'West Station',bus:'Bus Station',air:'Airport',ferry:'Ferry Terminal',rail:'railway station',skm:'suburban train station',st:'station'},
+  de:{main:'Hauptbahnhof',cen:'Zentralbahnhof',east:'Ostbahnhof',west:'Westbahnhof',bus:'Busbahnhof',air:'Flughafen',ferry:'Fährterminal',rail:'Bahnhof',skm:'S-Bahn-Station',st:'Bahnhof'},
+  cs:{main:'hlavní nádraží',cen:'centrální nádraží',east:'východní nádraží',west:'západní nádraží',bus:'autobusové nádraží',air:'letiště',ferry:'přístaviště trajektů',rail:'nádraží',skm:'zastávka příměstské železnice',st:'nádraží'},
+  sk:{main:'hlavná stanica',cen:'centrálna stanica',east:'východná stanica',west:'západná stanica',bus:'autobusová stanica',air:'letisko',ferry:'prístav trajektov',rail:'železničná stanica',skm:'zastávka prímestskej železnice',st:'stanica'}};
+function gdStnParts(name,l){const W=GD_STW[l];if(!W||/^Sucharskiego/.test(name))return null;const g=GD_TRN[name]&&GD_TRN[name][l];
+  // (a dictionary entry with the kind of station only – "Železniční zastávka" for Śródmieście SKM: the place said after it too)
+  if(g){if(g.some(x=>x[1]==='pl'))return g;const pl=name.replace(/\s*\/?\s*\b(PKP|SKM|PKM|PKS)\b/g,'').replace(/\bDworzec\b|\bDw\./g,'').replace(/[\/\-–\s]+$/,'').replace(/^[\/\-–\s]+/,'').trim();
+    return pl&&!/^(Główny|G[łl]\.|Centralny|Wschodni|Zachodni|Autobusowy)$/i.test(pl)&&!g.some(x=>x[0].includes(pl))?[...g,[pl,'pl']]:g}
+  const E=k=>[[W[k],l]];
+  if(/Port Lotniczy|Lotnisko/i.test(name))return E('air');if(/Terminal Promowy|\bProm\b|Przeprawa/i.test(name))return E('ferry');
+  if(/Dworzec G[łl]|Dw\. G[łl]/.test(name))return E('main');if(/Dworzec Centralny/.test(name))return E('cen');
+  if(/Dworzec Wsch|Dw\. Wsch/.test(name))return E('east');if(/Dworzec Zach|Dw\. Zach/.test(name))return E('west');
+  if(/Dworzec (PKS|Autobusowy)|\bPKS\b/i.test(name))return E('bus');
+  const m=name.match(/^(.*?)\s*\/?\s*\b(PKP|SKM|PKM)\b/);if(m){const pl=m[1].replace(/\bDworzec\b|\bDw\./g,'').replace(/[\/\-–\s]+$/,'').trim(),k=m[2]==='PKP'?'rail':'skm',U=W[k][0].toUpperCase()+W[k].slice(1);return pl?(l==='en'?[[pl,'pl'],[W[k],l]]:[[U,l],[pl,'pl']]):[[U,l]]}   // (English: "Oliwa suburban train station"; the others: "S-Bahn-Station Oliwa")
+  if(/\bDworzec\b|\bDw\./.test(name)||GD_RAILST.test(name))return E('st');return null}
 function gdSegs0(kind,name,isLast,req,zc){const l=gdLang(),nl=gdNameLang(),T=GD_TXT[l],st=GUIDE.run&&GUIDE.run.r&&GUIDE.run.r.t==='rail'?2:0;
   const out=[];if(kind==='next')out.push([T[st]+':',l,0]);else if(gdGongId()==='word'&&GD_STOPW[l])out.push([GD_STOPW[l],l,0]);out.push([gdNameSaid(name,nl),nl,1]);
-  const tr=l!=='pl'&&nl==='pl'&&true&&!gdNoTrn(name,l)&&(l==='en'&&gdRailEn(name)||GD_TRN[name]&&GD_TRN[name][l]);
+  const tr=l!=='pl'&&nl==='pl'&&!gdNoTrn(name,l)&&(l==='en'&&gdRailEn(name)||gdStnParts(name,l));
   {const tp=l==='pl'&&nl!=='pl'&&true&&gdTrnPl(name,nl);if(tp)out.push([tp+'.','pl',2])}   // (Praha, Flensburg in Polish: the name's meaning in Polish after it)
   if(tr)tr.forEach(([t,x],i)=>out.push([i===tr.length-1&&!/[.!?]$/.test(t)?t+'.':t,x,2]));   // (the translated name too ends going down, a full stop, before what follows)
   if(window.MK_OVR&&MK_OVR.en&&nl==='pl'&&!(tr&&l==='en')){const e=gdEnStation(name);if(e)e.forEach(([t,x],i)=>out.push([i===e.length-1&&!/[.!?]$/.test(t)?t+'.':t,x,2]))}
@@ -4668,10 +4685,10 @@ function gdSipNew(R,P,cur,next,MID){const last=P.length-1;const hd=Math.min(last
   const s0=depStyle(R.r);const sym=`<span class="sym"><svg viewBox="-12 -12 24 24" aria-hidden="true"><circle class="dot" r="8.5"/></svg></span>`;
   const adm=!!(ACC.user&&ACC.mode==='admin');const ts=adm&&GUIDE.trSel;const sel=ts&&ts.run===R&&Date.now()-ts.t<20000&&ts.j>=hd&&ts.j<=last?ts.j:hd;
   const chs=j=>{if(!store.get('ztm.gdChips',true))return '';const t=gdTransfers(R.ps[j],R.r,T[j]+lag);return t?`<span class="chs">${t}</span>`:''};
-  const to=Math.min(last,hd+MID),rows=[];const hand=j=>gdReq(j)?HAND:'';
-  for(let j=to;j>hd;j--)rows.push(`<button type="button" data-j="${j}" class="gnRow${adm?' pick':''}${j===to&&to===last?' top':''}${j===sel&&sel!==hd?' sel':''}"><span class="tl">${mins(j)}</span><span class="rl">${sym}</span><span class="nm"><span class="nmL"><b>${esc(P[j][0])}</b>${hand(j)}</span>${chs(j)}</span></button>`);
+  const to=Math.min(last,hd+MID),rows=[];const hand=j=>gdReq(j)?HAND:'';const trn=j=>{const t=gdTrnText(P[j][0]);return t?` <small class="gsTrn">${esc(t)}</small>`:''};
+  for(let j=to;j>hd;j--)rows.push(`<button type="button" data-j="${j}" class="gnRow${adm?' pick':''}${j===to&&to===last?' top':''}${j===sel&&sel!==hd?' sel':''}"><span class="tl">${mins(j)}</span><span class="rl">${sym}</span><span class="nm"><span class="nmL"><b>${esc(P[j][0])}</b>${trn(j)}${hand(j)}</span>${chs(j)}</span></button>`);
   const rl=R.r.t==='rail';const lbl=trS(hd===last?(rl?'Stacja końcowa':'Przystanek końcowy'):cur!=null?(rl?'Stacja':'Przystanek'):(rl?'Następna stacja':'Następny przystanek'));
-  rows.push(`<button type="button" data-j="${hd}" class="gnRow now${adm?' pick':''}${hd===last?' top':''}"><span class="tl">${cur==null?mins(hd):''}</span><span class="rl">${sym}</span><span class="nm"><small>${esc(lbl)}</small><span class="nmL"><b>${esc(P[hd][0])}</b>${hand(hd)}</span>${chs(hd)}</span></button>`);
+  rows.push(`<button type="button" data-j="${hd}" class="gnRow now${adm?' pick':''}${hd===last?' top':''}"><span class="tl">${cur==null?mins(hd):''}</span><span class="rl">${sym}</span><span class="nm"><small>${esc(lbl)}</small><span class="nmL"><b>${esc(P[hd][0])}</b>${trn(hd)}${hand(hd)}</span>${chs(hd)}</span></button>`);
   const trs=gdTrRows(R,R.ps[sel],T[sel]+lag,nowM,sel===hd);
   return `<div class="gnTop"><span class="mb ${s0.shape}${sqCls(R.r)}${String(R.r.n).length===1?' one':''}" style="background:${s0.bg};color:${s0.fg}">${esc(R.r.n)}</span>
 <div class="gtt"><small>${esc(trS('Kierunek'))}</small><b>${esc(R.head)}${gdTrnText(R.head)?` <small class="gsTrn">${esc(gdTrnText(R.head))}</small>`:''}</b></div>

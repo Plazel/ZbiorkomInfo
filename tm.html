@@ -80,10 +80,23 @@ input[type=checkbox],input[type=range],input[type=radio]{padding:0;accent-color:
 .mback{position:fixed;inset:0;background:rgba(10,12,18,.5);display:flex;align-items:center;justify-content:center;z-index:5000;padding:16px}
 .mbox{background:var(--panel);color:var(--fg);border:1px solid var(--bd);border-radius:0;box-shadow:0 8px 28px rgba(0,0,0,.22);width:min(440px,100%);max-height:92vh;display:flex;flex-direction:column}
 .mbox.wide{width:min(1180px,100%);height:88vh}
-.ttEd .seg{display:inline-flex;border:1px solid var(--bd)}.ttEd .seg button{border:0;background:var(--panel);color:var(--fg);padding:7px 12px;font:inherit;cursor:pointer;white-space:nowrap}.ttEd .seg button+button{border-left:1px solid var(--bd)}.ttEd .seg button.on{background:var(--fg);color:var(--panel)}
-.ttCols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px}@media (max-width:760px){.ttCols{grid-template-columns:1fr}}
-.ttGrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:4px 14px}.ttH{display:flex;align-items:center;gap:8px}.ttH b{width:24px;font-variant-numeric:tabular-nums}.ttH input{flex:1;min-width:0;font-variant-numeric:tabular-nums;letter-spacing:.04em}
-.ttStops{display:flex;flex-direction:column}.ttS{display:grid;grid-template-columns:minmax(0,1fr) 70px auto;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--bd2)}.ttS input{width:70px}
+.ttModal{width:min(1080px,100%)!important}.ttModal .mb{overflow:auto}
+.ttEd{display:flex;flex-direction:column;gap:14px}
+.ttBar{display:flex;flex-wrap:wrap;gap:10px}.ttSeg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--bd)}
+.ttSeg button{border:0;background:transparent;color:var(--fg);padding:8px 14px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.ttSeg button+button{border-left:1px solid var(--bd)}.ttSeg button:hover{background:var(--bd2)}.ttSeg button.on{background:var(--fg);color:var(--panel)}
+.ttDot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block}
+.ttCols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:24px;align-items:start}@media (max-width:820px){.ttCols{grid-template-columns:1fr}}
+.ttEd h4{margin:0;font-size:14px;font-weight:700}.ttEd h5{margin:0 0 8px;font-size:13px;font-weight:700}.ttSub{margin:4px 0 10px;font-size:12px;color:var(--mut);line-height:1.4}
+.ttGrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:4px 16px}
+.ttH{display:flex;align-items:center;gap:8px}.ttH b{flex:none;width:22px;font-size:13px;font-variant-numeric:tabular-nums}
+.ttH input{flex:1;min-width:0;height:30px;padding:0 8px;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.ttBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.ttBtns .b.on{background:var(--fg);color:var(--panel)}
+.ttGen{margin-top:12px;padding:12px;border:1px solid var(--bd)}.ttBands{display:flex;flex-direction:column;gap:6px}
+.ttBand{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:13px}.ttBand label{display:inline-flex;align-items:center;gap:6px}.ttBand input{width:64px;height:30px;padding:0 6px;font-variant-numeric:tabular-nums}
+.ttStops{display:flex;flex-direction:column;border-top:1px solid var(--bd2)}
+.ttS{display:grid;grid-template-columns:minmax(0,1fr) 64px 28px;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--bd2);font-size:13px}
+.ttSn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ttSn small,.ttS>small{color:var(--mut)}.ttS input{width:64px;height:28px;padding:0 6px;text-align:right}
 .ttEd input.auto{color:var(--mut)}
 .mh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px 18px;border-bottom:1px solid var(--bd2)}.mh b{font-size:15px}
 .mb{padding:16px 18px;overflow:auto;flex:1;min-height:0}.mb.flush{padding:0;overflow:hidden}
@@ -1792,7 +1805,7 @@ Object.assign(ICON,{lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path
 function modal(o){
  return new Promise(res=>{
   const bk=document.createElement('div');bk.className='mback';
-  const bx=document.createElement('div');bx.className='mbox'+(o.wide?' wide':'');bx.setAttribute('role','dialog');bx.setAttribute('aria-modal','true');
+  const bx=document.createElement('div');bx.className='mbox'+(o.wide?' wide':'')+(o.cls?' '+o.cls:'');bx.setAttribute('role','dialog');bx.setAttribute('aria-modal','true');
   bx.innerHTML=`<div class="mh"><b>${esc(o.title||'')}</b><button class="b ico flat mx" title="Zamknij">${ic('x')}</button></div><div class="mb${o.flush?' flush':''}"></div><div class="mf"></div>`;
   const mb=bx.querySelector('.mb');if(typeof o.body==='string')mb.innerHTML=o.body;else mb.appendChild(o.body);
   const mf=bx.querySelector('.mf'),cv=o.cancelV===undefined?null:o.cancelV;
@@ -1814,35 +1827,49 @@ const askConfirm=(msg,o={})=>modal({title:o.title||'Potwierdzenie',body:`<p styl
 Object.assign(ICON,{clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'});
 const TT_DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 function ttEdit(l){const P=FP(),a=ziAuto(l,P);if(!a){say('Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.');return}
- const st={dk:'A',dy:'w'},b=document.createElement('div');b.className='ttEd';
+ const st={dk:'A',dy:'w',gen:false},b=document.createElement('div');b.className='ttEd';
+ const pkIv=ivOf(S.peak||DEFPEAK),win=ivOf(winSrc(l).ws),o0=l.op||{};
+ // the bands for generating: the line's hours split at the peaks, each with its headway (peak / off-peak, days off one band)
+ const bandsDef=dy=>{const out=[],cuts=new Set();win.forEach(([x,y])=>{cuts.add(x);cuts.add(y)});if(dy==='w')pkIv.forEach(([x,y])=>{cuts.add(x);cuts.add(y)});
+   const cs=[...cuts].sort((x,y)=>x-y);for(let i=0;i<cs.length-1;i++){const x=cs[i],y=cs[i+1];if(!win.some(([p,q])=>x>=p&&y<=q))continue;
+     const pk=dy==='w'&&pkIv.some(([p,q])=>x>=p&&y<=q),h=dy==='w'?numOr(((pk?o0.pk:o0.ot)||{}).h,0):numOr((o0.we||{}).h,0);out.push({a:x,b:y,h:h||(pk?10:20)})}
+   return out.length?out:[{a:300,b:1380,h:20}]};
  const own=()=>((l.tt||{})[st.dk]||{})[st.dy],cur=()=>ttOf(l,st.dk,a);
  const setDep=v=>{l.tt=l.tt||{};const D=l.tt[st.dk]=l.tt[st.dk]||{};if(v==null)delete D[st.dy];else D[st.dy]=[...new Set(v)].filter(x=>x>=0&&x<1440).sort((x,y)=>x-y);if(!Object.keys(D).length)delete l.tt[st.dk];if(!Object.keys(l.tt).length)delete l.tt;save();renderLines()};
  const setOff=v=>{l.tto=l.tto||{};if(v==null)delete l.tto[st.dk];else l.tto[st.dk]=v;if(!Object.keys(l.tto).length)delete l.tto;save();renderLines()};
+ const t2m=v=>{const m=String(v||'').match(/^(\d{1,2})[:.]?(\d{2})$/);return m?Math.min(1440,+m[1]*60+ +m[2]):null};
  const draw=()=>{const T=cur(),dep=T.dep[st.dy],isOwn=!!own(),hrs=[...Array(24)].map((_,i)=>(i+3)%24);
   const byH=h=>dep.filter(m=>Math.floor(m/60)===h).map(m=>String(m%60).padStart(2,'0')).join(' ');
   const dn=x=>x.st.length?x.st[x.st.length-1].n:'';
-  b.innerHTML=`<div class="row wrap" style="gap:8px;margin-bottom:10px"><div class="seg ttDir">${['A','B'].filter(k=>a[k]).map(k=>`<button type="button" data-dk="${k}" class="${st.dk===k?'on':''}">→ ${esc(dn(a[k]))}</button>`).join('')}</div>
-    <div class="seg ttDay">${TT_D.map(k=>`<button type="button" data-dy="${k}" class="${st.dy===k?'on':''}">${TT_DN[k]}${((l.tt||{})[st.dk]||{})[k]?' •':''}</button>`).join('')}</div></div>
-   <div class="ttCols"><div class="ttDeps"><div class="sech"><i data-ic="clock"></i>Odjazdy z przystanku ${esc(T.st[0].n)}<span class="grow"></span><span class="small">${isOwn?'edytowane ręcznie':'wyliczone z częstotliwości'} · ${dep.length} kursów</span></div>
-     <div class="small" style="margin:0 0 6px">Wpisz minuty odjazdów w danej godzinie, oddzielone spacjami (np. „05 20 35 50”).</div>
-     <div class="ttGrid">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" class="${isOwn?'':'auto'}"></label>`).join('')}</div>
-     <div class="row wrap" style="gap:6px;margin-top:8px"><button type="button" class="b" data-t="copy">Kopiuj do pozostałych dni</button><button type="button" class="b" data-t="shift">Przesuń…</button>${isOwn?'<button type="button" class="b" data-t="auto">Przywróć wyliczone</button>':''}</div></div>
-    <div class="ttOff"><div class="sech"><i data-ic="route"></i>Czasy przejazdu<span class="grow"></span><span class="small">${T.ownOff?'edytowane ręcznie':'wyliczone'}</span></div>
-     <div class="ttStops">${T.st.map((q,i)=>`<label class="ttS"><span>${esc(q.n)}${q.num?' <span class="small">'+esc(q.num)+'</span>':''}</span><input type="number" min="0" max="600" data-o="${i}" value="${T.off[i]}"${i===0?' disabled':''} class="${T.ownOff?'':'auto'}"><span class="small">min</span></label>`).join('')}</div>
-     ${T.ownOff?'<div class="row" style="margin-top:8px"><button type="button" class="b" data-t="oauto">Przywróć wyliczone</button></div>':''}</div></div>`;
-  icons&&b.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic));
+  if(!st.bands||st.bandsFor!==st.dk+st.dy){st.bands=bandsDef(st.dy);st.bandsFor=st.dk+st.dy}
+  b.innerHTML=`<div class="ttBar"><div class="ttSeg" role="group" aria-label="Kierunek">${['A','B'].filter(k=>a[k]).map(k=>`<button type="button" data-dk="${k}" class="${st.dk===k?'on':''}">→ ${esc(dn(a[k]))}</button>`).join('')}</div>
+    <div class="ttSeg" role="group" aria-label="Dni">${TT_D.map(k=>`<button type="button" data-dy="${k}" class="${st.dy===k?'on':''}">${TT_DN[k]}${((l.tt||{})[st.dk]||{})[k]?'<i class="ttDot" title="edytowane ręcznie"></i>':''}</button>`).join('')}</div></div>
+   <div class="ttCols"><section class="ttDeps"><h4>Odjazdy z przystanku ${esc(T.st[0].n)}</h4><p class="ttSub">${isOwn?'Rozkład wpisany ręcznie':'Wyliczony z częstotliwości linii'} · ${dep.length} ${dep.length===1?'kurs':dep.length%10>=2&&dep.length%10<=4&&(dep.length%100<10||dep.length%100>=20)?'kursy':'kursów'}. Wpisz minuty odjazdów w danej godzinie, oddzielone spacjami (np. „05 20 35 50”).</p>
+     <div class="ttGrid">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" class="${isOwn?'':'auto'}" aria-label="Godzina ${h}"></label>`).join('')}</div>
+     <div class="ttBtns"><button type="button" class="b${st.gen?' on':''}" data-t="gen">${ic('clock')}Generuj z częstotliwości…</button><button type="button" class="b" data-t="copy">Kopiuj do pozostałych dni</button><button type="button" class="b" data-t="shift">Przesuń…</button>${isOwn?'<button type="button" class="b" data-t="auto">Przywróć wyliczone</button>':''}</div>
+     ${st.gen?`<div class="ttGen"><h5>Generuj rozkład (${esc(TT_DN[st.dy].toLowerCase())})</h5><div class="ttBands">${st.bands.map((x,i)=>`<div class="ttBand"><label>od <input data-ba="${i}" value="${hm(x.a)}" inputmode="numeric"></label><label>do <input data-bb="${i}" value="${hm(x.b%1440)}" inputmode="numeric"></label><label>co <input data-bh="${i}" type="number" min="1" max="240" value="${x.h}"> min</label><button type="button" class="b ico flat" data-bx="${i}" title="Usuń przedział"${st.bands.length>1?'':' disabled'}>${ic('x')}</button></div>`).join('')}</div>
+      <div class="ttBtns"><button type="button" class="b" data-t="badd">${ic('plus')}Dodaj przedział</button><button type="button" class="b pri" data-t="bgo">Wygeneruj</button></div><p class="ttSub">Zastąpi odjazdy w wybranym kierunku i dniach. Pierwszy kurs o godzinie „od”, kolejne co podaną liczbę minut, do godziny „do”.</p></div>`:''}</section>
+    <section class="ttOff"><h4>Czasy przejazdu</h4><p class="ttSub">${T.ownOff?'Wpisane ręcznie':'Wyliczone z długości trasy i prędkości'} – minuty od pierwszego przystanku.</p>
+     <div class="ttStops">${T.st.map((q,i)=>`<label class="ttS"><span class="ttSn">${esc(q.n)}${q.num?' <small>'+esc(q.num)+'</small>':''}</span><input type="number" min="0" max="600" data-o="${i}" value="${T.off[i]}"${i===0?' disabled':''} class="${T.ownOff?'':'auto'}"><small>min</small></label>`).join('')}</div>
+     ${T.ownOff?'<div class="ttBtns"><button type="button" class="b" data-t="oauto">Przywróć wyliczone</button></div>':''}</section></div>`;
   b.querySelectorAll('[data-dk]').forEach(x=>x.onclick=()=>{st.dk=x.dataset.dk;draw()});
   b.querySelectorAll('[data-dy]').forEach(x=>x.onclick=()=>{st.dy=x.dataset.dy;draw()});
   b.querySelectorAll('[data-h]').forEach(x=>x.onchange=()=>{const all=[];b.querySelectorAll('[data-h]').forEach(y=>{const h=+y.dataset.h;(y.value.match(/\d{1,2}/g)||[]).forEach(m=>{m=+m;if(m<60)all.push(h*60+m)})});setDep(all);draw()});
   b.querySelectorAll('[data-o]').forEach(x=>x.onchange=()=>{const v=[...b.querySelectorAll('[data-o]')].map(y=>Math.max(0,Math.round(+y.value||0)));v[0]=0;for(let i=1;i<v.length;i++)if(v[i]<v[i-1])v[i]=v[i-1];setOff(v);draw()});
+  b.querySelectorAll('[data-ba],[data-bb],[data-bh]').forEach(x=>x.onchange=()=>{const i=+(x.dataset.ba||x.dataset.bb||x.dataset.bh),B=st.bands[i];
+    if(x.dataset.ba!=null){const m=t2m(x.value);if(m!=null)B.a=m}else if(x.dataset.bb!=null){let m=t2m(x.value);if(m!=null){if(m<=B.a)m+=1440;B.b=Math.min(m,1440+180)}}else B.h=Math.max(1,Math.round(+x.value||1));draw()});
+  b.querySelectorAll('[data-bx]').forEach(x=>x.onclick=()=>{st.bands.splice(+x.dataset.bx,1);draw()});
   const t=k=>b.querySelector(`[data-t="${k}"]`);
+  t('gen').onclick=()=>{st.gen=!st.gen;draw()};
+  if(t('badd'))t('badd').onclick=()=>{const L=st.bands[st.bands.length-1];st.bands.push({a:L?L.b%1440:360,b:Math.min(1440,(L?L.b:360)+120),h:L?L.h:20});draw()};
+  if(t('bgo'))t('bgo').onclick=()=>{const out=[];st.bands.forEach(({a:x,b:y,h})=>{for(let m=x;m<y&&out.length<1500;m+=h)out.push(m%1440)});setDep(out);say('Wygenerowano '+[...new Set(out)].length+' odjazdów ('+TT_DN[st.dy].toLowerCase()+').');st.gen=false;draw()};
   if(t('auto'))t('auto').onclick=()=>{setDep(null);draw()};
   if(t('oauto'))t('oauto').onclick=()=>{setOff(null);draw()};
   t('copy').onclick=()=>{const v=cur().dep[st.dy];l.tt=l.tt||{};const D=l.tt[st.dk]=l.tt[st.dk]||{};TT_D.forEach(k=>D[k]=v.slice());save();renderLines();draw();say('Skopiowano odjazdy ('+TT_DN[st.dy]+') do pozostałych dni.')};
   t('shift').onclick=async()=>{const v=await modal({title:'Przesuń odjazdy',body:'<label class="row" style="gap:8px">O ile minut (np. 5 lub -3): <input id="ttSh" type="number" value="0" style="width:80px" autofocus></label>',cancelV:null,btns:[{t:'Anuluj',v:null},{t:'Przesuń',c:'pri',v:()=>+document.getElementById('ttSh').value||0}]});
    if(!v)return;setDep(cur().dep[st.dy].map(m=>m+v));draw()}};
  draw();
- modal({title:'Rozkład jazdy – linia '+l.num,body:b,wide:true,cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}]})}
+ modal({title:'Rozkład jazdy – linia '+l.num,body:b,cls:'ttModal',cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}]})}
 function askPrompt(msg,def,o={}){
  const w=document.createElement('div'),inp=document.createElement('input');inp.value=def||'';inp.setAttribute('autofocus','');inp.style.width='100%';
  w.innerHTML=`<div style="margin-bottom:8px">${esc(msg)}</div>`;w.appendChild(inp);
