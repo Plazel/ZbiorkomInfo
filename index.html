@@ -1781,7 +1781,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794757751;
+const APP_BUILD=1794767251;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7883,7 +7883,10 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
         const left = state.align === 'left', oa = left || a.w >= tw ? 0 : Math.floor((tw - a.w) / 2), ob = left || b.w >= tw ? 0 : Math.floor((tw - b.w) / 2);
         // the smallest distance between the two cap tops: caps a row or two apart, every lit LED of the lower row
         // a blank row below any of the upper row in its column and the columns beside it
+        // (a floating row moves under the other: any of its columns can come under any of the other's, so the lowest mark of the
+        // upper row has to clear the highest of the lower row everywhere)
         const need = gap => { let d = cap + gap;
+          if (scroll && (a.w > avail || b.w > avail)) { const ab = Math.max(...Object.values(a.bot)), bt = Math.min(...Object.values(b.top)); return Math.max(d, ab - bt + 2); }
           for (const xs in b.top) { const x = +xs + ob;
             for (const dx of [-1, 0, 1]) { const ux = x + dx - oa; if (a.bot[ux] !== undefined) d = Math.max(d, a.bot[ux] - b.top[xs] + 2); } }
           return d; };
