@@ -233,7 +233,7 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
   <div id="lines"></div>
  </div>
  <div class="pane" id="p2">
-  <div class="row" style="margin-bottom:8px"><div class="grow" style="position:relative"><input id="flt" placeholder="Szukaj przystanku…" style="width:100%;padding-left:30px"><span style="position:absolute;left:9px;top:8px;color:var(--mut);display:inline-flex"><i data-ic="search"></i></span></div><button class="b" id="load" title="Pobiera przystanki z OSM dla bieżącego obszaru – także te, które wcześniej usunąłeś ręcznie"><i data-ic="download"></i>Pobierz z OSM</button></div>
+  <div class="row" style="margin-bottom:8px"><div class="grow" style="position:relative"><input id="flt" placeholder="Szukaj przystanku…" style="width:100%;padding-left:30px"><span style="position:absolute;left:9px;top:8px;color:var(--mut);display:inline-flex"><i data-ic="search"></i></span></div></div><div class="row" style="margin-bottom:8px;gap:6px"><button class="b" id="load" title="Pobiera przystanki z OSM dla bieżącego obszaru – także te, które wcześniej usunąłeś ręcznie"><i data-ic="download"></i>Pobierz z OSM</button><button class="b" id="reloadStops" title="Usuwa wszystkie przystanki tego miasta i wczytuje je od nowa z OSM"><i data-ic="refresh"></i>Wczytaj od nowa</button></div>
   <div class="row" style="margin-bottom:6px"><div class="small grow" id="cnt" style="margin:0"></div><button class="b" id="clrNums" title="Usuwa numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="trash"></i>Usuń numery</button></div><div id="stops"></div>
  </div>
  <div class="pane" id="p3">
@@ -1291,6 +1291,22 @@ function renderStops(){
   box.appendChild(h);
   if(open)g.items.forEach(s=>box.appendChild(mkRow(s,true)))})}
 $('#flt').oninput=renderStops;$('#load').onclick=()=>loadStops();
+// wszystkie przystanki miasta od nowa z OSM (także dodane, zmienione i usunięte ręcznie). Linie zachowują trasy: każdy ich
+// przystanek zastępuje nowy o tym samym identyfikatorze z OSM, a gdy go nie ma – najbliższy w promieniu 80 m (najpierw o tej
+// samej nazwie i rodzaju); przystanek bez odpowiednika wypada z linii. Gdy pobieranie się nie uda, nic się nie zmienia.
+$('#reloadStops').onclick=async()=>{
+ if(!await askConfirm('Usunąć wszystkie przystanki ('+S.stops.length+') w tym mieście i wczytać je od nowa z OpenStreetMap? Ręczne zmiany przystanków (nazwy, położenie, dodane i usunięte przystanki) zostaną utracone. Linie zostaną przypięte do nowych przystanków.',{title:'Wczytaj przystanki od nowa',ok:'Wczytaj od nowa',danger:true}))return;
+ const old=S.stops,oldRm=S.rmStops,oldBB=S.stopBB,byId=new Map(old.map(x=>[x.id,x]));S.stops=[];S.rmStops=[];
+ await loadStops();
+ if(!S.stops.length){S.stops=old;S.rmStops=oldRm;S.stopBB=oldBB;save();drawStops();renderStops();say('Nie udało się pobrać przystanków z OSM – zachowano dotychczasowe. Spróbuj ponownie za chwilę.');return}
+ const nu=new Map(S.stops.map(x=>[x.id,x])),kind=x=>x.rail?'r':x.tram?'t':'a',mp=new Map();let lost=0;
+ const pick=o=>{if(nu.has(o.id))return o.id;let best=null,bd=1e9;const bn=baseName(o),k=kind(o);
+  for(const x of S.stops){const d=mdist(x.ll,o.ll);if(d>80)continue;const sc=d-(baseName(x)===bn?40:0)-(kind(x)===k?20:0);if(sc<bd){bd=sc;best=x}}return best?best.id:null};
+ const aff=[];S.lines.forEach(l=>{let ch=false;const ns=[];(l.stops||[]).forEach(id=>{const o=byId.get(id);if(!o){ch=true;return}
+   if(!mp.has(id))mp.set(id,pick(o));const n=mp.get(id);if(n!==id)ch=true;if(n)ns.push(n);else lost++});
+  if(ch){l.stops=ns;aff.push(l)}});
+ save();drawStops();renderStops();renderLines();aff.forEach(stopsChanged);redraw();
+ say('Wczytano od nowa '+S.stops.length+' przystanków z OSM.'+(aff.length?' Przypięto do nich linie: '+aff.length+'.':'')+(lost?' Bez odpowiednika (usunięte z linii): '+lost+'.':''))};
 
 const MSG={move:'Przeciągaj przystanki na mapie. Przystanek zostaje przypisany do swoich linii; przystanki tramwajowe i kolejowe przyciągają się do toru. Przy scalonych nazwach przesuwana jest cała grupa.',edit:'Zaznacz linię narysowaną ręcznie. Kliknij linię w miejscu bez punktu, aby dodać punkt. Przeciągaj punkty, aby zmienić przebieg. Prawy przycisk myszy na punkcie usuwa go.',nav:'Tryb wyboru. Najedź na przystanek, aby zmienić jego nazwę lub numer albo dodać go do linii.',draw:'Klikaj na mapie kolejne punkty trasy. Sposób prowadzenia (tory, ulice, swobodnie) wybierasz listą „Trasa”.',stop:'Kliknij na mapie, aby dodać nowy przystanek.',pick:'Klikaj przystanki w kolejności przejazdu – trafiają do zaznaczonej linii. Trasa linii wyznaczy się automatycznie.',infra:'Klikaj kolejne punkty nowego toru lub drogi (rodzaj wybierasz w sekcji „Własne tory i drogi”). Enter lub prawy przycisk myszy kończy, Esc anuluje.'};
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(vs&&b.dataset.m!=='nav')vs=null;if(mode==='infra'&&b.dataset.m!=='infra'){draft=[];drawDraft();infraEditId=null}mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));map.getContainer().style.cursor=(mode==='nav'||mode==='edit'||mode==='move')?'':'crosshair';drawStops();drawEdit();drawInfraEdit();say(MSG[mode])});
