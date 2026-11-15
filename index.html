@@ -1155,8 +1155,8 @@ header.top .themebar .plus,header.top #gsMob{width:38px;height:38px;box-sizing:b
 header.top .themebar .setWrap{display:inline-flex;align-items:center}
 header.top #cityBtn{height:38px;box-sizing:border-box}
 /* the city's name next to the logo, without a frame: the two read as one name ("ZbiorkomInfo Trójmiasto ⌄") */
-header.top .logo+.cityPick{margin-left:-6px}
-header.top #cityBtn{border:0!important;background:none!important;box-shadow:none!important;border-radius:6px;padding:0 6px;gap:6px;font-family:Roboto,var(--font-body),sans-serif;font-size:1.45rem;font-weight:400;letter-spacing:-.01em;line-height:1.3;color:var(--fg)}header.top #cityName{font:inherit;letter-spacing:inherit;line-height:1.3;padding-bottom:.08em;overflow:visible}   /* (Roboto, regular; room for the g, y, j under the line) */
+header.top .logo+.cityPick{margin-left:-12px}
+header.top #cityBtn{border:0!important;background:none!important;box-shadow:none!important;border-radius:6px;padding:0 6px;gap:6px;font-family:Roboto,var(--font-body),sans-serif;font-size:1.3rem;font-weight:400;letter-spacing:-.01em;line-height:1.3;color:var(--fg)}header.top #cityName{font:inherit;letter-spacing:inherit;line-height:1.3;padding-bottom:.08em;overflow:visible}   /* (Roboto, regular; room for the g, y, j under the line) */
 header.top #cityBtn>svg:last-child{width:18px;height:18px;opacity:.6;transition:transform .15s}
 header.top #cityBtn[aria-expanded="true"]>svg:last-child{transform:rotate(180deg)}
 header.top #cityBtn:hover #cityName{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
@@ -1771,7 +1771,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794733388;
+const APP_BUILD=1794733453;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
