@@ -51,7 +51,7 @@ def seg_dist(a, b, c, d):
     return min(pt(a, c, d), pt(b, c, d), pt(c, a, b), pt(d, a, b))
 
 
-def layout(nodes, cors, G, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_of=None, sep=0.9, time_limit=60, log=print, wide=1):
+def layout(nodes, cors, G, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_of=None, sep=0.9, time_limit=60, log=print, wide=1, w_diag=0.0):
     """G: {node: (x, y)} real positions in units. Sets c['dir'] and returns {node: np.array([x, y])}."""
     ix = {n: i for i, n in enumerate(nodes)}; N = len(nodes)
     span = max(max(p[0] for p in G.values()) - min(p[0] for p in G.values()), max(p[1] for p in G.values()) - min(p[1] for p in G.values()))
@@ -70,7 +70,8 @@ def layout(nodes, cors, G, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_of=
         al = {}
         for k in cand:
             off = min((k - s) % 8, (s - k) % 8)
-            al[k] = md.var(0, 1, True, cost=w_dir * off * (1 + 0.1 * (len(c['ch']) - 1)))
+            # (a diagonal costs a little: the diagrams of Berlin, Prague or Gdańsk run mostly across and up and down)
+            al[k] = md.var(0, 1, True, cost=w_dir * off * (1 + 0.1 * (len(c['ch']) - 1)) + w_diag * (k % 2) * (len(c['ch']) - 1) ** 0.5)
             dx, dy = DIR[k]
             md.add([(X[v], 1), (X[u], -1), (L, -dx), (al[k], M)], -np.inf, M)
             md.add([(X[v], -1), (X[u], 1), (L, dx), (al[k], M)], -np.inf, M)
@@ -94,10 +95,15 @@ def layout(nodes, cors, G, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_of=
 
 
 def solve(nodes, cors, G, ST, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_of=None, sep=1.25, time_limit=60, log=print,
-          rounds=10, anchors=None):
+          rounds=10, anchors=None, pairs=(), w_pair=4.0, w_diag=0.0):
     """ST: {station: (x, y)} in units, all stations (for the bearings at the nodes)."""
     for wide in (1, 2):
-        md, X, Y, lam, alpha, dexpr, inc, ix, need, B, M, bearing = layout(nodes, cors, G, w_bend, w_dir, w_len, w_geo, lmin_of, sep, time_limit, log, wide)
+        md, X, Y, lam, alpha, dexpr, inc, ix, need, B, M, bearing = layout(nodes, cors, G, w_bend, w_dir, w_len, w_geo, lmin_of, sep, time_limit, log, wide, w_diag)
+        # interchanges (a train station and the tram stop beside it, on lines of their own): drawn next to each other
+        for a, b in pairs:
+            for V in (X, Y):
+                t = md.var(0, np.inf, cost=w_pair)
+                md.add([(V[ix[a]], 1), (V[ix[b]], -1), (t, -1)], -np.inf, 0); md.add([(V[ix[a]], -1), (V[ix[b]], 1), (t, -1)], -np.inf, 0)
         for n, lst in inc.items():
             if len(lst) < 2: continue
             lst = sorted(lst, key=lambda t: bearing(t[0], t[1], ST))
@@ -126,6 +132,7 @@ def solve(nodes, cors, G, ST, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_
         # corridors joined by a third one cannot be farther apart than that one is long
         link = {}
         for m, c in enumerate(cors): link[frozenset((c['ch'][0], c['ch'][-1]))] = need[m]
+        for a, b in pairs: link[frozenset((a, b))] = 1.1
         def dreq_of(i, j):
             d = sep + (width[i] + width[j]) / 2
             for a in (cors[i]['ch'][0], cors[i]['ch'][-1]):
@@ -149,14 +156,24 @@ def solve(nodes, cors, G, ST, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_
                 for a in (cors[i]['ch'][0], cors[i]['ch'][-1]):
                     for b in (cors[j]['ch'][0], cors[j]['ch'][-1]):
                         md.add([(X[ix[b]], dx), (Y[ix[b]], dy), (X[ix[a]], -dx), (Y[ix[a]], -dy), (gam[k], -2 * M)], dreq * s - 2 * M, np.inf)
-        base = (md.n, len(md.rows))
+        # pairs of corridors that lie close together in the terrain get their distance from the start (asked for one
+        # round after another, the programme is solved anew each time – slow)
+        for i, j in itertools.combinations(range(len(cors)), 2):
+            a, b = cors[i]['ch'][0], cors[i]['ch'][-1]; c, d = cors[j]['ch'][0], cors[j]['ch'][-1]
+            if {a, b} & {c, d} or (i, j) in cross: continue
+            if seg_dist(np.array(ST[a]), np.array(ST[b]), np.array(ST[c]), np.array(ST[d])) < 2.5: sep_req[(i, j)] = dreq_of(i, j)
+        log('  odstępy od początku: %d par' % len(sep_req))
+        for (i, j), d in sep_req.items(): add_sep(i, j, d)
+        base = (md.n, len(md.rows)); pre = dict(sep_req); sep_req = {}
         def rebuild():
-            md.n = base[0]; del md.lb[base[0]:], md.ub[base[0]:], md.int[base[0]:], md.c[base[0]:], md.rows[base[1]:]
+            md.n = base[0]; del md.lb[base[0]:], md.ub[base[0]:], md.int[base[0]:], md.c[base[0]:], md.rows[base[1]:]   # (the pairs given from the start stay)
             for (i, j), d in sep_req.items(): add_sep(i, j, d)
         for rnd in range(rounds):
-            r = md.solve(time_limit=time_limit)
+            r = md.solve(time_limit=time_limit * (2 if rnd else 1))
             if r.x is None:
                 if not sep_req or rnd > rounds - 2: log('  brak rozwiązania (%s)' % r.message); break
+                if r.status == 1 and not getattr(md, 'more', 0):   # (out of time, not impossible: once more with longer)
+                    md.more = 1; time_limit *= 2; log('  runda %d: za mało czasu – dłużej' % (rnd + 1)); continue
                 # the last pairs asked too much: half the distance for them
                 for key in last: sep_req[key] *= 0.5
                 log('  runda %d: nie da się – mniejszy odstęp dla %d par' % (rnd + 1, len(last))); rebuild(); continue
@@ -164,7 +181,7 @@ def solve(nodes, cors, G, ST, w_bend=3.0, w_dir=2.0, w_len=1.0, w_geo=0.0, lmin_
             bad = []
             for i, j in itertools.combinations(range(len(cors)), 2):
                 a, b = cors[i]['ch'][0], cors[i]['ch'][-1]; c, d = cors[j]['ch'][0], cors[j]['ch'][-1]
-                if {a, b} & {c, d} or (i, j) in sep_req or (i, j) in cross: continue
+                if {a, b} & {c, d} or (i, j) in sep_req or (i, j) in pre or (i, j) in cross: continue
                 dreq = dreq_of(i, j)
                 if seg_dist(P[a], P[b], P[c], P[d]) < dreq - 1e-6: bad.append((i, j, dreq))
             log('  runda %d: cel %.1f, za blisko siebie: %d par' % (rnd + 1, r.fun, len(bad)))
@@ -239,7 +256,7 @@ def dp_keep(pts, tol):
     return keep
 
 
-def graph(st, seqs, bend_tol=300.0):
+def graph(st, seqs, bend_tol=300.0, force=()):
     """corridors: chains of stations between nodes (junctions, line ends, places where the set of lines changes and
     where the street really turns – by more than bend_tol metres off the straight line)"""
     E = collections.defaultdict(set); fwd = collections.Counter()
@@ -251,7 +268,7 @@ def graph(st, seqs, bend_tol=300.0):
         a, b = tuple(e); adj[a].add(b); adj[b].add(a)
     ends = {seq[0] for ss in seqs.values() for seq in ss} | {seq[-1] for ss in seqs.values() for seq in ss}
     def is_node(n):
-        if len(adj[n]) != 2 or n in ends: return True
+        if len(adj[n]) != 2 or n in ends or n in force: return True
         a, b = sorted(adj[n]); return E[frozenset((n, a))] != E[frozenset((n, b))]
     nodes = {n for n in adj if is_node(n)}
     if not nodes: nodes = {sorted(adj)[0]}
@@ -295,7 +312,7 @@ def main_patterns(d):
     return [d['pats'][p] for p, c in sorted(use.items()) if c >= top * 0.25]
 
 
-def network(data_dir, pick, box_stop=None, clip_by=None, merge_m=350.0):
+def network(data_dir, pick, box_stop=None, clip_by=None, merge_m=350.0, strict=None):
     """-> st {key: (x, y) metres}, name {key: name}, seqs {route id: [[keys]]}, cuts {key: [[route id, terminus name]]}"""
     idx = json.load(open(os.path.join(data_dir, 'index.json'), encoding='utf-8'))
     stops = idx['stops']; routes = [r for r in idx['routes'] if pick(r)]
@@ -371,9 +388,23 @@ def network(data_dir, pick, box_stop=None, clip_by=None, merge_m=350.0):
         if ps:
             m = 20.0
             box = ((min(p[0] for p in ps) - m) * M_PER, (min(p[1] for p in ps) - m * .7) * M_PER, (max(p[0] for p in ps) + m) * M_PER, (max(p[1] for p in ps) + m * .7) * M_PER)
-    inside = lambda k: box is None or (box[0] <= st[k][0] <= box[2] and box[1] <= st[k][1] <= box[3])
+    in_box = lambda k: box is None or (box[0] <= st[k][0] <= box[2] and box[1] <= st[k][1] <= box[3])
+    # trains (strict): only their stations in the area itself (with no stops to go by: in the box around the other lines'
+    # stops, without the margin) – a train line is cut where it leaves the city, not 2 km further on
+    own = {key_of[st_of[s]] for r, ids in runs for s in ids if box_stop is not None and box_stop(stops[s])}
+    tight = None
+    if strict and box_stop is None:
+        ps = [st[key_of[st_of[s]]] for r, ids in runs if not strict(r) for s in ids]
+        if ps: tight = (min(p[0] for p in ps) - 800, min(p[1] for p in ps) - 800, max(p[0] for p in ps) + 800, max(p[1] for p in ps) + 800)
+    def inside_of(rid):
+        if not (strict and strict(by_rid[rid])): return in_box
+        if box_stop is not None: return lambda k: k in own
+        if tight: return lambda k: tight[0] <= st[k][0] <= tight[2] and tight[1] <= st[k][1] <= tight[3]
+        return in_box
+    by_rid = {r['id']: r for r, _ in runs}
     seqs = collections.defaultdict(list); cuts = collections.defaultdict(list)
     for rid, ss in raw.items():
+        inside = inside_of(rid)
         for seq0 in ss:
             seq = []
             for n in seq0:
@@ -442,14 +473,112 @@ def along(poly, n):
     return out
 
 
+OCT = [(math.cos(k * math.pi / 4), math.sin(k * math.pi / 4)) for k in range(8)]
+
+
+def octi_dir(v):
+    """the octilinear direction nearest to v"""
+    n = math.hypot(*v) or 1.0
+    return max(OCT, key=lambda d: (d[0] * v[0] + d[1] * v[1]) / n)
+
+
+def rail_layout(st, rail, S, cors, P, link=0.95, step=1.15, log=print):
+    """the railway put in beside the laid-out network, as the printed diagrams draw it: each station next to the stop it
+    is an interchange with (a train station and the tram stop within 450 m), on the side of the street the railway really
+    lies; the stations between two such ones evenly between them; those beyond the last one (out to the airport, to the
+    edge of the city) one station-distance apart in the octilinear direction the line really goes. -> (positions of the
+    train stations, pieces [(a, b, points, lines)], interchanges [(station, stop)])"""
+    others = list(S)
+    # the direction of the laid-out network at each stop (for the side the station goes on)
+    dirv = {}
+    for c in cors:
+        sp = c['sp']
+        for k, n in enumerate(c['ch']):
+            a = np.array(sp[max(0, k - 1)], float); b = np.array(sp[min(len(sp) - 1, k + 1)], float)
+            if np.hypot(*(b - a)) > 1e-9: dirv.setdefault(n, (b - a) / np.hypot(*(b - a)))
+    seqs = [seq for ss in rail.values() for seq in ss]
+    rs = sorted({n for seq in seqs for n in seq})
+    pair = {}
+    used = set()
+    for a in sorted(rs, key=lambda a: min(math.hypot(st[a][0] - st[b][0], st[a][1] - st[b][1]) for b in others) if others else 0):
+        if a in S: continue
+        b = min(others, key=lambda b: math.hypot(st[a][0] - st[b][0], st[a][1] - st[b][1])) if others else None
+        if b is None or b in used or math.hypot(st[a][0] - st[b][0], st[a][1] - st[b][1]) > 650: continue
+        pair[a] = b; used.add(b)
+    R = {}
+    for a, b in pair.items():
+        v = dirv.get(b, np.array([1.0, 0.0])); nrm = np.array([-v[1], v[0]])
+        g = np.array([st[a][0] - st[b][0], st[a][1] - st[b][1]], float)
+        side = 1.0 if float(nrm @ g) >= 0 else -1.0
+        nd = np.array(octi_dir(nrm * side))
+        R[a] = np.array(S[b], float) + nd * link
+    # the stations between and beyond them, line by line
+    for seq in sorted(seqs, key=len, reverse=True):
+        idx = [k for k, n in enumerate(seq) if n in R]
+        if not idx: continue
+        for k0, k1 in zip(idx, idx[1:]):
+            if k1 - k0 < 2: continue
+            gd = [0.0]
+            for x, y in zip(seq[k0:k1], seq[k0 + 1:k1 + 1]): gd.append(gd[-1] + math.hypot(st[x][0] - st[y][0], st[x][1] - st[y][1]))
+            for m in range(k0 + 1, k1):
+                if seq[m] in R: continue
+                f = gd[m - k0] / (gd[-1] or 1); R[seq[m]] = R[seq[k0]] + (R[seq[k1]] - R[seq[k0]]) * f
+        for rng, a0 in ((range(idx[-1] + 1, len(seq)), idx[-1]), (range(idx[0] - 1, -1, -1), idx[0])):
+            prev = seq[a0]
+            for m in rng:
+                n = seq[m]
+                if n in R: prev = n; continue
+                g = (st[n][0] - st[prev][0], st[n][1] - st[prev][1])
+                R[n] = R[prev] + np.array(octi_dir(g)) * step; prev = n
+    # still none (a train line with no interchange at all): where the stations fall among the others
+    rest = [n for n in rs if n not in R]
+    if rest:
+        W = warp_of(st, S)
+        for n, q in zip(rest, W([st[n] for n in rest])): R[n] = np.array(q, float)
+    # the pieces: each pair of stations in a row once, with the lines through it; drawn octilinear (one bend at most)
+    E = collections.defaultdict(set)
+    for rid, ss in rail.items():
+        for seq in ss:
+            for x, y in zip(seq, seq[1:]): E[tuple(sorted((x, y)))].add(rid)
+    # a fast train passing stations another line stops at (Gdańsk Wrzeszcz – Gdańsk Oliwa past Zaspa and Przymorze) runs on
+    # the same track: drawn along that line's stations, not straight across the city
+    gd = lambda x, y: math.hypot(st[x][0] - st[y][0], st[x][1] - st[y][1])
+    import heapq
+    for e in sorted(E, key=lambda e: -gd(*e)):
+        x, y = e; D = gd(x, y)
+        adj = collections.defaultdict(list)
+        for f in E:
+            if f != e: adj[f[0]].append(f[1]); adj[f[1]].append(f[0])
+        dist = {x: 0.0}; prev = {}; pq = [(0.0, x)]
+        while pq:
+            d0, n = heapq.heappop(pq)
+            if n == y or d0 > D * 1.2: break
+            if d0 > dist.get(n, 1e18): continue
+            for m in adj[n]:
+                nd = d0 + gd(n, m)
+                if nd < dist.get(m, 1e18): dist[m] = nd; prev[m] = n; heapq.heappush(pq, (nd, m))
+        if y in prev and dist[y] <= D * 1.2:
+            path = [y]
+            while path[-1] != x: path.append(prev[path[-1]])
+            ls = E.pop(e)
+            for a2, b2 in zip(path, path[1:]): E[tuple(sorted((a2, b2)))] |= ls
+    pieces = []
+    for (x, y), ls in sorted(E.items()):
+        a, b = R[x], R[y]
+        poly = octi_path(a, b, [])
+        pieces.append((x, y, [np.array(q, float) for q in poly], sorted(ls)))
+    log('  kolej: %d stacji, %d przesiadek' % (len(R), len(pair)))
+    return R, pieces, sorted(pair.items())
+
+
 def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0.9), time_limit=120, max_nodes=160, bg=True, log=print):
     """the diagram of the picked lines: {'n': [[x, y, name(, cuts)]], 'e': [[from, to, [x1, y1, …], strokes(, grey, night)]],
-    'bg': the landscape}. The trams, trolleybuses and buses are laid out by the programme; the railway (few long lines
-    beside them) is put in afterwards where its stations fall among them, each run between its junctions drawn as two
-    octilinear pieces"""
+    'x': [[station, stop]] interchanges, 'bg': the landscape}. The trams, trolleybuses and buses laid out by the programme
+    (octilinear, few bends, the centre drawn larger); the railway put in beside them, its stations next to the stops they are
+    interchanges with (rail_layout), cut where it leaves the city"""
     idx = json.load(open(os.path.join(data_dir, 'index.json'), encoding='utf-8'))
     rail_ids = {r['id'] for r in idx['routes'] if r['t'] == 'rail'}
-    st, name, seqs, cuts = network(data_dir, pick, box_stop, clip_by)
+    st, name, seqs, cuts = network(data_dir, pick, box_stop, clip_by, strict=lambda r: r['t'] == 'rail')
     if not seqs: return None
     base = {k: v for k, v in seqs.items() if k not in rail_ids} or seqs
     rail = {k: v for k, v in seqs.items() if k in rail_ids and base is not seqs}
@@ -469,7 +598,6 @@ def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0
             mid = (np.array(ST[c['ch'][0]]) + np.array(ST[c['ch'][-1]])) / 2
             L *= 1 + centre[1] * max(0.0, 1 - float(np.hypot(*(mid - cx))) / centre[0])
         return L
-    # parts of the network not joined to each other: two far-apart nodes of each held near their real places
     par = {n: n for n in nodes}
     def fd(n):
         while par[n] != n: n = par[n]
@@ -482,29 +610,21 @@ def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0
         for ns in comp.values():
             a = max(ns, key=lambda n: (G[n][0] + G[n][1], n)); b = max(ns, key=lambda n: (math.hypot(G[n][0] - G[a][0], G[n][1] - G[a][1]), n))
             anchors += [a] + ([b] if b != a else [])
-    P = solve(nodes, cors, G, ST, w_dir=5.0, w_geo=0.5 if anchors else 0.0, anchors=anchors, lmin_of=lmin, time_limit=time_limit, log=log)
+    P = solve(nodes, cors, G, ST, w_bend=4.0, w_dir=5.0, w_diag=0.35, w_geo=0.5 if anchors else 0.0, anchors=anchors, lmin_of=lmin, time_limit=time_limit, log=log)
     at = prepare(nodes, cors, P)
     rank = {l: i for i, l in enumerate(sorted({l for c in cors for l in c['lines']}, key=lambda x: (len(x), x)))}
     order_lines(cors, at, P, rank)
     S = {}
-    pieces = []          # (a, b, points, ordered lines)
+    pieces = []
     for c in cors:
         for n, p in zip(c['ch'], c['sp']): S.setdefault(n, p)
         for a, b in zip(c['ch'], c['ch'][1:]): pieces.append((a, b, [S[a], S[b]], c['ord']))
+    pairs = []
     if rail:
-        W = warp_of(st, S)
-        rn, rc = graph(st, rail, bend_tol=600.0)
-        for n in rn:
-            if n not in S: S[n] = W([st[n]])[0]
-        for c in rc:
-            a, b = c['ch'][0], c['ch'][-1]
-            mids = W([st[n] for n in c['ch'][1:-1]]) if len(c['ch']) > 2 else []
-            poly = octi_path(np.array(S[a], float), np.array(S[b], float), list(mids))
-            segs = along(poly, len(c['ch']) - 1)
-            for k2, (x, y) in enumerate(zip(c['ch'], c['ch'][1:])):
-                if 0 < k2 + 1 < len(c['ch']) - 1 and c['ch'][k2 + 1] not in S: S[c['ch'][k2 + 1]] = segs[k2][-1]
-                pieces.append((x, y, segs[k2], sorted(c['lines'])))
-    mn = np.min(np.array(list(S.values())), 0)
+        R, rp, pairs = rail_layout(st, rail, {n: np.array(p, float) for n, p in S.items()}, cors, P, log=log)
+        for n, q in R.items(): S.setdefault(n, q)
+        pieces += rp
+    mn = np.min(np.array([np.array(v, float) for v in S.values()]), 0)
     ix = {n: i for i, n in enumerate(sorted(S))}
     out_n = [[round(float(S[n][0] - mn[0]), 3), round(float(S[n][1] - mn[1]), 3), name[n]] + ([cuts[n]] if n in cuts else []) for n in sorted(S)]
     out_e = []
@@ -515,6 +635,7 @@ def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0
         flat[:2] = out_n[ix[a]][:2]; flat[-2:] = out_n[ix[b]][:2]
         out_e.append([ix[a], ix[b], flat, strokes] + ([gm, nm] if nm else [gm] if gm else []))
     res = {'n': out_n, 'e': out_e}
+    if pairs: res['x'] = [[ix[a], ix[b]] for a, b in pairs if a in ix and b in ix]
     if bg:
         try: res['bg'] = landscape(st, {n: (float(S[n][0] - mn[0]), float(S[n][1] - mn[1])) for n in S}, log=log)
         except Exception as e: log('  tło schematu: %s' % str(e)[:120])
@@ -539,13 +660,19 @@ def landscape(geo, lay, z=12, log=print):
     x0, y1 = basemap.tile_of(la0, lo0, z); x1, y0 = basemap.tile_of(la1, lo1, z)
     jobs = [(z, x, y) for x in range(min(x0, x1), max(x0, x1) + 1) for y in range(min(y0, y1), max(y0, y1) + 1)]
     def one(j):
-        try: return j, basemap.decode_tile(basemap.fetch(url.replace('{z}', str(j[0])).replace('{x}', str(j[1])).replace('{y}', str(j[2]))), {'water', 'landcover', 'park'})
+        try: return j, basemap.decode_tile(basemap.fetch(url.replace('{z}', str(j[0])).replace('{x}', str(j[1])).replace('{y}', str(j[2]))), {'water', 'landcover', 'park', 'place'})
         except Exception: return j, {}
-    lo = dst.min(0) - 6; hi = dst.max(0) + 6; out = {'w': [], 'f': [], 'g': [], 'b': []}
+    lo = dst.min(0) - 6; hi = dst.max(0) + 6; out = {'w': [], 'f': [], 'g': [], 'b': []}; places = {}
     with concurrent.futures.ThreadPoolExecutor(8) as ex:
         for (zz, tx, ty), layers in ex.map(one, jobs):
             for lname, feats in layers.items():
                 for props, typ, parts, ext in feats:
+                    if lname == 'place':   # the districts (their names, in large light letters behind the lines)
+                        nm = props.get('name:pl') or props.get('name') or ''
+                        if typ == 1 and parts and parts[0] and props.get('class') in ('suburb', 'quarter') and nm and nm not in places:
+                            la, lo2 = basemap.to_latlon(zz, tx, ty, parts[0][0][0], parts[0][0][1], ext)
+                            places[nm] = ((lo2 * schematic.COS * 1000.0 * M_PER, -la * 1000.0 * M_PER), props.get('class'))
+                        continue
                     kd = basemap.classify(lname, props, typ)
                     if kd not in out: continue
                     for part in parts:
@@ -558,5 +685,18 @@ def landscape(geo, lay, z=12, log=print):
                         if q[:, 0].max() < lo[0] or q[:, 0].min() > hi[0] or q[:, 1].max() < lo[1] or q[:, 1].min() > hi[1]: continue
                         q = basemap.rdp([tuple(p) for p in np.clip(q, lo - 4, hi + 4)], 0.06)
                         if len(q) >= 3: out[kd].append([round(float(v), 2) for p in q for v in p])
+    # a district's name where its place falls on the diagram, if it lies among the stations (not out in the sea or the fields)
+    if places:
+        nms = sorted(places); q = warp([places[n][0] for n in nms]); pl = []
+        for n, (x, y) in zip(nms, q):
+            near = float(np.min(np.hypot(dst[:, 0] - x, dst[:, 1] - y)))
+            if near < 3.5 and lo[0] + 4 < x < hi[0] - 4 and lo[1] + 4 < y < hi[1] - 4:
+                if places[n][1] == 'suburb': pl.append([round(float(x), 2), round(float(y), 2), n, 0.62])
+        # (no two names over each other: the shorter first, a name left out where it would cover another)
+        keep = []
+        for q in sorted(pl, key=lambda q: len(q[2])):
+            w = len(q[2]) * q[3] * 0.62 + 0.6; h = q[3] * 1.4
+            if all(abs(q[0] - k[0]) * 2 > w + len(k[2]) * k[3] * 0.62 + 0.6 or abs(q[1] - k[1]) * 2 > h + k[3] * 1.4 for k in keep): keep.append(q)
+        out['pl'] = keep
     log('  tło schematu: %s' % ', '.join('%s %d' % (k2, len(v)) for k2, v in out.items()))
     return out
