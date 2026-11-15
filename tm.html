@@ -80,6 +80,11 @@ input[type=checkbox],input[type=range],input[type=radio]{padding:0;accent-color:
 .mback{position:fixed;inset:0;background:rgba(10,12,18,.5);display:flex;align-items:center;justify-content:center;z-index:5000;padding:16px}
 .mbox{background:var(--panel);color:var(--fg);border:1px solid var(--bd);border-radius:0;box-shadow:0 8px 28px rgba(0,0,0,.22);width:min(440px,100%);max-height:92vh;display:flex;flex-direction:column}
 .mbox.wide{width:min(1180px,100%);height:88vh}
+.ttEd .seg{display:inline-flex;border:1px solid var(--bd)}.ttEd .seg button{border:0;background:var(--panel);color:var(--fg);padding:7px 12px;font:inherit;cursor:pointer;white-space:nowrap}.ttEd .seg button+button{border-left:1px solid var(--bd)}.ttEd .seg button.on{background:var(--fg);color:var(--panel)}
+.ttCols{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px}@media (max-width:760px){.ttCols{grid-template-columns:1fr}}
+.ttGrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(12,auto);grid-auto-flow:column;gap:4px 14px}.ttH{display:flex;align-items:center;gap:8px}.ttH b{width:24px;font-variant-numeric:tabular-nums}.ttH input{flex:1;min-width:0;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.ttStops{display:flex;flex-direction:column}.ttS{display:grid;grid-template-columns:minmax(0,1fr) 70px auto;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--bd2)}.ttS input{width:70px}
+.ttEd input.auto{color:var(--mut)}
 .mh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px 18px;border-bottom:1px solid var(--bd2)}.mh b{font-size:15px}
 .mb{padding:16px 18px;overflow:auto;flex:1;min-height:0}.mb.flush{padding:0;overflow:hidden}
 .mf{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid var(--bd2);flex-wrap:wrap}
@@ -164,6 +169,11 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
     <button class="b" id="fOpen"><i data-ic="folder"></i>Otwórz plik projektu…</button>
     <button class="b" id="fReconnect" style="display:none"></button>
     <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAuto" disabled>Autozapis do pliku po każdej zmianie</label>
+    <div class="sech"><i data-ic="upload"></i>Konto ZbiorkomInfo</div>
+    <button class="b" id="fAccSave"><i data-ic="upload"></i>Zapisz na koncie</button>
+    <button class="b" id="fAccLoad"><i data-ic="download"></i>Wczytaj z konta…</button>
+    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAccAuto">Autozapis na koncie po każdej zmianie</label>
+    <div class="small" id="fAccSt" style="padding:0 11px 4px;color:var(--mut)"></div>
     <div class="sech"><i data-ic="download"></i>Kopia przenośna</div>
     <button class="b" id="exp"><i data-ic="download"></i>Eksportuj projekt (JSON)</button>
     <button class="b" id="imp"><i data-ic="upload"></i>Importuj projekt (JSON)</button>
@@ -273,15 +283,29 @@ function netStore(j){const seq=++_netSeq;let ok=false;
  idbPutNet(j).then(good=>{if(seq!==_netSeq)return;
   if(good){if(first){NETIDB=true;try{localStorage.setItem('gdn-net-idb','1');localStorage.removeItem('gdn-net')}catch(e){}say('Projekt jest za duży na pamięć przeglądarki (localStorage) – zapisuję go w IndexedDB. Zapisz też kopię do pliku (menu Plik).')}}
   else if(Date.now()-_netW>20000){_netW=Date.now();say('Projekt nie mieści się w pamięci przeglądarki i nie udało się go zapisać w IndexedDB – zapisz go do pliku (menu Plik).')}})}
+// ---- the project on the ZbiorkomInfo account this browser is logged in to (the same site): saved from the File menu, and –
+// with "Autozapis na koncie" on – a few seconds after each change; read back from the menu ("Wczytaj z konta…")
+const ACCP={url:'https://divine-limit-0a3b.latka1500.workers.dev/konto/tm',t:null,auto:false};try{ACCP.auto=localStorage.getItem('gdn-acc-auto')==='1'}catch(e){}
+function accTok(){try{return JSON.parse(localStorage.getItem('ztm.token')||'""')||''}catch(e){return''}}
+function accStat(t){const e=document.getElementById('fAccSt');if(!e)return;const on=!!accTok();['fAccSave','fAccLoad','fAccAuto'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!on});
+ const a=document.getElementById('fAccAuto');if(a)a.checked=on&&ACCP.auto;e.textContent=t!=null?t:on?(ACCP.last?'Ostatni zapis na koncie: '+new Date(ACCP.last).toLocaleTimeString():''):'Zaloguj się w ZbiorkomInfo, aby zapisywać projekt na koncie.'}
+async function accSaveNet(quiet){clearTimeout(ACCP.t);ACCP.t=null;const tok=accTok();if(!tok||BOOTWAIT||NOSAVE){accStat();return false}
+ try{const r=await fetch(ACCP.url,{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),net:S})});
+  if(!r.ok)throw new Error(r.status===404||r.status===405?'serwer nie obsługuje zapisu projektu – wdróż najnowszy worker.js':r.status===401?'sesja wygasła – zaloguj się ponownie w ZbiorkomInfo':r.status===413?'projekt jest za duży (limit 20 MB)':'HTTP '+r.status);
+  ACCP.last=Date.now();accStat();if(!quiet)say('Projekt zapisano na koncie.');return true}
+ catch(e){const m='Nie udało się zapisać projektu na koncie: '+e.message+'.';accStat(m);if(!quiet||Date.now()-(ACCP.warn||0)>60000){ACCP.warn=Date.now();say(m)}return false}}
+function accAutoQ(){if(!ACCP.auto||!accTok())return;clearTimeout(ACCP.t);ACCP.t=setTimeout(()=>accSaveNet(true),3000)}
 function saveNow(){clearTimeout(_svT);_svT=null;if(BOOTWAIT)return;if(NOSAVE){if(Date.now()-_netW>20000){_netW=Date.now();say('Zmiany nie są zapisywane (nie odczytano projektu z IndexedDB) – wczytaj projekt z pliku: Plik → Otwórz plik projektu.')}return}let j=null;try{j=JSON.stringify(S)}catch(e){}
- if(j){_svSz=j.length;netStore(j);histPush(j);}if(typeof scheduleFile==='function')scheduleFile();clearTimeout(ziExport.t);ziExport.t=setTimeout(ziExport,400)}
+ if(j){_svSz=j.length;netStore(j);histPush(j);accAutoQ()}if(typeof scheduleFile==='function')scheduleFile();clearTimeout(ziExport.t);ziExport.t=setTimeout(ziExport,400)}
 // ---- for ZbiorkomInfo: the network as its timetables and map read it – the city, each line's two directions (TAM and its
 // POWRÓT, or TAM reversed) with their stops, the time to each stop (from the line's length, the speeds and the stops'
 // dwell, as in "Tabor i załoga") and the departures from the frequencies (peak / off-peak on working days, the days off at
 // weekends, within the line's hours). Kept in this browser (localStorage gdn-zi); ZbiorkomInfo, the same site, reads it
 // at once (the storage event, or the message to the page around this one)
-function ziExport(){try{
-  const P=FP(),pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.some(x=>t>=x[0]&&t<x[1]);
+// the line as ZbiorkomInfo needs it, worked out: both directions (TAM and its POWRÓT, or TAM reversed) with their stops, the
+// minutes to each stop (from the line's length and speed) and the shape, and the departures from the headways (peak / off-peak /
+// days off) within the line's hours. The timetable edited by hand (l.tt departures, l.tto minutes to the stops) goes over it.
+function ziAuto(l,P){P=P||FP();const pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.some(x=>t>=x[0]&&t<x[1]);
   const deps=(l,kind)=>{const o=l.op||{},iv=ivOf(winSrc(l).ws),out=[];iv.forEach(([a,b])=>{let t=a;let n=0;while(t<b&&n<400){const h=kind==='we'?numOr((o.we||{}).h,0):inPk(t)?numOr((o.pk||{}).h,0):numOr((o.ot||{}).h,0);if(!(h>0)){t+=5;continue}out.push(Math.round(t));t+=h;n++}});return out};
   const pathOf=x=>{const F=[];x.segs.forEach((sg,k)=>sg.pts.forEach((q,i)=>{if(k>0&&i===0)return;F.push(q)}));return F};
   const thin=F=>{const o=[];F.forEach(q=>{if(!o.length||mdist(o[o.length-1],q)>=12)o.push(q)});if(F.length&&o[o.length-1]!==F[F.length-1])o.push(F[F.length-1]);return o.map(q=>[+q[0].toFixed(6),+q[1].toFixed(6)])};
@@ -289,13 +313,21 @@ function ziExport(){try{
   const dir=(x,ids,F,t1)=>{const st=ids.map(stopOf).filter(Boolean);if(st.length<2)return null;const D=plen(F)||1;const dd=st.map(q=>along(F,q.ll));
     for(let i=1;i<dd.length;i++)if(dd[i]<dd[i-1])dd[i]=dd[i-1];
     return {st:st.map(q=>({id:q.id,n:String(q.name).replace(NUMRE,'$1'),num:q.num||((String(q.name).match(NUMRE)||[])[2]||''),ll:[+q.ll[0].toFixed(6),+q.ll[1].toFixed(6)]})),off:dd.map(d=>Math.round(t1*d/D)),sh:thin(F)}};
-  const lines=[];
-  S.lines.filter(l=>!l.par&&l.stops&&l.stops.length>1&&l.segs&&l.segs.length).forEach(l=>{const r=calcLine(l,P),t1=r.ok?r.t1:Math.max(1,lineLen(l)/1000/20*60),F=pathOf(l);
-    const A=dir(l,l.stops,F,t1);if(!A)return;
-    const B0=S.lines.find(x=>x.dir==='B'&&x.par===l.id&&(x.rev||x.par)===l.id&&x.segs&&x.segs.length&&x.stops.length>1);
-    const B=B0?dir(B0,B0.stops,pathOf(B0),t1):dir(l,l.stops.slice().reverse(),F.slice().reverse(),t1);
-    const w=deps(l,'w'),we=deps(l,'we');
-    lines.push({id:l.id,n:String(l.num||''),color:l.color||'#555',kind:lineMode(l),dirs:[A,B].filter(Boolean).map(d=>({...d,dep:{w,s:we,h:we}}))})});
+  if(l.par||!l.stops||l.stops.length<2||!l.segs||!l.segs.length)return null;
+  const r=calcLine(l,P),t1=r.ok?r.t1:Math.max(1,lineLen(l)/1000/20*60),F=pathOf(l);
+  const A=dir(l,l.stops,F,t1);if(!A)return null;
+  const B0=S.lines.find(x=>x.dir==='B'&&x.par===l.id&&(x.rev||x.par)===l.id&&x.segs&&x.segs.length&&x.stops.length>1);
+  const B=B0?dir(B0,B0.stops,pathOf(B0),t1):dir(l,l.stops.slice().reverse(),F.slice().reverse(),t1);
+  const w=deps(l,'w'),we=deps(l,'we');return {A,B,dep:{w,s:we,h:we}}}
+// the timetable of one direction (A: TAM, B: POWRÓT) with the hand edits: the departures of each kind of day, the minutes to the stops
+const TT_D=['w','s','h'];
+function ttOf(l,dk,a){const d=a[dk];if(!d)return null;const tt=((l.tt||{})[dk])||{},to=((l.tto||{})[dk]);
+  const dep={};TT_D.forEach(k=>dep[k]=Array.isArray(tt[k])?tt[k].slice():a.dep[k].slice());
+  const off=Array.isArray(to)&&to.length===d.st.length?to.slice():d.off.slice();return {...d,off,dep,own:TT_D.filter(k=>Array.isArray(tt[k])),ownOff:Array.isArray(to)&&to.length===d.st.length}}
+function ziExport(){try{
+  const P=FP(),lines=[];
+  S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>ttOf(l,dk,a)).filter(Boolean).map(({st,off,sh,dep})=>({st,off,sh,dep}));
+    lines.push({id:l.id,n:String(l.num||''),color:l.color||'#555',kind:lineMode(l),dirs:D})});
   const k=cityKey(),out={v:1,t:Date.now(),city:k,cityName:CITIES[k].n.replace(/\s*\(.*\)$/,''),lines};
   localStorage.setItem('gdn-zi',JSON.stringify(out));try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}
  }catch(e){try{dbg('Eksport do ZbiorkomInfo: '+(e&&e.message||e))}catch(x){}}}
@@ -303,7 +335,7 @@ const save=()=>{if(_svSz>1e6&&!HIST.rest){if(!_svT)_svT=setTimeout(saveNow,350);
 const PEND=new Map();
 function later(key,ms,fn){const o=PEND.get(key);if(o)clearTimeout(o.t);PEND.set(key,{fn,t:setTimeout(()=>{PEND.delete(key);fn()},ms)})}
 function flushLater(key){if(key===undefined){[...PEND.keys()].forEach(k=>flushLater(k));return}const o=PEND.get(key);if(o){clearTimeout(o.t);PEND.delete(key);o.fn()}}
-addEventListener('pagehide',()=>{flushLater();if(_svT)saveNow()});document.addEventListener('visibilitychange',()=>{if(document.hidden){flushLater();if(_svT)saveNow()}});
+addEventListener('pagehide',()=>{flushLater();if(_svT)saveNow();if(ACCP.t)accSaveNet(true)});document.addEventListener('visibilitychange',()=>{if(document.hidden){flushLater();if(_svT)saveNow();if(ACCP.t)accSaveNet(true)}else accStat()});
 let sayT=null;const say=t=>{const e=$('#status');e.textContent=t;e.style.opacity=t?1:0;clearTimeout(sayT);if(t)sayT=setTimeout(()=>{e.style.opacity=0},12000)};
 const ICON={closed:'<circle cx="12" cy="12" r="9"/><path d="M7 12h10"/>',twoway:'<path d="M4 8h15M15 4l4 4-4 4"/><path d="M20 16H5M9 12l-4 4 4 4"/>',magnet:'<path d="M5 3v9a7 7 0 0 0 14 0V3h-4.5v9a2.5 2.5 0 0 1-5 0V3z"/><path d="M5 7.5h4.5M14.5 7.5H19"/>',flag:'<path d="M5 21V4M5 4h12l-2 4 2 4H5"/>',branch:'<circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 7v10M18 10c0 4-6 3-12 7"/>',move:'<path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>',grip:'<circle cx="9" cy="6" r="1.3"/><circle cx="15" cy="6" r="1.3"/><circle cx="9" cy="12" r="1.3"/><circle cx="15" cy="12" r="1.3"/><circle cx="9" cy="18" r="1.3"/><circle cx="15" cy="18" r="1.3"/>',num:'<circle cx="12" cy="12" r="9"/><path d="M10 9.8 12.4 8v8"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',shapes:'<rect x="3" y="3" width="8" height="8" rx="1.5"/><circle cx="17" cy="7" r="4"/><path d="M3 21l4-8 4 8z"/>',eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',eyeoff:'<path d="M17.9 17.9A10.9 10.9 0 0 1 12 19C5 19 1 12 1 12a18.5 18.5 0 0 1 5.1-5.9M9.9 5.1A10.4 10.4 0 0 1 12 5c7 0 11 7 11 7a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>',up:'<path d="M12 19V5M5 12l7-7 7 7"/>',down:'<path d="M12 5v14M19 12l-7 7-7-7"/>',right:'<path d="M9 6l6 6-6 6"/>',plus:'<path d="M12 5v14M5 12h14"/>',x:'<path d="M18 6L6 18M6 6l12 12"/>',check:'<path d="M5 12l5 5L20 7"/>',undo:'<path d="M3 7v6h6M3 13a9 9 0 1 0 3-7"/>',download:'<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',upload:'<path d="M12 21V9M7 14l5-5 5 5M4 3h16"/>',pencil:'<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',target:'<circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',pin:'<path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>',pinplus:'<path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><path d="M12 7v6M9 10h6"/>',cursor:'<path d="M5 3l14 7-6 2-2 6L5 3z"/>',route:'<path d="M5 19c0-6 14-2 14-9"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="7" r="2"/>',listcheck:'<path d="M9 6h12M9 12h12M9 18h12M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/>',layers:'<path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/>',palette:'<path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2a4 4 0 0 0 4-4c0-5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16.5" cy="11" r="1"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/>',contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',tram:'<rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M9 21l2-4M15 21l-2-4M9 7h.01M15 7h.01"/>',bus:'<rect x="4" y="4" width="16" height="13" rx="2"/><path d="M4 11h16M7 20v-3M17 20v-3M8 14h.01M16 14h.01"/>',road:'<path d="M8 3L4 21M16 3l4 18M12 4v3M12 11v3M12 18v3"/>',tag:'<path d="M20 12l-8 8-9-9V3h8l9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/>',activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',type:'<path d="M4 7V4h16v3M9 20h6M12 4v16"/>',hash:'<path d="M5 9h14M5 15h14M10 3L8 21M16 3l-2 18"/>',refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/>',reset:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/>',sliders:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',dash:'<path d="M3 12h4M10 12h4M17 12h4"/>',ruler:'<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v4M10 8v3M14 8v4M18 8v3"/>'};
 const ic=(n,z=16)=>`<svg class="ic" width="${z}" height="${z}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICON[n]||''}</svg>`;
@@ -1183,7 +1215,7 @@ function lineCard(l){
  const setp=ui.set&&!l.par?`<div class="setg"><span class="lab">${ic('num',14)}Numer</span><input class="num2" maxlength="4" value="${esc(l.num)}"><span class="lab">${ic('palette',14)}Kolor</span><div class="cp"><div class="row"><button type="button" class="cps${ui.cp?' on':''}" title="Wybierz kolor (HSB)" style="--c:${l.color}"><i></i></button><input class="cpx" value="${l.color}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Kod koloru, np. #2456d6"></div><div class="cpp"${ui.cp?'':' hidden'}><div class="cpsb"><b></b></div><div class="cph"><b></b></div><div class="cpr"></div></div></div><span class="lab">${ic('sliders',14)}Grubość</span><div class="row"><input type="range" class="rw" min="2" max="14" value="${l.w||5}" style="flex:1"><b class="wv">${l.w||5}</b></div><span class="lab">${ic('dash',14)}Styl linii</span><div class="seg rs">${[['solid','',' ciągła'],['dashed','9 6','przerywana'],['dotted','0.1 7','kropkowana']].map(([v,d,t])=>`<button type="button" data-v="${v}" title="${t.trim()}"${(l.style||'solid')===v?' class="on"':''}><svg width="56" height="14" viewBox="0 0 56 14"><line x1="4" y1="7" x2="52" y2="7" stroke="currentColor" stroke-width="4" stroke-linecap="${v==='solid'?'butt':'round'}"${d?` stroke-dasharray="${d}"`:''}/></svg></button>`).join('')}</div><span class="lab">${ic('shapes',14)}Kształt numeru</span><div class="seg rsh">${[['square','0','kwadrat'],['round','12px','koło']].map(([v,r,t])=>`<button type="button" data-v="${v}" title="${t}"${(l.shape||'square')===v?' class="on"':''}><span class="badge" style="background:${l.color};color:${txt(l.color)};border-radius:${r}">${esc(l.num||'1')}</span></button>`).join('')}</div><span class="lab">${ic('tag',14)}Kategoria</span><select class="lc"><option value="">Bez kategorii</option>${S.cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}<option value="__new">+ Nowa kategoria…</option></select></div>`:'';
  const note=ui.note?`<textarea class="nt" rows="3" placeholder="Komentarz do linii…">${esc(l.note||'')}</textarea>`:'';
  c.innerHTML=`<div class="row"><div class="nb" style="background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}">${esc(l.num)}</div><div class="grow">${vtag}<div class="route">${route}</div><div class="meta">${vars.length?`<span>${vars.length} ${vars.length===1?'wariant':vars.length<5?'warianty':'wariantów'}</span><span>·</span>`:''}<span style="display:inline-flex;align-items:center;gap:4px">${ic('pin',13)}${l.stops.length} przyst.</span><span>·</span><span style="display:inline-flex;align-items:center;gap:4px">${ic('ruler',13)}${fmtKm(lineLen(l))}</span></div></div></div>
- <div class="tools">${l.par?'':`<button class="b ico flat dg" title="Przytrzymaj i przeciągnij, aby zmienić kolejność w kategorii" style="cursor:grab;touch-action:none">${ic('grip')}</button>`}<button class="b ico flat eye" title="Pokaż/ukryj linię na mapie">${ic(l.hidden?'eyeoff':'eye')}</button><button class="b ico flat vbt${ui.var&&selHere?' act':''}" title="${ui.var&&selHere?'Ukryj':'Pokaż'} przystanki i warianty linii (${l.stops.length} przyst.${vars.length?', '+vars.length+' war.':''})">${ic('branch')}</button>${l.par?'':`<button class="b ico flat gear${ui.set?' act':''}" title="Ustawienia linii (numer, kolor, styl, grubość, kształt)">${ic('gear')}</button>`}<button class="b ico flat nbt${ui.note||l.note?' act':''}" title="${l.note?esc(l.note.slice(0,120)):'Dodaj komentarz do linii'}">${ic('message')}</button><button class="b ico flat del" title="Usuń linię">${ic('trash')}</button></div>${setp}${note}${chips}${list}`;
+ <div class="tools">${l.par?'':`<button class="b ico flat dg" title="Przytrzymaj i przeciągnij, aby zmienić kolejność w kategorii" style="cursor:grab;touch-action:none">${ic('grip')}</button>`}<button class="b ico flat eye" title="Pokaż/ukryj linię na mapie">${ic(l.hidden?'eyeoff':'eye')}</button><button class="b ico flat vbt${ui.var&&selHere?' act':''}" title="${ui.var&&selHere?'Ukryj':'Pokaż'} przystanki i warianty linii (${l.stops.length} przyst.${vars.length?', '+vars.length+' war.':''})">${ic('branch')}</button>${l.par?'':`<button class="b ico flat gear${ui.set?' act':''}" title="Ustawienia linii (numer, kolor, styl, grubość, kształt)">${ic('gear')}</button>`}${l.par?'':`<button class="b ico flat ttb${l.tt||l.tto?' act':''}" title="Rozkład jazdy linii (odjazdy i czasy przejazdu)">${ic('clock')}</button>`}<button class="b ico flat nbt${ui.note||l.note?' act':''}" title="${l.note?esc(l.note.slice(0,120)):'Dodaj komentarz do linii'}">${ic('message')}</button><button class="b ico flat del" title="Usuń linię">${ic('trash')}</button></div>${setp}${note}${chips}${list}`;
  if(l.hidden)c.style.opacity=.55;
  c.onclick=()=>{if(!selHere)S.sel=l.id;renderLines();redraw()};
  const q=x=>c.querySelector(x);
@@ -1215,6 +1247,7 @@ function lineCard(l){
  q('.eye').onclick=e=>{e.stopPropagation();l.hidden=!l.hidden;save();renderLines();redraw()};
  if(!l.par)q('.gear').onclick=e=>{e.stopPropagation();ui.set=!ui.set;renderLines()};
  q('.nbt').onclick=e=>{e.stopPropagation();ui.note=!ui.note;renderLines()};
+ {const tb=c.querySelector('.ttb');if(tb)tb.onclick=e=>{e.stopPropagation();ttEdit(l)}}
  q('.vbt').onclick=e=>{e.stopPropagation();const open=ui.var&&selHere;ui.var=ui.lst=!open;if(!selHere){S.sel=l.id;renderLines();redraw()}else renderLines()};
  q('.del').onclick=async e=>{e.stopPropagation();const nv=l.par?0:S.lines.filter(x=>x.par===l.id).length;if(await askConfirm(l.par?'Usunąć ten wariant linii '+l.num+'?':'Usunąć linię '+l.num+(nv?' wraz z jej wariantami ('+nv+')':'')+'?',{title:l.par?'Usuń wariant':'Usuń linię',ok:'Usuń',danger:true})){S.lines=S.lines.filter(x=>x!==l&&x.par!==l.id);if(S.sel===l.id)S.sel=null;save();renderLines();redraw()}};
  if(ui.set){const num=q('.num2'),rw=q('.rw'),lc=q('.lc'),nb=q('.nb');
@@ -1756,6 +1789,41 @@ function modal(o){
   const f=bx.querySelector('[autofocus]')||mf.querySelector('.pri,.dng')||mf.lastElementChild;if(f)f.focus();
  })}
 const askConfirm=(msg,o={})=>modal({title:o.title||'Potwierdzenie',body:`<p style="margin:0;line-height:1.5">${esc(msg).replace(/\n/g,'<br>')}</p>`,btns:[{t:o.cancel||'Anuluj',v:false},{t:o.ok||'OK',v:true,c:o.danger?'dng':'pri'}],cancelV:false});
+// ---- the line's timetable, edited by hand: for each direction and kind of day the departures from the first stop (an hour per
+// row, its minutes), and the minutes from the first stop to each stop. Left as worked out (from the headways and the line's
+// hours, from the length and speed) until changed; "Przywróć wyliczone" goes back. ZbiorkomInfo's NM city shows it at once.
+Object.assign(ICON,{clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'});
+const TT_DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+function ttEdit(l){const P=FP(),a=ziAuto(l,P);if(!a){say('Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.');return}
+ const st={dk:'A',dy:'w'},b=document.createElement('div');b.className='ttEd';
+ const own=()=>((l.tt||{})[st.dk]||{})[st.dy],cur=()=>ttOf(l,st.dk,a);
+ const setDep=v=>{l.tt=l.tt||{};const D=l.tt[st.dk]=l.tt[st.dk]||{};if(v==null)delete D[st.dy];else D[st.dy]=[...new Set(v)].filter(x=>x>=0&&x<1440).sort((x,y)=>x-y);if(!Object.keys(D).length)delete l.tt[st.dk];if(!Object.keys(l.tt).length)delete l.tt;save();renderLines()};
+ const setOff=v=>{l.tto=l.tto||{};if(v==null)delete l.tto[st.dk];else l.tto[st.dk]=v;if(!Object.keys(l.tto).length)delete l.tto;save();renderLines()};
+ const draw=()=>{const T=cur(),dep=T.dep[st.dy],isOwn=!!own(),hrs=[...Array(24)].map((_,i)=>(i+3)%24);
+  const byH=h=>dep.filter(m=>Math.floor(m/60)===h).map(m=>String(m%60).padStart(2,'0')).join(' ');
+  const dn=x=>x.st.length?x.st[x.st.length-1].n:'';
+  b.innerHTML=`<div class="row wrap" style="gap:8px;margin-bottom:10px"><div class="seg ttDir">${['A','B'].filter(k=>a[k]).map(k=>`<button type="button" data-dk="${k}" class="${st.dk===k?'on':''}">→ ${esc(dn(a[k]))}</button>`).join('')}</div>
+    <div class="seg ttDay">${TT_D.map(k=>`<button type="button" data-dy="${k}" class="${st.dy===k?'on':''}">${TT_DN[k]}${((l.tt||{})[st.dk]||{})[k]?' •':''}</button>`).join('')}</div></div>
+   <div class="ttCols"><div class="ttDeps"><div class="sech"><i data-ic="clock"></i>Odjazdy z przystanku ${esc(T.st[0].n)}<span class="grow"></span><span class="small">${isOwn?'edytowane ręcznie':'wyliczone z częstotliwości'} · ${dep.length} kursów</span></div>
+     <div class="small" style="margin:0 0 6px">Wpisz minuty odjazdów w danej godzinie, oddzielone spacjami (np. „05 20 35 50”).</div>
+     <div class="ttGrid">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" class="${isOwn?'':'auto'}"></label>`).join('')}</div>
+     <div class="row wrap" style="gap:6px;margin-top:8px"><button type="button" class="b" data-t="copy">Kopiuj do pozostałych dni</button><button type="button" class="b" data-t="shift">Przesuń…</button>${isOwn?'<button type="button" class="b" data-t="auto">Przywróć wyliczone</button>':''}</div></div>
+    <div class="ttOff"><div class="sech"><i data-ic="route"></i>Czasy przejazdu<span class="grow"></span><span class="small">${T.ownOff?'edytowane ręcznie':'wyliczone'}</span></div>
+     <div class="ttStops">${T.st.map((q,i)=>`<label class="ttS"><span>${esc(q.n)}${q.num?' <span class="small">'+esc(q.num)+'</span>':''}</span><input type="number" min="0" max="600" data-o="${i}" value="${T.off[i]}"${i===0?' disabled':''} class="${T.ownOff?'':'auto'}"><span class="small">min</span></label>`).join('')}</div>
+     ${T.ownOff?'<div class="row" style="margin-top:8px"><button type="button" class="b" data-t="oauto">Przywróć wyliczone</button></div>':''}</div></div>`;
+  icons&&b.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic));
+  b.querySelectorAll('[data-dk]').forEach(x=>x.onclick=()=>{st.dk=x.dataset.dk;draw()});
+  b.querySelectorAll('[data-dy]').forEach(x=>x.onclick=()=>{st.dy=x.dataset.dy;draw()});
+  b.querySelectorAll('[data-h]').forEach(x=>x.onchange=()=>{const all=[];b.querySelectorAll('[data-h]').forEach(y=>{const h=+y.dataset.h;(y.value.match(/\d{1,2}/g)||[]).forEach(m=>{m=+m;if(m<60)all.push(h*60+m)})});setDep(all);draw()});
+  b.querySelectorAll('[data-o]').forEach(x=>x.onchange=()=>{const v=[...b.querySelectorAll('[data-o]')].map(y=>Math.max(0,Math.round(+y.value||0)));v[0]=0;for(let i=1;i<v.length;i++)if(v[i]<v[i-1])v[i]=v[i-1];setOff(v);draw()});
+  const t=k=>b.querySelector(`[data-t="${k}"]`);
+  if(t('auto'))t('auto').onclick=()=>{setDep(null);draw()};
+  if(t('oauto'))t('oauto').onclick=()=>{setOff(null);draw()};
+  t('copy').onclick=()=>{const v=cur().dep[st.dy];l.tt=l.tt||{};const D=l.tt[st.dk]=l.tt[st.dk]||{};TT_D.forEach(k=>D[k]=v.slice());save();renderLines();draw();say('Skopiowano odjazdy ('+TT_DN[st.dy]+') do pozostałych dni.')};
+  t('shift').onclick=async()=>{const v=await modal({title:'Przesuń odjazdy',body:'<label class="row" style="gap:8px">O ile minut (np. 5 lub -3): <input id="ttSh" type="number" value="0" style="width:80px" autofocus></label>',cancelV:null,btns:[{t:'Anuluj',v:null},{t:'Przesuń',c:'pri',v:()=>+document.getElementById('ttSh').value||0}]});
+   if(!v)return;setDep(cur().dep[st.dy].map(m=>m+v));draw()}};
+ draw();
+ modal({title:'Rozkład jazdy – linia '+l.num,body:b,wide:true,cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}]})}
 function askPrompt(msg,def,o={}){
  const w=document.createElement('div'),inp=document.createElement('input');inp.value=def||'';inp.setAttribute('autofocus','');inp.style.width='100%';
  w.innerHTML=`<div style="margin-bottom:8px">${esc(msg)}</div>`;w.appendChild(inp);
@@ -1824,6 +1892,15 @@ $('#fReconnect').onclick=async()=>{closeMenus();const h=FS.pend;if(!h)return;
   if(p!=='granted'){say('Brak zgody na zapis do pliku.');return}
   FS.h=h;FS.auto=true;FS.pend=null;if(await writeFile())say(`Autozapis wznowiony: „${h.name}”.`)}catch(e){say('Nie udało się połączyć z plikiem: '+(e.message||e))}};
 $('#fAuto').onchange=async e=>{FS.auto=e.target.checked;if(FS.auto)await writeFile();fsStat()};
+$('#fAccSave').onclick=()=>{closeMenus();accSaveNet(false)};
+$('#fAccAuto').onchange=e=>{ACCP.auto=e.target.checked;try{localStorage.setItem('gdn-acc-auto',ACCP.auto?'1':'0')}catch(x){}if(ACCP.auto)accSaveNet(true);accStat()};
+$('#fAccLoad').onclick=async()=>{closeMenus();const tok=accTok();if(!tok)return;let d;
+ try{const r=await fetch(ACCP.url,{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)throw new Error(r.status===404||r.status===405?'serwer nie obsługuje zapisu projektu – wdróż najnowszy worker.js':'HTTP '+r.status);d=await r.json()}
+ catch(e){say('Nie udało się wczytać projektu z konta: '+e.message+'.');return}
+ if(!d||!d.net){say('Na koncie nie ma jeszcze zapisanego projektu.');return}
+ if(!await askConfirm('Wczytać projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'? Zastąpi on bieżący projekt (można to cofnąć przyciskiem Cofnij).',{title:'Wczytaj z konta',ok:'Wczytaj'}))return;
+ NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();say('Wczytano projekt z konta.')};
+accStat();addEventListener('storage',e=>{if(e.key==='ztm.token')accStat()});
 $('#exp').onclick=()=>{closeMenus();dlFile('siec-gdansk.json',projectJSON());say('Pobrano kopię projektu (JSON).')};
 $('#imp').onclick=()=>{closeMenus();$('#file').click()};
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;

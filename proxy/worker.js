@@ -19,7 +19,7 @@
 //    random token instead of a password; the page keeps it on the device. Only the token's SHA-256 is stored, so the
 //    store holds nothing that lets anyone in. Kept in a KV namespace bound as KONTA:
 //      t:<sha256 of token> → account id     u:<id> → {id, name, role, created}     d:<id> → the account's data (JSON)
-//    GET /konto → {id, name, role}; GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
+//    GET /konto → {id, name, role, emp, grant, mk}; GET /konto/tm, PUT /konto/tm – the TransitMaker project (at most 20 MB); GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); GET /admin/konta/<id>/token → the token in use
@@ -166,7 +166,9 @@ async function konta(req, env, cors) {
   if (p === '/konto/konfig' && req.method === 'GET') { const c = (await env.KONTA.get('cfg:mk', 'json')) || {}; return J({ comp: c.comp || null, ok: c.ok || [] }); }
   if (!u) return J({ error: 'unauthorized' }, 401);
   // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
-  if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role, mk: await env.KONTA.get('cfg:mk', 'json') });
+  // the account: its service number, and the sections or options given to it alone (ucomp; the whole list only for an administrator)
+  if (p === '/konto' && req.method === 'GET') { const mk = (await env.KONTA.get('cfg:mk', 'json')) || null, grant = mk && mk.ucomp && Array.isArray(mk.ucomp[u.id]) ? mk.ucomp[u.id] : [];
+    if (mk && u.role !== 'admin') delete mk.ucomp; return J({ id: u.id, name: u.name, role: u.role, emp: u.emp || null, grant, mk }); }
   // the administrator's messages: those for this account, newest first; fetching marks them delivered, opening read
   // ("every driver": the administrators too, who can use the drivers' mode)
   const forMe = x => x.to === '*' ? u.role === 'driver' || u.role === 'admin' : Array.isArray(x.to) && x.to.includes(u.id);
@@ -193,6 +195,15 @@ async function konta(req, env, cors) {
     if (b.s === 'off') { await env.KONTA.delete('st:' + u.id); return J({ ok: true }); }
     b.at = new Date().toISOString(); b.s = b.s === 'run' ? 'run' : 'break';
     await env.KONTA.put('st:' + u.id, JSON.stringify(b), { expirationTtl: 6 * 3600 }); return J({ ok: true });
+  }
+  // TransitMaker: the account's project (the whole network, saved from its File menu), apart from the small account data
+  if (p === '/konto/tm') {
+    if (req.method === 'GET') return new Response((await env.KONTA.get('tm:' + u.id)) || '{}', { headers: h });
+    if (req.method === 'PUT') {
+      const t = await req.text(); if (t.length > 20000000) return J({ error: 'too large' }, 413);
+      try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || !o.net || typeof o.net !== 'object') throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
+      await env.KONTA.put('tm:' + u.id, t); return J({ ok: true });
+    }
   }
   if (p === '/konto/dane') {
     if (req.method === 'GET') return new Response((await env.KONTA.get('d:' + u.id)) || '{}', { headers: h });
@@ -223,6 +234,8 @@ async function konta(req, env, cors) {
       // approved proposals (ids of the proposals from data/propozycje.json, with what was approved): applied for everyone
       if ('ok' in b) c.ok = (Array.isArray(b.ok) ? b.ok : []).filter(x => x && typeof x === 'object' && typeof x.id === 'string' && x.id.length <= 80).slice(0, 300)
         .map(x => ({ id: x.id, at: typeof x.at === 'string' ? x.at.slice(0, 30) : new Date().toISOString(), d: x.d && typeof x.d === 'object' && JSON.stringify(x.d).length <= 4000 ? x.d : null }));
+      // sections or options given to single accounts, whatever their group: {account id: [keys]}
+      if ('ucomp' in b) { const o = {}; if (b.ucomp && typeof b.ucomp === 'object') for (const [id, L] of Object.entries(b.ucomp).slice(0, 300)) { if (!/^[A-Za-z0-9_-]{4,40}$/.test(id) || !Array.isArray(L)) continue; const k = L.map(String).filter(x => /^[a-zA-Z.]{2,24}$/.test(x)).slice(0, 60); if (k.length) o[id] = k; } c.ucomp = o; }
       if ('no' in b) c.no = (Array.isArray(b.no) ? b.no : []).map(String).filter(x => x.length <= 80).slice(0, 500);
       await env.KONTA.put('cfg:mk', JSON.stringify(c)); return J(c);
     }
