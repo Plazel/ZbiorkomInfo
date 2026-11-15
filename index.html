@@ -938,7 +938,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 .chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
 html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
-html.flat header.top .themebar{gap:2px!important}html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
+html.flat #gsBtn{border-color:var(--line)!important}html.flat header.top .themebar{gap:2px!important}   /* (the search box keeps its frame round the button too) */html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
 html.flat button.plus:hover,html.flat .crumb:hover,html.flat .btn:hover,html.flat .ibtn:hover,html.flat .moreMenu button:hover,html.flat #topMoreMenu .plus:hover{background:var(--hover,rgba(127,127,127,.12))!important;color:var(--fg)!important}html.flat button.plus:hover svg,html.flat .moreMenu button:hover svg,html.flat .btn:hover svg,html.flat .ibtn:hover svg{color:var(--fg)!important;opacity:1!important}   /* (the icon stays dark on the light background of the pointer) */
 html.flat .seg>button[aria-pressed=true],html.flat .seg>button.on{border-color:transparent!important}
 .gdSip.gn{--rh:calc(var(--gs)*1.95);background:var(--bR);border:1px solid var(--sL);gap:0;font-size:var(--gs)}
@@ -1771,7 +1771,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794732176;
+const APP_BUILD=1794732263;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5574,11 +5574,15 @@ function alertPara(x,pi,sg,src,srcLang){src=src==null?x:src;
       const li=items.map(it=>{const nm=esc(it.n),known=AL_STOPRE&&AL_STOPRE.set.has(alNorm(it.n));
         const nmH=known?`<a class="aStop" href="#s${encodeURIComponent(it.n)}${it.p.length===1?'|'+it.p[0]:''}">${nm}</a>`:nm;return `<li><b>${nmH}</b>${it.p.length?' <span class="aPole">'+it.p.map(esc).join(', ')+'</span>':''}</li>`}).join('');
       const lead=LANG===srcLang?m[1]:(MT.memo.get(srcLang+'>'+LANG+'|'+m[1])||m[1]);return `<p>${sg(lead)}:</p><ul class="aStops">${li}</ul>`}}
+  // (a heading of a part: "Linia 132", "Linie 189, 289" – only the lines, in bold)
+  if(/^(?:Linia|Linie|Linii|Line|Lines|Linie|Linka|Linky)\s+[\p{L}\d]{1,5}(?:\s*(?:,|i|oraz|und|a|and)\s*[\p{L}\d]{1,5})*\s*:?$/u.test(alNorm(x)))return `<p class="aSub"><strong>${alertLinkStops(sg(x))}</strong></p>`;
   let lead='',rest=x;if(pi===0){for(let i=0;i<x.length;i++){if(!'.!?'.includes(x[i]))continue;if(i<15)continue;if(x[i]==='.'&&AL_ABBR.test(x.slice(0,i+1)))continue;
       if(i+1<x.length&&!/\s/.test(x[i+1]))continue;lead=x.slice(0,i+1);rest=x.slice(i+1);break}if(!lead&&x.length<220){lead=x;rest=''}}
   return `<p>${lead?`<strong class="aLead">${alertLinkStops(sg(lead))}</strong>`:''}${alertLinkStops(sg(rest))}</p>`}
 function alertParas(a,sg){const srcLang=a.de!=null?'de':(a.lang||'pl'),srcT=a.de!=null?a.de:(a.o0?a.o0.text:a.text),srcH=a.de!=null?(a.deTitle||''):(a.o0?a.o0.title:a.title);
-  const S=String(srcT||'').split('\n').map(alNorm),T=String(a.text||'').split('\n').map(alNorm);const al=S.length===T.length;
+  // (a bullet alone on its line: joined to the text of the next one)
+  const bul=L=>{const o=[];L.forEach(x=>{if(o.length&&/^[•·▪-]$/.test(o[o.length-1]))o[o.length-1]='• '+x;else o.push(x)});return o};
+  const S=bul(String(srcT||'').split('\n').map(alNorm).filter((x,i,A)=>x||!/^[•·▪-]$/.test(A[i-1]||''))),T=bul(String(a.text||'').split('\n').map(alNorm).filter((x,i,A)=>x||!/^[•·▪-]$/.test(A[i-1]||'')));const al=S.length===T.length;
   const out=[];let pi=0;const skip0=S.length&&alNorm(S[0]).toLowerCase()===alNorm(srcH).toLowerCase();
   (al?S:T).forEach((line,k)=>{if(k===0&&(al?skip0:alNorm(T[0]).toLowerCase()===alNorm(a.title).toLowerCase()))return;const shown=al?T[k]:line;if(!shown)return;
     out.push(alertPara(shown,pi++,sg,al?line:shown,al?srcLang:LANG))});return out.length?`<div class="aTxt">${out.join('')}</div>`:''}
