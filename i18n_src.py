@@ -807,6 +807,9 @@ ROWS = [
     ('Anuluj', 'Cancel', 'Abbrechen', 'Zrušiť', 'Zrušit'),
     ('TransitMaker', 'TransitMaker', 'TransitMaker', 'TransitMaker', 'TransitMaker'),
     ('Zaznaczone uprawnienia mają wszyscy kierowcy. Administrator ma zawsze dostęp do wszystkiego.', 'All drivers have the selected permissions. The administrator always has access to everything.', 'Alle Fahrer haben die ausgewählten Berechtigungen. Der Administrator hat immer Zugriff auf alles.', 'Označené oprávnenia majú všetci vodiči. Administrátor má vždy prístup ku všetkému.', 'Označená oprávnění mají všichni řidiči. Administrátor má vždy přístup ke všemu.'),
+    ('Za długi tekst', 'Text too long', 'Zu langer Text', 'Príliš dlhý text', 'Příliš dlouhý text'),
+    ('Zmniejsz', 'Shrink', 'Verkleinern', 'Zmenšiť', 'Zmenšit'),
+    ('Przewijaj', 'Scroll', 'Laufschrift', 'Posúvať', 'Posouvat'),
 ]
 
 WEEKDAYS = {
