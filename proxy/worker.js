@@ -24,7 +24,8 @@
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); GET /admin/konta/<id>/token → the token in use
 //        (kept encrypted with ADMIN_TOKEN; null for accounts made earlier); DELETE /admin/konta/<id> → the account removed.
-//      PUT /admin/ustawienia {voice, lang, gong, en, msgs, l2, perm} → mKomputer's settings for every driver (null: the driver's
+//      GET /konto/konfig (anyone) → {comp, ok}: the components each role may use, the approved proposals.
+//      PUT /admin/ustawienia {voice, lang, gong, en, msgs, l2, perm, comp, ok, no} → mKomputer's settings for every driver (null: the driver's
 //        own choice; en: stations, the ferry terminal and the airport also named in English; msgs: the special announcements,
 //        each [pl, en, de, sk, cs]; l2: their second language; perm: what the drivers may do {ann, spec, mic, free});
 //      POST /konto/status (mKomputer: on a trip / a break / off) · GET /admin/statusy (the administrator's table)
@@ -161,6 +162,9 @@ async function konta(req, env, cors) {
   const J = (o, st) => new Response(JSON.stringify(o), { status: st || 200, headers: h });
   if (!env.KONTA) return J({ error: 'accounts not set up' }, 503);
   const p = new URL(req.url).pathname.replace(/\/+$/, ''), u = await who(req, env);
+  // the settings every visitor's page needs, logged in or not: which sections and options each role gets (comp), and the
+  // proposals the administrator approved (ok: e.g. the transfer to replacement lines shown in a line's timetable)
+  if (p === '/konto/konfig' && req.method === 'GET') { const c = (await env.KONTA.get('cfg:mk', 'json')) || {}; return J({ comp: c.comp || null, ok: c.ok || [] }); }
   if (!u) return J({ error: 'unauthorized' }, 401);
   // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
   if (p === '/konto' && req.method === 'GET') return J({ id: u.id, name: u.name, role: u.role, mk: await env.KONTA.get('cfg:mk', 'json') });
@@ -226,6 +230,12 @@ async function konta(req, env, cors) {
       if ('l2' in b) c.l2 = ['pl', 'en', 'de', 'sk', 'cs'].includes(b.l2) ? b.l2 : null;
       // what the drivers may do: change the announcements' settings, use the special announcements, the microphone, trips without a duty
       if ('perm' in b && b.perm && typeof b.perm === 'object') { c.perm = c.perm || {}; for (const k of ['ann', 'spec', 'mic', 'free']) if (k in b.perm) c.perm[k] = b.perm[k] !== false; }
+      // the components each role may use: {guest|user|driver: [the switched-off sections and options]}
+      if ('comp' in b) { const o = {}; if (b.comp && typeof b.comp === 'object') for (const r of ['guest', 'user', 'driver']) o[r] = (Array.isArray(b.comp[r]) ? b.comp[r] : []).map(String).filter(k => /^[a-zA-Z.]{2,24}$/.test(k)).slice(0, 60); c.comp = o; }
+      // approved proposals (ids of the proposals from data/propozycje.json, with what was approved): applied for everyone
+      if ('ok' in b) c.ok = (Array.isArray(b.ok) ? b.ok : []).filter(x => x && typeof x === 'object' && typeof x.id === 'string' && x.id.length <= 80).slice(0, 300)
+        .map(x => ({ id: x.id, at: typeof x.at === 'string' ? x.at.slice(0, 30) : new Date().toISOString(), d: x.d && typeof x.d === 'object' && JSON.stringify(x.d).length <= 4000 ? x.d : null }));
+      if ('no' in b) c.no = (Array.isArray(b.no) ? b.no : []).map(String).filter(x => x.length <= 80).slice(0, 500);
       await env.KONTA.put('cfg:mk', JSON.stringify(c)); return J(c);
     }
     if (p === '/admin/komunikaty' && req.method === 'GET') return J((await env.KONTA.get('msg:list', 'json')) || []);
