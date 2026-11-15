@@ -783,6 +783,7 @@ ROWS = [
     ('Brak propozycji do zatwierdzenia.', 'No proposals to approve.', 'Keine Vorschläge zur Freigabe.', 'Žiadne návrhy na schválenie.', 'Žádné návrhy ke schválení.'),
     ('Przesiadka na linie', 'Change to lines', 'Umstieg zu den Linien', 'Prestup na linky', 'Přestup na linky'),
     ('w kierunku:', 'towards:', 'Richtung:', 'v smere:', 've směru:'),
+    ("Pokaż moją aktualną lokalizację", "Show my current location", "Meinen aktuellen Standort zeigen", "Ukázať moju aktuálnu polohu", "Ukázat mou aktuální polohu"),
 ]
 
 WEEKDAYS = {
