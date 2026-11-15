@@ -361,7 +361,7 @@ let STOPMSG=''; // podsumowanie ostatniego importu po zmianie obszaru (wyświetl
 // Klasy 2 i 3 są dodawane tylko wtedy, gdy w pobliżu nie ma już przystanku (ten sam przystanek bywa opisany podwójnie).
 const stopQuery=B=>{const u=[`node["highway"="bus_stop"](${B})`,`node["railway"="tram_stop"](${B})`,`node["railway"~"^(station|halt)$"]["station"!="subway"](${B})`,`way["railway"~"^(station|halt)$"]["station"!="subway"](${B})`];
  ['bus','trolleybus','tram'].forEach(k=>u.push(`node["public_transport"="platform"]["${k}"="yes"](${B})`,`way["public_transport"="platform"]["${k}"="yes"](${B})`,`way["highway"="platform"]["${k}"="yes"](${B})`));
- ['bus','trolleybus'].forEach(k=>u.push(`node["public_transport"="stop_position"]["${k}"="yes"]["name"](${B})`));
+ ['bus','trolleybus','tram'].forEach(k=>u.push(`node["public_transport"="stop_position"]["${k}"="yes"]["name"](${B})`));
  return `[out:json][timeout:90];(${u.join(';')};);out body center;`};
 const stopClass=e=>{const t=e.tags||{};if(t.public_transport==='stop_position')return 3;
  return e.type==='node'&&(t.highway==='bus_stop'||t.railway==='tram_stop'||(/^(station|halt)$/.test(t.railway||'')&&t.station!=='subway'))?1:2};
@@ -373,6 +373,7 @@ function stopFromOsm(e,c){
 const STOPBB_OLD={gdansk:'54.27,18.43,54.46,18.85',trojmiasto:'54.27,18.40,54.58,18.85'}; // obszar z wcześniejszych wersji (kończył się na 18,85°E – bez wschodniej części Wyspy Sobieszewskiej)
 // starsze projekty: dobieramy przystanki tylko z dołączonego pasa na wschodzie (nic nie nadpisujemy, pomijamy ręcznie usunięte); znacznik S.stopBB zapisuje, jaki obszar już zaimportowano
 function stopsTopUp(){
+ if(S.stops.some(x=>x.name==='(bez nazwy)')&&!stopsTopUp.ran){stopsTopUp.ran=1;loadStops({auto:true,quiet:true}).then(()=>{renderLines();redraw()})}
  const k=cityKey(),old=STOPBB_OLD[k];if(!old||!S.stops.length||S.stopBB===bb())return null;
  const o=(S.stopBB||old).split(',').map(Number),n=bb().split(',').map(Number);
  if(!(n[3]>o[3])){S.stopBB=bb();return null}
@@ -386,10 +387,17 @@ async function loadStops(o){
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
   const addCov=(ll,name)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name)})};
   const covered=(ll,name)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;for(const q of c){const d=mdist(q.ll,ll);if(d<25||(d<60&&n0&&q.n===n0))return true}}return false};
+  // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
+  // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
+  const NOM=new Map();(j.elements||[]).forEach(e=>{const t=e.tags||{};if(!t.name)return;const ll=e.type==='node'?[e.lat,e.lon]:(e.center?[e.center.lat,e.center.lon]:null);if(!ll)return;
+   const k=Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800);(NOM.get(k)||NOM.set(k,[]).get(k)).push({ll,name:t.name,ref:/^\d{2}$/.test(t.local_ref||'')?t.local_ref:'',tram:t.tram==='yes'||t.railway==='tram_stop'})});
+  const nameNear=(ll,tram)=>{const a=Math.floor(ll[0]*1800),b=Math.floor(ll[1]*1800);let best=null,bd=1e9;for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++)for(const q of NOM.get((a+i)+','+(b+k))||[]){const d=mdist(q.ll,ll)-(tram&&q.tram?15:0);if(d<bd&&mdist(q.ll,ll)<60){bd=d;best=q}}return best};
+  const nameFix=st=>{if(st.name!=='(bez nazwy)')return false;const q=nameNear(st.ll,st.tram);if(!q)return false;st.name=q.name;const mm=q.name.match(NUMRE);st.num=mm?mm[2]:(q.ref||st.num||'');if(st.num&&!mm&&q.ref)st.name=q.name+' '+q.ref;return true};
+  let fixed=0;S.stops.forEach(s=>{if(nameFix(s))fixed++});if(fixed)dbg('Uzupełniono nazwy przystanków bez nazwy: '+fixed);
   S.stops.forEach(s=>addCov(s.ll,s.name));
   const cnt=[0,0,0,0];let skD=0,skM=0;
   (j.elements||[]).filter(e=>e.tags).map(e=>({e,c:stopClass(e)})).sort((a,b)=>a.c-b.c).forEach(({e,c})=>{
-   const st=stopFromOsm(e,c);if(!st)return;const old=have.get(st.id);
+   const st=stopFromOsm(e,c);if(!st)return;nameFix(st);const old=have.get(st.id);
    if(old){ // już w projekcie: nie nadpisujemy; liczymy te, które użytkownik zmienił (nazwa, położenie, rodzaj)
     if(old.name!==st.name||mdist(old.ll,st.ll)>1||!!old.tram!==!!st.tram||!!old.rail!==!!st.rail||!!old.bus!==!!st.bus)skM++;return}
    if(gone.has(st.id)){skD++;addCov(st.ll,st.name);return}
@@ -406,6 +414,7 @@ async function loadStops(o){
   if(strip){if(n){const ms=`Obszar miasta rozszerzono na wschód (m.in. Wyspa Sobieszewska): dodano ${n} przystanków z OSM (łącznie ${S.stops.length}).`+alt;say(ms);
     // komunikat o torowiskach (ładowanych równolegle) nie może go zagłuszyć
     Promise.resolve(typeof tramReady!=='undefined'?tramReady:null).catch(()=>0).then(()=>{const t=$('#status').textContent;say(/^Torowiska wczytane/.test(t)?ms+' '+t:ms)})}return}
+  if(quiet){if(fixed)say('Uzupełniono nazwy '+fixed+' przystanków (nazwy z peronów w OSM).');return}
   if(auto)STOPMSG=msg;say(msg)
  }catch(e){if(quiet){dbg('Przystanki z rozszerzonego obszaru: '+e.message+' – ponowię przy następnym uruchomieniu');return}say('Błąd pobierania przystanków: '+e.message+(auto?' Spróbuj ponownie przyciskiem „Pobierz z OSM” w zakładce Przystanki.':''))}}
 let OSMW=null,GS=null,CID=1e12,OSMR=null,RG=null,railReady=null;
