@@ -934,10 +934,12 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 /* TransitMaker: the frame over the whole section */
 #toolsDr:has(#tdTm:not([hidden])){padding:0!important;overflow:hidden}#tdTm{padding:0!important;margin:0!important;max-width:none!important;height:100%}#tdTm iframe{display:block;width:100%;height:calc(100dvh - var(--top-h,58px));border:0}
 @media (max-width:760px){#tdTm iframe{height:calc(100dvh - var(--top-h,54px) - 64px)}}
+/* the lines' signs: always Roboto Condensed SemiBold, whatever the text around them (a bold heading or plain text) */
+.chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
 html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
 html.flat header.top .themebar{gap:2px!important}html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
-html.flat button.plus:hover,html.flat .crumb:hover,html.flat .btn:hover,html.flat .ibtn:hover{background:var(--hover,rgba(127,127,127,.12))!important}
+html.flat button.plus:hover,html.flat .crumb:hover,html.flat .btn:hover,html.flat .ibtn:hover,html.flat .moreMenu button:hover,html.flat #topMoreMenu .plus:hover{background:var(--hover,rgba(127,127,127,.12))!important;color:var(--fg)!important}html.flat button.plus:hover svg,html.flat .moreMenu button:hover svg,html.flat .btn:hover svg,html.flat .ibtn:hover svg{color:var(--fg)!important;opacity:1!important}   /* (the icon stays dark on the light background of the pointer) */
 html.flat .seg>button[aria-pressed=true],html.flat .seg>button.on{border-color:transparent!important}
 .gdSip.gn{--rh:calc(var(--gs)*1.95);background:var(--bR);border:1px solid var(--sL);gap:0;font-size:var(--gs)}
 /* mSIP on trial: no frame, from one edge of the page to the other; the arrow back in the top bar; no own-position button */
@@ -1154,7 +1156,7 @@ header.top .themebar .setWrap{display:inline-flex;align-items:center}
 header.top #cityBtn{height:38px;box-sizing:border-box}
 /* the city's name next to the logo, without a frame: the two read as one name ("ZbiorkomInfo Trójmiasto ⌄") */
 header.top .logo+.cityPick{margin-left:-6px}
-header.top #cityBtn{border:0!important;background:none!important;box-shadow:none!important;border-radius:6px;padding:0 6px;gap:6px;font-family:var(--font-head,inherit);font-size:1.45rem;font-weight:800;letter-spacing:-.02em;line-height:1;color:var(--fg)}header.top #cityName{font:inherit;letter-spacing:inherit}
+header.top #cityBtn{border:0!important;background:none!important;box-shadow:none!important;border-radius:6px;padding:0 6px;gap:6px;font-family:Roboto,var(--font-body),sans-serif;font-size:1.45rem;font-weight:400;letter-spacing:-.01em;line-height:1.3;color:var(--fg)}header.top #cityName{font:inherit;letter-spacing:inherit;line-height:1.3;padding-bottom:.08em;overflow:visible}   /* (Roboto, regular; room for the g, y, j under the line) */
 header.top #cityBtn>svg:last-child{width:18px;height:18px;opacity:.6;transition:transform .15s}
 header.top #cityBtn[aria-expanded="true"]>svg:last-child{transform:rotate(180deg)}
 header.top #cityBtn:hover #cityName{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
@@ -1769,7 +1771,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794732116;
+const APP_BUILD=1794732176;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
