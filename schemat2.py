@@ -473,6 +473,43 @@ def along(poly, n):
     return out
 
 
+def even_out(nodes, cors, G, lmin, iters=2500, log=print):
+    """the junctions moved from their real places just so far that the stops come out evenly spaced, as on ZTM's diagram:
+    a dense centre (Wrzeszcz, Brama Wyżynna) and a tight loop (Nowy Port) open up, long thin runs shrink; each run keeps
+    its real direction and the whole its real shape. Gradient descent on: run lengths against their stop counts, run
+    directions against the real ones, the real places (weakly), and junctions kept apart from runs they are not on"""
+    idx = {n: i for i, n in enumerate(nodes)}; X0 = np.array([G[n] for n in nodes], float)
+    A = np.array([idx[c['ch'][0]] for c in cors]); B = np.array([idx[c['ch'][-1]] for c in cors])
+    L = np.array([lmin(c) for c in cors], float)
+    D0 = X0[B] - X0[A]; U0 = D0 / np.maximum(np.hypot(D0[:, 0], D0[:, 1]), 1e-9)[:, None]
+    # the real map scaled to the stop spacing the runs ask for
+    sc = float(np.median(L / np.maximum(np.hypot(D0[:, 0], D0[:, 1]), 1e-6)))
+    X = X0 * sc; G0 = X.copy()
+    adj = set(); [adj.update({(a, b), (b, a)}) for a, b in zip(A, B)]
+    m = np.zeros_like(X); v = np.zeros_like(X); lr = 0.05
+    for it in range(iters):
+        g = np.zeros_like(X); d = X[B] - X[A]; ln = np.maximum(np.hypot(d[:, 0], d[:, 1]), 1e-9); u = d / ln[:, None]
+        # lengths
+        f = ((ln - L) / L ** 2)[:, None] * u * 2.0
+        np.add.at(g, B, f); np.add.at(g, A, -f)
+        # directions (the run along its real bearing)
+        e = (u - U0); J = (e - (e * u).sum(1)[:, None] * u) / ln[:, None] * 3.0
+        np.add.at(g, B, J); np.add.at(g, A, -J)
+        # the real places, weakly
+        g += 0.02 * (X - G0)
+        # junctions apart (at least 2.2 stop spacings) unless joined by a run
+        if it % 5 == 0:
+            dd = X[:, None, :] - X[None, :, :]; r = np.hypot(dd[..., 0], dd[..., 1]) + np.eye(len(X)) * 99
+            close = (r < 2.2)
+            for i, j in zip(*np.nonzero(close)):
+                if i < j and (i, j) not in adj:
+                    w = (2.2 - r[i, j]) * 2.0 * dd[i, j] / r[i, j]; g[i] -= w; g[j] += w
+        m = 0.9 * m + 0.1 * g; v = 0.999 * v + 0.001 * g * g
+        X -= lr * (m / (1 - 0.9 ** (it + 1))) / (np.sqrt(v / (1 - 0.999 ** (it + 1))) + 1e-8)
+        if it == iters // 2: lr = 0.02
+    return {n: X[idx[n]] for n in nodes}
+
+
 OCT = [(math.cos(k * math.pi / 4), math.sin(k * math.pi / 4)) for k in range(8)]
 
 
@@ -578,7 +615,7 @@ def rail_layout(st, rail, S, cors, P, link=0.95, step=1.15, log=print):
     return R, pieces, sorted(pair.items())
 
 
-def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0.9), time_limit=120, max_nodes=160, bg=True, log=print):
+def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(8.0, 1.0), time_limit=120, max_nodes=160, bg=True, log=print, geo=1.6):
     """the diagram of the picked lines: {'n': [[x, y, name(, cuts)]], 'e': [[from, to, [x1, y1, …], strokes(, grey, night)]],
     'x': [[station, stop]] interchanges, 'bg': the landscape}. The trams, trolleybuses and buses laid out by the programme
     (octilinear, few bends, the centre drawn larger); the railway put in beside them, its stations next to the stops they are
@@ -600,7 +637,8 @@ def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0
     cx = np.array(G[max(nodes, key=lambda n: (deg[n], n))])
     def lmin(c):
         n = len(c['ch']) - 1; w = SP * len(c['lines'])
-        L = max(n * 1.0, 1.0 + 0.9 * w, 1.6 if n == 1 else 0)
+        L = max(n * 1.0, 1.2 + 1.2 * w, 2.0 if n == 1 else 0)
+        if c.get('oneway'): L = max(L, 2.6)   # (a street loop, one way round: drawn as a ring with room inside, as on ZTM's diagram)
         if centre:
             mid = (np.array(ST[c['ch'][0]]) + np.array(ST[c['ch'][-1]])) / 2
             L *= 1 + centre[1] * max(0.0, 1 - float(np.hypot(*(mid - cx))) / centre[0])
@@ -617,15 +655,27 @@ def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0
         for ns in comp.values():
             a = max(ns, key=lambda n: (G[n][0] + G[n][1], n)); b = max(ns, key=lambda n: (math.hypot(G[n][0] - G[a][0], G[n][1] - G[a][1]), n))
             anchors += [a] + ([b] if b != a else [])
-    P = solve(nodes, cors, G, ST, w_bend=4.0, w_dir=5.0, w_diag=0.35, w_geo=0.5 if anchors else 0.0, anchors=anchors, lmin_of=lmin, time_limit=time_limit, log=log)
+    # as ZTM's own diagram: every junction at its real place, each run between two of them drawn in the eight directions
+    # (straight, or one straight piece and one at 45°, the bend on the side the street really goes), its stops evenly along
+    # it – the streets keep their shapes: Grunwaldzka a diagonal, Hallera straight up, the loop in Nowy Port a ring where it is
+    P = even_out(nodes, cors, G, lmin, log=log)
+    # (the stops' real places on the same scale, for the side a bend goes)
+    sc = np.median([float(np.hypot(*(P[c['ch'][-1]] - P[c['ch'][0]]))) / max(1e-6, math.hypot(G[c['ch'][-1]][0] - G[c['ch'][0]][0], G[c['ch'][-1]][1] - G[c['ch'][0]][1])) for c in cors])
     at = prepare(nodes, cors, P)
     rank = {l: i for i, l in enumerate(sorted({l for c in cors for l in c['lines']}, key=lambda x: (len(x), x)))}
     order_lines(cors, at, P, rank)
     S = {}
     pieces = []
     for c in cors:
-        for n, p in zip(c['ch'], c['sp']): S.setdefault(n, p)
-        for a, b in zip(c['ch'], c['ch'][1:]): pieces.append((a, b, [S[a], S[b]], c['ord']))
+        a, b = c['ch'][0], c['ch'][-1]; n = len(c['ch']) - 1
+        ga = np.array(G[a], float)
+        mids = [P[a] + (np.array(ST[x], float) - ga) * sc for x in c['ch'][1:-1]]
+        poly = [np.array(q, float) for q in octi_path(P[a], P[b], mids)]
+        segs = along(poly, n) if n > 1 else [poly]
+        for k, (x, y) in enumerate(zip(c['ch'], c['ch'][1:])):
+            S.setdefault(x, segs[k][0]); S.setdefault(y, segs[k][-1])
+            pieces.append((x, y, segs[k], c['ord']))
+        c['sp'] = [segs[0][0]] + [sg[-1] for sg in segs]
     pairs = []; pair_set = set()
     if rail:
         R, rp, pairs = rail_layout(st, rail, {n: np.array(p, float) for n, p in S.items()}, cors, P, log=log)

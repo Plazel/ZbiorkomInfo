@@ -937,6 +937,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 /* the lines' signs: always Roboto Condensed SemiBold, whatever the text around them (a bold heading or plain text) */
 .chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
 .aTxt p.aSub strong{font-weight:700}
+.slist li.noDep button,tr.noDep button.sb{cursor:default;pointer-events:none}.slist li.noDep button:disabled,tr.noDep button.sb:disabled{color:inherit;opacity:1}.slist li.noDep button:hover,tr.noDep button.sb:hover{background:none}
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
 html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
 html.flat #gsBtn{border-color:var(--line)!important}html.flat header.top .themebar{gap:2px!important}   /* (the search box keeps its frame round the button too) */html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
@@ -1772,7 +1773,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794733656;
+const APP_BUILD=1794734734;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2185,7 +2186,8 @@ async function renderLine(id){
       const st=IDX.stops[s[0]];const li=document.createElement('li');
       if(ends.has(si))li.className='end';if(s[1])li.className='var';
       li.innerHTML=`<button type="button"><span class="nm">${esc(st[0])}</span><span class="num">${stopNum(st)}</span>${s[2]?HAND:''}</button>`;   // (no "only some runs" label: the variant's stop is greyed)
-      li.querySelector('button').onclick=()=>{location.hash='#t'+id+'-'+di+'-'+si};
+      // (the line's last stop: no departures from there – not a link)
+      if(si===mainPat[mainPat.length-1]){li.querySelector('button').disabled=true;li.classList.add('noDep')}else li.querySelector('button').onclick=()=>{location.hash='#t'+id+'-'+di+'-'+si};
       ul.appendChild(li);
       // (a line cut in two – S2 changing trains at Gdańsk Osowa, a tram parted by building works –: the break after the
       // last stop of its first part)
@@ -2304,7 +2306,7 @@ async function renderStop(id,di,si){
       const end=T?(k===0||k===rows.length-1):ends.has(i);
       tr.className='r'+(i===si?' cur':'')+(end?' end':'')+(s[1]?' var':'')+(k===0||k===rows.length-1?' fl':'');
       tr.innerHTML=`<td colspan="2"><button class="sb" type="button"><span class="m">${m}</span><span class="d"></span><span class="n">${esc(S[0])}${s[2]?' '+HAND:''}</span><span class="p">${stopNum(S)}</span></button></td>`;
-      tr.querySelector('button').onclick=()=>{location.hash='#t'+id+'-'+di+'-'+i};sl.appendChild(tr)})};
+      if(i===d.pats[0][d.pats[0].length-1]&&i!==si){tr.querySelector('button').disabled=true;tr.classList.add('noDep')}else tr.querySelector('button').onclick=()=>{location.hash='#t'+id+'-'+di+'-'+i};sl.appendChild(tr)})};   // (the last stop: no departures, not a link)
   drawSL(null);
   // letters for variant trips
   const noteKey={};const letters='abcdefghijklmnoprstuwxyz';const used=[];
@@ -2491,7 +2493,7 @@ async function renderCombo(key){
       if(cd.breaks[i]){const b=document.createElement('li');b.className='seg-break';b.title='Linie rozjeżdżają się i łączą ponownie';b.setAttribute('aria-label',b.title);b.innerHTML='<i></i>';ul.appendChild(b)}
       const li=document.createElement('li');if(i===0||i===cd.common.length-1)li.className='end';   // only the first and last stop are marked (not the stops next to a break)
       li.innerHTML=`<button type="button"><span class="nm">${esc(n)}</span>${comboReq(C,cd,n)?HAND:''}</button>`;
-      li.querySelector('button').onclick=()=>{location.hash='#k'+key+'-'+ci+'-'+i};ul.appendChild(li)});
+      if(i===cd.common.length-1){li.querySelector('button').disabled=true;li.classList.add('noDep')}else li.querySelector('button').onclick=()=>{location.hash='#k'+key+'-'+ci+'-'+i};ul.appendChild(li)});
     el.appendChild(ul);box.appendChild(el)});
 }
 async function renderComboStop(key,ci,i){
@@ -3283,7 +3285,7 @@ function drawSchema(){
     // as on the printed diagrams: the sea, the rivers and the beaches, and the names of the districts in large light letters
     // (the woods and parks, bent onto the diagram, only blurred it)
     parts.push('<g id="schBg">'+['b','w'].map(k=>(G.bg[k]||[]).length?`<path class="bg-${k}" d="${G.bg[k].map(pth).join('')}"/>`:'').join('')
-      +(G.bg.pl||[]).map(([x,y,t,sz])=>`<text x="${x}" y="${y}" font-size="${(sz||1)*.95}">${esc(t)}</text>`).join('')+'</g>')}
+      +'</g>')}   // (no district names: ZTM's diagram has none, and the map's place names do not keep to the city)
   parts.push('<g id="schLines">');
   const nm=ids=>ids.map(i=>schR(i)).filter(Boolean).map(r=>r.n).sort(numSort);
   // grey and night lines: one stroke, its pieces between stops clickable (they pick out the lines running there)
