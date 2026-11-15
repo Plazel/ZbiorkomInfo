@@ -938,6 +938,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 .chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
 .aTxt p.aSub strong{font-weight:700}
 .slist li.noDep button,tr.noDep button.sb{cursor:default;pointer-events:none}.slist li.noDep button:disabled,tr.noDep button.sb:disabled{color:inherit;opacity:1}.slist li.noDep button:hover,tr.noDep button.sb:hover{background:none}
+[data-mv=schema],[data-mv=schemaN]{display:none!important}   /* (the diagrams: off for now, see SCHEMA_OFF) */
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
 html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
 html.flat #gsBtn{border-color:var(--line)!important}html.flat header.top .themebar{gap:2px!important}   /* (the search box keeps its frame round the button too) */html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
@@ -1773,7 +1774,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794734734;
+const APP_BUILD=1794735144;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -1793,6 +1794,9 @@ let city=store.get('ztm.city','gda');if(!CITIES[city])city='gda';
 function cityUrl(){try{const u=new URL(location.href);if(u.searchParams.get('miasto')===city)return;u.searchParams.set('miasto',city);history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}
 // Krynica-Zdrój with Muszyna and Bydgoszcz are separate areas: not part of "Trójmiasto"
 const SEP_AREAS=['nm','km','byd','ns','poz','krk','waw','wej','ldz','fl','prg','ber','ham','wro','lub','bts'];
+// the network diagrams (schematy): taken off the page for now – the code that draws them (here and in schemat2.py,
+// schematic.py) is kept, so they can come back by setting SCHEMA_OFF to false
+const SCHEMA_OFF=true;
 const NO_SCHEMA=['nm','ldz','fl','prg','ber','ham','wro','lub','bts'];   // no network diagram (yet)
 const BIG_AREAS=['poz','krk','waw','wej','ldz','fl','prg','ber','ham','wro','lub','bts'];   // their route files come packed (data/rp/) and their network map in a file of its own
 const areaOf=r=>{const c=r.c||[];return SEP_AREAS.find(a=>c.length>0&&c.every(x=>x===a))||'tri'};
@@ -2849,7 +2853,7 @@ async function openMap(){
   const secs=sections();MAP.routes=secs.flatMap(s=>s.lines);MAP.byId={};MAP.routes.forEach(r=>MAP.byId[r.id]=r);
   renderMapList(secs);
   // there is a diagram for the Tricity and for Krynica-Zdrój with Muszyna, not for Bydgoszcz
-  const sb=document.querySelector('[data-mv="schema"]');sb.hidden=NO_SCHEMA.includes(city);document.querySelector('[data-mv="schemaN"]').hidden=true;   // (the night diagram: a version in the diagram's own choice)
+  const sb=document.querySelector('[data-mv="schema"]');sb.hidden=SCHEMA_OFF||NO_SCHEMA.includes(city);document.querySelector('[data-mv="schemaN"]').hidden=true;   // (the night diagram: a version in the diagram's own choice)
   {const vb=document.querySelector('[data-mv="veh"]');if(vb)vb.hidden=!(['gda','sop','gdy','all'].includes(city)||VP_FEEDS[RT_GTFS[city]]||ZB_OPEN[city]||TU_VEH[city]||EST_VEH[city])}   // (no vehicle positions published: no "Pojazdy na mapie")   // with no diagram there is nothing to switch betweennavMark();
   let vw=store.get('ztm.mapView','osm');if(vw!=='schema'||sb.hidden)vw='osm';   // (the plain "Linie" view is gone: map or diagram)
   requestAnimationFrame(()=>{drawMap();setMapView(vw)});   // let the window paint first
@@ -3470,7 +3474,7 @@ function hideSchema(){if(MAP.drawn==='schema')drawMap()}
 // the map's views in its top bar: the lines on the map, the lines on the diagram, the vehicles on the map
 function mapViewsMark(){const cur=typeof VEH!=='undefined'&&VEH.on?'veh':MAP.view==='schema'?'schema':'osm';   // (the night diagram: a version of the diagram)
  document.querySelectorAll('[data-mv]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mv===cur)))}
-async function setMapView(vw){
+async function setMapView(vw){if(SCHEMA_OFF&&vw==='schema')vw='osm';
   if(vw==='schema'&&MAP.rot)setMapRot(0);
   const was=MAP.view==='schema'?'s':'g',now=vw==='schema'?'s':'g';
   if(was!==now&&MAP.vb){MAP.vbs=MAP.vbs||{};MAP.vbs[was]={vb:MAP.vb,base:MAP.base};const o=MAP.vbs[now];MAP.vb=o?o.vb:null;MAP.base=o?o.base:null}
