@@ -20,7 +20,6 @@
 //    store holds nothing that lets anyone in. Kept in a KV namespace bound as KONTA:
 //      t:<sha256 of token> → account id     u:<id> → {id, name, role, created}     d:<id> → the account's data (JSON)
 //    GET /konto → {id, name, role}; GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
-//    GET /konto/tm → the account's TransitMaker project {t, net}; PUT /konto/tm saves it (at most 20 MB).
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); GET /admin/konta/<id>/token → the token in use
@@ -194,15 +193,6 @@ async function konta(req, env, cors) {
     if (b.s === 'off') { await env.KONTA.delete('st:' + u.id); return J({ ok: true }); }
     b.at = new Date().toISOString(); b.s = b.s === 'run' ? 'run' : 'break';
     await env.KONTA.put('st:' + u.id, JSON.stringify(b), { expirationTtl: 6 * 3600 }); return J({ ok: true });
-  }
-  // TransitMaker: the account's project (the whole network), kept apart from the small account data; {t, net}
-  if (p === '/konto/tm') {
-    if (req.method === 'GET') return new Response((await env.KONTA.get('tm:' + u.id)) || '{}', { headers: h });
-    if (req.method === 'PUT') {
-      const t = await req.text(); if (t.length > 20000000) return J({ error: 'too large' }, 413);
-      try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || !o.net || typeof o.net !== 'object') throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
-      await env.KONTA.put('tm:' + u.id, t); return J({ ok: true });
-    }
   }
   if (p === '/konto/dane') {
     if (req.method === 'GET') return new Response((await env.KONTA.get('d:' + u.id)) || '{}', { headers: h });
