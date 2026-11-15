@@ -936,6 +936,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 @media (max-width:760px){#tdTm iframe{height:calc(100dvh - var(--top-h,54px) - 64px)}}
 /* the lines' signs: always Roboto Condensed SemiBold, whatever the text around them (a bold heading or plain text) */
 .chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
+.aTxt p.aSub strong{font-weight:700}
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
 html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
 html.flat #gsBtn{border-color:var(--line)!important}html.flat header.top .themebar{gap:2px!important}   /* (the search box keeps its frame round the button too) */html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
@@ -1771,7 +1772,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794733453;
+const APP_BUILD=1794733656;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2266,7 +2267,9 @@ function lineWarnLive(r){const g=alertGrp(city);if(!g)return;ztmAlerts(g).then(A
   const md=t=>t.replace(/\*\*\s*(.+?)\s*\*\*/g,'$1').replace(/\*\*/g,'');   // (the source's ** marks of bold: left out here)
   const parts=mine.slice(0,3).map(([a,i])=>{const T=(a.text||'').split('\n'),D=(a.de||a.text||'').split('\n');
     const ls=D.map((l,k)=>[l,k]).filter(([l])=>re.test(l)&&!/^\[|kommt es bei den/.test(l)).sort((x,y)=>sc(x[0])-sc(y[0])||x[1]-y[1]).map(([,k])=>(T[k]||D[k]).replace(/^•\s*/,''));
-    return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?'<span class="lwTx">'+lineSigns(esc(md(ls.slice(0,4).join(' · '))),a.lines)+'</span>':''}</button>`}).join('');
+    // (the parts' headings – "Linia 132" – in bold here too)
+    const lt=ls.slice(0,4).map(x=>{const h=lineSigns(esc(md(x)),a.lines);return AL_HEAD.test(alNorm(md(x)))?'<b>'+h+'</b>':h}).join(' · ');
+    return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?'<span class="lwTx">'+lt+'</span>':''}</button>`}).join('');
   const old=document.querySelector('.lhead .lineWarn');const rep=(lineWarnRep(r).match(/<a class="lwItem"[\s\S]*<\/a>/)||[''])[0];const inf=mine.every(([a])=>alertInfo(a)),html=`<div class="lineWarn ${inf?'lwInfo':'lwAlert'}" role="note">${inf?INFO_IC.replace(/"26"/g,'"22"'):ALERT_IC}<div>${parts}${rep}${mine.length>3?`<button type="button" class="lwItem" data-i="all">${esc(trS('Wszystkie komunikaty'))} (${mine.length})</button>`:''}</div></div>`;
   if(old)old.outerHTML=html;else document.getElementById('hc').insertAdjacentHTML('afterend',html);
   document.querySelectorAll('.lhead .lineWarn button.lwItem').forEach(b=>b.onclick=()=>alertShow(b.dataset.i==='all'?mine[0][1]:+b.dataset.i,g))})}
@@ -5571,6 +5574,8 @@ function alertLinkStops(h){const re=alStopRe();if(!re)return h;h=h.normalize('NF
 // one paragraph: the first sentence of the notice in bold (what happens, to which lines); stops suspended as a list
 const AL_ABBR=/(?:^|[\s(])(?:ul|al|Al|Ul|pl|Pl|os|Os|godz|ks|św|im|nr|ok|tj|in|r|dn|tzw|ww|pn|pd|wsch|zach|str|Str|St|Dw|Bhf)\.$/;
 const AL_LIST_RE=/^(.*?\b(?:zawiesza się obsługę|zawieszone zostaje funkcjonowanie|zawieszona zostaje obsługa|wyłącza się z obsługi|nieczynne będą|nie będą obsługiwane|nie będą obsługiwane przez autobusy|nie będą obsługiwane przez tramwaje)\s+przystank\p{L}*)\s*:?\s*(.+?)\.?\s*$/iu;
+// a heading of a part of a notice: only the lines ("Linia 132", "Linie 189, 289", "Linia nr N14 i 113:") – bold everywhere
+const AL_HEAD=/^(?:Linia|Linie|Linii|Line|Lines|Linka|Linky|Linien)\s+(?:nr\s+)?[\p{L}\d-]{1,6}(?:\s*(?:,|i|oraz|und|a|and|&)\s*[\p{L}\d-]{1,6})*\s*:?$/u;
 const alNorm=t=>String(t||'').normalize('NFC').replace(/[\s\u00a0\u202f]+/g,' ').trim();
 // x: the paragraph in the language shown; src: the same paragraph in the source's language (its layout: the list of stops)
 function alertPara(x,pi,sg,src,srcLang){src=src==null?x:src;
@@ -5582,7 +5587,7 @@ function alertPara(x,pi,sg,src,srcLang){src=src==null?x:src;
         const nmH=known?`<a class="aStop" href="#s${encodeURIComponent(it.n)}${it.p.length===1?'|'+it.p[0]:''}">${nm}</a>`:nm;return `<li><b>${nmH}</b>${it.p.length?' <span class="aPole">'+it.p.map(esc).join(', ')+'</span>':''}</li>`}).join('');
       const lead=LANG===srcLang?m[1]:(MT.memo.get(srcLang+'>'+LANG+'|'+m[1])||m[1]);return `<p>${sg(lead)}:</p><ul class="aStops">${li}</ul>`}}
   // (a heading of a part: "Linia 132", "Linie 189, 289" – only the lines, in bold)
-  if(/^(?:Linia|Linie|Linii|Line|Lines|Linie|Linka|Linky)\s+[\p{L}\d]{1,5}(?:\s*(?:,|i|oraz|und|a|and)\s*[\p{L}\d]{1,5})*\s*:?$/u.test(alNorm(x)))return `<p class="aSub"><strong>${alertLinkStops(sg(x))}</strong></p>`;
+  if(AL_HEAD.test(alNorm(x)))return `<p class="aSub"><strong>${alertLinkStops(sg(x))}</strong></p>`;
   let lead='',rest=x;if(pi===0){for(let i=0;i<x.length;i++){if(!'.!?'.includes(x[i]))continue;if(i<15)continue;if(x[i]==='.'&&AL_ABBR.test(x.slice(0,i+1)))continue;
       if(i+1<x.length&&!/\s/.test(x[i+1]))continue;lead=x.slice(0,i+1);rest=x.slice(i+1);break}if(!lead&&x.length<220){lead=x;rest=''}}
   return `<p>${lead?`<strong class="aLead">${alertLinkStops(sg(lead))}</strong>`:''}${alertLinkStops(sg(rest))}</p>`}
