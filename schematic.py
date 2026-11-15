@@ -247,7 +247,7 @@ AREAS = [
 
 
 # areas drawn with the newer layout (schemat2.py) where the network is small enough for it; the others with LOOM
-MIP_AREAS = {'gda'}
+MIP_AREAS = {'gda', 'sop'}
 
 
 def kind_of(r):

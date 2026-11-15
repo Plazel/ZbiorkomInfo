@@ -496,12 +496,19 @@ def rail_layout(st, rail, S, cors, P, link=0.95, step=1.15, log=print):
         for k, n in enumerate(c['ch']):
             a = np.array(sp[max(0, k - 1)], float); b = np.array(sp[min(len(sp) - 1, k + 1)], float)
             if np.hypot(*(b - a)) > 1e-9: dirv.setdefault(n, (b - a) / np.hypot(*(b - a)))
+    # a train station that is one place with a stop of the other lines (the same name): a station of its own beside it
+    AL = '\u2009'
+    rail = {rid: [[(n + AL if n in S else n) for n in seq] for seq in ss] for rid, ss in rail.items()}
+    for ss in rail.values():
+        for seq in ss:
+            for n in seq:
+                if n.endswith(AL): st[n] = st[n[:-1]]
     seqs = [seq for ss in rail.values() for seq in ss]
     rs = sorted({n for seq in seqs for n in seq})
-    pair = {}
-    used = set()
+    pair = {n: n[:-1] for n in rs if n.endswith(AL)}
+    used = set(pair.values())
     for a in sorted(rs, key=lambda a: min(math.hypot(st[a][0] - st[b][0], st[a][1] - st[b][1]) for b in others) if others else 0):
-        if a in S: continue
+        if a in S or a in pair: continue
         b = min(others, key=lambda b: math.hypot(st[a][0] - st[b][0], st[a][1] - st[b][1])) if others else None
         if b is None or b in used or math.hypot(st[a][0] - st[b][0], st[a][1] - st[b][1]) > 650: continue
         pair[a] = b; used.add(b)
@@ -619,14 +626,15 @@ def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(7.0, 0
     for c in cors:
         for n, p in zip(c['ch'], c['sp']): S.setdefault(n, p)
         for a, b in zip(c['ch'], c['ch'][1:]): pieces.append((a, b, [S[a], S[b]], c['ord']))
-    pairs = []
+    pairs = []; pair_set = set()
     if rail:
         R, rp, pairs = rail_layout(st, rail, {n: np.array(p, float) for n, p in S.items()}, cors, P, log=log)
         for n, q in R.items(): S.setdefault(n, q)
-        pieces += rp
+        pieces += rp; pair_set = {b for a, b in pairs if a.endswith('\u2009')}
     mn = np.min(np.array([np.array(v, float) for v in S.values()]), 0)
     ix = {n: i for i, n in enumerate(sorted(S))}
-    out_n = [[round(float(S[n][0] - mn[0]), 3), round(float(S[n][1] - mn[1]), 3), name[n]] + ([cuts[n]] if n in cuts else []) for n in sorted(S)]
+    nm_ = lambda n: name.get(n, name.get(n.rstrip('\u2009'), n.rstrip('\u2009')))
+    out_n = [[round(float(S[n][0] - mn[0]), 3), round(float(S[n][1] - mn[1]), 3), nm_(n)] + ([cuts[n.rstrip('\u2009')]] if n.rstrip('\u2009') in cuts and (n.endswith('\u2009') or n not in pair_set) else []) for n in sorted(S)]
     out_e = []
     for a, b, pts, ordl in pieces:
         strokes, gm, nm = schematic.bundle(ordl, kind or {})
