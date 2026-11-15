@@ -367,8 +367,12 @@ async function loadStops(o){
  if(!quiet)say(auto?'Pobieranie przystanków z OSM dla nowego obszaru…':'Pobieranie przystanków z OSM…');
  try{const j=await ov(stopQuery(BX));
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
-  const addCov=(ll,name)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name)})};
-  const covered=(ll,name)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;for(const q of c){const d=mdist(q.ll,ll);if(d<25||(d<60&&n0&&q.n===n0))return true}}return false};
+  const md=x=>x.rail?'r':x.tram?'t':'a',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):''})};
+  // ten sam przystanek opisany drugi raz (peron / pozycja zatrzymania): tylko w obrębie tego samego rodzaju – peron tramwajowy obok
+  // przystanku autobusowego o tej samej nazwie (np. Sikorskiego) to osobny przystanek; tuż obok (< 25 m) – wspólny przystanek A+T
+  const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
+   for(const q of c){const d=mdist(q.ll,ll);if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
+    if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(added.has(q.st.id)){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
   // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
   // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
   const NOM=new Map();(j.elements||[]).forEach(e=>{const t=e.tags||{};if(!t.name)return;const ll=e.type==='node'?[e.lat,e.lon]:(e.center?[e.center.lat,e.center.lon]:null);if(!ll)return;
@@ -376,15 +380,15 @@ async function loadStops(o){
   const nameNear=(ll,tram)=>{const a=Math.floor(ll[0]*1800),b=Math.floor(ll[1]*1800);let best=null,bd=1e9;for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++)for(const q of NOM.get((a+i)+','+(b+k))||[]){const d=mdist(q.ll,ll)-(tram&&q.tram?15:0);if(d<bd&&mdist(q.ll,ll)<60){bd=d;best=q}}return best};
   const nameFix=st=>{if(st.name!=='(bez nazwy)')return false;const q=nameNear(st.ll,st.tram);if(!q)return false;st.name=q.name;const mm=q.name.match(NUMRE);st.num=mm?mm[2]:(q.ref||st.num||'');if(st.num&&!mm&&q.ref)st.name=q.name+' '+q.ref;return true};
   let fixed=0;S.stops.forEach(s=>{if(nameFix(s))fixed++});if(fixed)dbg('Uzupełniono nazwy przystanków bez nazwy: '+fixed);
-  S.stops.forEach(s=>addCov(s.ll,s.name));
+  S.stops.forEach(s=>addCov(s.ll,s.name,s));
   const cnt=[0,0,0,0];let skD=0,skM=0;
   (j.elements||[]).filter(e=>e.tags).map(e=>({e,c:stopClass(e)})).sort((a,b)=>a.c-b.c).forEach(({e,c})=>{
    const st=stopFromOsm(e,c);if(!st)return;nameFix(st);const old=have.get(st.id);
    if(old){ // już w projekcie: nie nadpisujemy; liczymy te, które użytkownik zmienił (nazwa, położenie, rodzaj)
     if(old.name!==st.name||mdist(old.ll,st.ll)>1||!!old.tram!==!!st.tram||!!old.rail!==!!st.rail||!!old.bus!==!!st.bus)skM++;return}
-   if(gone.has(st.id)){skD++;addCov(st.ll,st.name);return}
-   if(c>1&&covered(st.ll,st.name))return; // ten sam przystanek opisany także jako peron / pozycja zatrzymania
-   S.stops.push(st);added.add(st.id);addCov(st.ll,st.name);cnt[c]++});
+   if(gone.has(st.id)){skD++;addCov(st.ll,st.name,st);return}
+   if(c>1&&covered(st.ll,st.name,st))return; // ten sam przystanek opisany także jako peron / pozycja zatrzymania
+   S.stops.push(st);added.add(st.id);addCov(st.ll,st.name,st);cnt[c]++});
   const n=cnt[1]+cnt[2]+cnt[3];
   dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}`);
   if(!auto&&S.rmStops&&added.size)S.rmStops=S.rmStops.filter(id=>!added.has(id));
