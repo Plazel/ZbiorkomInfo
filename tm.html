@@ -138,6 +138,17 @@ body.noglass{--g:1}body.noglass *,body.noglass .mback{-webkit-backdrop-filter:no
 /* ===== motyw interfejsu: wzorowany na stronie ZbiorkomInfo (jedyny; wariant jasny i ciemny) – zmienne w :root i body.dark, kształty i kolory w regułach powyżej ===== */
 .stk{width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:50%;box-sizing:border-box;color:#fff;font:700 10px/1 Roboto,Arial,sans-serif;border:1.5px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.3);cursor:pointer}.stk.t{background:#d32f2f}.stk.a{background:#1e6fe0}.stk.ta{background:#1e6fe0;border:2.5px solid #d32f2f;font-size:7.5px;letter-spacing:-.4px}.stk.tmp{box-shadow:0 0 0 2px #ffb347}
 button,input,select,textarea,summary,fieldset,details{border-radius:0}.leaflet-bar,.leaflet-bar a,.leaflet-bar a:first-child,.leaflet-bar a:last-child,.leaflet-touch .leaflet-bar,.leaflet-touch .leaflet-bar a,.leaflet-touch .leaflet-bar a:first-child,.leaflet-touch .leaflet-bar a:last-child,.leaflet-control-layers,.leaflet-control-attribution,.leaflet-popup-content-wrapper,.leaflet-container a.leaflet-popup-close-button,.leaflet-tooltip{border-radius:0!important}
+
+/* the choices as everywhere in ZbiorkomInfo: switches for yes/no, a row of buttons for one of several */
+.chk input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;width:36px;height:20px;margin:0;border-radius:999px;background:var(--bd);position:relative;cursor:pointer;transition:background .15s;border:0;outline:0}
+.chk input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
+.chk input[type=checkbox]:checked{background:var(--fg)}.chk input[type=checkbox]:checked::after{left:18px}
+.chk input[type=checkbox]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}.chk input[type=checkbox]:disabled{opacity:.45;cursor:default}
+.row.wrap:has(>.chk>input[type=radio]){gap:0!important}
+.chk:has(>input[type=radio]){position:relative;padding:6px 14px;border:1px solid var(--bd);background:var(--panel);color:var(--fg);margin:0 -1px 0 0;gap:0;font-weight:500}
+.chk:has(>input[type=radio]:checked){background:var(--fg);color:var(--panel);border-color:var(--fg)}
+.chk>input[type=radio]{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.chk:has(>input[type=radio]:focus-visible){outline:3px solid var(--focus);outline-offset:1px}
 </style></head><body>
 <header id="top">
  <div class="brand"><i data-ic="route"></i><b>NetworkMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
@@ -165,15 +176,14 @@ button,input,select,textarea,summary,fieldset,details{border-radius:0}.leaflet-b
   <div class="pop" id="pLay">
    <div class="sech" style="margin:0"><i data-ic="layers"></i>Podkład mapy</div>
    <div class="row wrap"><label class="chk"><input type="radio" name="base" value="osm">OSM</label><label class="chk"><input type="radio" name="base" value="carto">CARTO</label></div>
-   <div class="sech"><i data-ic="palette"></i>Wygląd mapy</div>
-   <div class="row"><div class="small grow" style="margin:0"></div><button class="b ico flat" id="uiReset" title="Przywróć domyślne" aria-label="Przywróć domyślne"><i data-ic="reset"></i></button></div>
+   <div class="sech" style="display:flex;align-items:center"><i data-ic="palette"></i><span style="flex:1">Wygląd mapy</span><button class="b ico flat" id="uiReset" title="Przywróć domyślne" aria-label="Przywróć domyślne"><i data-ic="reset"></i></button></div>
    <label class="chk"><input type="checkbox" id="uiInv"><i data-ic="contrast"></i>Ciemny podkład (odwrócenie kolorów)</label>
    <div class="row"><span class="lab" style="width:84px"><i data-ic="sun"></i>Jasność</span><input type="range" id="uiBr" min="10" max="110" class="grow"><b id="uiBrV" style="width:44px;text-align:right"></b></div>
    <div class="row"><span class="lab" style="width:84px"><i data-ic="contrast"></i>Kontrast</span><input type="range" id="uiCo" min="50" max="170" class="grow"><b id="uiCoV" style="width:44px;text-align:right"></b></div>
    <hr style="border:0;border-top:1px solid var(--bd2);width:100%;margin:4px 0">
    <div class="small" style="margin:0;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Linie na mapie</div>
    <label class="chk" title="Linie o tym samym kolorze i stylu, które biegną obok siebie, są rysowane jako jedna – aż do miejsca, w którym się rozdzielą"><input type="checkbox" id="uiMc"><i data-ic="layers"></i>Łącz linie tego samego koloru</label>
-   <div class="small" style="margin:0 0 0 25px">Linie o tym samym kolorze (i stylu), biegnące obok siebie, są rysowane jako jedna – do miejsca, w którym się rozdzielą. Dotyczy mapy i generowanego schematu. Najechanie na wspólny odcinek mapy pokazuje numery wszystkich linii.</div>
+   
   
    <div class="sech"><i data-ic="route"></i>Nakładki</div>
    <label class="chk"><input type="checkbox" id="lyTram" checked><i data-ic="tram"></i>Tory tramwajowe z OSM</label>
@@ -184,7 +194,7 @@ button,input,select,textarea,summary,fieldset,details{border-radius:0}.leaflet-b
    <label class="chk"><input type="checkbox" id="hideUnused"><i data-ic="eyeoff"></i>Ukryj przystanki nieużywane przez żadną linię</label>
    <label class="chk"><input type="checkbox" id="mergeNames"><i data-ic="layers"></i>Scal przystanki o tej samej nazwie</label>
    <label class="chk"><input type="checkbox" id="showNames"><i data-ic="type"></i>Pokaż nazwy przystanków na mapie</label>
-   <label class="chk" style="margin-left:25px"><input type="checkbox" id="namesUsed">tylko przystanki używane przez linie</label>
+   <label hidden style="display:none"><input type="checkbox" id="namesUsed"></label>
    <div class="small" style="margin:0 0 0 25px">Nazwy pojawiają się od przybliżenia 14. Nazwy przystanków końcowych są pokazywane zawsze.</div>
    <div class="row small" style="margin:6px 0 0"><span class="grow"><span id="gstat">Torowiska: ładowanie…</span><br><span id="rstat">Tory kolejowe: ładowanie…</span></span><button class="b ico" id="retryTram" title="Pobierz torowiska ponownie"><i data-ic="refresh"></i></button></div>
   </div></div>
@@ -198,7 +208,7 @@ button,input,select,textarea,summary,fieldset,details{border-radius:0}.leaflet-b
    <div class="row"><span class="lab" style="width:84px"><i data-ic="search"></i>Skala</span><input type="range" id="uiSc" min="70" max="150" step="5" class="grow"><span style="display:flex;align-items:center;gap:2px"><input type="number" id="uiScV" min="50" max="200" step="5" style="width:58px;text-align:right"><b>%</b></span></div>
    <hr style="border:0;border-top:1px solid var(--bd2);width:100%;margin:4px 0">
    </div></div>
- <button class="b" id="bHelp" title="Jak zapewnić działanie podkładu OSM"><i data-ic="help"></i>Pomoc</button>
+ <button class="b" id="bHelp" hidden style="display:none"></button>
  <button class="b ico" id="tdark" hidden style="display:none"></button><div hidden style="display:none"><input id="mtKey"><select id="mtStyle"><option value="streets-v2">x</option></select><div id="mtBox"></div></div>
 </header>
 <div id="app">

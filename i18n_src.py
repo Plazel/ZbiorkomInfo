@@ -786,6 +786,8 @@ ROWS = [
     ("Pokaż moją aktualną lokalizację", "Show my current location", "Meinen aktuellen Standort zeigen", "Ukázať moju aktuálnu polohu", "Ukázat mou aktuální polohu"),
     ('Pokaż wszystkie linie', 'Show all lines', 'Alle Linien zeigen', 'Zobraziť všetky linky', 'Zobrazit všechny linky'),
     ('przystanek na żądanie – zgłoś zamiar wysiadania przyciskiem lub daj znak kierowcy', 'request stop – press the button to get off or signal the driver', 'Bedarfshalt – zum Aussteigen den Knopf drücken oder dem Fahrer ein Zeichen geben', 'zastávka na znamenie – výstup ohláste tlačidlom alebo dajte znamenie vodičovi', 'zastávka na znamení – výstup ohlaste tlačítkem nebo dejte znamení řidiči'),
+    ("Otwórz TransitMaker w nowej karcie", "Open TransitMaker in a new tab", "TransitMaker in neuem Tab öffnen", "Otvoriť TransitMaker na novej karte", "Otevřít TransitMaker na nové kartě"),
+    ('Ustawienia dotyczą wszystkich miast. Komunikat odtwarzany jest w języku miasta, a po nim w drugim wybranym języku (gdy jest nim język miasta – po angielsku).', "The settings apply to every city. An announcement is played in the city's language, then in the second language chosen (English where that is the city's own).", 'Die Einstellungen gelten für alle Städte. Eine Ansage wird in der Sprache der Stadt abgespielt, danach in der gewählten zweiten Sprache (Englisch, wenn das die Sprache der Stadt ist).', 'Nastavenia platia pre všetky mestá. Hlásenie sa prehrá v jazyku mesta a potom v zvolenom druhom jazyku (ak je ním jazyk mesta – v angličtine).', 'Nastavení platí pro všechna města. Hlášení se přehraje v jazyce města a poté ve zvoleném druhém jazyce (je-li jím jazyk města – v angličtině).'),
 ]
 
 WEEKDAYS = {
