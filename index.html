@@ -931,6 +931,9 @@ nav.rail [data-nav]{touch-action:none;-webkit-user-select:none;user-select:none;
 html.co-map nav.rail [data-nav=map],html.co-dep nav.rail [data-nav=dep],html.co-jp nav.rail [data-nav=jp],html.co-guide nav.rail [data-nav=guide],html.co-hub nav.rail [data-nav=hub],html.co-dbd nav.rail [data-nav=dbd],html.co-takt nav.rail [data-nav=takt],html.co-bryg nav.rail [data-nav=bryg],
 html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co-map-veh [data-mv=veh],html.co-gd-voice #gdVoice,html.co-exp .expWrap,html.co-combo #coBtn,html.co-pers [data-am=pers],html.co-tools label[for=toolsSw],html.co-tools label[for=mapToolsSw],html.co-alerts .alertBar{display:none!important}
 .slist li.zastLi{color:var(--fg);font-weight:500}.slist li.zastLi a.zastL{text-decoration:none}.propList{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:10px;max-width:760px}.propI{border:1px solid var(--line);padding:10px 12px}.propI p{margin:0 0 8px;line-height:1.75}.propI .admRow input{flex:1;min-width:0}
+/* TransitMaker: the frame over the whole section */
+#toolsDr:has(#tdTm:not([hidden])){padding:0!important;overflow:hidden}#tdTm{padding:0!important;margin:0!important;max-width:none!important;height:100%}#tdTm iframe{display:block;width:100%;height:calc(100dvh - var(--top-h,58px));border:0}
+@media (max-width:760px){#tdTm iframe{height:calc(100dvh - var(--top-h,54px) - 64px)}}
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
 html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
 html.flat header.top .themebar{gap:2px!important}html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
@@ -1429,6 +1432,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
 
 <header class="top"><button type="button" class="plus gdBackTop" id="gdBackTop" hidden title="Wstecz" aria-label="Wstecz"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><a class="logo" href="#" aria-label="ZbiorkomInfo – strona główna"><span>Zbiorkom<i>Info</i></span></a><div class="cityPick"><button type="button" id="cityBtn" aria-haspopup="true" aria-expanded="false" aria-controls="cityMenu"><svg class="cityIco" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 21h18M5 21V10l5-3v14M10 21V4l9 4v13M13 9h3M13 12.5h3M13 16h3M7 13h1M7 16h1"/></svg><span id="cityName"></span><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
  <div class="cityMenu" id="cityMenu" hidden role="menu" aria-label="Wybierz miasto">
+  <div class="cmg cmNm" hidden><span>NetworkMaker</span><a role="menuitem" data-city="nm" href="?miasto=nm">NetworkMaker</a></div>
   <div class="cmg"><span>Pomorskie</span><div class="cmTri"><a role="menuitem" data-city="all" href="?miasto=all">Trójmiasto</a><button type="button" class="cmExp" id="cmExp" aria-expanded="false" aria-controls="cmSub" title="Pokaż miasta">▾</button></div><div class="cmSub" id="cmSub" hidden><a role="menuitem" data-city="gda" href="?miasto=gda">Gdańsk</a><a role="menuitem" data-city="sop" href="?miasto=sop">Sopot</a><a role="menuitem" data-city="gdy" href="?miasto=gdy">Gdynia</a><a role="menuitem" data-city="wej" href="?miasto=wej">Wejherowo</a></div></div>
   <div class="cmg"><span>Kujawsko-pomorskie</span><a role="menuitem" data-city="byd" href="?miasto=byd">Bydgoszcz</a></div>
   <div class="cmg"><span>Wielkopolskie</span><a role="menuitem" data-city="poz" href="?miasto=poz">Poznań</a></div>
@@ -1436,7 +1440,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
   <div class="cmg"><span>Dolnośląskie</span><a role="menuitem" data-city="wro" href="?miasto=wro">Wrocław</a></div>
   <div class="cmg"><span>Lubelskie</span><a role="menuitem" data-city="lub" href="?miasto=lub">Lublin</a></div>
   <div class="cmg"><span>Mazowieckie</span><a role="menuitem" data-city="waw" href="?miasto=waw">Warszawa</a></div>
-  <div class="cmg"><span>Małopolskie</span><a role="menuitem" data-city="krk" href="?miasto=krk">Kraków</a><a role="menuitem" data-city="ns" href="?miasto=ns">Nowy Sącz</a><a role="menuitem" data-city="km" href="?miasto=km">Krynica-Zdrój i Muszyna</a><a role="menuitem" data-city="tst" href="?miasto=tst" hidden>TEST</a></div>
+  <div class="cmg"><span>Małopolskie</span><a role="menuitem" data-city="krk" href="?miasto=krk">Kraków</a><a role="menuitem" data-city="ns" href="?miasto=ns">Nowy Sącz</a><a role="menuitem" data-city="km" href="?miasto=km">Krynica-Zdrój i Muszyna</a></div>
   <div class="cmg"><span>Czechy</span><a role="menuitem" data-city="prg" href="?miasto=prg">Praga</a></div>
   <div class="cmg"><span>Słowacja</span><a role="menuitem" data-city="bts" href="?miasto=bts">Bratysława</a></div>
   <div class="cmg"><span>Niemcy</span><a role="menuitem" data-city="ber" href="?miasto=ber">Berlin</a><a role="menuitem" data-city="ham" href="?miasto=ham">Hamburg</a><a role="menuitem" data-city="fl" href="?miasto=fl">Flensburg</a></div>
@@ -1457,7 +1461,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
  <button type="button" data-nav="adm" class="railAdm" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c1-3.6 3.6-5.5 6.5-5.5 1.3 0 2.5.4 3.5 1.1"/><circle cx="17.5" cy="16.5" r="2.2"/><path d="M17.5 12.3v1.5M17.5 19.2v1.5M21.7 16.5h-1.5M14.8 16.5h-1.5M20.5 13.5l-1 1M15.5 18.5l-1 1M20.5 19.5l-1-1M15.5 14.5l-1-1"/></svg><span>Konta</span></button>
  <button type="button" data-nav="mkadm" class="railAdm" hidden title="Zarządzanie uprawnieniami"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/><circle cx="12" cy="10" r="2.2"/><path d="M12 6.3v1.2M12 12.5v1.2M15.7 10h-1.2M9.5 10H8.3"/></svg><span>Zarządzanie uprawnieniami</span></button>
  <button type="button" data-nav="msgadm" class="railAdm" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span>Wiadomości</span></button>
- <button type="button" data-nav="krt" class="railAdm" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="12" cy="12" r="2"/><path d="M6.5 7.5 10.5 10.5M13.5 13.5l4 3"/><path d="M16 4h4v4M4 16v4h4"/></svg><span>Kreator</span></button>
+ <button type="button" data-nav="tm" class="railAdm" hidden title="TransitMaker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-6 14-2 14-9"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="7" r="2"/></svg><span>TransitMaker</span></button>
  <button type="button" data-nav="more" class="railMore" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span>Więcej</span></button><div class="navMore" id="navMore" hidden role="menu"></div>
 </nav>
 <div class="mapModal" id="mapModal" hidden role="dialog" aria-modal="true" aria-labelledby="mapTitle">
@@ -1503,7 +1507,7 @@ html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
  </div></div>
 </div>
 
-<div class="toolsDr" id="toolsDr" hidden role="region" aria-label="Takty i rozkłady brygad"><div class="tdBody" id="tdTakt" hidden></div><div class="tdBody" id="tdBryg" hidden></div><div class="tdBody" id="tdHub" hidden></div><div class="tdBody" id="tdAdm" hidden></div><div class="tdBody" id="tdMkAdm" hidden></div><div class="tdBody" id="tdMsgAdm" hidden></div><div class="tdBody" id="tdKrt" hidden></div><div class="tdBody" id="tdDbd" hidden></div><div class="tdBody mkBody" id="tdMk" hidden></div></div>
+<div class="toolsDr" id="toolsDr" hidden role="region" aria-label="Takty i rozkłady brygad"><div class="tdBody" id="tdTakt" hidden></div><div class="tdBody" id="tdBryg" hidden></div><div class="tdBody" id="tdHub" hidden></div><div class="tdBody" id="tdAdm" hidden></div><div class="tdBody" id="tdMkAdm" hidden></div><div class="tdBody" id="tdMsgAdm" hidden></div><div class="tdBody tmBody" id="tdTm" hidden></div><div class="tdBody" id="tdDbd" hidden></div><div class="tdBody mkBody" id="tdMk" hidden></div></div>
 <div class="guideModal" id="guideModal" hidden role="region" aria-label="mSIP">
  <div class="gdWrap">
   <div class="gdTop"><button type="button" class="crumb gdBack" id="gdBack" hidden>← Wybór kursu</button><button type="button" class="gdLoc gdIco" id="gdLoc" aria-pressed="true" title="Moja lokalizacja" aria-label="Moja lokalizacja"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
@@ -1765,7 +1769,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794729747;
+const APP_BUILD=1794732116;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -1778,14 +1782,14 @@ async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.a
 addEventListener('load',()=>setTimeout(appVerCheck,800));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&appVerCheck.t&&Date.now()-appVerCheck.t>36e5)appVerCheck()});
 
-const CITIES={tst:['TEST','w mieście TEST'],gda:['Gdańsk','w Gdańsku'],sop:['Sopot','w Sopocie'],gdy:['Gdynia','w Gdyni'],all:['Trójmiasto','w Trójmieście'],km:['Krynica-Zdrój i Muszyna','w Krynicy-Zdroju i Muszynie'],byd:['Bydgoszcz','w Bydgoszczy'],ns:['Nowy Sącz','w Nowym Sączu'],poz:['Poznań','w Poznaniu'],krk:['Kraków','w Krakowie'],waw:['Warszawa','w Warszawie'],wej:['Wejherowo','w Wejherowie'],ldz:['Łódź','w Łodzi'],fl:['Flensburg','we Flensburgu'],prg:['Praga','w Pradze'],ber:['Berlin','w Berlinie'],ham:['Hamburg','w Hamburgu'],wro:['Wrocław','we Wrocławiu'],lub:['Lublin','w Lublinie'],bts:['Bratysława','w Bratysławie']};
+const CITIES={nm:['NetworkMaker','w sieci NetworkMaker'],gda:['Gdańsk','w Gdańsku'],sop:['Sopot','w Sopocie'],gdy:['Gdynia','w Gdyni'],all:['Trójmiasto','w Trójmieście'],km:['Krynica-Zdrój i Muszyna','w Krynicy-Zdroju i Muszynie'],byd:['Bydgoszcz','w Bydgoszczy'],ns:['Nowy Sącz','w Nowym Sączu'],poz:['Poznań','w Poznaniu'],krk:['Kraków','w Krakowie'],waw:['Warszawa','w Warszawie'],wej:['Wejherowo','w Wejherowie'],ldz:['Łódź','w Łodzi'],fl:['Flensburg','we Flensburgu'],prg:['Praga','w Pradze'],ber:['Berlin','w Berlinie'],ham:['Hamburg','w Hamburgu'],wro:['Wrocław','we Wrocławiu'],lub:['Lublin','w Lublinie'],bts:['Bratysława','w Bratysławie']};
 let city=store.get('ztm.city','gda');if(!CITIES[city])city='gda';
 // each city has its own address (?miasto=gda), so a city in the list opens in a new tab with the middle button
 {let q=null;try{q=new URLSearchParams(location.search).get('miasto')}catch(e){}if(q&&CITIES[q]){city=q;store.set('ztm.city',q)}}
 function cityUrl(){try{const u=new URL(location.href);if(u.searchParams.get('miasto')===city)return;u.searchParams.set('miasto',city);history.replaceState(history.state,'',u.pathname+u.search+u.hash)}catch(e){}}
 // Krynica-Zdrój with Muszyna and Bydgoszcz are separate areas: not part of "Trójmiasto"
-const SEP_AREAS=['tst','km','byd','ns','poz','krk','waw','wej','ldz','fl','prg','ber','ham','wro','lub','bts'];
-const NO_SCHEMA=['tst','ldz','fl','prg','ber','ham','wro','lub','bts'];   // no network diagram (yet)
+const SEP_AREAS=['nm','km','byd','ns','poz','krk','waw','wej','ldz','fl','prg','ber','ham','wro','lub','bts'];
+const NO_SCHEMA=['nm','ldz','fl','prg','ber','ham','wro','lub','bts'];   // no network diagram (yet)
 const BIG_AREAS=['poz','krk','waw','wej','ldz','fl','prg','ber','ham','wro','lub','bts'];   // their route files come packed (data/rp/) and their network map in a file of its own
 const areaOf=r=>{const c=r.c||[];return SEP_AREAS.find(a=>c.length>0&&c.every(x=>x===a))||'tri'};
 const areaNow=()=>SEP_AREAS.includes(city)?city:'tri';
@@ -1815,7 +1819,7 @@ const idxHas=a=>IDX_HAS.has('*')||IDX_HAS.has(a);
 function idxJoin(j){const ids=new Set(IDX.routes.map(r=>r.id));(j.routes||[]).forEach(r=>{if(!ids.has(r.id))IDX.routes.push(r)});Object.assign(IDX.stops,j.stops||{});
   hideRoutes();nightTrams();setByName();setCorridors();if(typeof DEP!=='undefined')DEP.cache={};if(typeof GUIDE!=='undefined')GUIDE._nt=null}
 function idxArea(a){if(!IDX||idxHas(a))return Promise.resolve();
-  return IDX_BUSY[a]||(IDX_BUSY[a]=(async()=>{try{const r=a==='tst'?null:await fetch('data/ix/'+a+'.json');if(!r||!r.ok)throw 0;idxJoin(await r.json());IDX_HAS.add(a)}
+  return IDX_BUSY[a]||(IDX_BUSY[a]=(async()=>{try{const r=a==='nm'?null:await fetch('data/ix/'+a+'.json');if(!r||!r.ok)throw 0;idxJoin(await r.json());IDX_HAS.add(a)}
     catch(e){try{const r=await fetch('data/index.json');idxJoin(await r.json());IDX_HAS.add('*')}catch(e2){}}delete IDX_BUSY[a]})())}
 let custom=store.get('ztm.custom',[]);
 const app=document.getElementById('app');
@@ -2821,6 +2825,8 @@ async function loadMapData(){
   if(BIG_AREAS.includes(a)&&!MAP.areas[a]){const E=window.EMBEDDED_DATA&&EMBEDDED_DATA.maps&&EMBEDDED_DATA.maps[a];let J=E;
     if(!J){const r=await fetch('data/map_'+a+'.json');if(!r.ok)throw new Error('Brak danych schematu');J=await r.json()}
     const D=decodeMap(J);Object.assign(MAP.data.routes,D.routes);MAP.areas[a]=1}
+  // (NetworkMaker's lines: drawn from their own shapes)
+  if(typeof nmMapOf==='function')IDX.routes.forEach(r=>{if(r.op==='NM'&&CACHE[r.id]&&!MAP.data.routes[r.id])nmMapOf(CACHE[r.id])});
   return MAP.data;
 }
 async function openMap(){
@@ -4935,8 +4941,8 @@ function toggleMe(){const b=document.getElementById('mapMeBtn');
 function drawMe(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapMe');
   if(!MAP.me||MAP.view==='schema'||MAP.drawn==='schema'||!MAP.vb){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapMe'}svg.appendChild(g);
-  const [x,y]=proj(MAP.me.lat,MAP.me.lon);const k=unitsPerPx();const acc=MAP.me.acc/111;   // metres to map units (1 unit = 0.001° of latitude)
-  g.innerHTML=`<circle cx="${x}" cy="${y}" r="${acc.toFixed(3)}" fill="#1a73e8" fill-opacity=".14" stroke="#1a73e8" stroke-opacity=".4" stroke-width="${(k).toFixed(4)}"/><circle cx="${x}" cy="${y}" r="${(8*k).toFixed(4)}" fill="#1a73e8" stroke="#fff" stroke-width="${(3*k).toFixed(4)}"/>`}
+  const [x,y]=proj(MAP.me.lat,MAP.me.lon);const k=unitsPerPx();   // (only the dot: no circle of the position's accuracy around it)
+  g.innerHTML=`<circle cx="${x}" cy="${y}" r="${(8*k).toFixed(4)}" fill="#1a73e8" stroke="#fff" stroke-width="${(3*k).toFixed(4)}"/>`}
 function setupMap(){
   const svg=document.getElementById('mapSvg'),rotBox=document.getElementById('mapRot');
   // a screen point in the (turned) box of the map: [x, y, box width, box height]
@@ -5010,7 +5016,7 @@ function setupMap(){
   document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{const v=b.dataset.nav;
     if(v==='more'){navMoreOpen();return}
     if(v==='guide'){openGuide();return}if(GUIDE.open)closeGuide();
-    if(v==='takt'||v==='bryg'||v==='hub'||v==='adm'||v==='mkadm'||v==='msgadm'||v==='krt'||v==='dbd'||v==='mk'){openTool(v);return}
+    if(v==='takt'||v==='bryg'||v==='hub'||v==='adm'||v==='mkadm'||v==='msgadm'||v==='tm'||v==='dbd'||v==='mk'){openTool(v);return}
     closeTool();
     if(v==='jp'){if(!JP.open)openJP();return}
     if(JP.open)closeJP();
@@ -6043,7 +6049,7 @@ window.addEventListener('popstate',e=>{if(OVL.skip){OVL.skip--;if(OVL.fix&&locat
 window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.ov||'tt';NAV_POP=true;
   try{const cur=NAV_LAST;
     if(want!==cur){if(want!=='guide'&&GUIDE.open)closeGuide();if(want==='map'){if(typeof DEP!=='undefined'&&DEP.open)closeDep();await openMap()}
-      else if(want==='dep')await openDep();else if(want==='jp')await openJP();else if(want==='guide')openGuide();else if(want==='takt'||want==='bryg'||want==='hub'||want==='adm'||want==='mkadm'||want==='msgadm'||want==='krt'||want==='dbd'||want==='mk')openTool(want);
+      else if(want==='dep')await openDep();else if(want==='jp')await openJP();else if(want==='guide')openGuide();else if(want==='takt'||want==='bryg'||want==='hub'||want==='adm'||want==='mkadm'||want==='msgadm'||want==='tm'||want==='dbd'||want==='mk')openTool(want);
       else{if(GUIDE.open)closeGuide();if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool()}}
     if(want==='guide'&&GUIDE.open&&GUIDE.run&&!st.gd)gdBack();
     else if(want==='guide'&&GUIDE.open&&st.gd&&GUIDE.runStack&&GUIDE.runStack.length>(st.gs||0)){let r;while(GUIDE.runStack.length>(st.gs||0))r=GUIDE.runStack.pop();if(r)gdSwitch(r)}
@@ -6079,7 +6085,7 @@ window.addEventListener('popstate',async e=>{const st=e.state||{};const want=st.
 // the section open before a reload (map, board, planner…) opens again (kept in the session, and for 12 hours in the browser's
 // storage: some browsers and embedded pages start every load with a new, empty session)
 const NAV0=(()=>{let v='';try{v=sessionStorage.getItem('ztm.nav')||''}catch(e){}if(!v){const k=store.get('ztm.nav',null);if(Array.isArray(k)&&Date.now()-k[1]<43200000)v=k[0]}return v})();
-(window.EMBEDDED_DATA?Promise.resolve(EMBEDDED_DATA.index):city==='tst'?fetch('data/index.json').then(r=>r.json()):fetch('data/ix/'+cityArea(city)+'.json').then(r=>{if(!r.ok)throw 0;return r.json()}).catch(()=>fetch('data/index.json').then(r=>r.json()))).then(async j=>{
+(window.EMBEDDED_DATA?Promise.resolve(EMBEDDED_DATA.index):city==='nm'?fetch('data/index.json').then(r=>r.json()):fetch('data/ix/'+cityArea(city)+'.json').then(r=>{if(!r.ok)throw 0;return r.json()}).catch(()=>fetch('data/index.json').then(r=>r.json()))).then(async j=>{
   // (the data may come from the phone's store at once – before the page's later scripts have been read: wait for them first)
   if(document.readyState==='loading')await new Promise(r=>document.addEventListener('DOMContentLoaded',r,{once:true}));
   IDX=j;IDX_HAS.add(j.area||'*');cityAvail();hideRoutes();nightTrams();setByName();setCorridors();await route();if(typeof alertBar==='function')alertBar();
@@ -6141,8 +6147,8 @@ function tdRail(on){store.set('ztm.tools',on);if(typeof MAP!=='undefined'&&MAP.o
   // (the accounts' panel: only the administrator's)
   document.querySelectorAll('nav.rail .railTool').forEach(b=>b.hidden=!on);if(!on&&['takt','bryg','dbd'].includes(TD.view))closeTool();if(typeof gdTBtn==='function')gdTBtn()}
 function openTool(v){if(!IDX)return;if(MAP.open)closeMap();if(DEP.open)closeDep();if(JP.open)closeJP();
-  TD.view=v;document.getElementById('toolsDr').hidden=false;document.getElementById('tdTakt').hidden=v!=='takt';document.getElementById('tdBryg').hidden=v!=='bryg';document.getElementById('tdHub').hidden=v!=='hub';document.getElementById('tdAdm').hidden=v!=='adm';document.getElementById('tdMkAdm').hidden=v!=='mkadm';document.getElementById('tdMsgAdm').hidden=v!=='msgadm';document.getElementById('tdKrt').hidden=v!=='krt';document.getElementById('tdDbd').hidden=v!=='dbd';document.getElementById('tdMk').hidden=v!=='mk';document.getElementById('toolsDr').classList.toggle('mkOn',v==='mk');
-  clearInterval(HUB.timer);clearInterval(MSA.timer);navMark();if(v==='takt')tkRender();else if(v==='hub'){hubRender();HUB.timer=setInterval(hubFill,30000)}else if(v==='adm')accAdminRender();else if(v==='mkadm'){mkAdmRender()}else if(v==='msgadm'){msgAdmRender();msgAdmLoad();MSA.timer=setInterval(()=>{if(TD.view==='msgadm')msgAdmLoad()},30000)}else if(v==='mk')mkOpen();else if(v==='krt')krRender();else if(v==='dbd')dbdRender();else bgRender()}
+  TD.view=v;document.getElementById('toolsDr').hidden=false;document.getElementById('tdTakt').hidden=v!=='takt';document.getElementById('tdBryg').hidden=v!=='bryg';document.getElementById('tdHub').hidden=v!=='hub';document.getElementById('tdAdm').hidden=v!=='adm';document.getElementById('tdMkAdm').hidden=v!=='mkadm';document.getElementById('tdMsgAdm').hidden=v!=='msgadm';document.getElementById('tdTm').hidden=v!=='tm';document.getElementById('tdDbd').hidden=v!=='dbd';document.getElementById('tdMk').hidden=v!=='mk';document.getElementById('toolsDr').classList.toggle('mkOn',v==='mk');
+  clearInterval(HUB.timer);clearInterval(MSA.timer);navMark();if(v==='takt')tkRender();else if(v==='hub'){hubRender();HUB.timer=setInterval(hubFill,30000)}else if(v==='adm')accAdminRender();else if(v==='mkadm'){mkAdmRender()}else if(v==='msgadm'){msgAdmRender();msgAdmLoad();MSA.timer=setInterval(()=>{if(TD.view==='msgadm')msgAdmLoad()},30000)}else if(v==='mk')mkOpen();else if(v==='tm')tmOpen();else if(v==='dbd')dbdRender();else bgRender()}
 function closeTool(){if(!TD.view)return;if(TD.view==='mk'){if(GUIDE.run&&GUIDE.run===MK.run)GUIDE.run=null;mkGps(false);mkMic(false);if(MK.fs)mkFull(false);mkOvr(false);clearInterval(MK.ibT)}if(TD.view==='adm'){admPoll(false);admDlgClose();const g=document.getElementById('gsIn');if(g){g.value='';g.placeholder=trS('Wyszukaj linię, łączenie linii lub przystanek');g.setAttribute('aria-label',g.placeholder)}}TD.view=null;clearInterval(HUB.timer);clearInterval(MSA.timer);document.getElementById('toolsDr').hidden=true;navMark()}
 document.getElementById('toolsSw').onchange=ev=>{tdRail(ev.target.checked);setTimeout(()=>{if(typeof persRender==='function')persRender()},60)};
 tdRail(store.get('ztm.tools',false));
@@ -6174,7 +6180,7 @@ async function accLogin(tok,quiet){tok=(tok||'').trim();if(!tok)return false;ACC
     return true}
   catch(e){ACC.user=null;ACC.state=e.st===401?'bad':e.st===503||e.st===404||e.st===405?'nosrv':'net';
     if(e.st===401&&tok===ACC.token){ACC.token='';store.set('ztm.token','')}accShow();if(quiet&&e.st!==401)ACC.state='out';return false}}
-function accLogout(){ACC.token='';ACC.user=null;ACC.data={};ACC.admin=null;ACC.made=null;ACC.state='out';store.set('ztm.token','');if(TD.view==='hub'||TD.view==='adm'||TD.view==='mkadm'||TD.view==='msgadm'||TD.view==='krt')closeTool();accShow()}
+function accLogout(){ACC.token='';ACC.user=null;ACC.data={};ACC.admin=null;ACC.made=null;ACC.state='out';store.set('ztm.token','');if(TD.view==='hub'||TD.view==='adm'||TD.view==='mkadm'||TD.view==='msgadm'||TD.view==='tm')closeTool();accShow()}
 // the account's data saved a moment after the last change (one write for a burst of changes)
 function accSave(){clearTimeout(ACC.saveT);ACC.pend=true;ACC.saveT=setTimeout(()=>{ACC.pend=false;if(ACC.user){ACC.data.t=Date.now();accApi('konto/dane',{method:'PUT',body:ACC.data}).catch(()=>{})}},800)}
 // a setting changed on this device: into the account too
@@ -6198,7 +6204,7 @@ function accShow(){const on=!!ACC.user;accTools(on);accMode();try{compApply()}ca
   if(GUIDE.tmode!==ACC_ADMIN){if(GUIDE.open)gdTSet(ACC_ADMIN);else GUIDE.tmode=ACC_ADMIN}if(typeof mkNav==='function')mkNav();document.querySelectorAll('nav.rail .railHub').forEach(b=>b.hidden=!on);
   document.querySelectorAll('nav.rail .railAdm').forEach(b=>b.hidden=!ACC_ADMIN);   // (the administrator's sections: whether the tools are on or not)
   const t=document.getElementById('accTop');if(t){t.classList.toggle('on',on);t.title=on?ACC.user.name:trS('Zaloguj');t.setAttribute('aria-label',t.title)}
-  accRender();if(TD.view==='hub')hubRender();if(TD.view==='adm'){if(ACC_ADMIN)accAdminRender();else closeTool()}if(TD.view==='mkadm'){if(ACC_ADMIN)mkAdmRender();else closeTool()}if(TD.view==='msgadm'){if(ACC_ADMIN)msgAdmRender();else closeTool()}if(TD.view==='krt'){if(ACC_ADMIN)krRender();else closeTool()}
+  accRender();if(TD.view==='hub')hubRender();if(TD.view==='adm'){if(ACC_ADMIN)accAdminRender();else closeTool()}if(TD.view==='mkadm'){if(ACC_ADMIN)mkAdmRender();else closeTool()}if(TD.view==='msgadm'){if(ACC_ADMIN)msgAdmRender();else closeTool()}if(TD.view==='tm'){if(ACC_ADMIN)krRender();else closeTool()}
   if(typeof netSync==='function')netSync();
   document.querySelectorAll('.hubStar').forEach(b=>b.hidden=!on)}
 function accOpen(){document.getElementById('setPanel').hidden=true;document.getElementById('accDlg').hidden=false;accRender();setTimeout(()=>{const i=document.getElementById('accTok');if(i)i.focus()},50)}
@@ -6877,37 +6883,54 @@ function mkPickRender(B){const wm=trS('mKomputer'),FS=on=>on?'<path d="M9 4v5H4M
 {const k=store.get('ztm.mkRun',null);MK.restore=k}
 new MutationObserver(()=>{if(TD.view==='mk'&&MK.run)mkUpd()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
 function mkOpen(){mkOvr(true);mkInboxLoad();clearInterval(MK.ibT);MK.ibT=setInterval(()=>{if(TD.view==='mk')mkInboxLoad();else clearInterval(MK.ibT)},60000);if(!MK.run&&MK.restore&&MK.restore.c===city){const r=IDX.routes.find(x=>x.id===MK.restore.id);if(r)MK.run={...MK.restore,r}}MK.restore=null;mkRender()}
-// ---- the TEST city: a network made in the creator (stops, lines with their timetables, duties), kept by the server for the
-// drivers and the administrators; shown as a city of its own (only in their modes, never to the other accounts) – its lines
-// in the timetables and in mKomputer like the others
-const NET={data:null,busy:false};
-const netStaff=()=>!!(ACC.user&&(ACC.mode==='driver'||ACC.mode==='admin'));
-const netEmpty=()=>({stops:[],lines:[],duties:[]});
+// ---- NetworkMaker (the administrator's section "TransitMaker"): the network drawn there shown as a city of its own –
+// "<its city> (NM)" at the top of the list of cities, only in the administrator's mode – its lines in the timetables and on
+// the map like the others. TransitMaker (tm.html, this site) keeps it in this browser (gdn-zi) and tells this page at once.
+// Each line's stops are the real poles by the direction it runs (the pole on the right of the road, numbered as on the
+// street: Odrzańska → Śródmieście SKM by the poles 01), where the data has a stop of that name close by
+const NM={data:null,sig:''};
+// the section TransitMaker (the administrator's): NetworkMaker in a frame filling the section; it follows the theme of this page
+function tmOpen(){const B=document.getElementById('tdTm');if(!B)return;if(!window.ACC_ADMIN){closeTool();return}
+  if(!B.querySelector('iframe')){B.innerHTML='<iframe src="tm.html" title="TransitMaker" allow="geolocation; clipboard-write"></iframe>'}}
+new MutationObserver(()=>{const f=document.querySelector('#tdTm iframe');if(f&&f.contentWindow)try{f.contentWindow.postMessage({zi:'theme'},location.origin)}catch(e){}}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+const krInv=(x,y,z)=>{const n=256*2**z;return [Math.atan(Math.sinh(Math.PI*(1-2*y/n)))*180/Math.PI,x/n*360-180]};   // (a tile's pixel to latitude and longitude)
 const hm2m=s=>{const m=String(s).trim().match(/^(\d{1,2})[:.](\d{2})$/);return m?+m[1]*60+ +m[2]:null};
 const m2hm=t=>String(Math.floor(t/60)%24).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
-// a line as the timetables read it (the same record as a line of the data): its directions, their stops, times and departures
-function netRoute(L,N){const nm=id=>(krStop(id)||{n:'?'}).n,keys=Object.keys(IDX.days||{w0:1,s0:1,h0:1});
-  const dirs=(L.dirs||[]).map(d=>{if(!d.s||d.s.every(krStop))return d;const o={...d,s:[],run:[]};d.s.forEach((x,i)=>{if(krStop(x)){o.s.push(x);if(i<d.s.length-1)o.run.push(+(d.run||[])[i]||0)}else if(o.run.length)o.run[o.run.length-1]+=+(d.run||[])[i]||0});o.run.length=Math.max(0,o.s.length-1);return o}).filter(d=>d.s&&d.s.length>1).map((d,di)=>{const off=[0];for(let i=1;i<d.s.length;i++)off.push(off[i-1]+Math.max(0,+(d.run||[])[i-1]||0));
-    const ids=d.s.map(x=>'tst_'+x);return {d:String(di),head:nm(d.s[d.s.length-1]),from:nm(d.s[0]),stops:ids.map(id=>[id,0,0,'',0]),pats:[ids.map((_,i)=>i)],notes:[''],prof:[[0,off]],
-      shape:(()=>{const g=[];for(let i=1;i<d.s.length;i++){const A=krStop(d.s[i-1]),B=krStop(d.s[i]),e=d.g&&d.gk&&d.gk[i-1]&&d.gk[i-1].startsWith(d.s[i-1]+'|'+d.s[i]+'|')?d.g[i-1]:'';const P=e?krDec(e):[[A.lat,A.lon],[B.lat,B.lon]];g.push(...(g.length?P.slice(1):P))}return g.length>1?g:null})(),plans:['w','s','h'].map(k=>((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(t=>[t,0,0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1]}});
-  return {id:'tstl'+L.id,n:L.n,t:L.t,op:'TEST',dates:IDX.days,dirs,lt:[]}}
-// the network into the index: its stops and lines replace those put in before
-function netInject(){if(!IDX)return;const N=NET.data||netEmpty();
-  Object.keys(IDX.stops).forEach(k=>{if(k.startsWith('tst_'))delete IDX.stops[k]});IDX.routes=IDX.routes.filter(r=>r.op!=='TEST');Object.keys(CACHE).forEach(k=>{if(k.startsWith('tst'))delete CACHE[k]});
-  if(netStaff()){Object.entries(IDX.stops).forEach(([k,S])=>{if(S[4]==='km')IDX.stops['tst_'+k]=[S[0],S[1],S[2],S[3],'tst',...S.slice(5)]});N.stops.forEach(S=>IDX.stops['tst_'+S.id]=[S.n,'',S.lat,S.lon,'tst']);
-    N.lines.forEach(L=>{const R=netRoute(L,N);if(!R.dirs.length)return;const d0=R.dirs[0];CACHE[R.id]=R;
-      IDX.routes.push({id:R.id,n:L.n,t:L.t||'bus',op:'TEST',f:true,pk:null,fh:0,avg:15,c:['tst'],ends:[d0.from,d0.head],sn:[...new Set(R.dirs.flatMap(d=>d.stops.map(s=>IDX.stops[s[0]][0])))].sort(),k:L.k||'#2e7d32'})})}
-  setByName();if(city==='tst'&&!TD.view&&!MAP.open)renderBoard()}
-async function netLoad(){if(NET.busy)return;NET.busy=true;try{NET.data=Object.assign(netEmpty(),await accApi('siec'));NET.ok=true}catch(e){NET.data=NET.data||netEmpty();NET.ok=false;NET.err=e&&e.st}NET.busy=false;netInject();
-  if(TD.view==='krt')krRender()}
-// the account or its mode changed: the city shown or hidden; out of it when no longer allowed
-function netSync(){const on=netStaff();document.querySelectorAll('[data-city=tst]').forEach(b=>b.hidden=!on);
-  if(on&&!NET.data)netLoad();else netInject();
-  if(!on&&city==='tst'&&ACC.state!=='wait')setCity('km')}
-// the duties of a TEST line of today (the day's kind: working day, Saturday, Sunday)
-const netDayK=()=>{try{return depDayKeys()[1][0][0]}catch(e){return 'w'}};
-function netDuties(r){const N=NET.data;if(!N||r.op!=='TEST')return [];const lid=r.id.slice(4),k=netDayK();
-  return N.duties.filter(d=>(d.dt||'w')===k&&(d.trips||[]).some(t=>t.l===lid)).map(d=>({d,lab:r.n+'/'+d.n,trips:(d.trips||[]).slice().sort((a,b)=>a.t-b.t)})).sort((a,b)=>a.lab.localeCompare(b.lab,'pl',{numeric:true}))}
+const netDuties=()=>[];   // (duties: only the timetables' own; NetworkMaker has none)
+const nmOn=()=>!!window.ACC_ADMIN;
+function nmRead(){try{return JSON.parse(localStorage.getItem('gdn-zi')||'null')}catch(e){return null}}
+const nmKm=(a,b)=>{const r=Math.PI/180,x=(b[1]-a[1])*r*Math.cos((a[0]+b[0])/2*r),y=(b[0]-a[0])*r;return Math.hypot(x,y)*6371};
+// the real pole for a stop of a direction: of the stops of that name within 300 m, the one on the right of the way it goes
+function nmPole(st,sh){const f=fold(st.n);if(!f)return null;const C=[];for(const [id,S] of Object.entries(IDX.stops)){if(S[4]==='nm'||fold(S[0])!==f)continue;const d=nmKm(st.ll,[S[2],S[3]]);if(d<.3)C.push({id,S,d})}
+  if(!C.length)return null;if(C.length===1||!sh||sh.length<2)return C.sort((a,b)=>a.d-b.d)[0];
+  let bi=0,bd=1e9;sh.forEach((q,k)=>{const x=nmKm(st.ll,q);if(x<bd){bd=x;bi=k}});const a=sh[Math.max(0,bi-1)],b=sh[Math.min(sh.length-1,bi+1)];
+  const M=(P,Q)=>[(Q[1]-P[1])*Math.cos(P[0]*Math.PI/180)*111.32,(Q[0]-P[0])*110.57],v=M(a,b);if(Math.hypot(v[0],v[1])<1e-6)return C.sort((x,y)=>x.d-y.d)[0];
+  const side=S=>{const w=M(a,[S[2],S[3]]);return v[0]*w[1]-v[1]*w[0]};
+  return C.filter(c=>side(c.S)<0).sort((x,y)=>x.d-y.d)[0]||C.sort((x,y)=>x.d-y.d)[0]}
+function nmRoute(Lx){const keys=Object.keys(IDX.days||{w0:1,s0:1,h0:1});
+  const dirs=(Lx.dirs||[]).filter(d=>d&&d.st&&d.st.length>1).map((d,di)=>{const ids=d.st.map(st=>{const P=nmPole(st,d.sh);if(P){const id='nm_'+P.id;IDX.stops[id]=[P.S[0],P.S[1]||'',P.S[2],P.S[3],'nm'];return id}
+      const id='nmu_'+st.id;IDX.stops[id]=[st.n,st.num||'',st.ll[0],st.ll[1],'nm'];return id});
+    const nm=k=>IDX.stops[ids[k]][0];
+    return {d:String(di),head:nm(ids.length-1),from:nm(0),stops:ids.map(id=>[id,0,0,'',0]),pats:[ids.map((_,i)=>i)],notes:[''],prof:[[0,d.off]],shape:d.sh&&d.sh.length>1?d.sh:null,
+      plans:['w','s','h'].map(k=>((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(t=>[t,0,0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1]}});
+  return {id:'nml'+Lx.id,n:Lx.n,t:Lx.kind==='tram'?'tram':Lx.kind==='rail'?'rail':'bus',op:'NM',dates:IDX.days,dirs,lt:[]}}
+// the network into the index (and the map's data): its stops and lines replace those put in before
+function nmInject(){if(!IDX)return;Object.keys(IDX.stops).forEach(k=>{if(k.startsWith('nm_')||k.startsWith('nmu_'))delete IDX.stops[k]});IDX.routes=IDX.routes.filter(r=>r.op!=='NM');Object.keys(CACHE).forEach(k=>{if(k.startsWith('nml'))delete CACHE[k]});
+  if(MAP.data)Object.keys(MAP.data.routes).forEach(k=>{if(k.startsWith('nml'))delete MAP.data.routes[k]});
+  const N=NM.data;if(nmOn()&&N&&Array.isArray(N.lines))N.lines.forEach(Lx=>{const R=nmRoute(Lx);if(!R.dirs.length)return;const d0=R.dirs[0];CACHE[R.id]=R;
+    IDX.routes.push({id:R.id,n:R.n,t:R.t,op:'NM',f:true,pk:null,fh:0,avg:15,c:['nm'],ends:[d0.from,d0.head],sn:[...new Set(R.dirs.flatMap(d=>d.stops.map(s=>IDX.stops[s[0]][0])))].sort(),k:Lx.color||'#555'});
+    if(MAP.data)nmMapOf(R)});
+  setByName();if(city==='nm'&&!TD.view&&!MAP.open&&!location.hash)renderBoard()}
+function nmMapOf(R){if(!MAP.data)return;const sn={};R.dirs.forEach(d=>d.stops.forEach(s=>{const S=IDX.stops[s[0]];if(S&&!sn[s[0]]){const [x,y]=proj(S[2],S[3]);sn[s[0]]=[x,y,1,0]}}));
+  MAP.data.routes[R.id]={lt:[],g:R.dirs.map(d=>(d.shape||d.stops.map(s=>{const S=IDX.stops[s[0]];return [S[2],S[3]]})).map(q=>proj(q[0],q[1]))),v:[],d:R.dirs.map(d=>d.stops.map(s=>s[0])),ve:[],vs:[],sn,vr:[]}}
+// the account or its mode changed, or the network in TransitMaker: the city shown or hidden, its lines drawn anew
+function nmSync(){const on=nmOn(),N=nmRead();NM.data=N;const nmN=N&&N.cityName?N.cityName+' (NM)':'NetworkMaker';CITIES.nm=[nmN,'w sieci '+nmN];
+  document.querySelectorAll('.cmNm').forEach(g=>{g.hidden=!on||!N;const a=g.querySelector('[data-city=nm]');if(a)a.textContent=nmN});
+  const sig=on+'|'+(N?N.t:0);if(sig!==NM.sig){NM.sig=sig;nmInject();if(city==='nm'){if(typeof markCity==='function')markCity();if(location.hash.startsWith('#l')||location.hash.startsWith('#t'))route()}}
+  if(!on&&city==='nm'&&ACC.state!=='wait')setCity('gda')}
+const netSync=nmSync;
+addEventListener('storage',e=>{if(e.key==='gdn-zi')nmSync()});
+addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.zi==='nm')nmSync()});
 /* ===== DPB LED core: fonts, pictograms, layout ===== */
 let DPB=null;
 function dpbInit(){if(DPB)return DPB;DPB=(() => {
@@ -7987,208 +8010,6 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
     g.onpointerdown=e=>{e.preventDefault();document.addEventListener('pointermove',mv);document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);hold=setTimeout(()=>{on=true;li.classList.add('persDrag')},180)}});
   if(!DBD.ro){DBD.ro=new ResizeObserver(()=>{if(TD.view==='dbd')dbdPaint()});}DBD.ro.disconnect();DBD.ro.observe(A);
   dbdPaint();if(!DBD.anim)dbdAnim(true)}
-// ---- the creator (the administrator's): the TEST city's stops, its lines (number, kind, colour, the stops of each direction
-// with the minutes between them, the departures of working days, Saturdays and Sundays) and the duties (the trips each duty
-// runs); kept on the server with "Zapisz"
-const KR={tab:'lines',line:null,duty:null,dirty:false,v:null,drag:null,mode:'click',dir:0,msg:''};
-const KR_COL=['#2e7d32','#1565c0','#c62828','#ef6c00','#6a1b9a','#00838f','#ad1457','#5d4037','#37474f','#9e9d24'];
-const krN=()=>NET.data||(NET.data=netEmpty());
-const krId=()=>Math.random().toString(36).slice(2,8);
-// (the TEST stops are those of Krynica-Zdrój and Muszyna, by their own ids; stops of the network's own, of before, still count)
-const krStop=id=>{const c=krN().stops.find(s=>s.id===id);if(c)return c;const S=IDX&&IDX.stops[id];return S&&S[4]==='km'?{id,n:S[0],p:S[1]||'',lat:S[2],lon:S[3]}:null};
-const krAll=()=>Object.entries(IDX?IDX.stops:{}).filter(([k,S])=>S[4]==='km').map(([id,S])=>({id,n:S[0],p:S[1]||'',lat:S[2],lon:S[3]})).concat(krN().stops);
-const krNm=S=>S?S.n+(S.p?' '+S.p:''):'?';
-const krKm=(a,b)=>{const r=Math.PI/180,x=(b.lon-a.lon)*r*Math.cos((a.lat+b.lat)/2*r),y=(b.lat-a.lat)*r;return Math.hypot(x,y)*6371};
-// (the minutes between two stops, guessed: about 22 km/h along the way, at least one)
-const krRun=(a,b)=>{const A=krStop(a),B=krStop(b);return A&&B?Math.max(1,Math.round(krKm(A,B)*1.25/22*60)):2};
-// (the stop of the same name on the other side of the street: the way back)
-const krTwin=id=>{const S=krStop(id);if(!S)return id;let best=null,bd=.25;krAll().forEach(T=>{if(T.id!==id&&T.n===S.n){const d=krKm(S,T);if(d<bd){bd=d;best=T.id}}});return best||id};
-function krPush(d,ids){d.run=d.run||[];ids.forEach(id=>{if(d.s[d.s.length-1]===id)return;if(d.s.length)d.run[d.s.length-1]=krRun(d.s[d.s.length-1],id);d.s.push(id)});d.run.length=Math.max(0,d.s.length-1)}
-function krDirty(){KR.dirty=true;const s=document.getElementById('krSt');if(s)s.textContent=trS('Niezapisane zmiany');const b=document.getElementById('krSave');if(b)b.classList.add('pri');
-  clearTimeout(KR.inj);KR.inj=setTimeout(()=>{try{krGenDuties(krN());netInject();if(TD.view==='krt'&&KR.tab==='duties'&&!KR.drag)krRender()}catch(e){}},300);clearTimeout(KR.as);KR.as=setTimeout(()=>{if(KR.dirty)krSave()},2000)}   // (the TEST timetables at once; saved by itself after 2 s)
-async function krSave(){const s=document.getElementById('krSt');if(!NET.ok){if(s)s.textContent=trS('Nie udało się wczytać sieci z serwera, więc zapis jest wstrzymany, żeby nie nadpisać zapisanych linii. Wdróż najnowszy worker.js i odśwież stronę.');return}try{await accApi('admin/siec',{method:'PUT',body:krN()});KR.dirty=false;s.textContent=trS('Zapisano.');document.getElementById('krSave').classList.remove('pri');netInject()}
-  catch(e){s.textContent=trS(e.st===404?'Serwer nie ma kreatora – wdróż najnowszy worker.js':'Nie udało się zapisać.')}}
-function krRender(){const A=document.getElementById('tdKrt');if(!A||TD.view!=='krt')return;if(!window.ACC_ADMIN){closeTool();return}
-  if(!NET.data){A.innerHTML=`<h2>${esc(trS('Kreator sieci'))}</h2><p class="hint">${esc(trS('Wczytywanie…'))}</p>`;netLoad();return}
-  if(KR.tab!=='duties')KR.tab='lines';const T=[['lines','Linie i rozkłady'],['duties','Brygady']];
-  A.innerHTML=`<div class="krHead"><h2>${esc(trS('Kreator sieci'))} <small>TEST</small></h2><div class="accRow"><button type="button" class="accBtn${KR.dirty?' pri':''}" id="krSave">${esc(trS('Zapisz'))}</button><span class="accMsg" id="krSt">${KR.dirty?esc(trS('Niezapisane zmiany')):''}</span></div></div>
-    <p class="hint">${esc(trS('Linie miasta TEST widzą tylko kierowcy i administratorzy – w rozkładach i w mKomputerze.'))}</p>
-    <div class="seg krTabs">${T.map(([k,t])=>`<button type="button" data-krt="${k}" aria-pressed="${KR.tab===k}">${esc(trS(t))}</button>`).join('')}</div><div id="krBody"></div>`;
-  A.querySelectorAll('[data-krt]').forEach(b=>b.onclick=()=>{KR.tab=b.dataset.krt;krRender()});document.getElementById('krSave').onclick=krSave;
-  const B=document.getElementById('krBody');if(KR.tab==='lines')krLines(B);else krDuties(B)}
-// --- the way of a line along the streets (OSRM, as for a car) or the tram tracks (OpenStreetMap through Overpass), leg by leg
-// between its stops; each leg kept as an encoded polyline with the pair it joins; a leg not found: a straight line
-const plDec=s=>{const o=[];let i=0,la=0,lo=0;while(i<s.length){const v=[0,0];for(let k=0;k<2;k++){let r=0,sh=0,b;do{b=s.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5}while(b>=32&&i<s.length);v[k]=r&1?~(r>>1):r>>1}la+=v[0];lo+=v[1];o.push([la/1e5,lo/1e5])}return o};
-const plEnc=P=>{let o='',pa=0,po=0;const e=v=>{v=v<0?~(v<<1):v<<1;while(v>=32){o+=String.fromCharCode((32|(v&31))+63);v>>=5}o+=String.fromCharCode(v+63)};P.forEach(([a,b])=>{const A=Math.round(a*1e5),B=Math.round(b*1e5);e(A-pa);e(B-po);pa=A;po=B});return o};
-const KRR={c:{},dec:new Map(),tok:new WeakMap(),busy:0};
-const krDec=s=>{let g=KRR.dec.get(s);if(!g){g=plDec(s);KRR.dec.set(s,g)}return g};
-async function krFetch(u,ms){const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms);try{const r=await fetch(u,{signal:ac.signal});if(!r.ok)throw new Error(r.status);return await r.json()}finally{clearTimeout(t)}}
-// (the tram tracks around the two stops; the shortest way along them)
-async function krTram(A,B){const p=.012,q=`[out:json][timeout:25];way["railway"="tram"](${Math.min(A.lat,B.lat)-p},${Math.min(A.lon,B.lon)-p},${Math.max(A.lat,B.lat)+p},${Math.max(A.lon,B.lon)+p});out geom;`;
-  const j=await krFetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q),25000),id=g=>g.lat.toFixed(6)+','+g.lon.toFixed(6),N={},adj={};
-  (j.elements||[]).forEach(W=>{const g=W.geometry||[];for(let i=1;i<g.length;i++){const u=id(g[i-1]),v=id(g[i]),d=krKm(g[i-1],g[i]);N[u]=g[i-1];N[v]=g[i];(adj[u]=adj[u]||[]).push([v,d]);(adj[v]=adj[v]||[]).push([u,d])}});
-  const near=P=>{let b=null,bd=.15;for(const k in N){const d=krKm(P,N[k]);if(d<bd){bd=d;b=k}}return b},s0=near(A),t0=near(B);if(!s0||!t0)return null;
-  const dist={[s0]:0},prev={},H=[[0,s0]],push=x=>{H.push(x);let i=H.length-1;while(i){const p2=(i-1)>>1;if(H[p2][0]<=H[i][0])break;[H[p2],H[i]]=[H[i],H[p2]];i=p2}},
-    pop=()=>{const t=H[0],l=H.pop();if(H.length){H[0]=l;let i=0;for(;;){const a=2*i+1,b=a+1;let m=i;if(a<H.length&&H[a][0]<H[m][0])m=a;if(b<H.length&&H[b][0]<H[m][0])m=b;if(m===i)break;[H[m],H[i]]=[H[i],H[m]];i=m}}return t};
-  while(H.length){const [d,u]=pop();if(u===t0)break;if(d>dist[u])continue;(adj[u]||[]).forEach(([v,w])=>{const nd=d+w;if(dist[v]===undefined||nd<dist[v]){dist[v]=nd;prev[v]=u;push([nd,v])}})}
-  if(dist[t0]===undefined)return null;const path=[];for(let u=t0;u;u=prev[u])path.unshift([N[u].lat,N[u].lon]);return {p:plEnc([[A.lat,A.lon],...path,[B.lat,B.lon]]),km:dist[t0]}}
-async function krLeg(a,b,t){const k=a+'|'+b+'|'+t;if(KRR.c[k])return KRR.c[k];const A=krStop(a),B=krStop(b);if(!A||!B)return null;let r=null;
-  try{if(t==='tram')r=await krTram(A,B);else{const j=await krFetch(`https://router.project-osrm.org/route/v1/driving/${A.lon},${A.lat};${B.lon},${B.lat}?overview=full&geometries=polyline`,12000),R=j&&j.routes&&j.routes[0];if(R&&R.geometry)r={p:R.geometry,km:R.distance/1000}}}catch(e){}
-  if(r)KRR.c[k]=r;return r}
-// (the legs of a direction brought up to its stops: those of pairs still there kept, the others looked for, three at a time)
-async function krRoute(L,d){const t=L.t==='tram'?'tram':'bus',tok=(KRR.tok.get(d)||0)+1;KRR.tok.set(d,tok);
-  const old={};(d.gk||[]).forEach((k,i)=>{if(d.g&&d.g[i])old[k]=d.g[i]});const keys=[];for(let i=1;i<d.s.length;i++)keys.push(d.s[i-1]+'|'+d.s[i]+'|'+t);
-  d.g=keys.map(k=>old[k]||'');d.gk=keys;const todo=keys.map((k,i)=>i).filter(i=>!d.g[i]);if(!todo.length)return true;
-  KRR.busy++;krBusy();let n=0;const work=async()=>{while(n<todo.length){const j=todo[n++];const r=await krLeg(d.s[j],d.s[j+1],t);if(KRR.tok.get(d)!==tok)return;if(r){d.g[j]=r.p;d.run=d.run||[];d.run[j]=Math.max(1,Math.round(r.km/22*60))}}};
-  try{await Promise.all([work(),work(),work()])}finally{KRR.busy--;krBusy()}return KRR.tok.get(d)===tok}
-// (the platform: where the way passes a stop, the one of its name on the right of the way – the bus stops on the right)
-function krSides(d){const ch=[],all=krAll(),M=(P,Q)=>[(Q.lon-P.lon)*Math.cos(P.lat*Math.PI/180)*111.32,(Q.lat-P.lat)*110.57];
-  d.s.forEach((id,i)=>{const S=krStop(id);if(!S)return;const C=all.filter(T=>T.n===S.n&&krKm(S,T)<.25);if(C.length<2)return;const e=d.g&&(d.g[i-1]||d.g[i]);if(!e)return;const g=krDec(e);if(g.length<2)return;
-    let bi=0,bd=1e9;g.forEach((q,k)=>{const x=krKm(S,{lat:q[0],lon:q[1]});if(x<bd){bd=x;bi=k}});if(bd>.12)return;
-    const a=g[Math.max(0,bi-1)],b=g[Math.min(g.length-1,bi+1)],A={lat:a[0],lon:a[1]},v=M(A,{lat:b[0],lon:b[1]});if(Math.hypot(v[0],v[1])<1e-6)return;
-    const side=T=>{const w=M(A,T);return v[0]*w[1]-v[1]*w[0]};if(side(S)<0)return;
-    const R=C.filter(T=>side(T)<0).sort((x,y)=>krKm(S,x)-krKm(S,y))[0];if(R){d.s[i]=R.id;ch.push(i)}});return ch}
-function krBusy(){const h=document.getElementById('krMH');if(h&&KRR.busy)h.textContent=trS('Wyznaczanie trasy…')}
-// (after a change of the stops: the way looked for, the platforms set by it, the way again where a platform changed)
-async function krAfter(L,d){if(!(await krRoute(L,d)))return;if(krSides(d).length&&!(await krRoute(L,d)))return;krDirty();if(TD.view==='krt'&&KR.tab==='lines'&&KR.line===L.id&&!KR.drag&&!KR.ink)krRender()}
-function krEdit(L,d){if(d===L.dirs[0])krBack(L);else if(d)d.auto=false;krDirty();krRender();krAfter(L,d)}
-// (the way back: direction 1's stops reversed, each on the other side of the street – made by itself, and following direction 1
-// until its own stops are changed; not made again once removed)
-function krBack(L){const a=L.dirs[0];if(!a||a.s.length<2)return;let b=L.dirs[1];if(!b){if(L.noBack)return;b={s:[],run:[],dep:{w:[],s:[],h:[]},auto:true};L.dirs.push(b)}
-  if(!b.auto)return;b.s=[];b.run=[];krPush(b,a.s.slice().reverse().map(krTwin));krAfter(L,b)}
-// --- the duties made from the timetables: per line and kind of day, the trips in order of departure; a trip goes to the vehicle
-// waiting longest at the stop it starts from (at least 2 minutes after its last trip came in), else to a new one; named X/Y
-// (X the line, Y the duty)
-function krGenDuties(N){if(N.autoD===false)return;const old=new Set(N.duties.filter(u=>u.auto).map(u=>u.id));N.duties=N.duties.filter(u=>!u.auto);const nm=id=>(krStop(id)||{}).n||id;
-  N.lines.forEach(L=>['w','s','h'].forEach(dk=>{const T=[];(L.dirs||[]).forEach((d,di)=>{if(!d.s||d.s.length<2)return;const len=(d.run||[]).slice(0,d.s.length-1).reduce((a,b)=>a+(+b||0),0),A=krStop(d.s[0])||{n:d.s[0]},B=krStop(d.s[d.s.length-1])||{n:d.s[d.s.length-1]};((d.dep||{})[dk]||[]).forEach(t=>T.push({d:di,t,e:t+len,A,B}))});
-    T.sort((x,y)=>x.t-y.t||x.d-y.d);const V=[];T.forEach(x=>{let v=null;const near=(P,Q)=>P.n===Q.n||(P.lat!=null&&Q.lat!=null&&krKm(P,Q)<.6);V.forEach(o=>{if(near(o.at,x.A)&&o.free<=x.t&&(!v||o.free<v.free))v=o});if(!v){v={trips:[]};V.push(v)}v.trips.push({l:L.id,d:x.d,t:x.t});v.at=x.B;v.free=x.e+2});
-    V.forEach((v,i)=>N.duties.push({id:'a_'+L.id+'_'+dk+'_'+(i+1),n:L.n+'/'+(i+1),dt:dk,trips:v.trips,auto:true}))}));
-  if(KR.duty&&old.has(KR.duty)&&!N.duties.some(u=>u.id===KR.duty))KR.duty=null}
-// --- the route map of the line chosen: the stops of Krynica-Zdrój and Muszyna; the direction chosen in the line's colour, along
-// its way. "Klikaj przystanki": a click on a stop puts it at the end of the direction; "Rysuj trasę": what is drawn picks the
-// stops along it, in order. Dragging with the right button (or, clicking stops, with the left) moves the map; the wheel or +/− zoom
-// ---- reordering a list by dragging: hold the grip (.persGrip) of a row a moment, drag it up or down; let go – done(the rows'
-// data-i in their new order), called only when the order changed
-function gripSort(ul,done){if(!ul)return;ul.querySelectorAll(':scope>li>.persGrip').forEach(g=>{const li=g.parentNode;let hold=0,on=false;
-  const mv=e=>{if(!on)return;e.preventDefault();const o=[...ul.children].find(x=>x!==li&&x.dataset.i!=null&&(()=>{const r=x.getBoundingClientRect();return e.clientY>r.top&&e.clientY<r.bottom})());if(!o)return;const r=o.getBoundingClientRect();ul.insertBefore(li,e.clientY<r.top+r.height/2?o:o.nextSibling)};
-  const end=()=>{clearTimeout(hold);document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',end);document.removeEventListener('pointercancel',end);if(!on)return;on=false;li.classList.remove('persDrag');
-    const ord=[...ul.children].filter(x=>x.dataset.i!=null).map(x=>+x.dataset.i);if(ord.some((v,k)=>v!==k))done(ord)};
-  g.onpointerdown=e=>{e.preventDefault();document.addEventListener('pointermove',mv);document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);hold=setTimeout(()=>{on=true;li.classList.add('persDrag');if(navigator.vibrate)try{navigator.vibrate(15)}catch(_){}},180)}})}
-const krInv=(x,y,z)=>{const n=256*2**z;return [Math.atan(Math.sinh(Math.PI*(1-2*y/n)))*180/Math.PI,x/n*360-180]};
-function krMap(W,L){if(!W)return;const all=krAll(),d=L.dirs[KR.dir]||L.dirs[0];
-  if(!KR.v||KR.v.line!==L.id){const P=(d.s.length?d.s.map(krStop).filter(Boolean):all.filter(S=>S.n));const la=P.reduce((a,S)=>a+S.lat,0)/(P.length||1),lo=P.reduce((a,S)=>a+S.lon,0)/(P.length||1);KR.v={lat:P.length?la:49.42,lon:P.length?lo:20.96,z:d.s.length?15:13,line:L.id}}
-  W.innerHTML=`<div class="krTool"><span class="seg admSeg">${L.dirs.map((x,i)=>`<button type="button" data-kd="${i}" aria-pressed="${KR.dir===i}">${esc(trS('Kierunek'))} ${i+1}</button>`).join('')}</span>
-    <span class="seg admSeg">${[['click','Klikaj przystanki'],['draw','Rysuj trasę']].map(([k,t])=>`<button type="button" data-km="${k}" aria-pressed="${KR.mode===k}">${esc(trS(t))}</button>`).join('')}</span>
-    <button type="button" class="accBtn" data-a="clr"${d.s.length?'':' disabled'}>${esc(trS('Wyczyść trasę'))}</button></div>
-    <div class="krMapW"><canvas class="krMap${KR.mode==='draw'?' draw':''}"></canvas><div class="krZoom"><button type="button" data-kz="1">+</button><button type="button" data-kz="-1">−</button></div><small class="krAttr">© OpenStreetMap · © CARTO · OSRM</small></div>
-    <p class="hint" id="krMH">${esc(KR.msg||trS(KR.mode==='draw'?'Rysuj trasę po mapie – przystanki leżące na niej zostaną dodane w kolejności. Zbędne usuniesz z listy. Prawym przyciskiem przesuniesz mapę.':'Kliknij przystanek na mapie, aby dodać go na koniec trasy. Przeciągnij, aby przesunąć mapę.'))}</p>`;KR.msg='';krBusy();
-  const C=W.querySelector('canvas');KR.ink=null;
-  const view=()=>{const w=C.clientWidth,h=C.clientHeight,z=KR.v.z,c=mkWm(KR.v.lat,KR.v.lon,z);return {w,h,z,c,px:(la,lo)=>{const q=mkWm(la,lo,z);return [q[0]-c[0]+w/2,q[1]-c[1]+h/2]}}};
-  const draw=()=>{const w=C.clientWidth,h=C.clientHeight;if(!w||!h)return;const dpr=window.devicePixelRatio||1;C.width=Math.round(w*dpr);C.height=Math.round(h*dpr);const x=C.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-    const V=view(),lt=pageLight();x.fillStyle=lt?'#e9edf0':'#1b1f1d';x.fillRect(0,0,w,h);
-    {const tz=Math.min(V.z,18),f=2**(V.z-tz),ts=256*f,cx=V.c[0]/f,cy=V.c[1]/f;
-      for(let ty=Math.floor((cy-h/2/f)/256);ty<=Math.floor((cy+h/2/f)/256);ty++)for(let tx=Math.floor((cx-w/2/f)/256);tx<=Math.floor((cx+w/2/f)/256);tx++){const X=tx*ts-V.c[0]+w/2,Y=ty*ts-V.c[1]+h/2,t=mkTile(tz,tx,ty,draw,lt);
-        if(t.ok){x.drawImage(t.img,X,Y,ts+.5,ts+.5);continue}const p=MKM.tiles.get((lt?'rastertiles/voyager':'dark_all')+'/'+(tz-1)+'/'+(tx>>1)+'/'+(ty>>1));if(p&&p.ok){const sw=p.img.naturalWidth/2;x.drawImage(p.img,(tx&1)*sw,(ty&1)*sw,sw,sw,X,Y,ts+.5,ts+.5)}}}
-    const col=L.k||'#2e7d32';x.lineJoin=x.lineCap='round';
-    const way=(o,wd,a)=>{for(let i=1;i<o.s.length;i++){const A=krStop(o.s[i-1]),B=krStop(o.s[i]);if(!A||!B)continue;const g=o.g&&o.g[i-1]&&(!o.gk||o.gk[i-1]&&o.gk[i-1].startsWith(o.s[i-1]+'|'+o.s[i]+'|'))?krDec(o.g[i-1]):null;
-      x.beginPath();(g||[[A.lat,A.lon],[B.lat,B.lon]]).forEach((q,k)=>{const p=V.px(q[0],q[1]);k?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])});x.setLineDash(g?[]:[7,6]);x.strokeStyle=col;x.lineWidth=wd;x.globalAlpha=a;x.stroke()}x.globalAlpha=1;x.setLineDash([])};
-    L.dirs.forEach((o,i)=>{if(i!==KR.dir)way(o,3,.4)});way(d,5,.92);
-    const on=new Set(d.s);x.font='600 12px Roboto,sans-serif';x.textBaseline='middle';
-    const lab=(S,p)=>{x.lineWidth=3;x.strokeStyle=lt?'#fff':'#000';x.strokeText(krNm(S),p[0]+9,p[1]);x.fillStyle=lt?'#1d2126':'#fff';x.fillText(krNm(S),p[0]+9,p[1])};
-    all.forEach(S=>{if(on.has(S.id))return;const p=V.px(S.lat,S.lon);if(p[0]<-20||p[1]<-20||p[0]>w+20||p[1]>h+20)return;x.beginPath();x.arc(p[0],p[1],V.z>=15?5:3.5,0,7);x.fillStyle='#fff';x.fill();x.lineWidth=1.5;x.strokeStyle=lt?'#5a6470':'#9aa3ad';x.stroke();if(V.z>=16)lab(S,p)});
-    d.s.forEach((id,i)=>{const S=krStop(id);if(!S)return;const p=V.px(S.lat,S.lon);x.beginPath();x.arc(p[0],p[1],8,0,7);x.fillStyle=col;x.fill();x.lineWidth=2;x.strokeStyle='#fff';x.stroke();
-      x.fillStyle='#fff';x.font='700 9px Roboto,sans-serif';x.textAlign='center';x.fillText(String(i+1),p[0],p[1]+.5);x.textAlign='left';x.font='600 12px Roboto,sans-serif';if(V.z>=14)lab(S,p)});
-    if(KR.ink&&KR.ink.length>1){x.beginPath();KR.ink.forEach((q,i)=>{const p=V.px(q[0],q[1]);i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1])});x.strokeStyle=col;x.lineWidth=6;x.globalAlpha=.55;x.stroke();x.globalAlpha=1}};
-  const at=e=>{const r=C.getBoundingClientRect(),V=view();return krInv(V.c[0]+e.clientX-r.left-V.w/2,V.c[1]+e.clientY-r.top-V.h/2,V.z)};
-  // (the stops along a drawn line: near it, in the order of the way; of two of a name the one on the right of the way)
-  const pick=pts=>{const V=view(),P=pts.map(q=>V.px(q[0],q[1])),cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));
-    const hit=[];all.forEach(S=>{const q=V.px(S.lat,S.lon);let best=null;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy||1,t=Math.max(0,Math.min(1,((q[0]-a[0])*dx+(q[1]-a[1])*dy)/l2)),ex=a[0]+t*dx,ey=a[1]+t*dy,dd=Math.hypot(q[0]-ex,q[1]-ey);
-      if(!best||dd<best.dd)best={dd,pos:cum[i-1]+t*Math.sqrt(l2),right:dx*(q[1]-a[1])-dy*(q[0]-a[0])>0}}if(best&&best.dd<=Math.max(16,V.z>=16?26:20))hit.push(Object.assign(best,{S}))});
-    const by={};hit.forEach(h=>{const k=h.S.n;const o=by[k];if(!o||(h.right&&!o.right)||(h.right===o.right&&h.dd<o.dd))by[k]=h});
-    return Object.values(by).sort((a,b)=>a.pos-b.pos).map(h=>h.S.id)};
-  C.oncontextmenu=e=>e.preventDefault();
-  C.onpointerdown=e=>{C.setPointerCapture(e.pointerId);if(KR.mode==='draw'&&e.button===0){KR.ink=[at(e)];return}KR.drag={x:e.clientX,y:e.clientY,m:false,r:e.button!==0,c:mkWm(KR.v.lat,KR.v.lon,KR.v.z)}};
-  C.onpointermove=e=>{if(KR.ink){const q=at(e),l=KR.ink[KR.ink.length-1];if(Math.abs(q[0]-l[0])+Math.abs(q[1]-l[1])>1e-5){KR.ink.push(q);draw()}return}
-    const g=KR.drag;if(!g)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;if(Math.hypot(dx,dy)>4)g.m=true;if(g.m){const q=krInv(g.c[0]-dx,g.c[1]-dy,KR.v.z);KR.v.lat=q[0];KR.v.lon=q[1];draw()}};
-  C.onpointerup=e=>{if(KR.ink){const pts=KR.ink;KR.ink=null;const ids=pts.length>1?pick(pts):[];if(!ids.length){document.getElementById('krMH').textContent=trS('Nie znaleziono przystanków na narysowanej trasie.');draw();return}
-      const n0=d.s.length;krPush(d,ids);KR.msg=trS('Dodano przystanków:')+' '+(d.s.length-n0);krEdit(L,d);return}
-    const g=KR.drag;KR.drag=null;if(!g||g.m||g.r)return;const r=C.getBoundingClientRect(),V=view(),mx=e.clientX-r.left,my=e.clientY-r.top;let best=null,bd=16;
-    all.forEach(S=>{const p=V.px(S.lat,S.lon),dd=Math.hypot(p[0]-mx,p[1]-my);if(dd<bd){bd=dd;best=S}});if(!best)return;krPush(d,[best.id]);krEdit(L,d)};
-  C.onpointercancel=()=>{KR.ink=null;KR.drag=null;draw()};
-  C.onwheel=e=>{e.preventDefault();KR.v.z=Math.max(11,Math.min(20,KR.v.z+(e.deltaY<0?1:-1)));draw()};
-  W.querySelectorAll('[data-kz]').forEach(b=>b.onclick=()=>{KR.v.z=Math.max(11,Math.min(20,KR.v.z+ +b.dataset.kz));draw()});
-  W.querySelectorAll('[data-kd]').forEach(b=>b.onclick=()=>{KR.dir=+b.dataset.kd;krRender()});
-  W.querySelectorAll('[data-km]').forEach(b=>b.onclick=()=>{KR.mode=b.dataset.km;krRender()});
-  W.querySelector('[data-a=clr]').onclick=e=>{const b=e.currentTarget;if(!b.classList.contains('ask')){b.classList.add('ask');b.textContent=trS('Na pewno usunąć?');return}d.s=[];d.run=[];d.g=[];d.gk=[];krEdit(L,d)};
-  if(!KR.ro){KR.ro=new ResizeObserver(()=>{if(KR.redraw)KR.redraw()})}KR.ro.disconnect();KR.ro.observe(C);KR.redraw=draw;
-  requestAnimationFrame(draw);
-  // (a direction whose way is not all there yet: looked for now)
-  L.dirs.forEach(o=>{if(o.s.length>1&&(!o.g||o.g.length!==o.s.length-1||o.g.some(x=>!x))&&!KRR.tok.get(o))krAfter(L,o)})}
-// --- the lines: the list, and the line chosen – its number, kind and colour, its directions (the stops in order with the minutes
-// to the next one; the way back made from the way there), and each direction's departures by the kind of day
-function krLines(B){const N=krN();let L=N.lines.find(x=>x.id===KR.line);
-  B.innerHTML=`<div class="krCols3"><div class="krSide"><ul class="krList krPick" id="krLL"></ul><button type="button" class="accBtn" id="krAddL">${esc(trS('Dodaj linię'))}</button></div><div class="krMid" id="krRM"></div><div class="krEd" id="krLE"></div></div>`;
-  const LL=document.getElementById('krLL');N.lines.slice().sort((a,b)=>a.n.localeCompare(b.n,'pl',{numeric:true})).forEach(x=>{const li=document.createElement('li');const b=document.createElement('button');b.type='button';b.className=x.id===KR.line?'on':'';
-    b.innerHTML=`<span class="krChip" style="background:${esc(x.k||'#2e7d32')}"></span><b></b><small></small>`;b.querySelector('b').textContent=x.n;const d0=(x.dirs||[])[0];b.querySelector('small').textContent=d0&&d0.s.length>1?(krStop(d0.s[0])||{n:'?'}).n+' – '+(krStop(d0.s[d0.s.length-1])||{n:'?'}).n:trS('bez trasy');b.onclick=()=>{KR.line=x.id;krRender()};li.append(b);LL.append(li)});
-  if(!N.lines.length)LL.innerHTML=`<li class="hint">${esc(trS('Brak linii.'))}</li>`;
-  document.getElementById('krAddL').onclick=()=>{const x={id:krId(),n:String(N.lines.length+1),t:'bus',k:KR_COL[N.lines.length%KR_COL.length],dirs:[{s:[],run:[],dep:{w:[],s:[],h:[]}}]};N.lines.push(x);KR.line=x.id;krDirty();krRender()};
-  const E=document.getElementById('krLE');if(!L){E.innerHTML=`<p class="hint">${esc(trS('Wybierz linię albo dodaj nową.'))}</p>`;document.getElementById('krRM').innerHTML='';return}
-  L.dirs=L.dirs||[];if(!L.dirs.length)L.dirs.push({s:[],run:[],dep:{w:[],s:[],h:[]}});if(KR.dir>=L.dirs.length)KR.dir=0;
-  const opt=krAll().filter(S=>S.n).sort((a,b)=>krNm(a).localeCompare(krNm(b),'pl',{numeric:true})).map(S=>`<option value="${esc(S.id)}">${esc(krNm(S))}</option>`).join('');
-  E.innerHTML=`<div class="admRows"><label class="admRow"><span>${esc(trS('Numer linii'))}</span><input type="text" class="tdIn krNum" maxlength="5" value="${esc(L.n)}"></label>
-    <div class="admRow"><span>${esc(trS('Rodzaj'))}</span><span class="seg admSeg">${[['bus','Autobus'],['tram','Tramwaj']].map(([v,t])=>`<button type="button" data-kt="${v}" aria-pressed="${(L.t||'bus')===v}">${esc(trS(t))}</button>`).join('')}</span></div>
-    <div class="admRow"><span>${esc(trS('Kolor'))}</span><span class="krCols2">${KR_COL.map(c=>`<button type="button" class="krSw" data-kc="${c}" style="background:${c}" aria-pressed="${L.k===c}" aria-label="${c}"></button>`).join('')}</span></div></div>
-    <div class="krDirs">${L.dirs.map((d,di)=>`<section class="krDir${di===KR.dir?' on':''}" data-di="${di}"><div class="krDH"><h3>${esc(trS('Kierunek'))} ${di+1}${d.s.length>1?': '+esc((krStop(d.s[d.s.length-1])||{}).n||''):''} <small>(${d.s.length})</small>${d.auto?`<small class="krAuto">${esc(trS('tworzony automatycznie z kierunku 1 – zmiana jego przystanków go odłączy'))}</small>`:''}</h3>${di?`<button type="button" class="accBtn" data-a="deldir">${esc(trS('Usuń kierunek'))}</button>`:''}</div>
-      <ol class="krSeq">${d.s.map((sid,i)=>`<li data-i="${i}"><span class="persGrip" aria-label="${esc(trS('Przytrzymaj i przeciągnij, aby zmienić kolejność'))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span><b>${esc(krNm(krStop(sid)))}</b>${i<d.s.length-1?`<label class="krRun"><input type="number" class="tdIn" min="0" max="120" value="${+(d.run||[])[i]||0}"> ${esc(trS('min'))}</label>`:'<span class="krRun"></span>'}<button type="button" class="accBtn" data-a="rm" aria-label="${esc(trS('Usuń'))}">✕</button></li>`).join('')}</ol>
-      <div class="accRow"><select class="krAddS" aria-label="${esc(trS('Dodaj przystanek'))}"><option value="">${esc(trS('Dodaj przystanek…'))}</option>${opt}</select></div>
-      <h4>${esc(trS('Odjazdy z pierwszego przystanku'))}</h4>
-      ${[['w','Dni robocze'],['s','Soboty'],['h','Niedziele i święta']].map(([k,t])=>`<label class="krDep"><span>${esc(trS(t))} <small>(${((d.dep||{})[k]||[]).length})</small></span><textarea class="tdIn" rows="2" data-k="${k}" placeholder="05:00 05:30 06:00">${esc(((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(m2hm).join(' '))}</textarea></label>`).join('')}
-      ${di?`<div class="krGen"><button type="button" class="accBtn" data-a="copy">${esc(trS('Skopiuj rozkład z kierunku 1'))}</button><span>${esc(trS('przesunięty o'))}</span><input type="number" class="tdIn" data-g="sh" min="0" max="600" value="${(L.dirs[0].run||[]).reduce((a,b)=>a+(+b||0),0)}"><span>${esc(trS('min'))}</span></div>`:''}<div class="krGen"><span>${esc(trS('Dodaj co'))}</span><input type="number" class="tdIn" data-g="ev" min="1" max="240" value="20"><span>${esc(trS('min od'))}</span><input type="text" class="tdIn" data-g="a" value="05:00" maxlength="5"><span>${esc(trS('do'))}</span><input type="text" class="tdIn" data-g="b" value="22:00" maxlength="5">
-        <select data-g="k"><option value="w">${esc(trS('Dni robocze'))}</option><option value="s">${esc(trS('Soboty'))}</option><option value="h">${esc(trS('Niedziele i święta'))}</option></select><button type="button" class="accBtn" data-a="gen">${esc(trS('Dodaj'))}</button></div>
-    </section>`).join('')}</div>
-    <div class="accRow">${L.dirs.length<2?`<button type="button" class="accBtn" id="krBack">${esc(trS('Utwórz kierunek powrotny'))}</button>`:''}<button type="button" class="accBtn" id="krDelL">${esc(trS('Usuń linię'))}</button></div>`;
-  E.querySelector('.krNum').onchange=e=>{L.n=e.target.value.trim().toUpperCase()||L.n;krDirty();krRender()};
-  E.querySelectorAll('[data-kt]').forEach(b=>b.onclick=()=>{L.t=b.dataset.kt;krDirty();krRender();L.dirs.forEach(o=>krAfter(L,o))});
-  E.querySelectorAll('[data-kc]').forEach(b=>b.onclick=()=>{L.k=b.dataset.kc;krDirty();krRender()});
-  E.querySelectorAll('.krDir').forEach(sec=>{const d=L.dirs[+sec.dataset.di];d.run=d.run||[];d.dep=d.dep||{w:[],s:[],h:[]};
-    sec.querySelectorAll('.krSeq li').forEach(li=>{const i=+li.dataset.i;const r=li.querySelector('.krRun input');if(r)r.onchange=()=>{d.run[i]=Math.max(0,+r.value||0);krDirty()};
-      li.querySelector('[data-a=rm]').onclick=()=>{const ids=d.s.slice();ids.splice(i,1);d.s=[];d.run=[];krPush(d,ids);krEdit(L,d)}});
-    gripSort(sec.querySelector('.krSeq'),ord=>{const ids=ord.map(i=>d.s[i]);d.s=[];d.run=[];krPush(d,ids);krEdit(L,d)});
-    sec.querySelector('.krAddS').onchange=e=>{const v=e.target.value;if(!v)return;krPush(d,[v]);KR.dir=+sec.dataset.di;krEdit(L,d)};
-    sec.querySelectorAll('textarea[data-k]').forEach(t=>t.onchange=()=>{d.dep[t.dataset.k]=[...new Set(t.value.split(/[\s,;]+/).map(hm2m).filter(x=>x!=null))].sort((a,b)=>a-b);krDirty();krRender()});
-    sec.querySelector('[data-a=gen]').onclick=()=>{const g=k=>sec.querySelector(`[data-g="${k}"]`).value,a=hm2m(g('a')),b=hm2m(g('b')),ev=Math.max(1,+g('ev')||0),k=g('k');if(a==null||b==null)return;
-      const s=new Set(d.dep[k]||[]);for(let t=a;t<=b;t+=ev)s.add(t);d.dep[k]=[...s].sort((x,y)=>x-y);krDirty();krRender()};
-    const cp=sec.querySelector('[data-a=copy]');if(cp)cp.onclick=()=>{const sh=Math.max(0,+sec.querySelector('[data-g=sh]').value||0),o=L.dirs[0].dep||{};d.dep={};['w','s','h'].forEach(k=>d.dep[k]=(o[k]||[]).map(t=>t+sh).sort((a,b)=>a-b));krDirty();krRender()};
-    const dd=sec.querySelector('[data-a=deldir]');if(dd)dd.onclick=()=>{L.dirs.splice(+sec.dataset.di,1);if(+sec.dataset.di===1)L.noBack=true;KR.dir=0;krDirty();krRender()}});
-  krMap(document.getElementById('krRM'),L);
-  const bk=document.getElementById('krBack');if(bk)bk.onclick=()=>{const d=L.dirs[0];const b={s:[],run:[],dep:{w:[],s:[],h:[]}};krPush(b,d.s.slice().reverse().map(krTwin));L.dirs.push(b);L.noBack=false;b.auto=true;KR.dir=1;krDirty();krRender();krAfter(L,b)};
-  const dl=document.getElementById('krDelL');dl.onclick=()=>{if(!dl.classList.contains('ask')){dl.classList.add('ask');dl.textContent=trS('Na pewno usunąć?');return}N.lines.splice(N.lines.indexOf(L),1);N.duties.forEach(u=>u.trips=(u.trips||[]).filter(t=>t.l!==L.id));KR.line=null;krDirty();krRender()}}
-// --- the duties: each with its number, the kind of day and the trips it runs (chosen from that day's departures)
-function krDuties(B){const N=krN(),au=N.autoD!==false;if(au)krGenDuties(N);let D=N.duties.find(x=>x.id===KR.duty);
-  B.innerHTML=`<label class="sw-depot" for="krAutoD"><input type="checkbox" id="krAutoD" role="switch"${au?' checked':''}><span class="track" aria-hidden="true"></span><span class="swt">${esc(trS('Twórz brygady automatycznie z rozkładów linii'))}</span></label>
-    <div class="krCols"><div class="krSide"><ul class="krList krPick" id="krDL"></ul>${au?'':`<button type="button" class="accBtn" id="krAddD">${esc(trS('Dodaj brygadę'))}</button>`}</div><div class="krEd" id="krDE"></div></div>`;
-  document.getElementById('krAutoD').onchange=e=>{N.autoD=e.target.checked;if(!N.autoD)N.duties.forEach(u=>u.auto=false);else krGenDuties(N);krDirty();krRender()};
-  const DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},lineOf=id=>N.lines.find(l=>l.id===id);
-  const DL=document.getElementById('krDL');N.duties.slice().sort((a,b)=>String(a.n).localeCompare(String(b.n),'pl',{numeric:true})).forEach(x=>{const li=document.createElement('li'),b=document.createElement('button');b.type='button';b.className=x.id===KR.duty?'on':'';
-    b.innerHTML='<b></b><small></small>';b.firstChild.textContent=trS('Brygada')+' '+x.n;b.lastChild.textContent=trS(DN[x.dt||'w'])+' · '+(x.trips||[]).length+' '+trS('kursów');b.onclick=()=>{KR.duty=x.id;krRender()};li.append(b);DL.append(li)});
-  if(!N.duties.length)DL.innerHTML=`<li class="hint">${esc(trS('Brak brygad.'))}</li>`;
-  if(!au)document.getElementById('krAddD').onclick=()=>{const L0=N.lines[0],x={id:krId(),n:(L0?L0.n:'1')+'/'+(N.duties.filter(u=>String(u.n).startsWith((L0?L0.n:'1')+'/')).length+1),dt:'w',trips:[]};N.duties.push(x);KR.duty=x.id;krDirty();krRender()};
-  const E=document.getElementById('krDE');if(!D){E.innerHTML=`<p class="hint">${esc(trS(au?'Wybierz brygadę.':'Wybierz brygadę albo dodaj nową.'))}</p>`;return}D.trips=D.trips||[];
-  const dk=D.dt||'w',taken=new Set(N.duties.flatMap(u=>(u.dt||'w')===dk?(u.trips||[]).map(t=>t.l+'|'+t.d+'|'+t.t):[]));
-  const all=[];N.lines.forEach(L=>(L.dirs||[]).forEach((d,di)=>{if(d.s.length<2)return;const head=(krStop(d.s[d.s.length-1])||{}).n||'';((d.dep||{})[dk]||[]).forEach(t=>{const k=L.id+'|'+di+'|'+t;if(!taken.has(k))all.push({k,L,di,t,head})})}));
-  all.sort((a,b)=>a.t-b.t||a.L.n.localeCompare(b.L.n,'pl',{numeric:true}));
-  const trip=t=>{const L=lineOf(t.l),d=L&&(L.dirs||[])[t.d];return {L,head:d?(krStop(d.s[d.s.length-1])||{}).n||'':'?',from:d?(krStop(d.s[0])||{}).n||'':'?'}};
-  E.innerHTML=`<div class="admRows"><label class="admRow"><span>${esc(trS('Numer brygady'))}</span><input type="text" class="tdIn krNum" maxlength="8" placeholder="X/Y" value="${esc(D.n)}"${au?' disabled':''}></label>
-    <div class="admRow"><span>${esc(trS('Dzień'))}</span><span class="seg admSeg">${Object.entries(DN).map(([k,t])=>`<button type="button" data-dt="${k}" aria-pressed="${dk===k}"${au?' disabled':''}>${esc(trS(t))}</button>`).join('')}</span></div></div>
-    <h3>${esc(trS('Kursy brygady'))}</h3><ol class="krSeq krTrips">${D.trips.slice().sort((a,b)=>a.t-b.t).map(t=>{const x=trip(t);return `<li data-k="${esc(t.l+'|'+t.d+'|'+t.t)}"><span class="krT">${m2hm(t.t)}</span><span class="krChip" style="background:${esc(x.L?x.L.k:'#888')}"></span><b>${esc(x.L?x.L.n:'?')}</b><span class="krTo">${esc(x.from)} → ${esc(x.head)}</span>${au?'':`<button type="button" class="accBtn" data-a="rm" aria-label="${esc(trS('Usuń'))}">✕</button>`}</li>`}).join('')||`<li class="hint">${esc(trS('Brak kursów – dodaj je poniżej.'))}</li>`}</ol>
-    ${au?`<p class="hint">${esc(trS('Brygady powstają same z odjazdów linii. Aby je zmieniać ręcznie, wyłącz tworzenie automatyczne.'))}</p>`:''}<div class="accRow"${au?' hidden':''}><select id="krAddT" aria-label="${esc(trS('Dodaj kurs'))}"><option value="">${esc(trS('Dodaj kurs…'))}</option>${all.map(o=>`<option value="${esc(o.k)}">${m2hm(o.t)} · ${esc(o.L.n)} → ${esc(o.head)}</option>`).join('')}</select></div>
-    <div class="accRow"${au?' hidden':''}><button type="button" class="accBtn" id="krDelD">${esc(trS('Usuń brygadę'))}</button></div>`;
-  E.querySelector('.krNum').onchange=e=>{D.n=e.target.value.trim()||D.n;krDirty();krRender()};
-  E.querySelectorAll('[data-dt]').forEach(b=>b.onclick=()=>{if(D.dt===b.dataset.dt)return;D.dt=b.dataset.dt;D.trips=[];krDirty();krRender()});
-  E.querySelectorAll('.krTrips li[data-k] [data-a=rm]').forEach(bt=>{const li=bt.parentNode;bt.onclick=()=>{D.trips=D.trips.filter(t=>t.l+'|'+t.d+'|'+t.t!==li.dataset.k);krDirty();krRender()}});
-  document.getElementById('krAddT').onchange=e=>{const v=e.target.value;if(!v)return;const [l,d,t]=v.split('|');D.trips.push({l,d:+d,t:+t});krDirty();krRender()};
-  const dl=document.getElementById('krDelD');dl.onclick=()=>{if(!dl.classList.contains('ask')){dl.classList.add('ask');dl.textContent=trS('Na pewno usunąć?');return}N.duties.splice(N.duties.indexOf(D),1);KR.duty=null;krDirty();krRender()}}
-addEventListener('beforeunload',e=>{if(KR.dirty){e.preventDefault();e.returnValue=''}});
 // the side bar by the mode: the driver's mKomputer in place of mSIP; no planner and no board for the driver and the administrator
 function mkNav(){const drv=!!(ACC.user&&ACC.mode==='driver');window.ACC_DRV=drv;document.querySelectorAll('nav.rail .railMk').forEach(b=>b.hidden=!drv);
   document.querySelectorAll('nav.rail .railA11y').forEach(b=>b.hidden=drv||!store.get('ztm.a11y',false));
@@ -8205,7 +8026,7 @@ function mkNav(){const drv=!!(ACC.user&&ACC.mode==='driver');window.ACC_DRV=drv;
 // ---- Personalizacja (the account's menu): what the side / bottom bar shows – each section on the bar, in the menu "Więcej"
 // or not at all, their order; and, where the bar has no room (a phone), the last ones put into "Więcej" by themselves. Kept
 // with the account. (A section the account or the settings do not offer – the tools, mKomputer… – is listed only when offered)
-const NAV_N={hub:'Hub',tt:'Rozkłady',map:'Mapa',dep:'Odjazdy',jp:'Połączenia',guide:'mSIP',mk:'mKomputer',bryg:'Brygady',takt:'Takty',adm:'Konta',mkadm:'Zarządzanie uprawnieniami',msgadm:'Wiadomości',krt:'Kreator',dbd:'dBoard'};
+const NAV_N={hub:'Hub',tt:'Rozkłady',map:'Mapa',dep:'Odjazdy',jp:'Połączenia',guide:'mSIP',mk:'mKomputer',bryg:'Brygady',takt:'Takty',adm:'Konta',mkadm:'Zarządzanie uprawnieniami',msgadm:'Wiadomości',tm:'TransitMaker',dbd:'dBoard'};
 const persCfg=()=>{const c=ACC.data.navCfg=ACC.data.navCfg||{place:{},auto:true};c.place=c.place||{};if(c.auto==null)c.auto=true;if(!c.dbd0){c.dbd0=1;if(!c.place.dbd)c.place.dbd='off'}if(!c.hub0){c.hub0=1;if(!c.place.hub)c.place.hub='off'}return c};   // (dBoard and the Hub: hidden until shown in the personalisation)
 function navApply(){const nav=document.querySelector('nav.rail');if(!nav)return;const c=ACC.user?persCfg():{place:{dbd:'off'},auto:false};
   const all=[...nav.querySelectorAll('[data-nav]:not([data-nav=more])')];all.forEach(b=>{const pl=c.place[b.dataset.nav]||'bar';b.classList.toggle('navOff',pl!=='bar'&&b.dataset.nav!=='tt');b.classList.remove('navOver')});

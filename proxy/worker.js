@@ -30,7 +30,6 @@
 //        each [pl, en, de, sk, cs]; l2: their second language; perm: what the drivers may do {ann, spec, mic, free});
 //      POST /konto/status (mKomputer: on a trip / a break / off) · GET /admin/statusy (the administrator's table)
 //      PUT /admin/konta/<id> (the profile: name, role, first and last name, phone, e-mail, note); POST …/token {token} (own code)
-//      GET /siec (drivers, administrators) / PUT /admin/siec → the TEST network made in the creator (≤ 900 kB).
 //      Messages: POST /admin/komunikat {text, to: "*" (every driver) | [ids], ack} → sent; GET /admin/komunikaty → the last 100
 //        with each recipient's status {d: delivered, r: read, c: confirmed}; DELETE /admin/komunikat[/<id>] → removed.
 //        The driver: GET /konto/komunikaty → their messages (marked delivered); POST /konto/komunikaty/<id> {c} → read (confirmed).
@@ -203,19 +202,8 @@ async function konta(req, env, cors) {
       await env.KONTA.put('d:' + u.id, t); return J({ ok: true });
     }
   }
-  // the TEST network made in the creator (stops, lines with their timetables, duties): read by the drivers and the
-  // administrators (not by the other accounts), written by the administrators
-  if (p === '/siec' && req.method === 'GET') {
-    if (u.role !== 'admin' && u.role !== 'driver') return J({ error: 'forbidden' }, 403);
-    return new Response((await env.KONTA.get('net:tst')) || '{}', { headers: h });
-  }
   if (p.startsWith('/admin/')) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
-    if (p === '/admin/siec' && req.method === 'PUT') {
-      const t = await req.text(); if (t.length > 900000) return J({ error: 'too large' }, 413);
-      try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || Array.isArray(o)) throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
-      await env.KONTA.put('net:tst', t); return J({ ok: true });
-    }
     if (p === '/admin/ustawienia' && req.method === 'PUT') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       // fields left out of the body keep their stored values
@@ -315,7 +303,7 @@ export default {
     if (new URL(req.url).pathname === '/tts') return tts(req, env, ctx, cors);
     if (new URL(req.url).pathname === '/byd') return byd(req, cors);
     if (new URL(req.url).pathname === '/alerts') return alerts(cors);
-    if (/^\/(konto|admin|siec)(\/|$)/.test(new URL(req.url).pathname)) return konta(req, env, cors);   // (/siec: the TEST network, read by the drivers and administrators)
+    if (/^\/(konto|admin)(\/|$)/.test(new URL(req.url).pathname)) return konta(req, env, cors);
     const target = new URL(req.url).searchParams.get('url');
     let u; try { u = new URL(target); } catch (e) { return new Response('url?', { status: 400, headers: cors }); }
     if (u.protocol !== 'https:' || !ALLOWED.includes(u.hostname)) return new Response('host not allowed', { status: 403, headers: cors });
