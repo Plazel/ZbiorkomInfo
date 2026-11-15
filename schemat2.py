@@ -615,7 +615,7 @@ def rail_layout(st, rail, S, cors, P, link=0.95, step=1.15, log=print):
     return R, pieces, sorted(pair.items())
 
 
-def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(8.0, 1.0), time_limit=120, max_nodes=160, bg=True, log=print, geo=1.6):
+def build(data_dir, pick, box_stop=None, clip_by=None, kind=None, centre=(8.0, 1.0), time_limit=120, max_nodes=900, bg=True, log=print, geo=1.6):
     """the diagram of the picked lines: {'n': [[x, y, name(, cuts)]], 'e': [[from, to, [x1, y1, …], strokes(, grey, night)]],
     'x': [[station, stop]] interchanges, 'bg': the landscape}. The trams, trolleybuses and buses laid out by the programme
     (octilinear, few bends, the centre drawn larger); the railway put in beside them, its stations next to the stops they are
