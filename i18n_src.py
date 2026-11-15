@@ -784,6 +784,8 @@ ROWS = [
     ('Przesiadka na linie', 'Change to lines', 'Umstieg zu den Linien', 'Prestup na linky', 'Přestup na linky'),
     ('w kierunku:', 'towards:', 'Richtung:', 'v smere:', 've směru:'),
     ("Pokaż moją aktualną lokalizację", "Show my current location", "Meinen aktuellen Standort zeigen", "Ukázať moju aktuálnu polohu", "Ukázat mou aktuální polohu"),
+    ('Pokaż wszystkie linie', 'Show all lines', 'Alle Linien zeigen', 'Zobraziť všetky linky', 'Zobrazit všechny linky'),
+    ('przystanek na żądanie – zgłoś zamiar wysiadania przyciskiem lub daj znak kierowcy', 'request stop – press the button to get off or signal the driver', 'Bedarfshalt – zum Aussteigen den Knopf drücken oder dem Fahrer ein Zeichen geben', 'zastávka na znamenie – výstup ohláste tlačidlom alebo dajte znamenie vodičovi', 'zastávka na znamení – výstup ohlaste tlačítkem nebo dejte znamení řidiči'),
 ]
 
 WEEKDAYS = {
