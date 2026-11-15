@@ -646,7 +646,7 @@ def fix_dirs(lst):
 for rk in list(groups):
     if rk not in SPLIT_AT: groups[rk] = fix_dirs(groups[rk])
 # trolleybus lines where only some trips are run by buses (the GTFS marks them as bus routes)
-TROLLEY_LINES = {'181', 'X'}
+TROLLEY_LINES = {'34', '181', 'X'}
 first_route = {}
 for rid, r in zroutes.items(): first_route.setdefault('y' + re.sub(r'\W', '', r['route_short_name']), r)
 for rk in groups:
@@ -1612,6 +1612,9 @@ for d in data_all.values():
     for dd in d['dirs']: names |= {STOPS[dd['stops'][i][0]][0] for i in dd['pats'][0]}
     for n in names: hub[n] += 1
 for f, d in data_all.items():
+    # the stops of the line's main routes in either direction: a variant is named after a stop the line otherwise never
+    # serves (M32 through Ostróżek and Św. Wojciech: "przez Św. Wojciech" – Ostróżek is on the main route back)
+    line_main = {STOPS[dd['stops'][i][0]][0] for dd in d['dirs'] if dd['pats'] for i in dd['pats'][0]}
     for dd in d['dirs']:
         nm = lambda i: STOPS[dd['stops'][i][0]][0]
         main = [nm(i) for i in dd['pats'][0]]; mset = set(main)
@@ -1625,7 +1628,7 @@ for f, d in data_all.items():
             extra = [n for n in tail[:-1] if n not in mset and n != p[-1]]
             parts = []
             if p[-1] != main[-1]: parts.append('Kurs do: ' + p[-1])
-            via = min(extra, key=lambda n: (inpat[n], -hub[n])) if extra else None
+            via = min(extra, key=lambda n: (n in line_main, inpat[n], -hub[n])) if extra else None
             fixed = next((t for lines, last, through, t in NOTE_OVERRIDES
                           if d['n'] in lines and p[-1] == last and through in tail), None)
             # stops off the main route before the trip joins it (e.g. a run from the depot along other streets)
@@ -1769,40 +1772,31 @@ def densify(c, step=0.09):
         p, q = c[i - 1], c[i]; n = max(1, int(math.ceil(math.hypot(q[0] - p[0], q[1] - p[1]) / step)))
         out += [(p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n) for k in range(1, n + 1)]
     return out
+def _runs_off(G, line, TH=0.6, LO=0.3):
+    """the parts of `line` away from the polylines in G: a part begins where the line is TH (60 m) off them and is taken
+    back to where it last ran along them (within LO, 30 m), and goes on until it is back within LO – so a part joins the
+    other line where the two really meet, not with a jump across a dual carriageway (N14 at Drwęcka)"""
+    b = densify(line); D = [G.nearest(p) for p in b]; runs = []; i = 0; n = len(b)
+    while i < n:
+        if D[i][0] < TH: i += 1; continue
+        j = i
+        while j > 0 and D[j - 1][0] >= LO and i - j < 400: j -= 1
+        run = ([D[j - 1][1]] if j > 0 and D[j - 1][1] else []) + b[j:i + 1]
+        k = i + 1
+        while k < n and D[k][0] >= LO: run.append(b[k]); k += 1
+        if k < n and D[k][1]: run.append(D[k][1])
+        if len(run) > 3: runs.append(rdp(run))
+        i = k + 1
+    return runs
 def merged_lines(lines, TH=0.6):
     """first direction in full; the second only where it leaves the first (street loops, one-way streets)"""
     if len(lines) < 2 or len(lines[0]) < 2: return lines
-    a = lines[0]; G = SegGrid([a]); b = densify(lines[1]); out = [a]; run = None
-    for i, p in enumerate(b):
-        d, np_, _ = G.nearest(p)
-        if d >= TH:
-            if run is None:
-                prev = G.nearest(b[i - 1])[1] if i > 0 else None
-                run = [prev or p]
-            run.append(p)
-        elif run is not None:
-            run.append(np_)
-            if len(run) > 3: out.append(rdp(run))
-            run = None
-    if run is not None and len(run) > 3: out.append(rdp(run))
-    return out
+    a = lines[0]
+    return [a] + _runs_off(SegGrid([a]), lines[1], TH)
 def leaving_runs(base, line, TH=0.6):
     """parts of `line` that run away from every polyline in `base` (variant extensions, detours)"""
     if len(line) < 2: return []
-    G = SegGrid(base); runs = []; run = None; b = densify(line)
-    for i, p in enumerate(b):
-        d, np_, _ = G.nearest(p)
-        if d >= TH:
-            if run is None:
-                prev = G.nearest(b[i - 1])[1] if i > 0 else None
-                run = [prev or p]
-            run.append(p)
-        elif run is not None:
-            run.append(np_)
-            if len(run) > 3: runs.append(rdp(run))
-            run = None
-    if run is not None and len(run) > 3: runs.append(rdp(run))
-    return runs
+    return _runs_off(SegGrid(base), line, TH)
 def trim(path, a, b, tol=0.3):
     """cut a shape to the part between its first and last stop (shapes may include runs to/from the depot)"""
     if len(path) < 3: return path

@@ -749,6 +749,11 @@ ROWS = [
 ("Usuń tekst", "Remove text", "Text entfernen", "Odstrániť text", "Odstranit text"),
 ("tylko gdy wiersz ma kilka tekstów", "only when a row has several texts", "nur wenn eine Zeile mehrere Texte hat", "len keď má riadok viac textov", "jen když má řádek více textů"),
 ("Informacje", "Information", "Informationen", "Informácie", "Informace"),
+    ("Szpital", "Hospital", "Krankenhaus", "Nemocnica", "Nemocnice"),
+    ("Fabryka", "Factory", "Fabrik", "Továreň", "Továrna"),
+    ("Park", "Park", "Park", "Park", "Park"),
+    ("Samochód", "Car", "Auto", "Auto", "Auto"),
+    ("Zamek", "Castle", "Burg", "Hrad", "Hrad"),
 ]
 
 WEEKDAYS = {
