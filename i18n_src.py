@@ -754,6 +754,7 @@ ROWS = [
     ("Park", "Park", "Park", "Park", "Park"),
     ("Samochód", "Car", "Auto", "Auto", "Auto"),
     ("Zamek", "Castle", "Burg", "Hrad", "Hrad"),
+    ("Obecnie", "Current", "Aktuell", "Aktuálne", "Aktuálně"),
 ]
 
 WEEKDAYS = {
