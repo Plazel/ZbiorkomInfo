@@ -42,7 +42,7 @@ select.sselN{display:none!important}
 .chip.sq{aspect-ratio:1/1;width:auto;padding:0;letter-spacing:-.03em;justify-content:center}
 
 /* a line's sign inside a sentence (the notices) */
-.chip.small.inl.inl{--f:.88;--h:1.5em;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--f)*1em);font-weight:700;height:calc(var(--h) / var(--f));width:calc(var(--h) / var(--f));min-width:0;padding:0;margin:0 .12em;vertical-align:middle;line-height:1;letter-spacing:-.02em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.06em}.chip.small.inl.inl.l3{--f:.76;--h:1.66em}.chip.small.inl.inl.l4{--f:.6;--h:1.66em}.chip.small.inl.inl.l5{width:auto;min-width:calc(var(--h) / var(--f));padding:0 .28em}.chip.small.inl.inl.rail{border-radius:50%}.chip.small.inl.inl.rail.l5{padding:0 .5em;border-radius:999px}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%;width:calc(var(--h) / var(--f));min-width:0;padding:0}.chip.small.inl.inl.tram.l3,.chip.small.inl.inl.nt.l3,.chip.small.inl.inl.rail.l3{--f:.66;width:calc(var(--h) / var(--f));padding:0;border-radius:50%}.chip.small.inl.inl.tram.l4,.chip.small.inl.inl.nt.l4,.chip.small.inl.inl.rail.l4{--f:.54;border-radius:50%;width:calc(var(--h) / var(--f));padding:0}.alertBox .aItem p,.lineWarn{line-height:1.75}.alertBox h3,.alertBox summary,.alertBox .aItem h3,.lineWarn b,.lineWarn strong,.alertBar li button{line-height:1.7}.alertBox h3 .chip.small.inl.inl,.lineWarn b .chip.small.inl.inl,.lineWarn strong .chip.small.inl.inl{--h:1.3em;margin:0 .16em}.alertBox details.aItem>summary h3,.alertBox h3,.lineWarn>div,.lineWarn>span{min-width:0;overflow-wrap:anywhere}.alertBox,.alertBox .aItem,.lineWarn{max-width:100%;box-sizing:border-box;overflow-x:hidden}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
+.chip.small.inl.inl{--hn:1.5;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--hn) * .4174em);height:2.3958em;width:2.3958em;min-width:0;padding:0;margin:0 .12em;vertical-align:middle;line-height:1;letter-spacing:-.03em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.06em}.chip.small.inl.inl.l5{width:auto;min-width:2.3958em;padding:0 .3em}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%;letter-spacing:normal}.chip.small.inl.inl.rail{border-radius:999px;letter-spacing:-.02em}.chip.small.inl.inl.rail.circle{border-radius:50%}.chip.small.inl.inl.rail.l5{padding:0 .5em}.alertBox .aItem p,.lineWarn{line-height:1.75}.alertBox h3,.alertBox summary,.alertBox .aItem h3,.lineWarn b,.lineWarn strong,.alertBar li button{line-height:1.7}.alertBox h3 .chip.small.inl.inl,.lineWarn b .chip.small.inl.inl,.lineWarn strong .chip.small.inl.inl{--hn:1.3;margin:0 .16em}.alertBox details.aItem>summary h3,.alertBox h3,.lineWarn>div,.lineWarn>span{min-width:0;overflow-wrap:anywhere}.alertBox,.alertBox .aItem,.lineWarn{max-width:100%;box-sizing:border-box;overflow-x:hidden}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
 
 /* the notices' bar: one row at a time (rot), all of them when opened */
 .alertBar .abVp{flex:1 1 auto;width:100%;min-width:0}.alertBar.rot:not(.open) .abVp{height:41px;overflow:hidden}.alertBar.rot:not(.open) .abVp ul{display:block}.alertBar.rot:not(.open) li{height:41px}.alertBar.rot:not(.open) li button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:0!important;height:41px;padding:0;line-height:41px}.alertBar.open .abVp{max-height:50vh;overflow:auto}.alertBar .abExp{flex:none;width:auto;border:0;background:none;color:inherit;cursor:pointer;padding:6px;display:grid;place-items:center}.alertBar.open .abExp svg{transform:rotate(180deg)}
@@ -949,6 +949,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 .slist li.dtAdd button,.slist li.dtAdd:nth-child(odd) button,.side tr.r.dtAdd td,.side tr.r.dtAdd:nth-child(even) td{background:#ffe9a8;color:#1a1a1a;cursor:default}.slist li.dtAdd .num,.side tr.dtAdd .p{color:#5a4a10}
 :root[data-theme=dark] .slist li.dtAdd button,:root[data-theme=dark] .side tr.r.dtAdd td{background:#5a4810;color:#fff}:root[data-theme=dark] .slist li.dtAdd .num,:root[data-theme=dark] .side tr.dtAdd .p{color:#e8d9a0}
 .slist li.dtPass .nm,.side tr.dtPass .n{font-style:italic}
+.rpList li.dtAdd{background:#ffe9a8;color:#1a1a1a}:root[data-theme=dark] .rpList li.dtAdd{background:#5a4810;color:#fff}.rpList li.dtAdd .rl i{border-style:dashed}.rpList li.dtSkip .rl i{border-color:#d32f2f}
 .dtLeg{display:flex;gap:14px;flex-wrap:wrap;font-size:.85em;margin-top:2px}.dtLeg i{font-style:normal;background:#ffe9a8;color:#1a1a1a;padding:0 5px;border-radius:2px}
 .dtBeta{font-size:.6em;font-weight:700;letter-spacing:.04em;color:var(--muted);vertical-align:super;line-height:0;margin-left:3px}
 .dtNote .lwTx{display:block}.dir .dtNote{margin:4px 0 10px}.slist li.zastLi a.zastL{text-decoration:none}.propList{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:10px;max-width:760px}.propI{border:1px solid var(--line);padding:10px 12px}.propI p{margin:0 0 8px;line-height:1.75}.propI .admRow input{flex:1;min-width:0}
@@ -957,9 +958,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 @media (max-width:760px){#tdTm iframe{height:calc(100dvh - var(--top-h,54px) - 64px)}}
 /* the lines' signs: always Roboto Condensed SemiBold, whatever the text around them (a bold heading or plain text) */
 /* (the signs in the notices: squares up to four characters, as everywhere – the figures smaller in a longer number) */
-.alertBox h3 .chip.small.inl.inl,.alertBar li button .chip.small.inl.inl{--h:1.32em;top:-.06em;letter-spacing:-.03em}
-.alertBox h3 .chip.small.inl.inl.l3:not(.tram,.nt,.circle,.rail),.alertBar li button .chip.small.inl.inl.l3:not(.tram,.nt,.circle,.rail){--f:.8}
-.alertBox h3 .chip.small.inl.inl.l4:not(.tram,.nt,.circle,.rail),.alertBar li button .chip.small.inl.inl.l4:not(.tram,.nt,.circle,.rail){--f:.68}
+.alertBox h3 .chip.small.inl.inl,.alertBar li button .chip.small.inl.inl{--hn:1.3}
 .chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
 .aTxt p.aSub strong{font-weight:700}
 .slist li.noDep button,tr.noDep button.sb{cursor:default;pointer-events:none}.slist li.noDep button:disabled,tr.noDep button.sb:disabled{color:inherit;opacity:1}.slist li.noDep button:hover,tr.noDep button.sb:hover{background:none}
@@ -1804,7 +1803,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794838398;
+const APP_BUILD=1794838843;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5706,7 +5705,7 @@ function dtRead(al,r,L,G,ST){const S=IDX.stops,out=[];
       const avoid=new Set([...skip].map(i=>ids[i])),A0=[S[ids[fi]][2],S[ids[fi]][3]];
       const useIds=ev.use.map(ph=>{let best=null,bs=0;for(const id in S){const sc=dtScore(ph,S[id][0],S[id][1]);if(sc>bs&&dtDist([S[id][2],S[id][3]],A0)<5000){bs=sc;best=id}}return best}).filter(Boolean);
       let mid=[];
-      if(ev.serveAll!==null||!useIds.length){const p=G?dtPath(G,ids[fi],ids[ti],avoid,ev.via.concat(ev.use),ST):null;if(p)mid=p.slice(1,-1);else res.conf=Math.min(res.conf,useIds.length?.7:.5)}
+      if(ev.serveAll!==null||!useIds.length){const p=G?dtPath(G,ids[fi],ids[ti],avoid,ev.via.concat(ev.use),ST):null;if(p)mid=p.slice(1,-1);else res.conf=Math.min(res.conf,.7)}
       if(useIds.length){const set=new Set(mid);useIds.forEach(id=>{if(!set.has(id))mid.push(id)});if(ev.serveAll==null)mid=mid.filter(id=>useIds.includes(id))}
       if(ev.serveAll==null)mid.sort((x,y)=>dtDist(A0,[S[x][2],S[x][3]])-dtDist(A0,[S[y][2],S[y][3]]));
       add=mid.filter(id=>!ids.includes(id)).map(id=>({id,st:ev.serveAll===false?'pass':'add'}));
@@ -5757,33 +5756,67 @@ function dtSL(sl,x){if(!x)return;const tr=si=>sl.querySelector(':scope>tr[data-s
 // colour, edged in yellow), the stops not served crossed out in red
 // the course between two stops along the lines on the map: the shortest stretch of a line passing both (the line itself
 // first; then the lines of the same kind), or straight from one to the other
-function dtCut(a,b,own,kind){const D=MAP.data.routes,S=IDX.stops,pt=s=>{for(const M of [D[own],...Object.values(D)])if(M&&M.sn&&M.sn[s])return M.sn[s];const X=S[s];return X?proj(X[2],X[3]):null};
+// the streets the lines of one kind take, as a network (every line's course on the map, joined where two courses meet or
+// run within a few metres of each other), around the given points – a detour is drawn along it, never straight across
+function dtRoads(pts,kind){const D=MAP.data.routes,m=15;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;pts.forEach(p=>{x0=Math.min(x0,p[0]);y0=Math.min(y0,p[1]);x1=Math.max(x1,p[0]);y1=Math.max(y1,p[1])});x0-=m;y0-=m;x1+=m;y1+=m;
+  const X=[],Y=[],adj=[],grid=new Map(),C=.1,R=.065;
+  const node=(x,y)=>{const gx=Math.floor(x/C),gy=Math.floor(y/C);let b=-1,bd=R;for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const l=grid.get((gx+i)*100003+(gy+j));if(l)for(const n of l){const d=Math.hypot(X[n]-x,Y[n]-y);if(d<bd){bd=d;b=n}}}if(b>=0)return b;
+    const n=X.length;X.push(x);Y.push(y);adj.push([]);const k=gx*100003+gy;let l=grid.get(k);if(!l)grid.set(k,l=[]);l.push(n);return n};
+  const link=(a,b)=>{if(a===b)return;const w=Math.hypot(X[a]-X[b],Y[a]-Y[b]);adj[a].push([b,w]);adj[b].push([a,w])};
+  Object.keys(D).forEach(id=>{const r=MAP.byId[id];if(!r||dtKind(r)!==kind)return;const M=D[id];
+    [...M.g,...(M.v||[])].forEach(c=>{let pv=-1;for(let i=0;i<c.length;i++){const q=c[i],inb=q[0]>=x0&&q[0]<=x1&&q[1]>=y0&&q[1]<=y1;if(!inb){pv=-1;continue}
+      if(pv>=0){const a=c[i-1],L=Math.hypot(q[0]-a[0],q[1]-a[1]),n=Math.ceil(L/.08);for(let k=1;k<n;k++){const t=k/n,v=node(a[0]+(q[0]-a[0])*t,a[1]+(q[1]-a[1])*t);link(pv,v);pv=v}}
+      const v=node(q[0],q[1]);if(pv>=0)link(pv,v);pv=v}})});
+  const nearest=p=>{let b=-1,bd=.6;for(let n=0;n<X.length;n++){const d=Math.hypot(X[n]-p[0],Y[n]-p[1]);if(d<bd){bd=d;b=n}}return b};
+  // the shortest way between two points over the network (null: none within it)
+  const way=(A,B)=>{const s=nearest(A),t=nearest(B);if(s<0||t<0)return null;if(s===t)return [A,B];
+    const dist=new Float64Array(X.length).fill(Infinity),prev=new Int32Array(X.length).fill(-1),H=[[0,s]];dist[s]=0;
+    const push=e=>{H.push(e);let i=H.length-1;while(i>0){const p=(i-1)>>1;if(H[p][0]<=H[i][0])break;[H[p],H[i]]=[H[i],H[p]];i=p}};
+    const pop=()=>{const top=H[0],l=H.pop();if(H.length){H[0]=l;let i=0;for(;;){const a=2*i+1,b=a+1;let m=i;if(a<H.length&&H[a][0]<H[m][0])m=a;if(b<H.length&&H[b][0]<H[m][0])m=b;if(m===i)break;[H[m],H[i]]=[H[i],H[m]];i=m}}return top};
+    while(H.length){const [d,u]=pop();if(d>dist[u])continue;if(u===t)break;for(const [v,w] of adj[u]){const nd=d+w;if(nd<dist[v]){dist[v]=nd;prev[v]=u;push([nd,v])}}}
+    if(!isFinite(dist[t])||dist[t]>6*Math.hypot(B[0]-A[0],B[1]-A[1])+3)return null;const out=[];for(let u=t;u>=0;u=prev[u])out.push([X[u],Y[u]]);out.reverse();return [A,...out,B]};
+  return {way}}
+// a stop's point on the map: where a line's course passes it (else the stop itself)
+function dtPt(s,own){const D=MAP.data.routes;for(const M of [D[own],...Object.values(D)])if(M&&M.sn&&M.sn[s])return [M.sn[s][0],M.sn[s][1]];const X=IDX.stops[s];return X?proj(X[2],X[3]):null}
+// the course between two stops along the lines on the map: the stretch of a line passing both (the line itself first, then the
+// lines of the same kind), else the way over the streets the lines take; nothing where neither is known (no straight lines)
+function dtCut(a,b,own,kind,roads){const D=MAP.data.routes;
   const near=(c,p)=>{let bi=-1,bd=1e9,bt=0;for(let i=1;i<c.length;i++){const A=c[i-1],B=c[i],dx=B[0]-A[0],dy=B[1]-A[1],l2=dx*dx+dy*dy||1e-12,t=Math.max(0,Math.min(1,((p[0]-A[0])*dx+(p[1]-A[1])*dy)/l2)),d=Math.hypot(A[0]+t*dx-p[0],A[1]+t*dy-p[1]);if(d<bd){bd=d;bi=i-1;bt=t}}return [bi,bd,bt]};
   const len=q=>{let L=0;for(let i=1;i<q.length;i++)L+=Math.hypot(q[i][0]-q[i-1][0],q[i][1]-q[i-1][1]);return L};
   const tryM=M=>{if(!M||!M.sn||!M.sn[a]||!M.sn[b])return null;const pa=M.sn[a],pb=M.sn[b];let best=null;
     [...M.g,...(M.v||[])].forEach(c=>{if(c.length<2)return;const x=near(c,pa),y=near(c,pb);if(x[1]>.04||y[1]>.04)return;if(x[0]>y[0]||(x[0]===y[0]&&x[2]>y[2]))return;
       const q=[[pa[0],pa[1]],...c.slice(x[0]+1,y[0]+1),[pb[0],pb[1]]],L=len(q);if(L>4*Math.hypot(pb[0]-pa[0],pb[1]-pa[1])+.3)return;if(!best||L<best.L)best={q,L}});return best};
-  let best=tryM(D[own]);
+  let best=own?tryM(D[own]):null;
   if(!best)Object.keys(D).forEach(id=>{if(id===own)return;const r=MAP.byId[id];if(!r||dtKind(r)!==kind)return;const x=tryM(D[id]);if(x&&(!best||x.L<best.L))best=x});
-  if(best)return best.q;const A=pt(a),B=pt(b);return A&&B?[[A[0],A[1]],[B[0],B[1]]]:[]}
+  if(best)return best.q;const A=dtPt(a,own),B=dtPt(b,own);if(!A||!B||!roads)return [];return roads.way(A,B)||[]}
 // the map: the detour of each line shown – its way between the stop it leaves the route at and the one it comes back at, in
-// the line's colour edged in yellow, along the streets other lines take; the stretch it does not run grey, its stops crossed out
+// the line's colour edged in yellow, along the streets the lines take; the stretch it does not run grey, its stops crossed out
+// (a run followed: only its own direction)
 function dtMap(){const svg=document.getElementById('mapSvg'),hl=svg&&svg.querySelector('#mapHL');if(!hl)return;let g=svg.querySelector('#mapDT');
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapDT'}if(g.parentNode!==hl.parentNode||g.nextSibling)hl.parentNode.appendChild(g);g.innerHTML='';
-  if(!DT.on||MAP.view==='schema'||MAP.drawn!=='geo'||!MAP.hl.size||MAP.hl.size>4)return;const key=[...MAP.hl].sort().join(',');g.dataset.k=key;
+  if(!DT.on||MAP.view==='schema'||MAP.drawn!=='geo'||!MAP.hl.size||MAP.hl.size>4)return;const key=[...MAP.hl].sort().join(',')+'|'+(RUN&&RUN.d?RUN.d.di:'');g.dataset.k=key;
   const pl=(q,cls,st)=>q.length>1?`<polyline class="${cls}" points="${q.map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(' ')}"${st?' style="'+st+'"':''}/>`:'';
   [...MAP.hl].forEach(id=>{const r=MAP.byId[id]||IDX.routes.find(x=>x.id===id);if(!r)return;
     (CACHE[id]?Promise.resolve(CACHE[id]):loadRoute(id)).then(L=>dtFor(r,L).then(o=>[L,o])).then(([L,o])=>{if(!o||g.dataset.k!==key||!g.isConnected)return;const k=unitsPerPx(),kind=dtKind(r);let h='',top='';
-      Object.values(o).forEach(x=>{const d=L.dirs[x.di];if(!d)return;const ids=d.stops.map(s=>s[0]);
-        if(x.from!=null&&x.to>x.from){const off=[];for(let i=x.from+1;i<=x.to;i++)off.push(...dtCut(ids[i-1],ids[i],id,kind));h+=pl(off,'dtOff')}
-        if(x.path){const q=[];for(let i=1;i<x.path.length;i++)q.push(...dtCut(x.path[i-1],x.path[i],null,kind));h+=pl(q,'dtCase')+pl(q,'dtPath','stroke:'+lineColor(r))}
+      const only=RUN&&RUN.d&&RUN.d.r&&RUN.d.r.id===id?RUN.d.di:dirMode(id)?lineDir(id):null;
+      Object.values(o).forEach(x=>{if(only!=null&&x.di!==only)return;const d=L.dirs[x.di];if(!d)return;const ids=d.stops.map(s=>s[0]);
+        if(x.from!=null&&x.to>x.from){const off=[];for(let i=x.from+1;i<=x.to;i++)off.push(...dtCut(ids[i-1],ids[i],id,kind,null));h+=pl(off,'dtOff')}
+        if(x.path){const P=x.path.map(s=>dtPt(s,id)).filter(Boolean),roads=P.length>1?dtRoads(P,kind):null;let q=[];
+          for(let i=1;i<x.path.length;i++){const c=dtCut(x.path[i-1],x.path[i],null,kind,roads);if(!c.length){h+=pl(q,'dtCase')+pl(q,'dtPath','stroke:'+lineColor(r));q=[];continue}q.push(...c)}
+          h+=pl(q,'dtCase')+pl(q,'dtPath','stroke:'+lineColor(r))}
         x.skip.forEach(si=>{const X=IDX.stops[ids[si]];if(!X)return;const [px,py]=proj(X[2],X[3]),z=5*k;top+=pl([[px-z,py-z],[px+z,py+z]],'dtX')+pl([[px-z,py+z],[px+z,py-z]],'dtX')})});
       g.insertAdjacentHTML('beforeend',h+top)}).catch(e=>console.error(e))})}
 {const f=layoutHL;layoutHL=function(){const v=f.apply(this,arguments);try{dtMap()}catch(e){}return v}}
 // a run on the map: the stops it will not serve struck through in its list
-function dtRun(pn,d){const c=DT.on&&d&&d.r&&DT.res[d.r.id];if(!c){if(DT.on&&d&&d.r&&CACHE[d.r.id])dtFor(d.r,CACHE[d.r.id]);return}
-  const x=c.v&&c.v[d.di];if(!x)return;const ids=new Set([...x.skip].map(si=>(CACHE[d.r.id].dirs[d.di].stops[si]||[])[0]));
-  pn.querySelectorAll('.rpList li[data-sid]').forEach(li=>{if(ids.has(li.dataset.sid))li.classList.add('dtSkip')})}
+function dtRun(pn,d){if(!DT.on||!d||!d.r)return;const c=DT.res[d.r.id];
+  if(!c||c.L!==CACHE[d.r.id]){if(CACHE[d.r.id]&&!d._dtq){d._dtq=1;dtFor(d.r,CACHE[d.r.id]).then(()=>{const p=document.getElementById('runPanel');if(p&&RUN.d===d)dtRun(p,d)})}return}
+  const x=c.v&&c.v[d.di];if(!x)return;const st=CACHE[d.r.id].dirs[d.di].stops,ids=new Set([...x.skip].map(si=>(st[si]||[])[0]));
+  const ul=pn.querySelector('.rpList');if(!ul||ul.dataset.dt)return;ul.dataset.dt=1;
+  ul.querySelectorAll('li[data-sid]').forEach(li=>{if(ids.has(li.dataset.sid))li.classList.add('dtSkip')});
+  // the stops served only on the detour: put in after the stop it leaves the route at (no times: the timetable has none)
+  if(x.add.length){const after=(st[x.afterSi]||[])[0];let at=null;ul.querySelectorAll('li[data-sid]').forEach(li=>{if(li.dataset.sid===after)at=li});
+    if(at)at.after(...x.add.map(a=>{const X=IDX.stops[a.id]||['',''],li=document.createElement('li');li.className='dtAdd'+(a.st==='pass'?' dtPass':'')+(at.classList.contains('past')?' past':'');
+      li.innerHTML=`<span class="t"></span><span class="rl"><i></i></span><span class="n">${esc(X[0])}${X[1]?' <span class="spPole">'+esc(X[1])+'</span>':''}${a.st==='pass'?' <small>'+esc(trS('bez zatrzymania'))+'</small>':''}</span>`;return li}))}}
 // ---- the notices in the language chosen: the browser's own translator (Translator API, on the device: Chrome), sentence by
 // sentence from the original (BVG: German, ZTM/ZTP: Polish); without it the phrases the page knows (BVG) or the original
 const MT={tr:{},memo:new Map(),run:0,sv:0};
