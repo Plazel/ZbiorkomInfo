@@ -840,6 +840,8 @@ ROWS = [
 ("Dla tego miasta nie ma aktualności.", "There is no news for this city.", "Für diese Stadt gibt es keine Neuigkeiten.", "Pre toto mesto nie sú aktuality.", "Pro toto město nejsou aktuality."),
 ("Pojazd, brygada, linia lub przystanek", "Vehicle, duty, line or stop", "Fahrzeug, Umlauf, Linie oder Haltestelle", "Vozidlo, turnus, linka alebo zastávka", "Vozidlo, turnus, linka nebo zastávka"),
 ("Dni w rozkładzie", "Days in the timetable", "Tage im Fahrplan", "Dni v cestovnom poriadku", "Dny v jízdním řádu"),
+("Brak aktualności", "No news", "Keine Neuigkeiten", "Žiadne aktuality", "Žádné aktuality"),
+("Przewoźnik nie opublikował teraz żadnych aktualności.", "The operator has no news at the moment.", "Der Betreiber hat derzeit keine Neuigkeiten.", "Dopravca momentálne nezverejnil žiadne aktuality.", "Dopravce momentálně nezveřejnil žádné aktuality."),
 ]
 
 WEEKDAYS = {
