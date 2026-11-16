@@ -814,7 +814,7 @@ ROWS = [
     ('Wielkie', 'Capitals', 'Großbuchstaben', 'Veľké', 'Velká'),
     ('Jak wpisano', 'As typed', 'Wie eingegeben', 'Ako je napísané', 'Jak je napsáno'),
     ('Małe', 'Lower case', 'Kleinbuchstaben', 'Malé', 'Malá'),
-("Objazdy z komunikatów", "Detours from notices", "Umleitungen aus Meldungen", "Obchádzky z oznamov", "Objížďky z oznámení"),
+("Pokazuj objazdy", "Show detours", "Umleitungen anzeigen", "Zobrazovať obchádzky", "Zobrazovat objížďky"),
 ("Ten przystanek nie jest obsługiwany z powodu objazdu", "This stop is not served due to a detour", "Diese Haltestelle wird wegen einer Umleitung nicht bedient", "Táto zastávka nie je obsluhovaná pre obchádzku", "Tato zastávka není obsluhována kvůli objížďce"),
 ("Trasa objazdu według komunikatu", "Detour route according to the notice", "Umleitungsstrecke laut Meldung", "Trasa obchádzky podľa oznamu", "Trasa objížďky podle oznámení"),
 ("przystanek nieobsługiwany", "stop not served", "Haltestelle nicht bedient", "neobsluhovaná zastávka", "neobsluhovaná zastávka"),
@@ -838,6 +838,7 @@ ROWS = [
 ("Aktualności", "News", "Aktuelles", "Aktuality", "Aktuality"),
 ("Brak aktualności.", "No news.", "Keine Neuigkeiten.", "Žiadne aktuality.", "Žádné aktuality."),
 ("Dla tego miasta nie ma aktualności.", "There is no news for this city.", "Für diese Stadt gibt es keine Neuigkeiten.", "Pre toto mesto nie sú aktuality.", "Pro toto město nejsou aktuality."),
+("Pojazd, brygada, linia lub przystanek", "Vehicle, duty, line or stop", "Fahrzeug, Umlauf, Linie oder Haltestelle", "Vozidlo, turnus, linka alebo zastávka", "Vozidlo, turnus, linka nebo zastávka"),
 ]
 
 WEEKDAYS = {
