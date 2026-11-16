@@ -1772,9 +1772,10 @@ def densify(c, step=0.09):
         p, q = c[i - 1], c[i]; n = max(1, int(math.ceil(math.hypot(q[0] - p[0], q[1] - p[1]) / step)))
         out += [(p[0] + (q[0] - p[0]) * k / n, p[1] + (q[1] - p[1]) * k / n) for k in range(1, n + 1)]
     return out
-def _runs_off(G, line, TH=0.6, LO=0.3):
-    """the parts of `line` away from the polylines in G: a part begins where the line is TH (60 m) off them and is taken
-    back to where it last ran along them (within LO, 30 m), and goes on until it is back within LO – so a part joins the
+def _runs_off(G, line, TH=0.8, LO=0.4):
+    """the parts of `line` away from the polylines in G: a part begins where the line is TH (~90 m) off them and is taken
+    back to where it last ran along them (within LO, ~45 m), and goes on until it is back within LO (the two carriageways of
+    a wide avenue – Sikorskiego with the tram tracks between them, N14 – stay one line; streets of a one-way pair are further apart) – so a part joins the
     other line where the two really meet, not with a jump across a dual carriageway (N14 at Drwęcka)"""
     b = densify(line); D = [G.nearest(p) for p in b]; runs = []; i = 0; n = len(b)
     while i < n:
@@ -1788,7 +1789,7 @@ def _runs_off(G, line, TH=0.6, LO=0.3):
         if len(run) > 3: runs.append(rdp(run))
         i = k + 1
     return runs
-def merged_lines(lines, TH=0.6):
+def merged_lines(lines, TH=0.8):
     """first direction in full; the second only where it leaves the first (street loops, one-way streets)"""
     if len(lines) < 2 or len(lines[0]) < 2: return lines
     a = lines[0]
@@ -2038,6 +2039,11 @@ except Exception as e: print('„Dworzec”: pominięto (%s)' % e)
 try:
     import strefy; strefy.build(OUT, cache=SCR)
 except Exception as e: print('Strefy taryfowe: pominięto (%s)' % e)
+
+# the data of the detours read from the notices (objazdy_dane.py): each area's network of stops, the streets of ZTM's stops
+try:
+    import objazdy_dane; objazdy_dane.build(OUT)
+except Exception as e: print('Objazdy: pominięto (%s)' % e)
 
 # ---------------- optional: single-file page with the data built in ----------------
 if EMBED:
