@@ -1786,6 +1786,11 @@ def _runs_off(G, line, TH=0.8, LO=0.4):
         k = i + 1
         while k < n and D[k][0] >= LO: run.append(b[k]); k += 1
         if k < n and D[k][1]: run.append(D[k][1])
+        # (a part that only keeps close beside the other line – on average within ~60 m, never beyond ~130 m – is the other
+        # side of the same street drawn a little apart, or a corner cut in the data's shape (N14 between Chałubińskiego and
+        # Odrzańska): not a street of its own, left out)
+        dd = [D[q][0] for q in range(j, min(k, n))]
+        if dd and sum(dd) / len(dd) < .55 and max(dd) < 1.2: i = k + 1; continue
         if len(run) > 3: runs.append(rdp(run))
         i = k + 1
     return runs
