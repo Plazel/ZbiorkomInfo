@@ -1781,7 +1781,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794831030;
+const APP_BUILD=1794831168;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2476,9 +2476,9 @@ function comboIcon(rs){const kind=r=>r.cat==='ferry'||r.cat==='metro'||r.cat==='
   const back=ks.includes('tram')&&!ks.includes('bus')?'tram':ks.includes('trol')?'trol':ks.includes('tram')?'tram':ks.includes('rail')?'rail':(ks.find(k=>k!=='bus')||'bus');
   const front=ks.includes('bus')?'bus':ks.includes('trol')&&back!=='trol'?'trol':'bus';
   return comboPair(back,front)}
-// two vehicles, one behind the other (the front one filled, so that it hides the one behind)
+// two vehicles, one behind the other (the front one solid, so that it hides the one behind)
 function comboPair(back,front){const inner=k=>ICONS[k].replace(/^<svg[^>]*>/,'').replace(/<\/svg>$/,'');
-  return ICONS.combo.replace(/<g[\s\S]*<\/svg>$/,'')+`<g transform="translate(-6 1) scale(.78)">${inner(back)}</g><g transform="translate(17 12) scale(.78)">${inner(front).replace('<path ','<path style="fill:var(--bg)" ')}</g></svg>`}
+  return ICONS.combo.replace(/<g[\s\S]*<\/svg>$/,'')+`<g transform="translate(-6 1) scale(.78)">${inner(back)}</g><g transform="translate(17 12) scale(.78)"><g style="fill:var(--bg);stroke:var(--bg);stroke-width:7">${inner(front).replace(/\s(fill|stroke|stroke-width)="[^"]*"/g,'')}</g>${inner(front)}</g></svg>`}   // (under the front vehicle its own shape, filled and widened in the background colour: nothing of the one behind shows through or touches it)
 // the heading of the combined lines: tram and bus, or two buses in a city without trams (Flensburg)
 const comboHeadIcon=()=>IDX&&IDX.routes.some(r=>inCity(r)&&(r.t==='tram'||r.nt))?ICONS.combo:comboPair('bus','bus');
 function comboHeader(C,extra,back){
