@@ -258,6 +258,7 @@ def _psig(it):
     return (it[2], tuple((x[0], x[1]) for x in rows))
 
 
+REQ_NAMED = set()   # stops on request known only from their names (Łódź's "NŻ": filled where the city's stops are read)
 def build_routes(groups, meta_of):
     """groups: {route_key: [(day, lf, dir, rows)]} rows=[(sid, minute, pickup, drop)]"""
     for v in STOPS.values():   # (double spaces in a feed's names: "Kaliskiego  - Akademicka")
@@ -395,7 +396,7 @@ def build_routes(groups, meta_of):
             for _, _, rows, _t in tl:
                 for x in rows:
                     tot[x[0]] += 1
-                    if x[2] == '3' or x[3] == '3': req[x[0]] += 1
+                    if x[2] == '3' or x[3] == '3' or x[0] in REQ_NAMED: req[x[0]] += 1
             sdays = collections.defaultdict(set); regular = set()
             for day, dep, rows, _t in tl:
                 for x in rows:
@@ -1316,7 +1317,11 @@ def fl_name(n):
 def zb_name(s):
     m = re.match(r'^(.*\S)\s+(\d{2}|\d{5}|\d{8})$', re.sub(r'\s+', ' ', s).strip())
     return (m.group(1), m.group(2)) if m else (re.sub(r'\s+', ' ', s).strip(), '')
+# stops on request marked only in their names (Łódź: "Augustów-Wujaka NŻ"): the mark taken off the name, the stop marked on
+# request instead (the timetables' hand)
+NZ_RE = re.compile(r'\s*\bNŻ\s*$|(?<=\.)NŻ\s*$')
 def city_name(area, r):
+    if area == 'ldz': return NZ_RE.sub('', re.sub(r'\s+', ' ', r['stop_name'])).strip()
     if area == 'wej': return wej_name(r['stop_name'])[0]
     if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
         return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', re.sub(r'\s*\(Berlin,?\s*\)', '', r['stop_name']))).strip())
@@ -1388,6 +1393,7 @@ for area, A in NEW_AREAS.items():
             for r in rd(P + '/stops.txt'):
                 if (r.get('location_type') or '0') not in ('0', ''): continue
                 STOPS[pre + r['stop_id']] = [city_name(area, r), city_pole(area, r), round(float(r['stop_lat']), 5), round(float(r['stop_lon']), 5), area]
+                if area == 'ldz' and NZ_RE.search(r['stop_name']): REQ_NAMED.add(pre + r['stop_id'])
             routes = {r['route_id']: r for r in rd(P + '/routes.txt')}
             for r in rd(P + '/trips.txt'):
                 rt = routes.get(r['route_id'])
