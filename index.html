@@ -1800,7 +1800,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794835588;
+const APP_BUILD=1794835734;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2303,7 +2303,10 @@ function lineWarnLive(r){const g=alertGrp(city);if(!g)return;ztmAlerts(g).then(A
   const sc=l=>/fährt (nicht )?zwischen|hält .*nicht/.test(l)?0:/Ersatzverkehr/.test(l)?1:/Nutzen Sie/.test(l)?2:3;   // (judged on the German: its route first, the replacement, the alternatives)
   const md=t=>t.replace(/\*\*\s*(.+?)\s*\*\*/g,'$1').replace(/\*\*/g,'');   // (the source's ** marks of bold: left out here)
   const parts=mine.slice(0,3).map(([a,i])=>{const T=(a.text||'').split('\n'),D=(a.de||a.text||'').split('\n');
-    const ls=D.map((l,k)=>[l,k]).filter(([l])=>re.test(l)&&!/^\[|kommt es bei den/.test(l)).sort((x,y)=>sc(x[0])-sc(y[0])||x[1]-y[1]).map(([,k])=>(T[k]||D[k]).replace(/^•\s*/,''));
+    // (a part's heading naming the line – "Linia 6" –: not shown again, the heading above names it; its part's text instead)
+    const hd=l=>AL_HEAD.test(alNorm(md(l))),seen=new Set();
+    const ls=D.map((l,k)=>[l,k]).filter(([l])=>re.test(l)&&!/^\[|kommt es bei den/.test(l)).flatMap(([l,k])=>{if(!hd(l))return [[l,k]];const o=[];for(let j=k+1;j<D.length&&o.length<2&&!hd(D[j]);j++)if(alNorm(D[j]))o.push([D[j],j]);return o})
+      .filter(([,k])=>!seen.has(k)&&seen.add(k)).sort((x,y)=>sc(x[0])-sc(y[0])||x[1]-y[1]).map(([,k])=>(T[k]||D[k]).replace(/^•\s*/,''));
     // (the parts' headings – "Linia 132" – in bold here too)
     const lt=ls.slice(0,4).map(x=>{const h=lineSigns(esc(md(x)),a.lines);return AL_HEAD.test(alNorm(md(x)))?'<b>'+h+'</b>':h}).join(' · ');
     return `<button type="button" class="lwItem" data-i="${i}"><b>${lineSigns(esc(a.title.replace(/\s·\s(?:[A-Z]{0,2}\d{1,3}[A-Z]?(?:,\s*)?)+$/,'')),a.lines)}</b>${ls.length?'<span class="lwTx">'+lt+'</span>':''}</button>`}).join('');
