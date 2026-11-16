@@ -835,6 +835,9 @@ ROWS = [
 ("rozkładów", "timetables", "Fahrpläne", "poriadkov", "řádů"),
 ("Pobierz ZIP", "Download ZIP", "ZIP herunterladen", "Stiahnuť ZIP", "Stáhnout ZIP"),
 ("PDF do druku", "PDF for printing", "PDF zum Drucken", "PDF na tlač", "PDF k tisku"),
+("Aktualności", "News", "Aktuelles", "Aktuality", "Aktuality"),
+("Brak aktualności.", "No news.", "Keine Neuigkeiten.", "Žiadne aktuality.", "Žádné aktuality."),
+("Dla tego miasta nie ma aktualności.", "There is no news for this city.", "Für diese Stadt gibt es keine Neuigkeiten.", "Pre toto mesto nie sú aktuality.", "Pro toto město nejsou aktuality."),
 ]
 
 WEEKDAYS = {
