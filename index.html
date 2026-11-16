@@ -1781,7 +1781,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794791160;
+const APP_BUILD=1794831030;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3093,7 +3093,12 @@ function previewVB(){const C=MAP.vbC,v=MAP.vb;if(!C){applyVB();return}
   const f=Math.min((svg.clientWidth||1)/v.w,(svg.clientHeight||1)/v.h),k=C.w/v.w;   // (the element's own size: its on-screen box already includes the transform)
   if(k>4||k<.25){applyVB();renderLabels();return}   // too far from the drawn view: draw it again at once
   const tx=((C.x+C.w/2)-(v.x+v.w/2))*f,ty=((C.y+C.h/2)-(v.y+v.h/2))*f;
-  svg.style.transform=cv.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
+  // the lines follow at once: their layer takes the new view itself (a change of viewBox – their strokes keep their width, the
+  // lines laid side by side are spaced again for the scale, once a frame); only the background canvas is moved and scaled until
+  // the movement stops (drawing it is what costs)
+  cv.style.transform=`translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
+  svg.style.transform='';svg.setAttribute('viewBox',`${v.x} ${v.y} ${v.w} ${v.h}`);
+  if(!MAP.pvRaf)MAP.pvRaf=requestAnimationFrame(()=>{MAP.pvRaf=0;updatePar();if(typeof VEH!=='undefined'&&VEH.on)drawVehs();if(typeof RUN!=='undefined'&&RUN.d)drawVeh()});
   // names and symbols keep their size on screen, so while zooming they are hidden until the map is drawn again
   svg.classList.toggle('zooming',Math.abs(k-1)>.02);
   clearTimeout(MAP.cmt);MAP.cmt=setTimeout(()=>{MAP.cmt=0;applyVB();renderLabels()},140)}
@@ -5059,7 +5064,15 @@ function setupMap(){
   new MutationObserver(()=>{if(MAP.open)drawBase()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
   try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(MAP.open)drawBase()})}catch(e){}
   // the black bar on the left: timetables, or the network map as lines, on the map background, or as a diagram
-  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{const v=b.dataset.nav;
+  // every change of section from the side bar ends with the same short fade-in of whatever section is now shown (the timetables,
+  // the departures board, the map, a tool…) – whether it was opened, closed back to or swapped in place
+  const secIn=()=>{if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;let el=null,move=true;
+    if(typeof TD!=='undefined'&&TD.view)el=[...document.querySelectorAll('#toolsDr .tdBody')].find(x=>!x.hidden)||document.getElementById('toolsDr');
+    else if(DEP.open)el=depEl();else if(JP.open)el=document.querySelector('.jpModal:not([hidden])');else if(GUIDE.open)el=document.querySelector('.guideModal:not([hidden])');
+    else if(MAP.open){el=document.querySelector('.mapModal:not([hidden])');move=false}else el=document.getElementById('app');
+    if(!el||!el.animate)return;el.getAnimations&&el.getAnimations().forEach(a=>a.cancel());
+    el.animate(move?[{opacity:0,transform:'translateY(8px)'},{opacity:1,transform:'none'}]:[{opacity:0},{opacity:1}],{duration:220,easing:'ease-out'})};
+  document.querySelectorAll('[data-nav]').forEach(b=>b.onclick=async()=>{const v=b.dataset.nav;if(v!=='more'&&b.getAttribute('aria-current')!=='page')requestAnimationFrame(()=>requestAnimationFrame(secIn));
     if(v==='more'){navMoreOpen();return}
     if(v==='guide'){openGuide();return}if(GUIDE.open)closeGuide();
     if(v==='takt'||v==='bryg'||v==='hub'||v==='adm'||v==='mkadm'||v==='msgadm'||v==='tm'||v==='dbd'||v==='mk'){openTool(v);return}
