@@ -1802,7 +1802,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794838092;
+const APP_BUILD=1794838233;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3754,7 +3754,7 @@ function layoutHL(){
       if(vs.l==='run'&&RUN.cut&&RUN.e===e&&RUN.d&&RUN.d.r.id===vs.id){const c=RUN.cut,ln=q=>smoothPts(q).map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(' ');
         const past=[...e.g.slice(0,c.ci+1),c.pt],fut=[c.pt,...e.g.slice(c.ci+1)];
         return (past.length>1?`<polyline class="runPast" points="${ln(past)}"/>`:'')+`<polyline points="${ln(fut)}" style="stroke:${lineColor(vs.r)}"/>`}
-      const f=vs.l!=='run'&&MAP.par&&MAP.drawn==='geo'&&MAP.par.fit(e.g,vs.id);   // (one run followed: on its own course, not moved aside)
+      const f=vs.l!=='run'&&MAP.hl.size>1&&MAP.par&&MAP.drawn==='geo'&&MAP.par.fit(e.g,vs.id);   // (one run followed, one line alone: on its own course, not moved aside onto the bundles' grid)
       const pts=f?f.pts.map((q,i)=>(q[0]+f.nx[i]*f.sl[i]*W0).toFixed(2)+','+(q[1]+f.ny[i]*f.sl[i]*W0).toFixed(2)):smoothPts(e.g).map(q=>q[0].toFixed(2)+','+q[1].toFixed(2));
       return `<polyline points="${pts.join(' ')}" style="stroke:${lineColor(vs.r)}"/>`}).join('')});
   const ids=[...MAP.hl].filter(id=>MAP.data.routes[id]&&MAP.byId[id]&&(MAP.night||MAP.byId[id].t!=='night'));
