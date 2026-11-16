@@ -42,7 +42,7 @@ select.sselN{display:none!important}
 .chip.sq{aspect-ratio:1/1;width:auto;padding:0;letter-spacing:-.03em;justify-content:center}
 
 /* a line's sign inside a sentence (the notices) */
-.chip.small.inl.inl{--hn:1.5;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--hn) * .4174em);height:2.3958em;width:2.3958em;min-width:0;padding:0;margin:0 .12em;vertical-align:middle;line-height:1;letter-spacing:-.03em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.06em}.chip.small.inl.inl.l5{width:auto;min-width:2.3958em;padding:0 .3em}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%;letter-spacing:normal}.chip.small.inl.inl.rail{border-radius:999px;letter-spacing:-.02em}.chip.small.inl.inl.rail.circle{border-radius:50%}.chip.small.inl.inl.rail.l5{padding:0 .5em}.alertBox .aItem p,.lineWarn{line-height:1.75}.alertBox h3,.alertBox summary,.alertBox .aItem h3,.lineWarn b,.lineWarn strong,.alertBar li button{line-height:1.7}.alertBox h3 .chip.small.inl.inl,.lineWarn b .chip.small.inl.inl,.lineWarn strong .chip.small.inl.inl{--hn:1.3;margin:0 .16em}.alertBox details.aItem>summary h3,.alertBox h3,.lineWarn>div,.lineWarn>span{min-width:0;overflow-wrap:anywhere}.alertBox,.alertBox .aItem,.lineWarn{max-width:100%;box-sizing:border-box;overflow-x:hidden}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
+.chip.small.inl.inl{--hn:1.7;display:inline-flex;justify-content:center;align-items:center;font-size:calc(var(--hn) * .4174em);height:2.3958em;width:2.3958em;min-width:0;padding:0;margin:0 .12em;vertical-align:middle;line-height:1;letter-spacing:-.03em;transform:none;box-shadow:none;aspect-ratio:auto;position:relative;top:-.06em}.chip.small.inl.inl.l5{width:auto;min-width:2.3958em;padding:0 .3em}.chip.small.inl.inl.tram,.chip.small.inl.inl.nt,.chip.small.inl.inl.circle{border-radius:50%;letter-spacing:normal}.chip.small.inl.inl.rail{border-radius:999px;letter-spacing:-.02em}.chip.small.inl.inl.rail.circle{border-radius:50%}.chip.small.inl.inl.rail.l5{padding:0 .5em}.alertBox .aItem p,.lineWarn{line-height:1.75}.alertBox h3,.alertBox summary,.alertBox .aItem h3,.lineWarn b,.lineWarn strong,.alertBar li button{line-height:1.7}.alertBox h3 .chip.small.inl.inl,.lineWarn b .chip.small.inl.inl,.lineWarn strong .chip.small.inl.inl{--hn:1.5;margin:0 .16em}.alertBox details.aItem>summary h3,.alertBox h3,.lineWarn>div,.lineWarn>span{min-width:0;overflow-wrap:anywhere}.alertBox,.alertBox .aItem,.lineWarn{max-width:100%;box-sizing:border-box;overflow-x:hidden}   /* (a line's sign in a sentence: from a capital's top to a "y"'s bottom; squares square, circles round) */
 
 /* the notices' bar: one row at a time (rot), all of them when opened */
 .alertBar .abVp{flex:1 1 auto;width:100%;min-width:0}.alertBar.rot:not(.open) .abVp{height:41px;overflow:hidden}.alertBar.rot:not(.open) .abVp ul{display:block}.alertBar.rot:not(.open) li{height:41px}.alertBar.rot:not(.open) li button{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-top:0!important;height:41px;padding:0;line-height:41px}.alertBar.open .abVp{max-height:50vh;overflow:auto}.alertBar .abExp{flex:none;width:auto;border:0;background:none;color:inherit;cursor:pointer;padding:6px;display:grid;place-items:center}.alertBar.open .abExp svg{transform:rotate(180deg)}
@@ -958,7 +958,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 @media (max-width:760px){#tdTm iframe{height:calc(100dvh - var(--top-h,54px) - 64px)}}
 /* the lines' signs: always Roboto Condensed SemiBold, whatever the text around them (a bold heading or plain text) */
 /* (the signs in the notices: squares up to four characters, as everywhere – the figures smaller in a longer number) */
-.alertBox h3 .chip.small.inl.inl,.alertBar li button .chip.small.inl.inl{--hn:1.3}
+.alertBox h3 .chip.small.inl.inl,.alertBar li button .chip.small.inl.inl{--hn:1.5}
 .chip,.chip *,.chip.small.inl.inl,.mb,.bl text{font-family:"Roboto Condensed","Arial Narrow",Roboto,sans-serif!important;font-weight:600!important}
 .aTxt p.aSub strong{font-weight:700}
 .slist li.noDep button,tr.noDep button.sb{cursor:default;pointer-events:none}.slist li.noDep button:disabled,tr.noDep button.sb:disabled{color:inherit;opacity:1}.slist li.noDep button:hover,tr.noDep button.sb:hover{background:none}
@@ -1803,7 +1803,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794838843;
+const APP_BUILD=1794839417;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3835,7 +3835,9 @@ const VLET='abcdefghijklmnoprstuwxyz';
 // came apart where they take different streets (N14 at Drwęcka); several lines, a stop's lines, the diagram: as before
 const dirMode=id=>MAP.hl.size===1&&MAP.hl.has(id)&&!MAP.stopHL&&!MAP.combo&&MAP.view!=='schema'&&lineDirs(id).length>0;
 function lineDirs(id){const M=MAP.data&&MAP.data.routes[id];return M&&M.vr?[...new Set(M.vr.filter(e=>e.m&&e.g&&e.g.length>1).map(e=>e.d))].sort():[]}
-function lineDir(id){const D=lineDirs(id);MAP.dirOf=MAP.dirOf||{};return D.includes(MAP.dirOf[id])?MAP.dirOf[id]:D[0]}
+function lineDir(id){const D=lineDirs(id);MAP.dirOf=MAP.dirOf||{};if(D.includes(MAP.dirOf[id]))return MAP.dirOf[id];
+  // (a detour shown, in one direction only: that direction first)
+  const c=typeof DT!=='undefined'&&DT.on&&DT.res[id]&&DT.res[id].v;if(c){const k=Object.keys(c).map(Number).find(d=>D.includes(d));if(k!=null)return k}return D[0]}
 function varOfLine(id,v){const M=MAP.data&&MAP.data.routes[id];if(v==null||!M)return null;
   if(v==='main'){if(!dirMode(id))return {id,main:true,r:MAP.byId[id]};const d=lineDir(id);const es=M.vr.filter(e=>e.m&&e.d===d&&e.g&&e.g.length>1);return es.length?{id,es,r:MAP.byId[id],l:'main',dir:d}:{id,main:true,r:MAP.byId[id]}}
   if(v.run)return {id,es:[v.run],r:MAP.byId[id],l:'run'};
@@ -5797,7 +5799,9 @@ function dtMap(){const svg=document.getElementById('mapSvg'),hl=svg&&svg.querySe
   if(!DT.on||MAP.view==='schema'||MAP.drawn!=='geo'||!MAP.hl.size||MAP.hl.size>4)return;const key=[...MAP.hl].sort().join(',')+'|'+(RUN&&RUN.d?RUN.d.di:'');g.dataset.k=key;
   const pl=(q,cls,st)=>q.length>1?`<polyline class="${cls}" points="${q.map(p=>p[0].toFixed(2)+','+p[1].toFixed(2)).join(' ')}"${st?' style="'+st+'"':''}/>`:'';
   [...MAP.hl].forEach(id=>{const r=MAP.byId[id]||IDX.routes.find(x=>x.id===id);if(!r)return;
-    (CACHE[id]?Promise.resolve(CACHE[id]):loadRoute(id)).then(L=>dtFor(r,L).then(o=>[L,o])).then(([L,o])=>{if(!o||g.dataset.k!==key||!g.isConnected)return;const k=unitsPerPx(),kind=dtKind(r);let h='',top='';
+    (CACHE[id]?Promise.resolve(CACHE[id]):loadRoute(id)).then(L=>dtFor(r,L).then(o=>[L,o])).then(([L,o])=>{if(!o||g.dataset.k!==key||!g.isConnected)return;
+      if(dirMode(id)&&MAP.dirOf&&MAP.dirOf[id]==null&&!(MAP.varOf[id]!=null&&MAP.varOf[id]!=='main')){const w=lineDir(id);MAP.dirOf[id]=w;if(o[w]){updateVarPanel();renderLabels();return}}   // (the line just shown: in the direction of its detour)
+      const k=unitsPerPx(),kind=dtKind(r);let h='',top='';
       const only=RUN&&RUN.d&&RUN.d.r&&RUN.d.r.id===id?RUN.d.di:dirMode(id)?lineDir(id):null;
       Object.values(o).forEach(x=>{if(only!=null&&x.di!==only)return;const d=L.dirs[x.di];if(!d)return;const ids=d.stops.map(s=>s[0]);
         if(x.from!=null&&x.to>x.from){const off=[];for(let i=x.from+1;i<=x.to;i++)off.push(...dtCut(ids[i-1],ids[i],id,kind,null));h+=pl(off,'dtOff')}
