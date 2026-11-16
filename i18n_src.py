@@ -810,6 +810,10 @@ ROWS = [
     ('Za długi tekst', 'Text too long', 'Zu langer Text', 'Príliš dlhý text', 'Příliš dlouhý text'),
     ('Zmniejsz', 'Shrink', 'Verkleinern', 'Zmenšiť', 'Zmenšit'),
     ('Przewijaj', 'Scroll', 'Laufschrift', 'Posúvať', 'Posouvat'),
+    ('Wielkość liter', 'Letter case', 'Groß-/Kleinschreibung', 'Veľkosť písmen', 'Velikost písmen'),
+    ('Wielkie', 'Capitals', 'Großbuchstaben', 'Veľké', 'Velká'),
+    ('Jak wpisano', 'As typed', 'Wie eingegeben', 'Ako je napísané', 'Jak je napsáno'),
+    ('Małe', 'Lower case', 'Kleinbuchstaben', 'Malé', 'Malá'),
 ]
 
 WEEKDAYS = {
