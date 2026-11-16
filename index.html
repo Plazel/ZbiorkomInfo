@@ -1616,7 +1616,7 @@ const store={get(k,d){let v=null;try{v=localStorage.getItem(k)}catch(e){}if(v==n
 // combinations, what the timetables, the boards and mSIP show (not the place in the app, the city or the token)
 // buttons without frames and closer together (on trial; the whole change is the class "flat" – ztm.uiFlat false undoes it)
 document.documentElement.classList.toggle('flat',store.get('ztm.uiFlat',true)!==false);
-const SYNC_K=/^ztm\.(custom|theme|lang|a11y|hideVar|hideDepot|exp[A-Za-z]+|depOne|depNearAlways|mapMerge|mapStopRoutes|gdVoice|gdTrans|gdGong|gdExtra|gdSrc|mkVoice|mkLook|dbd|comboOk|tools|uiFlat)$/;
+const SYNC_K=/^ztm\.(custom|theme|lang|a11y|hideVar|hideDepot|exp[A-Za-z]+|depOne|depNearAlways|mapMerge|mapStopRoutes|gdVoice|gdTrans|gdGong|gdExtra|gdSrc|mkVoice|mkLook|comboOk|tools|uiFlat)$/;   // (not "dbd" – the board being drawn: a copy from the account must never land over what is typed)
 /* ---- interface language: pl (as written in the page), en, de, sk, cs. The page is written in Polish; for another language every
    text and tooltip shown is swapped for its translation (I18N, from i18n_src.py via build_i18n.py), also what is drawn later
    (a MutationObserver). Names of stops and lines stay as they are. ---- */
@@ -1781,7 +1781,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794784955;
+const APP_BUILD=1794790345;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6243,7 +6243,12 @@ function accStSet(k,v){if(!ACC.user||ACC.stIn)return;const S=ACC.data.st=ACC.dat
 function accStApply(){const S=ACC.data.st;
   if(!S){const o={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(SYNC_K.test(k))o[k]=store.get(k,null)}ACC.data.st=o;accSave();return}
   let ch=false;ACC.stIn=true;try{for(const [k,v] of Object.entries(S)){if(!SYNC_K.test(k))continue;if(JSON.stringify(store.get(k,null))!==JSON.stringify(v)){store.set(k,v);ch=true}}}finally{ACC.stIn=false}
-  if(ch){let n=0;try{n=+sessionStorage.getItem('ztm.stRe')||0}catch(e){}if(Date.now()-n>20000){try{sessionStorage.setItem('ztm.stRe',Date.now())}catch(e){}location.reload()}}}
+  if(ch)accReload()}
+// the page loaded anew for settings changed on another device – but never under the hands: while something is being typed or a
+// tool (dBoard, mKomputer…) is open it waits until the page is left and come back to
+function accReload(){const busy=()=>{const a=document.activeElement;return !!(a&&(a.matches('input,textarea,select,[contenteditable="true"]'))||(typeof TD!=='undefined'&&TD.view))};
+  if(busy()){if(!accReload.w){accReload.w=1;document.addEventListener('visibilitychange',function f(){if(document.visibilityState==='visible'&&!busy()){document.removeEventListener('visibilitychange',f);accReload.w=0;accReload()}})}return}
+  let n=0;try{n=+sessionStorage.getItem('ztm.stRe')||0}catch(e){}if(Date.now()-n>20000){try{sessionStorage.setItem('ztm.stRe',Date.now())}catch(e){}location.reload()}}
 // the account's data read again when the page comes back to the front, and every minute while it is in view: what was
 // changed on another device (the side bar, the settings, the Hub) shows here too
 async function accPull(){if(!ACC.user||ACC.pend||document.hidden)return;let d;try{d=await accApi('konto/dane')}catch(e){return}if(!d||ACC.pend)return;
@@ -7250,6 +7255,9 @@ function dpbInit(){if(DPB)return DPB;DPB=(() => {
     S: '..######.. .#......#. #........# #.........*5 .#........ ..######.. ........#. .........#*5 #........# .#......#. ..######..',
     M: '#........# ##......## #.#....#.# #..#..#..# #...##...# #........#*14',
     X: '#........#*2 .#......#.*2 ..#....#..*2 ...#..#...*2 ....##....*3 ...#..#...*2 ..#....#..*2 .#......#.*2 #........#*2',
+    // (punctuation in the number too: "N.1", "T-8")
+    '.': '.*17 #*2',
+    '-': '.....*9 ##### .....*9',
   };
 
   // nearest-neighbour resize of a glyph drawing (used to derive the 15-row single-line face)
