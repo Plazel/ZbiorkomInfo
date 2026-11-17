@@ -56,6 +56,7 @@ input[type=color]{width:44px;height:28px;padding:0;border:0;background:none}
 .cp .row{gap:8px}.cps{appearance:none;width:38px;height:30px;flex:none;padding:3px;border:1px solid var(--bd);border-radius:0;background:var(--panel);cursor:pointer}
 .cps i{display:block;width:100%;height:100%;border-radius:0;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
 .cps:hover,.cps.on{border-color:var(--fg)}
+.cpg{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:5px}.cpg[hidden],.cpm[hidden]{display:none}.cpt{appearance:none;aspect-ratio:1;min-width:0;padding:0;border:0;border-radius:0;background:var(--c);cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}.cpt:hover{outline:2px solid var(--bd)}.cpt.on{outline:2px solid var(--fg);outline-offset:2px}.cpman{display:flex;align-items:center;justify-content:center;background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);color:#fff}.cpman svg{filter:drop-shadow(0 0 1.5px rgba(0,0,0,.8))}.cpm .row{align-items:center}
 .cpx{width:96px;min-width:0;font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;letter-spacing:.02em}.cpx.bad{border-color:#d92d20!important;box-shadow:0 0 0 2px rgba(217,45,32,.25)}
 .cpp{display:flex;flex-direction:column;gap:9px;margin-top:9px}.cpp[hidden]{display:none}
 .cpsb,.cph{position:relative;border-radius:0;border:1px solid var(--bd);touch-action:none;user-select:none;-webkit-user-select:none}
@@ -67,6 +68,7 @@ input[type=checkbox],input[type=range],input[type=radio]{padding:0;accent-color:
 .st.sub{margin-left:22px;padding-left:8px;border-left:2px solid var(--bd2)}.st.grp{background:var(--tab);border-radius:0;padding:3px 4px}.st{display:flex;gap:6px;align-items:center;margin-bottom:5px}.st input{flex:1;min-width:0}.st select{width:86px}.st .tt{color:var(--mut);display:inline-flex}
 .badge{display:inline-block;padding:1px 6px;font-size:11px;font-weight:700;border-radius:0}
 .cat{display:flex;gap:4px;align-items:center;margin:14px 0 6px;padding:3px 4px;background:var(--tab);border-radius:0}
+.tcat{display:flex;gap:6px;align-items:center;margin:16px 0 6px;padding:5px 4px 5px 2px;border-bottom:2px solid var(--fg,#1c1f24);font-size:13px;text-transform:uppercase;letter-spacing:.04em}.tcat:first-child{margin-top:2px}.tcat .tgn{cursor:pointer}.tcat .tic{display:inline-flex}.tcat .meta{text-transform:none;letter-spacing:0}.tcat+.cat{margin-top:6px}
 #status{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:1200;max-width:min(560px,60vw);padding:7px 14px;font-size:12.5px;line-height:1.35;text-align:center;color:var(--fg);background:color-mix(in srgb,var(--panel) calc(var(--g,1)*100%),transparent);-webkit-backdrop-filter:blur(16px) saturate(1.6);backdrop-filter:blur(16px) saturate(1.6);border:1px solid var(--bd);border-radius:0;box-shadow:0 8px 24px rgba(0,0,0,.18);pointer-events:none;transition:opacity .3s}
 @media(min-width:701px){#status{left:calc(var(--sw,392px*var(--z,1)) + (100% - var(--sw,392px*var(--z,1)))/2)}}
 #diag{border-top:1px solid var(--bd2);background:var(--panel)}
@@ -317,6 +319,10 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
 const CITIES={gdansk:{n:'Gdańsk',bb:'54.27,18.43,54.46,19.02',c:[54.352,18.6466],z:13},gdynia:{n:'Gdynia',bb:'54.40,18.40,54.57,18.60',c:[54.5,18.5],z:13},sopot:{n:'Sopot',bb:'54.42,18.52,54.48,18.60',c:[54.447,18.565],z:14},
  trojmiasto:{n:'Trójmiasto (Gdańsk, Gdynia, Sopot)',bb:'54.27,18.40,54.58,19.02',c:[54.44,18.58],z:11},bydgoszcz:{n:'Bydgoszcz',bb:'53.06,17.85,53.21,18.20',c:[53.123,18.008],z:13},krynica:{n:'Krynica-Zdrój',bb:'49.395,20.92,49.445,21.00',c:[49.421,20.959],z:14}};
 let curCity='gdansk';const cityKey=()=>CITIES[S.city]?S.city:'gdansk',bb=()=>CITIES[cityKey()].bb,PAL=['#e6194b','#3cb44b','#4363d8','#f58231','#911eb4','#008080','#9a6324','#800000','#000075','#e6a800'];
+// kolory domyślne linii: barwy linii berlińskich (U-Bahn, S-Bahn, tramwaj) i bratysławskich
+const LPAL=[['#7dad4c','Berlin U1'],['#da421e','Berlin U2'],['#16683d','Berlin U3'],['#f0d722','Berlin U4'],['#7e5330','Berlin U5'],['#8c6dab','Berlin U6'],['#528dba','Berlin U7'],['#224f86','Berlin U8'],['#f3791d','Berlin U9'],
+ ['#dc6ba6','Berlin S1'],['#0066ad','Berlin S3'],['#ad5937','Berlin S41'],['#66aa22','Berlin S8'],['#992746','Berlin S9'],['#be1414','Berlin – tramwaj'],
+ ['#e30613','Bratysława – czerwony'],['#e6007e','Bratysława – purpurowy'],['#00a0e3','Bratysława – błękitny'],['#312783','Bratysława – granatowy'],['#009640','Bratysława – zielony'],['#00747a','Bratysława – morski'],['#ffcc00','Bratysława – żółty'],['#6d6e70','Bratysława – szary']];
 const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let S={lines:[],stops:[],sel:null},mode='nav',busy=false,G=null;
 let BOOTWAIT=false,NOSAVE=false,NETIDB=false,_svT=null,_svSz=0,_netSeq=0,_netW=0;
@@ -421,12 +427,13 @@ dbg('start: '+location.protocol+' | '+navigator.userAgent.slice(0,70));
 const map=L.map('map',{preferCanvas:true,renderer:L.canvas({padding:.25}),zoomControl:false,maxZoom:20})   // (the lines drawn a quarter of a screen beyond the view: fewer empty edges while dragging, the redraw still quick)
 .setView([54.352,18.6466],13);
 L.control.zoom({position:'bottomright',zoomInTitle:'Przybliż',zoomOutTitle:'Oddal'}).addTo(map);
-const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:19,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
+// (kafelki do poziomu 18 – dalej powiększane: na poziomach 19–20 podkłady często nie mają kafelków albo ich odmawiają, a mapa robiła się szara)
+const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
 const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
 const fromFile=location.protocol==='file:';
 // CARTO (Voyager; Dark Matter in the dark theme of ZbiorkomInfo) with ZbiorkomInfo's key, as the alternative to OSM
 const CARTO_KEY='cb1_4vdw_1_23a15f607749c4261b38e021';
-const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:19,keepBuffer:4,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
+const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
 const BASES={osm,osmde,carto:cartoMake(false)};let curBase=null,cartoDk=false;
 function setBase(k){
  if(k==='maptiler')k='carto';
@@ -1133,6 +1140,10 @@ function normCats(){
  if(!Array.isArray(S.cats))S.cats=[];
  if(S.catOrder){S.catOrder.forEach(c=>{if(c&&!S.cats.includes(c))S.cats.push(c)});delete S.catOrder}
  S.lines.forEach(l=>{if(l.cat&&!S.cats.includes(l.cat))S.cats.push(l.cat)})}
+// rodzaj linii na liście: tramwaje, trolejbusy, autobusy, kolej (w tej kolejności); kategorie użytkownika dzielą każdy rodzaj dalej
+const LTYPES=[['tram','Tramwaje','tram'],['trolley','Trolejbusy','trolley'],['bus','Autobusy','bus'],['rail','Kolej','train']];
+function ltype(l){if(l.veh==='trolley')return 'trolley';if(l.rm==='tram'||l.rm==='rail')return l.rm;if(l.rm==='street')return 'bus';const m=lineMode(l);return m==='tram'||m==='rail'?m:'bus'}
+const tyOf=l=>{const P=l.par&&S.lines.find(x=>x.id===l.par);return ltype(P||l)};
 function catList(){normCats();const present=new Set(S.lines.map(l=>l.cat||'')),o=S.cats.filter(c=>present.has(c));if(present.has(''))o.push('');return o}
 const orderedLines=()=>catList().flatMap(c=>S.lines.filter(l=>(l.cat||'')===c));
 function moveLine(l,dir){
@@ -1238,15 +1249,16 @@ function dragSort(handle,el,kind,key){
  const hold=handle===el;if(!hold)handle.onclick=e=>e.stopPropagation();
  handle.onpointerdown=e=>{
   e.preventDefault();e.stopPropagation();handle.setPointerCapture(e.pointerId);
-  const box=$('#lines'),line=S.lines.find(x=>x.id===key),cat=kind==='line'?(line.cat||''):'';
-  const items=()=>kind==='cat'?[...box.querySelectorAll('.cat')].filter(x=>x.dataset.cat):[...box.querySelectorAll('[data-lid]')].filter(x=>{const l=S.lines.find(y=>y.id===x.dataset.lid);return l&&(l.cat||'')===cat});
+  const box=$('#lines'),line=S.lines.find(x=>x.id===key),cat=kind==='line'?(line.cat||''):'',ty=kind==='line'?tyOf(line):el.dataset.ty;   // (only within its own kind of line)
+  const lOf=n=>S.lines.find(y=>y.id===n.dataset.lid);
+  const items=()=>kind==='cat'?[...box.querySelectorAll('.cat')].filter(x=>x.dataset.cat&&x.dataset.ty===ty):[...box.querySelectorAll('[data-lid]')].filter(x=>{const l=lOf(x);return l&&(l.cat||'')===cat&&tyOf(l)===ty});
   const ind=document.createElement('div');ind.style.cssText='height:3px;border-radius:0;background:#2456d6;margin:2px 0;pointer-events:none';
   el.style.opacity=.5;let idx=-1;document.body.style.cursor='grabbing';
   const others=()=>items().filter(x=>x!==el);
   const catOf=n=>n.classList.contains('cat')?n.dataset.cat:((S.lines.find(y=>y.id===n.dataset.lid)||{}).cat||'');
   let tgt=null;
   const aim=y=>{
-   const nodes=[...box.children].filter(n=>n!==el&&n!==ind&&(n.classList.contains('cat')||n.dataset.lid));
+   const nodes=[...box.children].filter(n=>n!==el&&n!==ind&&(n.classList.contains('cat')?n.dataset.ty===ty:n.dataset.lid&&lOf(n)&&tyOf(lOf(n))===ty));
    let prev=null,res=null;
    for(const n of nodes){const r=n.getBoundingClientRect();
     if(y<r.top+r.height/2){res={cat:(n.classList.contains('cat')&&prev!==null)?prev:catOf(n),ref:n};break}
@@ -1260,15 +1272,16 @@ function dragSort(handle,el,kind,key){
    for(let i=0;i<o.length;i++){const r=o[i].getBoundingClientRect();if(ev.clientY<r.top+r.height/2){k=i;break}}
    idx=k;
    if(k<o.length)o[k].parentNode.insertBefore(ind,o[k]);
-   else{const last=o[o.length-1]||el;let ref=last.nextSibling;if(last===o[o.length-1]&&kind==='cat'){/* po ostatniej kategorii: za jej liniami */const nx=[...box.children];let i=nx.indexOf(last)+1;while(i<nx.length&&!nx[i].classList.contains('cat'))i++;ref=nx[i]||null}
+   else{const last=o[o.length-1]||el;let ref=last.nextSibling;if(last===o[o.length-1]&&kind==='cat'){/* po ostatniej kategorii: za jej liniami */const nx=[...box.children];let i=nx.indexOf(last)+1;while(i<nx.length&&!nx[i].classList.contains('cat')&&!nx[i].classList.contains('tcat'))i++;ref=nx[i]||null}
     else if(kind==='line'){const nx=[...box.children];let i=nx.indexOf(last)+1;ref=nx[i]||null;/* nastepny element to nagłówek lub karta innej kategorii */}
     box.insertBefore(ind,ref)}
   };
   const end=ev=>{
    handle.onpointermove=handle.onpointerup=handle.onpointercancel=null;ind.remove();el.style.opacity='';document.body.style.cursor='';
    if(ev.type==='pointercancel'||idx<0){return}
-   if(kind==='cat'){const v=catList().filter(Boolean).filter(c=>c!==key);v.splice(idx,0,key);S.cats=[...v,...S.cats.filter(c=>!v.includes(c))]}
-   else{const tc=tgt.cat;S.lines=S.lines.filter(x=>x!==line);const tl=S.lines.filter(x=>(x.cat||'')===tc&&!x.par);
+   if(kind==='cat'){const shown=items().map(x=>x.dataset.cat),v=shown.filter(c=>c!==key);v.splice(idx,0,key);   // (the order of the categories shown in this kind; the rest keep their places)
+    const all=catList().filter(Boolean);const pos=all.map((c,i)=>v.includes(c)?i:-1).filter(i=>i>=0);let k=0;pos.forEach(i=>{all[i]=v[k++]});S.cats=[...all,...S.cats.filter(c=>!all.includes(c))]}
+   else{const tc=tgt.cat;S.lines=S.lines.filter(x=>x!==line);const tl=S.lines.filter(x=>(x.cat||'')===tc&&!x.par&&tyOf(x)===ty);
     if(tc)line.cat=tc;else delete line.cat;
     if(!tl.length)S.lines.push(line);else if(idx<tl.length)S.lines.splice(S.lines.indexOf(tl[idx]),0,line);else S.lines.splice(S.lines.indexOf(tl[tl.length-1])+1,0,line)}
    save();renderLines();redraw()};
@@ -1299,15 +1312,23 @@ function renderLines(){syncAmode();syncVariants();
  const cats=catList();S.collapsed=S.collapsed||{};
  {const any=S.lines.some(l=>!l.hidden),t=$('#toggleAll');t.innerHTML=ic(any?'eye':'eyeoff');t.title=any?'Ukryj wszystkie linie':'Pokaż wszystkie linie';t.setAttribute('aria-label',t.title);t.disabled=!S.lines.length}
  if(!S.lines.length)box.innerHTML='<div class="small">Brak linii. Dodaj ją przyciskiem + na dole panelu.</div>';
- cats.forEach(cn=>{
-  const ls=S.lines.filter(l=>(l.cat||'')===cn&&!l.par),lsAll=S.lines.filter(l=>(l.cat||'')===cn),showH=cats.length>1||cn,col=showH&&!!S.collapsed[cn];
+ LTYPES.forEach(([ty,tyName,tyIc])=>{
+  const tAll=S.lines.filter(l=>tyOf(l)===ty);if(!tAll.length)return;const tMain=tAll.filter(l=>!l.par),tk='§'+ty,tcol=!!S.collapsed[tk];
+  {const h=document.createElement('div');h.className='tcat';h.dataset.ty=ty;
+   h.innerHTML=`<button class="b ico flat tg" title="Zwiń / rozwiń">${ic(tcol?'right':'down')}</button><span class="tic">${ic(tyIc,16)}</span><b class="grow tgn">${tyName}</b><span class="meta">${tMain.length} · ${ic('ruler',13)}${fmtKm(tMain.reduce((t,l)=>t+lineLen(l),0))}</span><button class="b ico flat ey" title="Pokaż/ukryj wszystkie linie tego rodzaju">${ic(tAll.some(l=>!l.hidden)?'eye':'eyeoff')}</button>`;
+   const q=x=>h.querySelector(x),tgl=()=>{S.collapsed[tk]=!S.collapsed[tk];save();renderLines()};q('.tg').onclick=tgl;q('.tgn').onclick=tgl;
+   q('.ey').onclick=()=>{const hide=tAll.some(l=>!l.hidden);tAll.forEach(l=>l.hidden=hide);save();renderLines();redraw()};box.appendChild(h)}
+  if(tcol)return;
+  const tc=cats.filter(cn=>tAll.some(l=>(l.cat||'')===cn));
+  tc.forEach(cn=>{
+  const ls=tMain.filter(l=>(l.cat||'')===cn),lsAll=tAll.filter(l=>(l.cat||'')===cn),showH=tc.length>1||cn,col=showH&&!!S.collapsed[cn];
   if(showH){const h=document.createElement('div');h.className='cat';
    h.innerHTML=`<button class="b ico flat tg" title="Zwiń / rozwiń">${ic(col?'right':'down')}</button><b class="grow tgn" style="cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(cn||'Bez kategorii')}</b>${col?'':`<span class="meta">${ls.length} · ${ic('ruler',13)}${fmtKm(ls.reduce((t,l)=>t+lineLen(l),0))}</span>`}${cn?`<button class="b ico flat rn" title="Zmień nazwę kategorii">${ic('pencil',14)}</button>`:''}${cn?`<button class="b ico flat dg" title="Przytrzymaj i przeciągnij, aby zmienić kolejność kategorii" style="cursor:grab;touch-action:none">${ic('grip')}</button>`:''}<button class="b ico flat ey" title="Pokaż/ukryj całą kategorię">${ic(lsAll.some(l=>!l.hidden)?'eye':'eyeoff')}</button>`;
    const q=x=>h.querySelector(x),tgl=()=>{S.collapsed[cn]=!S.collapsed[cn];save();renderLines()};
-   q('.tg').onclick=tgl;q('.tgn').onclick=tgl;if(cn){dragSort(q('.dg'),h,'cat',cn);q('.rn').onclick=e=>{e.stopPropagation();renameCat(cn)}}h.dataset.cat=cn;
+   h.dataset.cat=cn;h.dataset.ty=ty;q('.tg').onclick=tgl;q('.tgn').onclick=tgl;if(cn){dragSort(q('.dg'),h,'cat',cn);q('.rn').onclick=e=>{e.stopPropagation();renameCat(cn)}}
    q('.ey').onclick=()=>{const hide=lsAll.some(l=>!l.hidden);lsAll.forEach(l=>l.hidden=hide);save();renderLines();redraw()};
    box.appendChild(h)}
-  if(!col)ls.forEach(l=>box.appendChild(lineCard(l)))});
+  if(!col)ls.forEach(l=>box.appendChild(lineCard(l)))})});
  lmRefresh()}
 // the line's settings in a window of their own (the gear on its card): the look, the variants and stops, the timetable
 const LM={id:null,box:null};
@@ -1350,7 +1371,7 @@ function lineCard(l,M){
   return `<div class="vpn vwar"><div class="vrow"><b class="vn" style="min-width:0">Warianty</b><span class="grow"></span>${canSwap?`<button class="b flat vsw" title="Zamień kierunki: trasa TAM stanie się trasą POWRÓT, a POWRÓT – trasą TAM">${ic('twoway',14)}Zamień TAM ↔ POWRÓT</button>`:''}<button class="b flat vpadd" title="Dodaj wariant tej linii: inna trasa, skrócony, wydłużony lub tylko jeden kierunek">${ic('plus',14)}Wariant</button></div><div class="vchips">${chs}</div>${det}</div>`})():''
  const list=M&&curV===l?(LS.length?vrows(0)+LS.map((s,i)=>{const dim=!own&&!T.stops.includes(s.id);return `<div class="st${ins&&ins.lid===T.id&&ins.id===s.id?' anch':''}"${dim?' style="opacity:.45"':''}><span class="small" style="width:24px;margin:0">${i+1}.</span><span class="grow" style="cursor:pointer${dim?';text-decoration:line-through':''}" data-a="z" data-i="${i}">${esc(lab(s))}</span>${dirSet.has(i)?'<span class="small" title="Ta część trasy dotyczy tylko kierunku A – w drugą stronę linia jedzie inaczej" style="margin-right:4px">→</span>':''}${!dim?`<button class="b ico flat tm${termIds(T).includes(s.id)?' on':''}" data-a="t" data-i="${i}" title="Przystanek końcowy – kliknij, aby zaznaczyć lub odznaczyć (domyślnie pierwszy i ostatni)">${ic('flag',14)}</button>`:''}${own?`<button class="b ico flat" data-g="${i}" title="Przytrzymaj i przeciągnij, aby zmienić kolejność" style="cursor:grab;touch-action:none">${ic('grip',14)}</button>`:''}<button class="b ico flat" data-a="x" data-i="${i}" title="${own?'Usuń przystanek z linii':dim?'Przywróć na wariancie':'Usuń z wariantu'}">${ic(dim?'plus':'x',14)}</button></div>`+vrows(i+1)}).join(''):'<div class="small">Brak przystanków. Użyj trybu „Wybieraj przystanki” albo przycisku plus na liście przystanków.</div>'):'';
  const vi=l.par?S.lines.filter(x=>x.par===l.par).indexOf(l):-1,vtag=l.par?`<div class="small" style="margin:0 0 2px;font-weight:700">${varLabel(l)}</div>`:'';
- const setp=M&&!l.par?`<div class="setg"><span class="lab">${ic('num',14)}Numer</span><input class="num2" maxlength="4" value="${esc(l.num)}"><span class="lab">${ic('palette',14)}Kolor</span><div class="cp"><div class="row"><button type="button" class="cps${ui.cp?' on':''}" title="Wybierz kolor (HSB)" style="--c:${l.color}"><i></i></button><input class="cpx" value="${l.color}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Kod koloru, np. #2456d6"></div><div class="cpp"${ui.cp?'':' hidden'}><div class="cpsb"><b></b></div><div class="cph"><b></b></div><div class="cpr"></div></div></div><span class="lab">${ic('sliders',14)}Grubość</span><div class="row"><input type="range" class="rw" min="2" max="14" value="${l.w||5}" style="flex:1"><b class="wv">${l.w||5}</b></div><span class="lab">${ic('dash',14)}Styl linii</span><div class="seg rs">${[['solid','',' ciągła'],['dashed','9 6','przerywana'],['dotted','0.1 7','kropkowana']].map(([v,d,t])=>`<button type="button" data-v="${v}" title="${t.trim()}"${(l.style||'solid')===v?' class="on"':''}><svg width="56" height="14" viewBox="0 0 56 14"><line x1="4" y1="7" x2="52" y2="7" stroke="currentColor" stroke-width="4" stroke-linecap="${v==='solid'?'butt':'round'}"${d?` stroke-dasharray="${d}"`:''}/></svg></button>`).join('')}</div><span class="lab">${ic('shapes',14)}Kształt numeru</span><div class="seg rsh">${[['square','0','kwadrat'],['round','12px','koło']].map(([v,r,t])=>`<button type="button" data-v="${v}" title="${t}"${(l.shape||'square')===v?' class="on"':''}><span class="badge" style="background:${l.color};color:${txt(l.color)};border-radius:${r}">${esc(l.num||'1')}</span></button>`).join('')}</div><span class="lab">${ic('tag',14)}Kategoria</span><select class="lc"><option value="">Bez kategorii</option>${S.cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}<option value="__new">+ Nowa kategoria…</option></select></div>`:'';
+ const setp=M&&!l.par?`<div class="setg"><span class="lab">${ic('num',14)}Numer</span><input class="num2" maxlength="4" value="${esc(l.num)}"><span class="lab">${ic('palette',14)}Kolor</span><div class="cp"><div class="cpg"${ui.cpm?' hidden':''}>${LPAL.map(([x,t])=>`<button type="button" class="cpt${x===String(l.color).toLowerCase()?' on':''}" data-c="${x}" title="${esc(t)}" style="--c:${x}"></button>`).join('')}<button type="button" class="cpt cpman" title="Ręczne ustawienie koloru">${ic('sliders',16)}</button></div><div class="cpm"${ui.cpm?'':' hidden'}><div class="row"><button type="button" class="b ico flat cpbk" title="Kolory domyślne" aria-label="Kolory domyślne">${ic('swatches',16)}</button><button type="button" class="cps${ui.cp?' on':''}" title="Wybierz kolor (HSB)" style="--c:${l.color}"><i></i></button><input class="cpx" value="${l.color}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Kod koloru, np. #2456d6"></div><div class="cpp"${ui.cp?'':' hidden'}><div class="cpsb"><b></b></div><div class="cph"><b></b></div><div class="cpr"></div></div></div></div><span class="lab">${ic('sliders',14)}Grubość</span><div class="row"><input type="range" class="rw" min="2" max="14" value="${l.w||5}" style="flex:1"><b class="wv">${l.w||5}</b></div><span class="lab">${ic('dash',14)}Styl linii</span><div class="seg rs">${[['solid','',' ciągła'],['dashed','9 6','przerywana'],['dotted','0.1 7','kropkowana']].map(([v,d,t])=>`<button type="button" data-v="${v}" title="${t.trim()}"${(l.style||'solid')===v?' class="on"':''}><svg width="56" height="14" viewBox="0 0 56 14"><line x1="4" y1="7" x2="52" y2="7" stroke="currentColor" stroke-width="4" stroke-linecap="${v==='solid'?'butt':'round'}"${d?` stroke-dasharray="${d}"`:''}/></svg></button>`).join('')}</div><span class="lab">${ic('shapes',14)}Kształt numeru</span><div class="seg rsh">${[['square','0','kwadrat'],['round','12px','koło']].map(([v,r,t])=>`<button type="button" data-v="${v}" title="${t}"${(l.shape||'square')===v?' class="on"':''}><span class="badge" style="background:${l.color};color:${txt(l.color)};border-radius:${r}">${esc(l.num||'1')}</span></button>`).join('')}</div><span class="lab">${ic('tag',14)}Kategoria</span><select class="lc"><option value="">Bez kategorii</option>${S.cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}<option value="__new">+ Nowa kategoria…</option></select></div>`:'';
  const note=ui.note?`<textarea class="nt" rows="3" placeholder="Komentarz do linii…">${esc(l.note||'')}</textarea>`:'';
  c.innerHTML=`<div class="row lnh"><div class="nb" style="background:${l.color};color:${txt(l.color)};${M?bst(l,48,20,'10px'):bst(l,34,15,'7px')}">${esc(l.num)}</div><div class="grow">${vtag}<div class="route">${route}</div><div class="meta">${vars.length?`<span>${vars.length} ${vars.length===1?'wariant':vars.length<5?'warianty':'wariantów'}</span><span>·</span>`:''}<span style="display:inline-flex;align-items:center;gap:4px">${ic('pin',13)}${l.stops.length} przyst.</span><span>·</span><span style="display:inline-flex;align-items:center;gap:4px">${ic('ruler',13)}${fmtKm(lineLen(l))}</span></div></div></div>
  ${M?`<div class="lnSec"><h4>${ic('palette',14)}Wygląd</h4>${setp}</div><div class="lnSec"><h4>${ic('branch',14)}Warianty i przystanki</h4>${chips}${list}</div><div class="lnSec"><h4>${ic('clock',14)}Rozkład jazdy</h4><button class="b ttb${l.tt||l.tto?' act':''}" type="button">${ic('clock')}Edytuj rozkład jazdy</button></div>`:`<div class="tools"><button class="b ico flat eye" title="Pokaż/ukryj linię na mapie">${ic(l.hidden?'eyeoff':'eye')}</button>${l.par?'':`<button class="b ico flat gear" title="Ustawienia linii: wygląd, warianty i przystanki, rozkład jazdy">${ic('gear')}</button>`}<button class="b ico flat nbt${ui.note||l.note?' act':''}" title="${l.note?esc(l.note.slice(0,120)):'Dodaj komentarz do linii'}">${ic('message')}</button><button class="b ico flat del" title="Usuń linię">${ic('trash')}</button></div>${note}`}`;
@@ -1412,6 +1433,11 @@ function lineCard(l,M){
    drag(hb,x=>{h=Math.min(359.99,x*360);setCol(hsv2hex(h,s,v))});
    pan.onclick=e=>e.stopPropagation();
    cps.onclick=e=>{e.stopPropagation();ui.cp=!ui.cp;pan.hidden=!ui.cp;cps.classList.toggle('on',!!ui.cp)};
+   // kolory domyślne (siatka) i przejście do ręcznego ustawiania (ostatnia kratka) – i z powrotem
+   {const g=q('.cpg'),mn=q('.cpm');const view=m=>{ui.cpm=m;g.hidden=m;mn.hidden=!m;if(m){ui.cp=true;pan.hidden=false;cps.classList.add('on')}};
+    g.onclick=e=>{e.stopPropagation();const b=e.target.closest('.cpt');if(!b)return;if(b.classList.contains('cpman')){view(true);return}
+     const x=b.dataset.c,hv=hex2hsv(x);if(hv[1]>0&&hv[2]>0)h=hv[0];s=hv[1];v=hv[2];setCol(x);g.querySelectorAll('.cpt').forEach(t=>t.classList.toggle('on',t===b));if(cT)commit()};
+    q('.cpbk').onclick=e=>{e.stopPropagation();view(false);const c0=String(l.color).toLowerCase();g.querySelectorAll('.cpt').forEach(t=>t.classList.toggle('on',t.dataset.c===c0))}}
    // jedno pole z kodem koloru: #RRGGBB lub #RGB (z lub bez „#”)
    cpx.onclick=e=>e.stopPropagation();
    cpx.oninput=()=>{const n=normHex(cpx.value);cpx.classList.toggle('bad',!n);if(!n)return;const hv=hex2hsv(n);if(hv[1]>0&&hv[2]>0)h=hv[0];s=hv[1];v=hv[2];setCol(n,true)};
@@ -1439,7 +1465,7 @@ function lineCard(l,M){
  return c}
 // a new line of the kind chosen (+ at the foot of the panel): trams and trains with a round number, buses and trolleybuses a square one;
 // trolleybuses go along the streets as buses do – only their kind differs
-function newLine(k){const rm=k==='tram'||k==='rail'?k:'street',l={id:'l'+Date.now(),num:String(S.lines.length+1),color:PAL[S.lines.length%PAL.length],w:5,style:'solid',segs:[],wp:[],stops:[],rm,shape:k==='tram'||k==='rail'?'round':'square'};if(k==='trolley')l.veh='trolley';
+function newLine(k){const rm=k==='tram'||k==='rail'?k:'street',l={id:'l'+Date.now(),num:String(S.lines.length+1),color:LPAL[S.lines.length%LPAL.length][0],w:5,style:'solid',segs:[],wp:[],stops:[],rm,shape:k==='tram'||k==='rail'?'round':'square'};if(k==='trolley')l.veh='trolley';
  S.lines.push(l);S.sel=l.id;UI.am=rm;save();applyUI();renderLines();redraw()}
 {const NK=[['tram','tram','Linia tramwajowa'],['bus','bus','Linia autobusowa'],['trolley','trolley','Linia trolejbusowa'],['rail','train','Linia kolejowa']],ab=$('#addL'),f=document.createElement('div');f.className='tfly';f.id='nlFly';f.hidden=true;f.setAttribute('role','menu');document.body.appendChild(f);
  ab.onclick=e=>{e.stopPropagation();if(!f.hidden){f.hidden=true;return}f.innerHTML=NK.map(([k,i,t])=>`<button type="button" role="menuitem" data-k="${k}">${ic(i)}${t}</button>`).join('');f.hidden=false;const r=ab.getBoundingClientRect();f.style.left=r.left+'px';f.style.top=Math.max(4,r.top-f.offsetHeight-6)+'px'};
@@ -1948,7 +1974,7 @@ const askConfirm=(msg,o={})=>modal({title:o.title||'Potwierdzenie',body:`<p styl
 // ---- the line's timetable, edited by hand: for each direction and kind of day the departures from the first stop (an hour per
 // row, its minutes), and the minutes from the first stop to each stop. Left as worked out (from the headways and the line's
 // hours, from the length and speed) until changed; "Przywróć wyliczone" goes back. ZbiorkomInfo's NM city shows it at once.
-Object.assign(ICON,{pole:'<rect x="7.5" y="2" width="9" height="7.5" rx="2"/><path d="M12 9.5V21.5M9.5 21.5h5"/>',stoppair:'<rect x="2.5" y="3" width="7" height="6" rx="1.6"/><path d="M6 9v11.5M4 20.5h4"/><rect x="14.5" y="3" width="7" height="6" rx="1.6"/><path d="M18 9v11.5M16 20.5h4"/>',sgltrack:'<path d="M12 2v20M8 6h8M8 12h8M8 18h8"/>',dbltrack:'<path d="M6 2v20M18 2v20M3.5 6h5M3.5 12h5M3.5 18h5M15.5 6h5M15.5 12h5M15.5 18h5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',trolley:'<rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 14h16M9 9 12 3M13 9l3-6M7 19v2M17 19v2"/>'});
+Object.assign(ICON,{swatches:'<rect x="3.5" y="3.5" width="7" height="7"/><rect x="13.5" y="3.5" width="7" height="7"/><rect x="3.5" y="13.5" width="7" height="7"/><rect x="13.5" y="13.5" width="7" height="7"/>',pole:'<rect x="7.5" y="2" width="9" height="7.5" rx="2"/><path d="M12 9.5V21.5M9.5 21.5h5"/>',stoppair:'<rect x="2.5" y="3" width="7" height="6" rx="1.6"/><path d="M6 9v11.5M4 20.5h4"/><rect x="14.5" y="3" width="7" height="6" rx="1.6"/><path d="M18 9v11.5M16 20.5h4"/>',sgltrack:'<path d="M12 2v20M8 6h8M8 12h8M8 18h8"/>',dbltrack:'<path d="M6 2v20M18 2v20M3.5 6h5M3.5 12h5M3.5 18h5M15.5 6h5M15.5 12h5M15.5 18h5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',trolley:'<rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 14h16M9 9 12 3M13 9l3-6M7 19v2M17 19v2"/>'});
 const TT_DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 function ttEdit(l){const P=FP(),a=ziAuto(l,P);if(!a){say('Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.');return}
  const st={dk:'A',dy:'w',gen:false},b=document.createElement('div');b.className='ttEd';
