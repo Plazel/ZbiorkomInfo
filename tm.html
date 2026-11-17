@@ -1107,7 +1107,7 @@ function popupGroup(u){
  d.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>delStop(u.members[+b.dataset.d]));
  d.querySelector('[data-all]').onclick=async()=>{const ms=u.members.slice();if(!await askConfirm('Usunąć wszystkie scalone przystanki „'+base+'” ('+ms.length+')?',{title:'Usuń przystanki',ok:'Usuń wszystkie',danger:true}))return;
   const ids=new Set(ms.map(x=>x.id)),aff=[...new Set(ms.flatMap(x=>linesOf(x.id)))];markGone([...ids]);S.stops=S.stops.filter(x=>!ids.has(x.id));S.lines.forEach(k=>k.stops=k.stops.filter(i=>!ids.has(i)));save();drawStops();renderStops();renderLines();map.closePopup();aff.forEach(stopsChanged)};
- d.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const s=u.members[+b.dataset.i],i=l.stops.indexOf(s.id);i<0?l.stops.push(s.id):l.stops.splice(i,1);save();done();stopsChanged(l)});
+ d.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const s=u.members[+b.dataset.i],i=l.stops.indexOf(s.id);if(i<0){done();addToLine(s.id);return}l.stops.splice(i,1);if(ins&&ins.id===s.id)ins=null;save();done();stopsChanged(l)});
  d.onmouseenter=keepPop;d.onmouseleave=()=>curM&&leavePop(curM);
  return d}
 const markGone=ids=>{const a=ids.filter(i=>/^[nw]\d+$/.test(i));if(a.length)S.rmStops=[...new Set([...(S.rmStops||[]),...a])]}; // identyfikatory przystanków z OSM usuniętych ręcznie – import po zmianie miasta ich nie przywraca
@@ -1123,7 +1123,7 @@ function popup(s){
  const done=()=>{drawStops();renderStops();renderLines();map.closePopup()};
  const sv=()=>{s.name=inp.value.trim()||s.name;syncNum(s);const kc=ksel.value!==kindOf(s);if(kc)setKind(s,ksel.value);save();done();if(kc)linesOf(s.id).forEach(stopsChanged)};
  bs[0].onclick=sv;inp.onkeydown=e=>{if(e.key==='Enter')sv()};
- if(l)bs[1].onclick=()=>{const i=l.stops.indexOf(s.id);i<0?l.stops.push(s.id):l.stops.splice(i,1);save();done();stopsChanged(l)};
+ if(l)bs[1].onclick=()=>{const i=l.stops.indexOf(s.id);if(i<0){done();addToLine(s.id);return}l.stops.splice(i,1);if(ins&&ins.id===s.id)ins=null;save();done();stopsChanged(l)};
  bs[bs.length-1].onclick=()=>delStop(s);
  d.onmouseenter=keepPop;d.onmouseleave=()=>curM&&leavePop(curM);
  return d}
