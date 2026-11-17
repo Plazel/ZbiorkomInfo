@@ -177,21 +177,17 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
  <div class="dd"><button class="b" id="bFile"><i data-ic="file"></i>Plik</button>
   <div class="pop" id="pFile">
    <div class="fmenu">
-    <button class="b" id="fSaveAs"><i data-ic="save"></i>Zapisz projekt jako… (autozapis)</button>
-    <button class="b" id="fSaveNow"><i data-ic="save"></i>Zapisz teraz</button>
-    <button class="b" id="fOpen"><i data-ic="folder"></i>Otwórz plik projektu…</button>
-    <button class="b" id="fReconnect" style="display:none"></button>
-    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAuto" disabled>Autozapis do pliku po każdej zmianie</label>
-    <div class="sech"><i data-ic="upload"></i>Konto ZbiorkomInfo</div>
+    <button class="b" id="fOpenM"><i data-ic="folder"></i>Otwórz…</button>
+    <button class="b" id="fSaveL"><i data-ic="save"></i>Zapisz (lokalnie)</button>
     <button class="b" id="fAccSave"><i data-ic="upload"></i>Zapisz na koncie</button>
-    <button class="b" id="fAccLoad"><i data-ic="download"></i>Wczytaj z konta…</button>
-    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAccAuto">Autozapis na koncie po każdej zmianie</label>
+    <button class="b" id="fReconnect" style="display:none"></button>
+    <div class="sech"><i data-ic="refresh"></i>Autozapis</div>
+    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAuto" disabled>Do pliku po każdej zmianie</label>
+    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAccAuto">Na koncie po każdej zmianie</label>
     <div class="small" id="fAccSt" style="padding:0 11px 4px;color:var(--mut)"></div>
-    <div class="sech"><i data-ic="download"></i>Kopia przenośna</div>
-    <button class="b" id="exp"><i data-ic="download"></i>Eksportuj projekt (JSON)</button>
-    <button class="b" id="imp"><i data-ic="upload"></i>Importuj projekt (JSON)</button>
-    <div class="sech"><i data-ic="network"></i>Schemat</div>
-    <button class="b" id="fSchema"><i data-ic="network"></i>Generuj interaktywny schemat…</button>
+    <div class="sech"></div>
+    <button class="b" id="fSchema"><i data-ic="network"></i>Schemat…</button>
+    <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button></span>
    </div>
    <div class="small" id="fStat" style="margin:6px 0 0"></div>
    <input type="file" id="file" accept=".json,application/json" hidden>
@@ -222,7 +218,6 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
    <div class="small" style="margin:0 0 0 25px">Nazwy pojawiają się od przybliżenia 14. Nazwy przystanków końcowych są pokazywane zawsze.</div>
    <div class="row small" style="margin:6px 0 0"><span class="grow"><span id="gstat">Torowiska: ładowanie…</span><br><span id="rstat">Tory kolejowe: ładowanie…</span></span><button class="b ico" id="retryTram" title="Pobierz torowiska ponownie"><i data-ic="refresh"></i></button></div>
   </div></div>
- <button class="b" id="bFreq" title="Częstotliwości kursowania linii"><i data-ic="clock"></i>Częstotliwości</button>
  <div class="dd" hidden style="display:none"><button class="b" id="bView"><i data-ic="palette"></i>Wygląd</button>
   <div class="pop" id="pView">
    <div class="row"><div class="small grow" style="margin:0;font-weight:700;text-transform:uppercase;letter-spacing:.04em">Interfejs aplikacji</div><button class="b ico flat" id="uiResetI" title="Przywróć domyślne" aria-label="Przywróć domyślne"><i data-ic="reset"></i></button></div>
@@ -668,7 +663,17 @@ const editL=L.layerGroup().addTo(map);
 function snapWp(ll,mm){const g=mm==='rail'?RG:(mm==='tram'||mm==='tramfirst')?G:null;if(!g)return ll;
  let bn=null;for(const [n,d] of bestPerComp(ll,g).values())if(!bn||d<bn[1])bn=[n,d];
  if(bn&&bn[1]<(mm==='tramfirst'?40:120))return g.pos.get(bn[0]);return(mm==='tram'||mm==='rail')?null:ll}
-const modeOfSeg=sg=>['tram','rail','street'].includes(sg&&sg.mode)?sg.mode:(curAm()==='auto'?'tramfirst':curAm());
+// (a line keeps to its kind: a stretch drawn the other way – tram on a bus line, street on a tram line – is led anew its line's way)
+const modeOfSeg=sg=>{const am=curAm();if(['tram','rail','street'].includes(am))return sg&&sg.mode==='free'?'free':am;return['tram','rail','street'].includes(sg&&sg.mode)?sg.mode:(am==='auto'?'tramfirst':am)};
+// the line's whole course led again the way of its kind, when its kind changes (no line drawn partly on tracks and partly on streets)
+async function reMode(l){const am=curAm();if(!['tram','rail','street'].includes(am)||!l||!l.segs||!l.segs.some(sg=>sg&&sg.mode!=='free'&&sg.mode!==am))return;
+ if(l.auto&&l.stops.length>1){await rebuild(l,true);return}
+ if(busy)return;busy=true;say('Prowadzenie trasy od nowa jako '+(am==='tram'?'linii tramwajowej':am==='rail'?'linii kolejowej':'linii autobusowej')+'…');
+ try{const wp=l.wp.slice(),segs=l.segs.slice(),bad=[];
+  for(let i=0;i<segs.length;i++){const sg=segs[i];if(!sg||sg.mode==='free'||sg.mode===am)continue;const t=Date.now()+'_m'+i,A={id:'e'+t+'a',name:'punkt',ll:wp[i],tram:false},B={id:'e'+t+'b',name:'punkt',ll:wp[i+1],tram:false};
+   const res=await segRoute(A,B,am);if(res&&res.pts&&!res.bad)segs[i]={mode:res.mode,pts:res.pts};else bad.push(i+1)}
+  l.segs=segs;l.stops=routeStops(l);save();say(bad.length?'Części odcinków ('+bad.join(', ')+') nie da się poprowadzić '+(am==='street'?'ulicami':'po torach')+' – przesuń ich punkty bliżej '+(am==='street'?'drogi':'toru')+'.':'Trasa poprowadzona od nowa.')}
+ catch(err){say('Błąd: '+err.message)}finally{busy=false;redraw();renderLines()}}
 async function editMove(l,i,ll,insert){
  if(busy)return;busy=true;say('Wyznaczanie trasy…');
  try{const wp=l.wp.slice(),segs=l.segs.slice();let idxs,modes;
@@ -1789,7 +1794,7 @@ $('#uiMc').onchange=e=>{UI.mc=e.target.checked;applyUI();redraw()};
 $('#showNames').onchange=e=>{UI.nm=e.target.checked;applyUI();drawStops()};
 $('#namesUsed').onchange=e=>{UI.nmu=e.target.checked;applyUI();drawStops()};
 $('#uiInv').onchange=e=>{UI.inv=e.target.checked;applyUI()};
-$('#amode').onchange=e=>{UI.am=e.target.value;const l=selLine();if(l){l.rm=UI.am;save()}applyUI()};
+$('#amode').onchange=e=>{UI.am=e.target.value;const l=selLine();if(l){l.rm=UI.am;save()}applyUI();if(l)reMode(l)};
 $('#uiGl').onchange=e=>{UI.gl=e.target.checked;applyUI()};$('#uiGa').oninput=e=>{UI.ga=+e.target.value;applyUI()};
 $('#uiBr').oninput=e=>{UI.br=+e.target.value;applyUI()};$('#uiCo').oninput=e=>{UI.co=+e.target.value;applyUI()};
 $('#uiReset').onclick=()=>{UI.inv=UI0.inv;UI.br=UI0.br;UI.co=UI0.co;applyUI()};
@@ -1947,6 +1952,13 @@ $('#fAccLoad').onclick=async()=>{closeMenus();const tok=accTok();if(!tok)return;
  if(!await askConfirm('Wczytać projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'? Zastąpi on bieżący projekt (można to cofnąć przyciskiem Cofnij).',{title:'Wczytaj z konta',ok:'Wczytaj'}))return;
  NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();say('Wczytano projekt z konta.')};
 accStat();addEventListener('storage',e=>{if(e.key==='ztm.token')accStat()});
+// Zapisz (lokalnie): to the file the project is joined to; none yet – a file chosen (then saved there after each change), or – where
+// the browser cannot write files – the project downloaded (JSON either way)
+$('#fSaveL').onclick=()=>{closeMenus();if(FS.h)$('#fSaveNow').click();else $('#fSaveAs').click()};
+// Otwórz: a file (JSON); signed in to ZbiorkomInfo – or the project kept on the account
+$('#fOpenM').onclick=async()=>{closeMenus();if(!accTok()){$('#fOpen').click();return}
+ const v=await modal({title:'Otwórz projekt',body:'<p style="margin:0;line-height:1.5">Skąd otworzyć projekt?</p>',cancelV:false,btns:[{t:'Anuluj',v:false},{t:'Z konta ZbiorkomInfo',v:'acc'},{t:'Z pliku…',v:'file',c:'pri'}]});
+ if(v==='file')$('#fOpen').click();else if(v==='acc')$('#fAccLoad').click()};
 $('#exp').onclick=()=>{closeMenus();dlFile('siec-gdansk.json',projectJSON());say('Pobrano kopię projektu (JSON).')};
 $('#imp').onclick=()=>{closeMenus();$('#file').click()};
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
@@ -2002,77 +2014,6 @@ const dash=(n,f=f0)=>(n>0?f(n):'–');
 let fleetRefresh=null;
 function routeText(l){const st=l.stops.map(id=>stopOf(id)).filter(Boolean),bn=s=>s.name.replace(NUMRE,'$1');if(!st.length)return'–';return st.length>1&&bn(st[0])!==bn(st[st.length-1])?bn(st[0])+' ↔ '+bn(st[st.length-1]):bn(st[0])}
 const kindName=m=>m==='tram'?'Tramwaj':m==='rail'?'Kolej':'Autobus';
-// ================= Częstotliwości kursowania (tabela dla wszystkich linii)
-function openDefaults(){
- const b=document.createElement('div'),cats=[...new Set([...(S.cats||[]),...S.lines.map(l=>l.cat||'').filter(Boolean)])];
- const tin=(attr,v)=>`<input type="time" class="ti" ${attr} value="${v||''}">`;
- const wins=ws=>[0,1].map(i=>`<span class="wn">${tin('',ws&&ws[i]&&ws[i][0])}–${tin('',ws&&ws[i]&&ws[i][1])}</span>`).join('<span class="mut">oraz</span>');
- const PRE=[['Dzienne','05:00','23:00'],['Nocne','23:00','05:00'],['Całodobowe','00:00','00:00']];
- let h=`<div class="note">${ic('clock',15)}<div>Domyślne godziny kursowania dla kategorii linii (np. „Tramwaje dzienne”, „Tramwaje nocne”, „Autobusy dzienne”). Linia, której nie ustawisz własnych godzin, korzysta z godzin swojej kategorii, a gdy ich brak – z pozycji „Wszystkie pozostałe”. Dla godzin szczytu liczone są tylko kursy w przedziałach szczytu.</div></div><div class="tw" style="margin-top:8px"><table class="tbl ftb"><thead><tr><th class="l">Kategoria</th><th>Godziny kursowania</th><th>Wzorzec</th></tr></thead><tbody>`;
- [['','Wszystkie pozostałe']].concat(cats.map(c=>[c,c])).forEach(([c,t])=>{h+=`<tr data-cat="${esc(c)}"><td class="l">${esc(t)}</td><td class="wc">${wins((S.catWin||{})[c]||(c===''?DEFWIN:null))}</td><td><select class="pre"><option value="">–</option>${PRE.map((p,i)=>`<option value="${i}">${p[0]} (${p[1]}–${p[2]})</option>`).join('')}</select></td></tr>`});
- h+=`<tr data-peak="1"><td class="l">Godziny szczytu</td><td class="wc">${wins(S.peak||DEFPEAK)}</td><td></td></tr></tbody></table></div>`;
- b.innerHTML=h;
- const rdWins=cell=>{const o=[];cell.querySelectorAll('.wn').forEach(w=>{const t=w.querySelectorAll('input');o.push([t[0].value,t[1].value])});return o.filter(w=>w[0]&&w[1])};
- b.querySelectorAll('tr[data-cat]').forEach(tr=>{const c=tr.dataset.cat,apply=w=>{S.catWin=S.catWin||{};if(w.length)S.catWin[c]=w;else delete S.catWin[c];save();if(fleetRefresh)fleetRefresh()};
-  tr.querySelectorAll('.wc input').forEach(i=>i.onchange=()=>apply(rdWins(tr.querySelector('.wc'))));
-  tr.querySelector('.pre').onchange=e=>{const p=PRE[e.target.value];if(!p)return;const t=tr.querySelectorAll('.wc input');t[0].value=p[1];t[1].value=p[2];t[2].value='';t[3].value='';e.target.value='';apply([[p[1],p[2]]])}});
- const pk=b.querySelector('tr[data-peak] .wc');pk.querySelectorAll('input').forEach(i=>i.onchange=()=>{const w=rdWins(pk);if(w.length)S.peak=w;else delete S.peak;save();if(fleetRefresh)fleetRefresh()});
- if(S.freqLock)b.querySelectorAll('input,select').forEach(e=>e.disabled=true);
- modal({title:'Domyślne godziny kursowania',body:b,cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}]})}
-function treeSort(rs){const info=new Map(),out=[],ids=new Set(rs.map(r=>r.l.id));
- rs.filter(r=>!r.l.par||!ids.has(r.l.par)).forEach(r=>{const ks=rs.filter(x=>x.l.par===r.l.id);if(!ks.length){out.push(r);return}
-  [r,...ks].forEach((k,i,a)=>{info.set(k.l.id,{last:i===a.length-1,head:i===0?a.length:0,label:varLabel(k.l)});out.push(k)})});
- return{out,info}}
-const grpHead=(l,n)=>`<span class="badge" style="background:${l.color};color:${txt(l.color)};${bst(l,28,14,'5px')}">${esc(l.num)}</span>`;
-const grpRowH=(l,n,row)=>`<tr class="grpr"><td>${grpHead(l)}</td><td class="l mut" colspan="${Math.max(1,(row.match(/<td/g)||[]).length-1)}"><b>Linia ${esc(l.num)}</b> · ${n} ${n<5?'przebiegi':'przebiegów'} – wartości ustawiasz osobno dla każdego z nich poniżej</td></tr>`;
-function openFreq(){
- const wrap=document.createElement('div'),P=FP();
- const bd=l=>`<span class="badge" style="background:${l.color};color:${txt(l.color)};${bst(l,28,14,'5px')}">${esc(l.num)}</span>`;
- const gv=(l,k,f)=>{const x=((l.op||{})[k]||{})[f];return x===undefined?'':x};
- const inp=(l,k,f,ph,extra='')=>`<td><input type="number" class="ni" min="0" ${extra} data-l="${l.id}" data-k="${k}" data-f="${f}" value="${gv(l,k,f)}" placeholder="${ph}"></td>`;
- const tin=(attr,v)=>`<input type="time" class="ti" ${attr} value="${v||''}">`;
- const wins=ws=>[0,1].map(i=>`<span class="wn">${tin('data-i="'+i+'" data-e="0"',ws&&ws[i]&&ws[i][0])}–${tin('data-i="'+i+'" data-e="1"',ws&&ws[i]&&ws[i][1])}</span>`).join('<span class="mut">oraz</span>');
- const PRE=[['Dzienne','05:00','23:00'],['Nocne','23:00','05:00'],['Całodobowe','00:00','00:00']];
- const cats=[...new Set([...(S.cats||[]),...S.lines.map(l=>l.cat||'').filter(Boolean)])];
- let h=`<div class="note">${ic('clock',15)}<div>Dla każdej linii ustal, w jakich godzinach kursuje (np. 5:00–23:00 oraz drugi przedział), i podaj odstęp między kursami w minutach (puste pole = brak kursów w tym okresie). Puste godziny linii oznaczają przyjęcie domyślnych godzin jej kategorii. Przedział „od późniejszej do wcześniejszej” godziny (np. 23:00–5:00) obejmuje północ; identyczne godziny oznaczają całą dobę. Liczba godzin na dobę jest wyliczana automatycznie, prędkość i postoje także.</div></div>
- <label class="chk" style="margin:8px 0"><input type="checkbox" id="fqLock"${S.freqLock?' checked':''}>${ic('lock',14)}Zablokuj edycję (zapobiega przypadkowym zmianom)</label>
- <button class="b" id="fqDef" style="margin-bottom:8px">${ic('clock',14)}Domyślne godziny kursowania…</button>`;
- const has=l=>l.segs.length||l.stops.length,allL=orderedLines().filter(l=>l.dir!=='B'&&has(l)),kidsOf=p=>allL.filter(x=>x.par===p.id),TREE=new Map();
- const rows=[];allL.filter(l=>!l.par||!allL.some(x=>x.id===l.par)).forEach(l=>{const ks=kidsOf(l);if(!ks.length){rows.push(l);return}
-  rows.push({grp:1,l,n:ks.length+1});[l,...ks].forEach((k,i,a)=>{TREE.set(k.id,{last:i===a.length-1,label:varLabel(k)});rows.push(k)})});
- const fcell=l=>{const t=TREE.get(l.id);if(!t)return bd(l);return `<span class="tcell"><span class="tg">${t.last?'└':'├'}</span>${bd(l)}</span>`};
- const rtxt=l=>{const t=TREE.get(l.id);return (t?`<span class="vl">${esc(t.label)}</span> `:'')+esc(routeText(l))};
- if(!rows.length){wrap.innerHTML=h+'<div class="small" style="margin-top:8px">Brak linii. Dodaj linię w zakładce „Linie”.</div>'}
- else{
- h+=`<div class="tw" style="margin-top:10px"><table class="tbl ftb"><thead><tr><th rowspan="2">Linia</th><th rowspan="2" class="l">Trasa</th><th rowspan="2">Rodzaj</th><th rowspan="2">Dł. [km]</th><th rowspan="2">Przyst.</th><th rowspan="2" title="Średnia prędkość jazdy, wyliczona automatycznie">Prędkość [km/h]</th><th rowspan="2" title="Jazda + postoje na przystankach, wyliczone automatycznie">Czas 1 str. [min]</th><th colspan="3">Co ile minut</th><th rowspan="2" title="Godziny kursowania linii (domyślne, jeśli nic nie wpisano)">Godziny kursowania</th></tr><tr><th>Szczyt</th><th>Poza szczytem</th><th>Dni wolne</th></tr></thead><tbody>`;
- rows.forEach(l=>{if(l.grp){h+=`<tr class="grpr"><td>${bd(l.l)}</td><td class="l mut" colspan="10"><b>Linia ${esc(l.l.num)}</b> · ${l.n} ${l.n<5?'przebiegi':'przebiegów'} – częstotliwości ustawiasz osobno dla każdego z nich poniżej</td></tr>`;return}const r=calcLine(l,P),adv=!!(l.win&&l.win.length)||['pk','ot','we'].some(k=>gv(l,k,'hrs')!=='');
-  h+=`<tr data-r="${l.id}"${TREE.has(l.id)?' class="kid"':''}><td>${fcell(l)}</td><td class="l">${rtxt(l)}</td><td><select class="fk" data-l="${l.id}"><option value="">auto (${kindName(r.mode)})</option><option value="tram"${l.kind==='tram'?' selected':''}>Tramwaj</option><option value="bus"${l.kind==='bus'?' selected':''}>Autobus</option><option value="rail"${l.kind==='rail'?' selected':''}>Kolej</option></select></td><td>${f1(r.Lkm)}</td><td>${r.n}</td><td class="cv">${r.ok?f1(r.v):'–'}</td><td class="ct">${r.ok?f1(r.t1):'–'}</td>${inp(l,'pk','h','–','step="1"')}${inp(l,'ot','h','–','step="1"')}${inp(l,'we','h','–','step="1"')}<td><button class="b ico gearb${adv?' on':''}" data-g="${l.id}" title="Godziny kursowania (puste = domyślne)">${ic('gear',14)}</button></td></tr>`});
- h+=`</tbody></table></div><div class="small">Wyniki (liczba pojazdów, kierowców, wozokilometry) znajdziesz w oknie „Tabor i załoga”.</div>`;
- wrap.innerHTML=h}
- const byId=id=>S.lines.find(x=>x.id===id);
- const rdWins=cell=>{const o=[];cell.querySelectorAll('.wn').forEach(w=>{const t=w.querySelectorAll('input');o.push([t[0].value,t[1].value])});return o.filter(w=>w[0]||w[1])};
- const inhTxt=(l,c)=>{const o=opHours(l);c.querySelector('.inh').textContent=`= ${fmtH(o.W)}/dobę · ${l.win&&l.win.length?'własne godziny':'domyślne ('+o.src+': '+o.ws.map(w=>w[0]+'–'+w[1]).join(', ')+')'}`};
- const lock=()=>{const on=!!S.freqLock;wrap.querySelectorAll('input,select,button').forEach(e=>{if(e.id!=='fqLock'&&e.id!=='fqDef')e.disabled=on})};lock();
- wrap.querySelector('#fqLock').onchange=e=>{S.freqLock=e.target.checked;save();lock()};
- const dfb=wrap.querySelector('#fqDef');if(dfb)dfb.onclick=openDefaults;
- const openHours=(l,btn)=>{const b=document.createElement('div'),dis=S.freqLock?' disabled':'';
-  b.innerHTML=`<div class="note">${ic('clock',15)}<div>Podaj godziny, w których linia kursuje – jeden lub dwa przedziały. Jeśli nic nie wpiszesz, system użyje domyślnych godzin kursowania kategorii linii (albo ogólnych domyślnych).</div></div><div class="wl" style="margin:10px 0">${wins(l.win)}<div class="small inh" style="margin-top:6px"></div></div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button class="b ico" id="hClr" title="Przywróć domyślne" aria-label="Przywróć domyślne"${dis}>${ic('reset',16)}</button></div>
-  <details${['pk','ot','we'].some(k=>gv(l,k,'hrs')!=='')?' open':''}><summary style="cursor:pointer;font-weight:600">Zaawansowane: ręczna liczba godzin na dobę</summary><div class="small" style="margin:6px 0">Nadpisuje wyliczenie z godzin kursowania. Puste = automatycznie.</div><div class="row" style="gap:8px;flex-wrap:wrap;align-items:center">Szczyt ${inp(l,'pk','hrs','auto','max="24" step="0.5"').replace(/<\/?td>/g,'')} Poza szczytem ${inp(l,'ot','hrs','auto','max="24" step="0.5"').replace(/<\/?td>/g,'')} Dni wolne ${inp(l,'we','hrs','auto','max="24" step="0.5"').replace(/<\/?td>/g,'')} h/dobę</div></details>`;
-  const c=b.querySelector('.wl');inhTxt(l,c);if(S.freqLock)b.querySelectorAll('input').forEach(e=>e.disabled=true);
-  const sv=()=>{const w=rdWins(c).filter(x=>x[0]&&x[1]);if(w.length)l.win=w;else delete l.win;save();inhTxt(l,c);if(fleetRefresh)fleetRefresh()};
-  c.querySelectorAll('input').forEach(i=>i.onchange=sv);
-  b.querySelector('#hClr').onclick=()=>{c.querySelectorAll('input').forEach(i=>i.value='');sv()};
-  b.querySelectorAll('input[data-k]').forEach(i=>i.oninput=()=>{const k=i.dataset.k,f=i.dataset.f,v=i.value;l.op=l.op||{};const x=l.op[k]=l.op[k]||{};if(v==='')delete x[f];else x[f]=+v;if(!Object.keys(x).length)delete l.op[k];if(!Object.keys(l.op).length)delete l.op;save();if(fleetRefresh)fleetRefresh()});
-  modal({title:'Godziny kursowania – linia '+l.num,body:b,cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}],onClose:()=>{btn.classList.toggle('on',!!(l.win&&l.win.length)||['pk','ot','we'].some(k=>gv(l,k,'hrs')!==''))}})};
- wrap.querySelectorAll('.gearb').forEach(b=>b.onclick=()=>openHours(byId(b.dataset.g),b));
-wrap.querySelectorAll('input[data-k]').forEach(i=>i.oninput=()=>{const l=byId(i.dataset.l),k=i.dataset.k,f=i.dataset.f,v=i.value;l.op=l.op||{};
-  const x=l.op[k]=l.op[k]||{};if(v==='')delete x[f];else x[f]=+v;if(!Object.keys(x).length)delete l.op[k];if(!Object.keys(l.op).length)delete l.op;
-  save();if(fleetRefresh)fleetRefresh()});
- wrap.querySelectorAll('.fk').forEach(sel=>sel.onchange=()=>{const l=byId(sel.dataset.l);if(sel.value)l.kind=sel.value;else delete l.kind;save();
-  const r=calcLine(l,FP()),tr=sel.closest('tr');tr.querySelector('.cv').textContent=r.ok?f1(r.v):'–';tr.querySelector('.ct').textContent=r.ok?f1(r.t1):'–'});
- modal({title:'Częstotliwości kursowania',body:wrap,wide:true,cancelV:true,btns:[{t:'Zamknij',v:true,c:'pri'}]})}
-$('#bFreq').onclick=()=>{closeMenus();openFreq()};
 // ================= NOWE: schemat interaktywny =================
 function schemaRuntime(){
  var $=function(i){return document.getElementById(i)};
