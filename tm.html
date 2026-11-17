@@ -5,7 +5,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%232456d6%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M5%2019c0-6%2014-2%2014-9%27%2F%3E%3Ccircle%20cx%3D%275%27%20cy%3D%2719%27%20r%3D%272%27%2F%3E%3Ccircle%20cx%3D%2719%27%20cy%3D%277%27%20r%3D%272%27%2F%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
-:root{--bg:#f4f6f9;--panel:#fff;--fg:#1f2a37;--mut:#5d6977;--bd:#d9dee5;--bd2:#e3e7ec;--tab:#f2f4f7;--acc:#d71920;--warn:#fff6d6;--head:#444b56;--focus:#f5b400;--mapf:brightness(100%) contrast(100%)}
+:root{--bg:#f4f6f9;--panel:#fff;--fg:#1f2a37;--mut:#5d6977;--bd:#d9dee5;--bd2:#e3e7ec;--tab:#f2f4f7;--acc:#d71920;--warn:#fff6d6;--head:#444b56;--focus:#f5b400;--mapf:none}
 body.dark{--bg:#14181d;--panel:#1c2229;--fg:#e7ebf0;--mut:#9aa5b2;--bd:#323a44;--bd2:#2a3139;--tab:#1a1f25;--acc:#ef4b52;--warn:#3b3720;--head:#2b323b;color-scheme:dark}
 *{box-sizing:border-box}body{margin:0;font:14px/1.35 Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;height:100vh;color:var(--fg);background:var(--bg)}
 #top{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--bd);position:relative;z-index:3000}
@@ -207,6 +207,7 @@ body{-webkit-user-select:none;user-select:none}input,textarea,select,[contentedi
 #status{left:calc(52px + (100% - 52px - var(--sw,392px*var(--z,1)))/2)!important}}
 @media(max-width:700px){#tools{flex-direction:row;flex-wrap:wrap;justify-content:center;border-right:0;border-bottom:1px solid var(--bd)}#tools .tsep{width:0;height:28px;border-top:0;border-left:1px solid var(--bd);margin:0 4px}}
 #appTip{position:fixed;z-index:6000;max-width:min(300px,calc(100vw - 12px));padding:6px 10px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none;white-space:pre-line}#appTip[hidden]{display:none}
+body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--panel)!important}body.mapMv #side,body.mapMv #tools{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--bg)!important}
 </style></head><body>
 <header id="top">
  <div class="brand"><i data-ic="route"></i><b>TransitMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
@@ -411,14 +412,15 @@ const ic=(n,z=16)=>VEH[n]?`<svg class="ic veh" width="${z}" height="${z}" viewBo
 const icons=()=>document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic));
 const LOG=[];const dbg=m=>{LOG.push(new Date().toLocaleTimeString()+' '+m);if(LOG.length>300)LOG.shift();const t=$('#dbg');if(t){t.value=LOG.join('\n');t.scrollTop=t.scrollHeight}};
 dbg('start: '+location.protocol+' | '+navigator.userAgent.slice(0,70));
-const map=L.map('map',{preferCanvas:true,zoomControl:false,maxZoom:20}).setView([54.352,18.6466],13);
+const map=L.map('map',{preferCanvas:true,renderer:L.canvas({padding:.25}),zoomControl:false,maxZoom:20})   // (the lines drawn a quarter of a screen beyond the view: fewer empty edges while dragging, the redraw still quick)
+.setView([54.352,18.6466],13);
 L.control.zoom({position:'bottomright',zoomInTitle:'Przybliż',zoomOutTitle:'Oddal'}).addTo(map);
-const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:19,attribution:'© OpenStreetMap contributors'});
-const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,attribution:'© OpenStreetMap contributors'});
+const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:19,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
+const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
 const fromFile=location.protocol==='file:';
 // CARTO (Voyager; Dark Matter in the dark theme of ZbiorkomInfo) with ZbiorkomInfo's key, as the alternative to OSM
 const CARTO_KEY='cb1_4vdw_1_23a15f607749c4261b38e021';
-const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
+const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:19,keepBuffer:4,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
 const BASES={osm,osmde,carto:cartoMake(false)};let curBase=null,cartoDk=false;
 function setBase(k){
  if(k==='maptiler')k='carto';
@@ -1845,7 +1847,7 @@ addEventListener('storage',e=>{if(e.key==='ztm.theme')ziTheme()});addEventListen
 try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ziTheme)}catch(e){}
 UI.dark=ziDark();UI.gl=false;UI.ga=100;UI.sc=100;
 function applyUI(){UI.br=Math.max(10,Math.min(110,+UI.br||100));document.body.classList.toggle('dark',!!UI.dark);document.body.classList.toggle('noglass',!UI.gl);document.documentElement.style.setProperty('--g',UI.ga/100);document.documentElement.style.setProperty('--z',UI.sc/100);if(document.activeElement!==$('#uiScV')){$('#uiScV').value=UI.sc}$('#uiSc').value=UI.sc;{const h=document.querySelector('#top');if(h){document.documentElement.style.setProperty('--hh',h.getBoundingClientRect().height+'px')}}$('#uiGl').checked=!!UI.gl;$('#uiGa').value=UI.ga;$('#uiGa').disabled=!UI.gl;$('#uiGaV').textContent=UI.ga+'%';
- document.documentElement.style.setProperty('--mapf',`${UI.inv?'invert(1) hue-rotate(180deg) ':''}brightness(${UI.br}%) contrast(${UI.co}%)`);
+ document.documentElement.style.setProperty('--mapf',(!UI.inv&&+UI.br===100&&+UI.co===100)?'none':`${UI.inv?'invert(1) hue-rotate(180deg) ':''}brightness(${UI.br}%) contrast(${UI.co}%)`);   // (no filter at all when nothing is changed: a filtered map is filtered again in every frame of dragging)
  $('#uiDark').checked=!!UI.dark;$('#uiInv').checked=!!UI.inv;$('#uiBr').value=UI.br;$('#uiCo').value=UI.co;$('#uiBrV').textContent=UI.br+'%';$('#uiCoV').textContent=UI.co+'%';$('#tdark').innerHTML=ic(UI.dark?'sun':'moon');$('#hideUnused').checked=!!UI.hu;$('#uiMc').checked=!!UI.mc;$('#showNames').checked=!!UI.nm;$('#namesUsed').checked=!!UI.nmu;$('#namesUsed').disabled=!UI.nm;$('#mergeNames').checked=!!UI.mg;setBase(UI.base);infraSig();document.querySelectorAll('[name=base]').forEach(r=>r.checked=r.value===curBase);
  try{localStorage.setItem('gdn-ui',JSON.stringify(UI))}catch(e){}}
 const setDark=v=>{UI.dark=v;applyUI();redraw()};
@@ -2649,7 +2651,10 @@ pShow()}
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
  br.after(fdd);fdd.after(ldd);const asw=document.createElement('button');asw.type='button';asw.id='autoSw';asw.className='b flat';asw.setAttribute('role','switch');asw.innerHTML='Autozapis<i class="swk"></i>';asw.onclick=()=>svToggle();top.appendChild(asw);top.appendChild(cs);cs.style.marginLeft='8px';svUI();top.classList.add('lay');
  applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
-map.on('zoomend',redraw);map.on('moveend',onMoveEnd);{const hh=()=>document.documentElement.style.setProperty('--hh',$('#top').getBoundingClientRect().height+'px');hh();addEventListener('resize',hh)}
+map.on('zoomend',redraw);map.on('moveend',onMoveEnd);
+// while the map moves, the panels over it lose their blur (the map behind them would be blurred again in every frame) – a solid background in its place, the blur back once the map stops
+{const B=document.body;let mvT=0;map.on('movestart zoomstart',()=>{clearTimeout(mvT);B.classList.add('mapMv')});map.on('moveend zoomend',()=>{clearTimeout(mvT);mvT=setTimeout(()=>B.classList.remove('mapMv'),120)})}
+{const hh=()=>document.documentElement.style.setProperty('--hh',$('#top').getBoundingClientRect().height+'px');hh();addEventListener('resize',hh)}
 // the numbers of the posts missing in OSM (e.g. Królewskie Wzgórze, Łabędzia): taken from ZbiorkomInfo's own stops (data/index.json,
 // the Tricity's operators) – the nearest post of the same name within 40 m; once per project, then for the stops loaded later
 let ZIST=null;
