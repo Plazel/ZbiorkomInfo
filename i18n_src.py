@@ -869,6 +869,7 @@ ROWS = [
     ('Ignoruj jednokierunkowość', 'Ignore one-way streets', 'Einbahnstraßen ignorieren', 'Ignorovať jednosmerky', 'Ignorovat jednosměrky'),
     ('Ignoruj zakaz wjazdu', 'Ignore no-entry', 'Einfahrverbot ignorieren', 'Ignorovať zákaz vjazdu', 'Ignorovat zákaz vjezdu'),
     ('Funkcja niedostępna w NetworkMaker', 'Not available in NetworkMaker', 'In NetworkMaker nicht verfügbar', 'V NetworkMakeri nedostupné', 'V NetworkMakeru nedostupné'),
+("Kurs odwołany", "Trip cancelled", "Fahrt fällt aus", "Spoj zrušený", "Spoj zrušen"),
 ]
 
 WEEKDAYS = {
