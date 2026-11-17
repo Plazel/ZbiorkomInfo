@@ -1093,6 +1093,10 @@ function popupGroup(u){
  d.onmouseenter=keepPop;d.onmouseleave=()=>curM&&leavePop(curM);
  return d}
 const markGone=ids=>{const a=ids.filter(i=>/^[nw]\d+$/.test(i));if(a.length)S.rmStops=[...new Set([...(S.rmStops||[]),...a])]}; // identyfikatory przystanków z OSM usuniętych ręcznie – import po zmianie miasta ich nie przywraca
+// cały zespół przystankowy jednym kliknięciem (jedno potwierdzenie)
+async function delStops(A,name){const ids=new Set(A.map(s=>s.id)),aff=[...new Set(A.flatMap(s=>linesOf(s.id)))];
+ if(!await askConfirm(`Usunąć wszystkie przystanki zespołu ${name} (${A.length})?`+(aff.length?' Zostaną też usunięte z linii: '+uqL(aff).map(l=>l.num).join(', ')+'.':''),{title:'Usuń zespół przystankowy',ok:'Usuń wszystkie',danger:true}))return;
+ markGone([...ids]);S.stops=S.stops.filter(x=>!ids.has(x.id));S.lines.forEach(k=>k.stops=k.stops.filter(i=>!ids.has(i)));save();drawStops();renderStops();renderLines();map.closePopup();aff.forEach(stopsChanged)}
 async function delStop(s,after){if(!await askConfirm('Usunąć przystanek '+lab(s)+'?',{title:'Usuń przystanek',ok:'Usuń',danger:true}))return;const aff=linesOf(s.id);markGone([s.id]);S.stops=S.stops.filter(x=>x.id!==s.id);S.lines.forEach(k=>k.stops=k.stops.filter(i=>i!==s.id));save();drawStops();renderStops();renderLines();map.closePopup();if(after)after();aff.forEach(stopsChanged)}
 function popup(s){
  const d=document.createElement('div'),l=selLine(),inL=l&&l.stops.includes(s.id);
@@ -1471,7 +1475,7 @@ function newLine(k){const rm=k==='tram'||k==='rail'?k:'street',l={id:'l'+Date.no
  ab.onclick=e=>{e.stopPropagation();if(!f.hidden){f.hidden=true;return}f.innerHTML=NK.map(([k,i,t])=>`<button type="button" role="menuitem" data-k="${k}">${ic(i)}${t}</button>`).join('');f.hidden=false;const r=ab.getBoundingClientRect();f.style.left=r.left+'px';f.style.top=Math.max(4,r.top-f.offsetHeight-6)+'px'};
  f.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-k]');if(!b)return;f.hidden=true;newLine(b.dataset.k)};document.addEventListener('click',()=>{f.hidden=true})}
 
-const openGrp=new Set(),PLC=new Intl.Collator('pl');
+const openGrp=new Set(),shutGrp=new Set(),PLC=new Intl.Collator('pl');
 function renderStops(){
  const q=$('#flt').value.toLowerCase(),box=$('#stops');box.innerHTML='';
  if(!q.trim()){$('#cnt').textContent='';box.innerHTML=`<div class="stEmpty">${ic('search')}<div>Wyszukaj przystanek, wpisując jego nazwę w polu powyżej.</div><small>Przystanków w projekcie: ${S.stops.length}</small></div>`;return}
@@ -1490,12 +1494,13 @@ function renderStops(){
   return d};
  groups.slice(0,150).forEach(g=>{
   if(g.items.length===1){box.appendChild(mkRow(g.items[0],false));return}
-  const open=openGrp.has(g.k)||(q&&g.items.length<=12),base=g.items[0].name.replace(NUMRE,'$1');
+  const open=openGrp.has(g.k)||(q&&g.items.length<=12&&!shutGrp.has(g.k)),base=g.items[0].name.replace(NUMRE,'$1');
   const h=document.createElement('div');h.className='st grp'+(open?' open':'');
-  h.innerHTML=`<button class="b gt" title="${open?'Zwiń':'Rozwiń'} listę przystanków" aria-expanded="${open}">${ic(open?'down':'right')}</button><input class="sn" value="${esc(base)}" title="Nazwa wspólna – zmiana dotyczy wszystkich przystanków w grupie"><span class="spn"></span><span class="sl"><span class="sc">${g.items.length} przyst.</span>${badges(g.items)}</span><span class="sa"><i></i><button class="b gf" title="Pokaż wszystkie na mapie">${ic('target')}</button><i></i></span>`;
-  const tog=()=>{openGrp.has(g.k)?openGrp.delete(g.k):openGrp.add(g.k);renderStops()};
+  h.innerHTML=`<button class="b gt" title="${open?'Zwiń':'Rozwiń'} listę przystanków" aria-expanded="${open}">${ic(open?'down':'right')}</button><input class="sn" value="${esc(base)}" title="Nazwa wspólna – zmiana dotyczy wszystkich przystanków w grupie"><span class="spn"></span><span class="sl"><span class="sc">${g.items.length} przyst.</span>${badges(g.items)}</span><span class="sa"><i></i><button class="b gf" title="Pokaż wszystkie na mapie">${ic('target')}</button><button class="b gd" title="Usuń wszystkie przystanki zespołu">${ic('trash')}</button></span>`;
+  const tog=()=>{if(open){openGrp.delete(g.k);shutGrp.add(g.k)}else{openGrp.add(g.k);shutGrp.delete(g.k)}renderStops()};
   h.querySelector('.gt').onclick=tog;
   h.querySelector('input').onchange=e=>{const nv=e.target.value.trim();if(!nv)return;g.items.forEach(s=>{const m=s.name.match(NUMRE);s.name=m?nv+' '+m[2]:nv});save();drawStops();renderLines();renderStops()};
+  h.querySelector('.gd').onclick=()=>delStops(g.items,base);
   h.querySelector('.gf').onclick=()=>map.fitBounds(L.latLngBounds(g.items.map(s=>s.ll)),{padding:[60,60],maxZoom:18});
   box.appendChild(h);
   if(open)g.items.forEach(s=>box.appendChild(mkRow(s,true)))})}
