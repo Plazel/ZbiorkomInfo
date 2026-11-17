@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NetworkMaker – Gdańsk</title>
+<title>TransitMaker – Gdańsk</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%232456d6%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M5%2019c0-6%2014-2%2014-9%27%2F%3E%3Ccircle%20cx%3D%275%27%20cy%3D%2719%27%20r%3D%272%27%2F%3E%3Ccircle%20cx%3D%2719%27%20cy%3D%277%27%20r%3D%272%27%2F%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
@@ -168,9 +168,24 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 .chk:has(>input[type=radio]:checked){background:var(--fg);color:var(--panel);border-color:var(--fg)}
 .chk>input[type=radio]{position:absolute;opacity:0;width:1px;height:1px;margin:0}
 .chk:has(>input[type=radio]:focus-visible){outline:3px solid var(--focus);outline-offset:1px}
+
+/* ---- the layout of the design programs: the tools in a column of icons on the left, the layers (lines, stops, tracks) on the right */
+#tools{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;z-index:1000;background:var(--bg);border-right:1px solid var(--bd)}
+#tools .b{width:38px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;gap:0}#tools .b svg{width:19px;height:19px;margin:0}
+#tools .tsep{width:28px;border-top:1px solid var(--bd);margin:4px 0;flex:none}#tools #modebar,#tools .tgrp{display:contents}
+#amFly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}#amFly[hidden]{display:none}
+#amFly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}#amFly button:hover{background:var(--tab)}#amFly button.on{font-weight:700}
+#tip{position:fixed;z-index:5000;max-width:260px;padding:8px 11px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none}#tip[hidden]{display:none}#tip b{display:block;font-size:13px;margin-bottom:2px}#tip span{color:var(--mut)}
+@media(min-width:701px){
+#tools{position:absolute;left:0;top:calc(var(--hh,52px)/var(--z,1));bottom:0;width:52px;overflow-y:auto;background:color-mix(in srgb,var(--bg) calc(var(--g,.85)*100%),transparent);-webkit-backdrop-filter:blur(22px) saturate(1.7);backdrop-filter:blur(22px) saturate(1.7)}
+#side{left:auto!important;right:0;border-right:0;border-left:1px solid var(--bd)}
+#sideRz{right:auto!important;left:-4px}
+.leaflet-left{margin-left:52px!important}.leaflet-right{margin-right:var(--sw,calc(392px*var(--z,1)))}
+#status{left:calc(52px + (100% - 52px - var(--sw,392px*var(--z,1)))/2)!important}}
+@media(max-width:700px){#tools{flex-direction:row;flex-wrap:wrap;justify-content:center;border-right:0;border-bottom:1px solid var(--bd)}#tools .tsep{width:0;height:28px;border-top:0;border-left:1px solid var(--bd);margin:0 4px}}
 </style></head><body>
 <header id="top">
- <div class="brand"><i data-ic="route"></i><b>NetworkMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
+ <div class="brand"><i data-ic="route"></i><b>TransitMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
  <div class="hist"><button class="b ico" id="hUndo" title="Cofnij (Ctrl+Z)"><i data-ic="undo"></i></button><button class="b ico" id="hRedo" title="Ponów (Ctrl+Y)"><i data-ic="redo"></i></button></div>
  <span class="grow"></span>
  <span id="fChip"></span>
@@ -1198,7 +1213,7 @@ function dragStopRow(handle,row,l,i){
    if(ev.type==='pointercancel'||idx<0||idx===i)return;
    const A=l.stops,[m]=A.splice(i,1);A.splice(idx,0,m);save();renderLines();drawStops();stopsChanged(l)};
   handle.onpointerup=end;handle.onpointercancel=end}}
-function syncAmode(){const l=selLine(),v=(l&&l.rm)||(typeof UI!=='undefined'&&UI.am)||'tram',a=$('#amode');if(a&&[...a.options].some(o=>o.value===v)&&a.value!==v)a.value=v}
+function syncAmode(){const l=selLine(),v=(l&&l.rm)||(typeof UI!=='undefined'&&UI.am)||'tram',a=$('#amode');if(a&&[...a.options].some(o=>o.value===v)&&a.value!==v)a.value=v;if(typeof amShow==='function')amShow()}
 function renderLines(){syncAmode();syncVariants();
  const box=$('#lines');box.innerHTML='';
  {const ids=new Set(S.stops.map(s=>s.id));S.lines.forEach(l=>{if(l.stops.some(id=>!ids.has(id)))l.stops=l.stops.filter(id=>ids.has(id))})}
@@ -1384,7 +1399,7 @@ $('#reloadStops').onclick=async()=>{
 
 const MSG={move:'Przeciągaj przystanki na mapie. Przystanek zostaje przypisany do swoich linii; przystanki tramwajowe i kolejowe przyciągają się do toru. Przy scalonych nazwach przesuwana jest cała grupa.',edit:'Zaznacz linię narysowaną ręcznie. Kliknij linię w miejscu bez punktu, aby dodać punkt. Przeciągaj punkty, aby zmienić przebieg. Prawy przycisk myszy na punkcie usuwa go.',nav:'Tryb wyboru. Najedź na przystanek, aby zmienić jego nazwę lub numer albo dodać go do linii.',draw:'Klikaj na mapie kolejne punkty trasy. Sposób prowadzenia (tory, ulice, swobodnie) wybierasz listą „Trasa”.',stop:'Kliknij na mapie, aby dodać nowy przystanek.',pick:'Klikaj przystanki w kolejności przejazdu – trafiają do zaznaczonej linii. Trasa linii wyznaczy się automatycznie.',infra:'Klikaj kolejne punkty nowego toru lub drogi (rodzaj wybierasz w sekcji „Własne tory i drogi”). Enter lub prawy przycisk myszy kończy, Esc anuluje.'};
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(vs&&b.dataset.m!=='nav')vs=null;if(mode==='infra'&&b.dataset.m!=='infra'){draft=[];drawDraft();infraEditId=null}mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));map.getContainer().style.cursor=(mode==='nav'||mode==='edit'||mode==='move')?'':'crosshair';drawStops();drawEdit();drawInfraEdit();say(MSG[mode])});
-function applyTab(t){document.querySelectorAll('#modebar [data-t]').forEach(b=>b.style.display=b.dataset.t===t?'':'none');$('#routebar').style.display=t==='t1'?'':'none';$('#stopbar').style.display=t==='t2'?'':'none';const cur=document.querySelector('#modebar [data-m].on');if(cur&&cur.dataset.t&&cur.dataset.t!==t)document.querySelector('#modebar [data-m=nav]').click()}
+function applyTab(t){document.querySelectorAll('#modebar [data-t]').forEach(b=>b.style.display=b.dataset.t===t?'':'none');{const rb=$('#routebar'),tg=document.querySelector('#tools .tgrp');if(rb.dataset.moved){rb.style.display='none';if(tg)tg.style.display=t==='t1'?'contents':'none'}else rb.style.display=t==='t1'?'':'none'}$('#stopbar').style.display=t==='t2'?'':'none';const cur=document.querySelector('#modebar [data-m].on');if(cur&&cur.dataset.t&&cur.dataset.t!==t)document.querySelector('#modebar [data-m=nav]').click()}
 [['t1','p1'],['t2','p2'],['t3','p3']].forEach(([t,p])=>$('#'+t).onclick=()=>{applyTab(t);['t1','t2','t3'].forEach(x=>$('#'+x).classList.toggle('on',x===t));['p1','p2','p3'].forEach(x=>$('#'+x).classList.toggle('on',x===p));if(p==='p2')renderStops();if(p==='p3')renderInfra()});
 
 let tramReady=null;
@@ -1644,7 +1659,7 @@ async function reLoop(l,quiet){
  l.loopBak={segs:JSON.parse(JSON.stringify(l.segs)),wp:JSON.parse(JSON.stringify(l.wp))};
  l.segs=[...l.segs,r.seg];l.wp=[l.segs[0].pts[0],...l.segs.map(x=>x.pts[x.pts.length-1])];l.loop=true;
  if(!quiet){save();redraw();renderLines();syncLoopBtn()}}
-function syncLoopBtn(){const b=$('#loopBtn'),l=selLine();if(!b)return;const on=!!(l&&l.loop);b.classList.toggle('on',on);b.lastChild.textContent=on?'Rozłącz pętlę':'Zamknij pętlą'}
+function syncLoopBtn(){const b=$('#loopBtn'),l=selLine();if(!b)return;const on=!!(l&&l.loop);b.classList.toggle('on',on);const t=on?'Rozłącz pętlę':'Zamknij pętlą';if(b.dataset.tl!=null)b.dataset.tl=t;else b.lastChild.textContent=t}
 $('#loopBtn').onclick=toggleLoop;
 function stopsChanged(l){
  const wl=stripLoop(l);
@@ -1664,7 +1679,7 @@ $('#lyLevel').onchange=()=>{if($('#lyStreet').checked)loadStreets()};
 $('#lyTram').onchange=()=>$('#lyTram').checked?map.addLayer(tracksL):map.removeLayer(tracksL);
 $('#cpDbg').onclick=()=>{const t=$('#dbg');t.value=LOG.join('\n');t.select();try{document.execCommand('copy')}catch(e){}};
 function setCity(k,go=true){
- if(!CITIES[k])k='gdansk';S.city=k;curCity=k;$('#citySel').value=k;document.title='NetworkMaker – '+CITIES[k].n.replace(/ \(.*/,'');
+ if(!CITIES[k])k='gdansk';S.city=k;curCity=k;$('#citySel').value=k;document.title='TransitMaker – '+CITIES[k].n.replace(/ \(.*/,'');
  if(go)map.setView(CITIES[k].c,CITIES[k].z);
  for(const q in sCache)delete sCache[q];streetL.clearLayers();OSMW=null;OSMR=null;rebuildGraphs();tracksL.clearLayers();railL.clearLayers();
  if($('#lyStreet').checked)loadStreets();tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
@@ -1748,7 +1763,7 @@ const UI0={dark:!!(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)')
 (()=>{const sd=document.getElementById('side'),h=document.getElementById('sideRz'),K='gdn-sw',lim=w=>Math.max(280,Math.min(w,Math.round(innerWidth*.7/(parseFloat(getComputedStyle(sd).zoom)||1))));
  try{const v=+localStorage.getItem(K);if(v)sd.style.width=lim(v)+'px'}catch(e){}
  h.onpointerdown=e=>{e.preventDefault();h.setPointerCapture(e.pointerId);h.classList.add('on');document.body.style.userSelect='none';const z=parseFloat(getComputedStyle(sd).zoom)||1,x0=e.clientX,w0=sd.getBoundingClientRect().width/z;
-  h.onpointermove=ev=>{sd.style.width=lim(w0+(ev.clientX-x0)/z)+'px'};
+  h.onpointermove=ev=>{sd.style.width=lim(w0+(innerWidth>700?-1:1)*(ev.clientX-x0)/z)+'px'};
   h.onpointerup=h.onpointercancel=()=>{h.onpointermove=h.onpointerup=h.onpointercancel=null;h.classList.remove('on');document.body.style.userSelect='';try{localStorage.setItem(K,parseFloat(sd.style.width))}catch(e){}};};
  try{const sw=()=>document.documentElement.style.setProperty('--sw',sd.getBoundingClientRect().width+'px');sw();new ResizeObserver(sw).observe(sd)}catch(e){}
  h.ondblclick=()=>{sd.style.width='';try{localStorage.removeItem(K)}catch(e){}};
@@ -2498,8 +2513,40 @@ function histGo(d){flushLater();histFlush();const k=HIST.i+d;if(k<0||k>=HIST.h.l
 $('#hUndo').onclick=()=>histGo(-1);$('#hRedo').onclick=()=>histGo(1);
 document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')||document.querySelector('.mback'))return;
  const k=e.key.toLowerCase();if(k==='z'&&!e.shiftKey){e.preventDefault();histGo(-1)}else if(k==='y'||(k==='z'&&e.shiftKey)){e.preventDefault();histGo(1)}});
-icons();applyUI();applyTab('t1');map.on('zoomend',redraw);map.on('moveend',onMoveEnd);{const hh=()=>document.documentElement.style.setProperty('--hh',$('#top').getBoundingClientRect().height+'px');hh();addEventListener('resize',hh)}
-function bootData(){rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
+icons();applyUI();applyTab('t1');
+// ---- the layout of the design programs: the tools moved into a column of icons on the left (each explained beside it on
+// hovering), the panel of lines, stops and tracks on the right; Plik and Warstwy beside the name, the city on the right
+(function toolsLayout(){const T=document.createElement('div');T.id='tools';T.setAttribute('role','toolbar');T.setAttribute('aria-label','Narzędzia');T.setAttribute('aria-orientation','vertical');
+ const app=$('#app');app.insertBefore(T,app.firstChild);T.appendChild($('#modebar'));
+ const sep=()=>{const d=document.createElement('div');d.className='tsep';return d};
+ const am=$('#amode'),rb=$('#routebar'),g=document.createElement('div');g.className='tgrp';
+ const amB=document.createElement('button');amB.className='b';amB.id='amBtn';amB.type='button';amB.setAttribute('aria-haspopup','menu');
+ g.append(sep(),amB);['strictTr','owTr','closedTr'].forEach(id=>{const b=$('#'+id);if(b)g.appendChild(b)});[...rb.querySelectorAll('button')].forEach(b=>{if(!g.contains(b))g.appendChild(b)});T.appendChild(g);rb.style.display='none';rb.dataset.moved='1';
+ const KIND={tram:['tram','Linia tramwajowa'],street:['bus','Linia autobusowa'],rail:['train','Linia kolejowa']};
+ const fly=document.createElement('div');fly.id='amFly';fly.hidden=true;fly.setAttribute('role','menu');document.body.appendChild(fly);
+ const tip=document.createElement('div');tip.id='tip';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.appendChild(tip);
+ window.tipHide=()=>{tip.hidden=true};
+ window.amShow=()=>{const k=KIND[am.value]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===am.value}" data-v="${v}" class="${v===am.value?'on':''}">${ic(i)}${t}</button>`).join('')};
+ amB.onclick=e=>{e.stopPropagation();if(!fly.hidden){fly.hidden=true;return}amShow();const r=amB.getBoundingClientRect();fly.hidden=false;fly.style.left=(innerWidth>700?r.right+6:r.left)+'px';fly.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
+ fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;if(am.value!==b.dataset.v){am.value=b.dataset.v;am.dispatchEvent(new Event('change'))}amShow()};
+ document.addEventListener('click',()=>{fly.hidden=true});
+ const D={nav:['Wybór','Przeglądanie mapy; najechanie na przystanek pozwala go edytować.'],draw:['Rysuj linię','Rysowanie trasy kliknięciami na mapie.'],edit:['Edytuj linię','Przeciąganie punktów narysowanej linii zmienia jej przebieg; kliknięcie linii dodaje punkt.'],
+  pick:['Wybieraj przystanki','Klikanie kolejnych przystanków linii – trasa prowadzi się między nimi sama.'],stop:['Dodaj przystanek','Dodawanie własnych przystanków.'],move:['Przenieś przystanek','Przeciąganie przystanków – przystanek zostaje przypisany do swoich linii.'],infra:['Dorysuj tor lub drogę','Dorysowanie toru lub drogi, których nie ma na mapie.'],
+  loopBtn:['Zamknij pętlą','Koniec trasy, który wraca w pobliże jej wcześniejszego przebiegu, zostaje płynnie dołączony do niego (pętla uliczna).'],amBtn:['Typ linii','Tramwajowa, autobusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],
+  strictTr:['Przyciąganie','Linie dopasowują się do torów lub dróg (zależnie od typu linii). Wyłączone – można rysować w dowolnym miejscu mapy.'],owTr:['Ignoruj jednokierunkowość','Linie autobusowe mogą jechać pod prąd ulicami jednokierunkowymi (ronda pozostają jednokierunkowe).'],closedTr:['Ignoruj zakaz wjazdu','Linie autobusowe mogą prowadzić także odcinkami zamkniętymi dla ruchu – budowa, zakaz wjazdu, drogi prywatne (rysowane czerwoną przerywaną).']};
+ amShow();
+ T.querySelectorAll('.b').forEach(b=>{const k=b.dataset.m||b.id,d=D[k];const txt=[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
+  [...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});const tl=b.getAttribute('title')||'';b.removeAttribute('title');
+  if(k!=='amBtn'||b.dataset.tl==null)b.dataset.tl=d&&k!=='amBtn'?d[0]:(b.dataset.tl||txt||tl.split(':')[0]);b.dataset.td=d?d[1]:(tl.includes(':')?tl.split(':').slice(1).join(':').trim():tl);b.setAttribute('aria-label',b.dataset.tl);
+  b.addEventListener('mouseenter',()=>{if(!fly.hidden)return;tip.innerHTML=`<b>${esc(b.dataset.tl)}</b><span>${esc(b.dataset.td||'')}</span>`;tip.hidden=false;const r=b.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+   if(innerWidth>700){tip.style.left=(r.right+8)+'px';tip.style.top=Math.max(4,Math.min(innerHeight-h-4,r.top+r.height/2-h/2))+'px'}else{tip.style.left=Math.max(4,Math.min(innerWidth-w-4,r.left))+'px';tip.style.top=(r.bottom+6)+'px'}});
+  b.addEventListener('mouseleave',tipHide);b.addEventListener('click',tipHide)});
+ syncLoopBtn();
+ const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
+ br.after(fdd);fdd.after(ldd);top.appendChild(cs);cs.style.marginLeft='8px';
+ applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
+map.on('zoomend',redraw);map.on('moveend',onMoveEnd);{const hh=()=>document.documentElement.style.setProperty('--hh',$('#top').getBoundingClientRect().height+'px');hh();addEventListener('resize',hh)}
+function bootData(){rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
 if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) – wczytujemy go przed zapisami i pobieraniem danych z OSM

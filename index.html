@@ -1282,6 +1282,7 @@ html.app nav.rail{touch-action:pan-x pan-y!important}
 #toolsDr.mkOn{background:var(--bg);overflow:hidden}
 #toolsDr.mkFs{position:fixed;inset:0;z-index:200}
 html.mkFsOn header.top,html.mkFsOn nav.rail{visibility:hidden}
+html.tmFsOn nav.rail{display:none!important}html.tmFsOn .toolsDr{left:0!important;bottom:0!important}html.tmFsOn #tdTm iframe{height:calc(100dvh - var(--top-h,58px))!important}
 .mk.thL{--bg:#ffffff;--fg:#1f2a37;--muted:#5d6977;--line:#e3e7ec;--panel:#f4f6f9;color-scheme:light}
 .mk.thD{--bg:#14181d;--fg:#e7ebf0;--muted:#9aa5b2;--line:#2a3139;--panel:#1c2229;color-scheme:dark}
 .mk{--g:var(--brand);--uk:1;--u:calc(clamp(10px,min(1.9vh,2.4vw),28px)*var(--uk));--gap:calc(var(--u)*.5);height:100%;min-height:0;box-sizing:border-box;position:relative;overflow:hidden;background:var(--bg);color:var(--fg);font-family:Roboto,"Segoe UI",Arial,sans-serif}
@@ -1810,7 +1811,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794877172;
+const APP_BUILD=1794877588;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6128,8 +6129,12 @@ function navMark(){const v=(typeof GUIDE!=='undefined'&&GUIDE.open)?'guide':MAP.
   {const gi=document.getElementById('gsIn');if(gi){const ph=v==='map'?'Wyszukaj przystanek na mapie':v==='guide'?(GUIDE.tmode?'Nazwa przystanku lub numer linii':'Nazwa przystanku lub numer pojazdu'):'Wyszukaj linię, łączenie linii lub przystanek';gi.placeholder=trS(ph);gi.setAttribute('aria-label',trS(ph))}}document.querySelectorAll('[data-nav]').forEach(b=>{if(b.dataset.nav===v)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
   document.body.classList.toggle('ovl',v!=='tt');document.documentElement.classList.toggle('ovl',v!=='tt');
   // "+" (own combination) only with the timetables, full screen only with the departure board
-  const pb=null,tf=document.getElementById('topFull'),tl=document.getElementById('topLoc');if(tf)tf.hidden=v!=='dep';if(tl)tl.hidden=v!=='dep'}
-document.getElementById('topFull').onclick=()=>document.getElementById('depFull').click();
+  const pb=null,tf=document.getElementById('topFull'),tl=document.getElementById('topLoc');if(tf)tf.hidden=v!=='dep'&&v!=='tm';if(tl)tl.hidden=v!=='dep';if(v!=='tm'&&document.documentElement.classList.contains('tmFsOn'))tmFull(false)}
+// full screen: the departure board's own; TransitMaker – the whole page, without the side bar of sections
+document.getElementById('topFull').onclick=()=>{if(TD.view==='tm'){tmFull(!document.documentElement.classList.contains('tmFsOn'));return}document.getElementById('depFull').click()};
+function tmFull(on){document.documentElement.classList.toggle('tmFsOn',on);document.getElementById('topFull').setAttribute('aria-pressed',String(on));
+  try{if(on&&document.documentElement.requestFullscreen&&!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.documentElement.classList.contains('tmFsOn'))tmFull(false)});
 // the location button (departure board): all departures from the nearest stop; poles serving opposite directions get a board each.
 // The board found this way is remembered like one chosen by hand
 document.getElementById('topLoc').onclick=async()=>{const b=document.getElementById('topLoc'),st=document.getElementById('depStat');
