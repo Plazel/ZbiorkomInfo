@@ -1827,7 +1827,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794959719;
+const APP_BUILD=1794959906;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6564,7 +6564,8 @@ const NAV0=(()=>{let v='';try{v=sessionStorage.getItem('ztm.nav')||''}catch(e){}
   if(document.readyState==='loading')await new Promise(r=>document.addEventListener('DOMContentLoaded',r,{once:true}));
   IDX=j;IDX_HAS.add(j.area||'*');cityAvail();hideRoutes();nightTrams();setByName();setCorridors();await route();if(typeof alertBar==='function')alertBar();
   NAV_READY=true;{const hs=location.hash.slice(1),hv=Object.keys(NAV_HASH).find(k=>NAV_HASH[k]===hs);const v0=hv||(location.hash&&!hv?'':NAV0);   // (an address of a section opens it; a timetable's address its timetable)
-    if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click();else{NAV_PEND=v0;setTimeout(()=>document.documentElement.classList.remove('navBoot'),2500)}}else document.documentElement.classList.remove('navBoot')}})   // (a section of the account's not there yet: opened once logged in)
+    if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click();else{NAV_PEND=v0;const d=document.documentElement;   // (still hidden while the account logs in – the section opens then, with no glimpse of the timetables; no account: shown at once)
+      if(!(ACC.token||store.get('ztm.token',''))||ACC.state==='out'||ACC.state==='bad'||ACC.state==='nosrv'||ACC.state==='net')d.classList.remove('navBoot');else setTimeout(()=>d.classList.remove('navBoot'),6500)}}else document.documentElement.classList.remove('navBoot')}})   // (a section of the account's not there yet: opened once logged in)
  .catch(()=>{app.innerHTML='<p class="loading err">Nie udało się wczytać rozkładów</p>'});
 </script>
 <script>
@@ -6651,10 +6652,10 @@ async function accLogin(tok,quiet){tok=(tok||'').trim();if(!tok)return false;ACC
   try{const u=await accApi('konto',{tok});ACC.token=tok;store.set('ztm.token',tok);ACC.user=u;ACC.state='in';
     try{ACC.data=await accApi('konto/dane')||{}}catch(e){ACC.data={}}accClose();accShow();accStApply();
     // (the section left open last time that needs the account – Hub, mKomputer, the administrator's – opened again)
-    {const v=NAV_PEND||(!location.hash.slice(1)&&NAV0)||'';if(quiet&&v&&IDX&&!TD.view){const b=document.querySelector(`[data-nav="${v}"]`);if(b&&!b.hidden){NAV_PEND='';b.click()}}}
+    {const v=NAV_PEND||(!location.hash.slice(1)&&NAV0)||'';if(quiet&&v&&IDX&&!TD.view){const b=document.querySelector(`[data-nav="${v}"]`);if(b&&!b.hidden){NAV_PEND='';b.click()}}if(IDX&&NAV_PEND)document.documentElement.classList.remove('navBoot')}
     return true}
   catch(e){ACC.user=null;ACC.state=e.st===401?'bad':e.st===503||e.st===404||e.st===405?'nosrv':'net';
-    if(e.st===401&&tok===ACC.token){ACC.token='';store.set('ztm.token','')}accShow();if(quiet&&e.st!==401)ACC.state='out';return false}}
+    if(e.st===401&&tok===ACC.token){ACC.token='';store.set('ztm.token','')}accShow();if(IDX&&NAV_PEND)document.documentElement.classList.remove('navBoot');if(quiet&&e.st!==401)ACC.state='out';return false}}
 function accLogout(){store.set('ztm.lastMode',null);ACC.token='';ACC.user=null;ACC.data={};ACC.admin=null;ACC.made=null;ACC.state='out';store.set('ztm.token','');if(TD.view==='hub'||TD.view==='adm'||TD.view==='mkadm'||TD.view==='msgadm'||TD.view==='tm')closeTool();accShow()}
 // the account's data saved a moment after the last change (one write for a burst of changes)
 function accSave(){clearTimeout(ACC.saveT);ACC.pend=true;ACC.saveT=setTimeout(()=>{ACC.pend=false;if(ACC.user){ACC.data.t=Date.now();accApi('konto/dane',{method:'PUT',body:ACC.data}).catch(()=>{})}},800)}
