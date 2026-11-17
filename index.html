@@ -1825,7 +1825,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794904121;
+const APP_BUILD=1794904381;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5606,7 +5606,7 @@ async function alertsBVG(u){try{const j=await (await fetch(u,{cache:'no-store'})
     return (j.alerts||[]).filter(a=>(!a.start||Date.parse(a.start)<=now)&&(!a.end||Date.parse(a.end)>=now)).map(a=>{const first=(a.text||'').split('\n')[0];
       const t0=BVG_GEN.test(a.title)?bvgTitle(a.title)+': '+[a.station,(a.lines||[]).join(', ')].filter(Boolean).join(' · '):bvgTitle(a.title);
       const big=/Sperrung|Ersatzverkehr|Unterbrechung|Kein Halt/i.test(a.title)||a.lines.some(l=>/^U\d/.test(l)||IDX&&IDX.routes.some(r=>r.n===l&&r.t==='tram'&&(r.c||[]).includes('ber')));
-      return {title:t0,text:bvgTr(a.text),url:j.url||'https://www.bvg.de/de/verbindungen/stoerungsmeldungen',lines:a.lines,de:a.text,deTitle:a.title,from:a.start?Date.parse(a.start):null,to:a.end?Date.parse(a.end):null,stretch:a.stretch||'',kind:a.kind||'',img:a.img||[],prio:/Haltestelle verlegt/i.test(a.title)?2:big?0:1}}).sort((x,y)=>x.prio-y.prio)}catch(e){return []}}
+      return {title:t0,text:bvgTr(a.text),url:j.url||'https://www.bvg.de/de/verbindungen/stoerungsmeldungen',lines:a.lines,de:a.text,deTitle:a.title,from:a.start?Date.parse(a.start):null,to:a.end?Date.parse(a.end):null,stretch:a.stretch||'',station:a.station||'',kind:a.kind||'',img:a.img||[],prio:/Haltestelle verlegt/i.test(a.title)?2:big?0:1}}).sort((x,y)=>x.prio-y.prio)}catch(e){return []}}
 // the page of a city's notices, for those that come without a link of their own (Kraków: ZTP)
 const ALERT_PAGE={krk:'https://ztp.krakow.pl/kmk/komunikaty'};
 const alertGrp=c=>['gda','sop','gdy','all'].includes(c)?'tri':ALERT_SRC[c]?c:null;
@@ -5645,7 +5645,7 @@ function ztmAlerts(g0){const g=g0||alertGrp(city);if(!g)return Promise.resolve([
 // notices; whatever cannot be read with confidence is left out (the notice itself is still shown) – a wrong detour on
 // the timetable would be worse than none
 const DT={on:store.get('ztm.detours',false),net:{},G:{},st:null,res:{}};
-const DT_AREAS=new Set(['tri','waw','ldz','lub','wro','krk','poz','byd','wej','ns']);
+const DT_AREAS=new Set(['tri','waw','ldz','lub','wro','krk','poz','byd','wej','ns','ber','prg']);
 const dtFold=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ł/g,'l');
 const DT_ENDS=['owiami','ami','ach','owie','owi','ego','emu','iej','ych','ich','ym','im','ej','em','om','ow','ie','iu','ia','ii','u','y','i','a','e','o'];
 const dtStem=w=>{w=dtFold(w).replace(/[^a-z0-9]/g,'');if(/^\d+$/.test(w)||w.length<=4)return w;for(const e of DT_ENDS)if(w.endsWith(e)&&w.length-e.length>=4)return w.slice(0,-e.length);return w};
@@ -5696,6 +5696,40 @@ function dtParse(txt){
   if(/obsługiwane\s+(?:są|będą)\s+wszystkie\s+przystanki\s+(?:na\s+)?(?:trasie\s+)?objazd/iu.test(t))ev.serveAll=true;
   if(/bez\s+zatrzyma[nń]|bez\s+obsługi\s+przystank/iu.test(t))ev.serveAll=false;
   ev.skip=ev.skip.map(x=>x.replace(/^przystanek\s+/iu,''));ev.use=ev.use.map(x=>x.replace(/^przystanek\s+/iu,''));return ev}
+// Berlin (BVG, in German): "Bus M27: Umleitung … Richtung S+U Pankow von U Turmstraße bis Stendaler Straße via Lübecker Str., Birkenstr.",
+// "• Bus 123 beide Richtungen [Umleitung] zwischen A ↔ B", "Kein Halt" at a stop; the stretch BVG gives with the notice ("A ↔ B") when the text names none
+function dtSplitDe(text,n){const esc=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),re=new RegExp('(?<![\\w+])'+esc+'(?![\\w])');const L=String(text).split('\n'),mine=L.filter(l=>re.test(l));
+  return (mine.length?mine:L).join('\n')}
+function dtParseDe(txt,al){const ev={from:null,to:null,via:[],blocked:[],skip:[],use:[],serveAll:null,toward:null,rejoin:null,cut:null,short:null};let m;
+  const cl=x=>String(x||'').replace(/^(?:der |die |dem |den )?(?:Haltestelle |Hst\.? |Bahnhof )/i,'').replace(/[\s.]+$/,'').trim();
+  const lst=x=>x.split(/\s*,\s*|\s+und\s+/).map(cl).filter(Boolean);
+  const pure=/^Umleitung\b/.test(al.kind||'')&&!/Ersatzverkehr|Unterbrechung/.test(al.kind||'');
+  // sentence by sentence (and bullet by bullet): the replacement buses, shuttles and the advice to use other lines are not the line's route
+  String(txt).replace(/\*\*|\[|\]/g,'').split(/\n|(?<=[a-zäöüß)])\.\s+(?=[A-ZÄÖÜ])/).map(x=>x.replace(/\s+/g,' ').replace(/^•\s*/,'').trim()).filter(Boolean).forEach(t=>{
+    if(/Ersatzverkehr|Shuttle|Nutzen Sie|Alternative|statt|anstelle/i.test(t))return;
+    if(!ev.toward&&!/beide[n]? Richtung/i.test(t)&&(m=t.match(/Richtung\s+(.+?)(?=\s+(?:von|zwischen|ab|bis|nicht|fährt|fahren|hält|halten|wird|werden|kein|über|via)\b|\s*[:.,;]|\s+Umleitung|$)/)))ev.toward=cl(m[1]);
+    const um=/Umleitung|umgeleitet/i.test(t);
+    if(!ev.from&&um&&(m=t.match(/(?<!aufgrund\s|infolge\s|wegen\s)\bvon\s+(?!dort\b|Bauarbeiten\b)([^.:;]+?)\s+bis\s+([^.:;]+?)(?:\s+via\s+(.+?))?\.?$/))){ev.from=cl(m[1]);ev.to=cl(m[2].replace(/\s+und weiter.*$/,''));if(m[3])ev.via=lst(m[3])}
+    else if(!ev.from&&um&&(m=t.match(/zwischen\s+([^↔]+?)\s*↔\s*([^↔]+?)(?=\s+(?:via|wegen|aufgrund|und weiter)\b|[.;]|$)/))&&(t.match(/↔/g)||[]).length===1){ev.from=cl(m[1]);ev.to=cl(m[2])}
+    else if(!ev.short&&!um&&(m=t.match(/fährt\s+(?:nur\s+)?zwischen\s+([^↔]+?)\s*↔\s*([^↔]+?)(?=\s+(?:und weiter|wegen|aufgrund)\b|[.;]|$)/))&&(t.match(/↔/g)||[]).length===1&&!/und weiter/.test(t))ev.short=[cl(m[1]),cl(m[2])];
+    if(um&&!ev.via.length&&(m=t.match(/\b[Vv]ia\s+(.+?)\.?$/)))ev.via=lst(m[1]);
+    for(const re of [/Haltestellen?\s+(.+?)\s+(?:entfällt|entfallen|wird nicht (?:bedient|angefahren)|werden nicht (?:bedient|angefahren))/g,/(?:hält|halten)\b.*?\bnicht\s+(?:mehr\s+)?(?:im Bahnhof|an der Haltestelle|in der Haltestelle|an|in)\s+(.+?)$/g])
+      while((m=re.exec(t)))ev.skip.push(...lst(m[1]))});
+  if(!ev.from&&pure&&al.stretch&&(al.stretch.match(/↔/g)||[]).length===1){const [a,b]=al.stretch.replace(/​/g,'').split('↔');ev.from=cl(a);ev.to=cl(b)}
+  if(/Kein Halt/i.test(al.kind||'')&&al.station&&!ev.skip.length)ev.skip.push(cl(al.station.replace(/​/g,'')));
+  return ev}
+// Prague (PID, in Czech): "Ruší se: X, Y" (stops not served), "Zřizuje se / Zavádí se: …" (added), "linka vedena do zastávky A beze změny,
+// dále po odklonové trase do zastávky B", "V úseku A – B jsou linky vedeny po odklonové trase", "ve směru X" (one direction)
+function dtParseCs(txt){const raw=String(txt).replace(/\*\*/g,'').replace(/[„“”"]/g,''),ev={from:null,to:null,via:[],blocked:[],skip:[],use:[],serveAll:null,toward:null,rejoin:null,cut:null,short:null};let m;
+  const items=hd=>{const out=[],re=new RegExp('(?:^|\\n|\\.\\s)\\s*(?:•\\s*)?'+hd+'\\s*(?:se\\s+)?(?:zastávk[ay]\\s+)?:?\\s*([\\s\\S]*?)(?=\\n\\s*(?:•\\s*)?(?:Ruší|Zřizuje|Zavádí|Přesouvá|Opatření|Během|Linky?\\s|\\d{3}\\b)|•\\s*(?:Ruší|Zřizuje|Zavádí|Přesouvá)|\\n\\s*\\n|$)','g');let q;
+    while((q=re.exec(raw)))q[1].split(/\n|•/).forEach(l=>{l=l.replace(/\(.*?\)/g,'').replace(/\s+ve směru.*$/,'').trim();if(!l)return;l.split(/\s*,\s+(?=[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ])|\s+a\s+(?=[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ])/).forEach(x=>{x=x.split(/\s+[–-]\s+|\s+v\s+(?:ulici|pravidelné|prostoru)|,\s*a to\b|:/)[0].replace(/^zastávk[ay]\s+/,'').replace(/[.\s]+$/,'').trim();if(x&&x.length<60&&/^[A-ZÁČĎÉĚÍŇÓŘŠŤÚŮÝŽ0-9]/.test(x))out.push(x)})});return out};
+  ev.skip=items('Ruší\\s+se');ev.use=items('(?:Zřizuje|Zavádí)\\s+se');
+  const t=raw.replace(/\s+/g,' ');
+  if((m=t.match(/ve směru\s+(?:ulice\s+)?(.+?)(?=\s+(?:je|jsou|se|do)\s|[,.;)]|$)/)))ev.toward=m[1].trim();
+  if((m=t.match(/do zastávky\s+(.+?)\s+beze změny,?\s+dále po odklonové trase\s+(?:přes\s+(.+?)\s+)?do zastávky\s+(.+?)(?=\s+a\s+dále|[,.;]|$)/))){ev.from=m[1];ev.to=m[3];if(m[2])ev.via=m[2].split(/\s*,\s*|\s+a\s+/)}
+  else if((m=t.match(/[Vv] úseku\s+(.+?)\s+[–-]\s+(.+?)\s+(?:jsou|je)\s+link[ay]?\s+veden[aáy]?\s+po odklonové trase/))){ev.from=m[1];ev.to=m[2]}
+  else if((m=t.match(/mezi zastávkami\s+(.+?)\s+a\s+(.+?)\s+(?:je|jsou)\s+link[ay]?\s+veden[aáy]?\s+(?:po odklonové trase|odklonem)(?:\s+(?:přes|ulicemi)\s+(.+?))?(?=[.;]|$)/))){ev.from=m[1];ev.to=m[2];if(m[3])ev.via=m[3].split(/\s*,\s*|\s+a\s+/)}
+  return ev}
 function dtFind(ph,ids,o){let best=-1,bs=0;o=o||{};ids.forEach((id,i)=>{if(o.after!=null&&i<=o.after)return;const st=IDX.stops[id];if(!st)return;const sc=dtScore(ph,st[0],st[1]);if(sc>bs||(sc===bs&&sc>0&&o.first)){bs=sc;best=i}});return best}
 const dtOnSt=(id,ST,v)=>{const W=dtWords(v);if(!W.length)return false;const has=t=>t&&W.every(w=>dtWords(t).some(x=>dtSame(x,w)));return has(IDX.stops[id]&&IDX.stops[id][0])||has(ST&&ST[id])};
 // the shortest path a → b over the network, not through the stops in `avoid`; stops on the streets named cost less
@@ -5708,8 +5742,8 @@ function dtPath(G,a,b,avoid,via,ST){const S=IDX.stops,vs=id=>S[id]&&via.some(v=>
   if(!D.has(b)||!done.has(b))return null;const out=[b];while(out[0]!==a)out.unshift(P.get(out[0]));return out}
 // one notice → the line's directions changed: {di, rows [{id, si (a stop of the route) / st 'ok'|'skip'|'add'|'pass'}], conf}
 function dtRead(al,r,L,G,ST){const S=IDX.stops,out=[];
-  const txt=dtSplit((al.title?al.title+'.\n':'')+(al.text||''),[r.n])[r.n];if(!txt)return out;
-  const ev=dtParse(txt);if(!ev.from&&!ev.skip.length&&!ev.cut&&!ev.short&&!(ev.blocked.length&&ST))return out;
+  const txt=al.g==='ber'?dtSplitDe(al.text||'',r.n):al.g==='prg'?(al.title?al.title+'.\n':'')+(al.text||''):dtSplit((al.title?al.title+'.\n':'')+(al.text||''),[r.n])[r.n];if(!txt)return out;
+  const ev=al.g==='ber'?dtParseDe(txt,al):al.g==='prg'?dtParseCs(txt):dtParse(txt);if(!ev.from&&!ev.skip.length&&!ev.cut&&!ev.short&&!(ev.blocked.length&&ST))return out;
   L.dirs.forEach((d,di)=>{const ids=d.stops.map(x=>x[0]);
     if(ev.toward&&!dtWords(ev.toward).some(w=>dtWords(d.head).some(x=>dtSame(x,w))))return;
     const res={di,notes:[],conf:1},skip=new Set();
@@ -5755,7 +5789,7 @@ async function dtFor(r,L){if(!DT.on||!r||!L)return null;const g=alertGrp(city);i
   const key=mine.map(a=>(a.o0||a).title+'|'+((a.o0||a).text||'').length).join('/'),c=DT.res[r.id];if(c&&c.k===key&&c.L===L)return c.v;
   const [G,ST]=await Promise.all([dtGraph(g,dtKind(r)),g==='tri'?dtStreets():null]);
   const out={};let any=false;
-  for(const a of mine){const o=a.o0||a;let R=[];try{R=dtRead({title:o.title,text:o.text},r,L,G,ST)}catch(e){}
+  for(const a of mine){const o=a.o0||a;let R=[];try{R=dtRead(g==='ber'?{title:a.deTitle||o.title,text:a.de||o.text,stretch:a.stretch,station:a.station,kind:a.kind,g}:{title:o.title,text:o.text,g},r,L,G,ST)}catch(e){}
     R.forEach(x=>{if(x.conf>=.7&&!out[x.di]){x.title=o.title;out[x.di]=x;any=true}})}
   DT.res[r.id]={k:key,L,v:any?out:null};return any?out:null}
 // (the sign of a detour on the vehicles' displays: an arrow up whose stem steps aside)

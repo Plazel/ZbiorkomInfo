@@ -8,8 +8,8 @@ import json, os, re, time, html, collections, urllib.request
 
 # the areas of the alerts on the page (alertGrp): the Tricity's route files are gda_*, gdy_*, sop_*, tri_*
 GROUP = {'gda': 'tri', 'gdy': 'tri', 'sop': 'tri', 'tri': 'tri'}
-# the areas whose notices are in Polish and follow the patterns the page reads (the others are left out)
-AREAS = {'tri', 'waw', 'ldz', 'lub', 'wro', 'krk', 'poz', 'byd', 'wej', 'ns'}
+# the areas whose notices follow the patterns the page reads (Polish; Berlin's BVG in German, Prague's PID in Czech)
+AREAS = {'tri', 'waw', 'ldz', 'lub', 'wro', 'krk', 'poz', 'byd', 'wej', 'ns', 'ber', 'prg'}
 
 
 def _kind(r):   # (as the page's dtKind: trams, trains, and every other kind on the roads)
