@@ -1811,7 +1811,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794877588;
+const APP_BUILD=1794877822;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6118,7 +6118,7 @@ function depLinesTable(){const tb=document.getElementById('depLinesB');tb.replac
 let NAV_READY=false,NAV_LAST='tt',NAV_CUR='tt',NAV_POP=false,NAV_SILENT=false,NAV_T=0;
 // every section its own address, like the pages of a website: #mapa, #odjazdy, #polaczenia, #msip, #takty, #brygady; the
 // timetables keep theirs (#l…, #t…, #s…), given back on the way back to them
-const NAV_HASH={map:'mapa',dep:'odjazdy',jp:'polaczenia',guide:'msip',takt:'takty',bryg:'brygady',hub:'hub',adm:'konta',mk:'mkomputer',mkadm:'mkomputer-ustawienia',msgadm:'wiadomosci',krt:'kreator',dbd:'dboard'};let NAV_PEND='';let TT_HASH='';
+const NAV_HASH={map:'mapa',dep:'odjazdy',jp:'polaczenia',guide:'msip',takt:'takty',bryg:'brygady',hub:'hub',adm:'konta',mk:'mkomputer',mkadm:'mkomputer-ustawienia',msgadm:'wiadomosci',krt:'kreator',dbd:'dboard',tm:'transitmaker',news:'aktualnosci'};let NAV_PEND='';let TT_HASH='';
 function navUrl(v){const base=location.pathname+location.search;const h=location.hash.slice(1);
   if(h&&!Object.values(NAV_HASH).includes(h))TT_HASH=h;
   return base+(NAV_HASH[v]?'#'+NAV_HASH[v]:TT_HASH?'#'+TT_HASH:'')}

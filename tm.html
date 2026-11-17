@@ -173,6 +173,7 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #tools{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;z-index:1000;background:var(--bg);border-right:1px solid var(--bd)}
 #tools .b{width:38px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;gap:0}#tools .b svg{width:19px;height:19px;margin:0}
 #tools .tsep{width:28px;border-top:1px solid var(--bd);margin:4px 0;flex:none}#tools #modebar,#tools .tgrp{display:contents}
+#pFile,#pLay{left:0;right:auto}
 #amFly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}#amFly[hidden]{display:none}
 #amFly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}#amFly button:hover{background:var(--tab)}#amFly button.on{font-weight:700}
 #tip{position:fixed;z-index:5000;max-width:260px;padding:8px 11px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none}#tip[hidden]{display:none}#tip b{display:block;font-size:13px;margin-bottom:2px}#tip span{color:var(--mut)}
@@ -202,6 +203,8 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
     <div class="small" id="fAccSt" style="padding:0 11px 4px;color:var(--mut)"></div>
     <div class="sech"></div>
     <button class="b" id="fSchema"><i data-ic="network"></i>Schemat…</button>
+    <div class="sech"></div>
+    <button class="b" id="delAll" style="color:var(--dng,#c62828)"><i data-ic="trash"></i>Usuń wszystkie linie</button>
     <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button></span>
    </div>
    <div class="small" id="fStat" style="margin:6px 0 0"></div>
@@ -261,7 +264,7 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
  <div class="bar2 row" id="routebar"><span class="lab"><i data-ic="route"></i>Trasa</span><select id="amode" class="grow" title="Rodzaj linii – decyduje, po czym prowadzona jest trasa (rysowanie i wybór przystanków)"><option value="tram">Linia tramwajowa</option><option value="street">Linia autobusowa</option><option value="rail">Linia kolejowa</option></select><button class="b ico" id="strictTr" title="Przyciąganie: gdy włączone, linie są przyciągane i dopasowywane do torów/drogi (zależnie od rodzaju linii). Po wyłączeniu można rysować linię w dowolnym miejscu mapy."><i data-ic="magnet"></i></button><button class="b ico" id="closedTr" title="Zamknięte drogi: gdy włączone, trasy po ulicach (linie autobusowe) mogą prowadzić także po odcinkach zamkniętych dla ruchu – budowa, zakaz wjazdu, drogi prywatne. Takie odcinki rysowane są czerwoną linią przerywaną. Pierwsze użycie pobiera dane dróg z Overpass."><i data-ic="closed"></i></button><button class="b ico" id="owTr" title="Ignoruj jednokierunkowość: gdy włączone, trasy po ulicach (linie autobusowe) mogą prowadzić także pod prąd po ulicach jednokierunkowych (ronda pozostają jednokierunkowe). Trasę liczy wtedy lokalny routing na danych dróg z Overpass (tak jak przy „Zamknięte drogi”) – pierwsze użycie pobiera dane. Zwykły routing (OSRM) nie pozwala wyłączyć jednokierunkowości."><i data-ic="twoway"></i></button></div>
  <div class="bar2 row" id="stopbar" style="display:none"><span class="lab"><i data-ic="pin"></i>Rodzaj</span><select id="stopKind" class="grow" title="Rodzaj dodawanego przystanku"><option value="bus">Przystanek autobusowy</option><option value="tram">Przystanek tramwajowy</option><option value="both">Przystanek autobusowo-tramwajowy</option><option value="rail">Przystanek kolejowy</option></select><label class="chk" title="Na torze dwunitkowym dodaje dwa przystanki – po jednym na kierunek"><input type="checkbox" id="stopDbl">Podwójny</label></div>
  <div class="pane on" id="p1">
-  <div class="row wrap"><button class="b pri" id="addL"><i data-ic="plus"></i>Nowa linia</button><span class="grow"></span><button class="b ico del" id="delAll" title="Usuń wszystkie linie"><i data-ic="trash"></i></button></div>
+  <div class="row wrap"><button class="b pri" id="addL"><i data-ic="plus"></i>Nowa linia</button><span class="grow"></span></div>
   <div class="sech"><i data-ic="route"></i>Linie<span class="grow"></span><button class="b flat" id="toggleAll" title="Ukryj wszystkie linie"></button></div>
   <div id="lines"></div>
  </div>
@@ -1896,7 +1899,7 @@ function askPrompt(msg,def,o={}){
  return modal({title:o.title||'Wpisz wartość',body:w,btns:[{t:'Anuluj',v:null},{t:o.ok||'OK',v:()=>inp.value,c:'pri'}],cancelV:null,init:(bx)=>{inp.onkeydown=e=>{if(e.key==='Enter')bx.querySelector('.pri').click()};inp.select()}})}
 
 // ---- usuwanie wszystkich linii (dwa potwierdzenia)
-$('#delAll').onclick=async()=>{
+$('#delAll').onclick=async()=>{closeMenus();
  const n=S.lines.length;if(!n){say('Nie ma żadnych linii do usunięcia.');return}
  if(!await askConfirm(`Usunąć wszystkie linie (${n})?\nPrzystanki i własne tory/drogi zostaną zachowane.`,{title:'Usuń wszystkie linie',ok:'Dalej…',danger:true}))return;
  if(!await askConfirm(`Czy na pewno? Wszystkie linie (${n}) zostaną trwale usunięte razem z ich trasami, ustawieniami i komentarzami. Tej operacji nie można cofnąć.`,{title:'Ostateczne potwierdzenie',ok:'Tak, usuń wszystkie linie',cancel:'Nie, wróć',danger:true}))return;
