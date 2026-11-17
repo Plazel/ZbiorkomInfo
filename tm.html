@@ -174,6 +174,9 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #tools .b{width:38px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;gap:0}#tools .b svg{width:19px;height:19px;margin:0}
 #tools .tsep{width:28px;border-top:1px solid var(--bd);margin:4px 0;flex:none}#tools #modebar,#tools .tgrp{display:contents}
 #pFile,#pLay{left:0;right:auto}
+#side>#modebar{display:none}
+#routeOpts{display:flex;flex-direction:column;gap:2px;margin:8px 10px 6px;padding:8px 10px;border:1px solid var(--bd);background:var(--panel)}#routeOpts .roH{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}
+#routeOpts .roB{display:flex;align-items:center;gap:9px;width:100%;justify-content:flex-start;text-align:left;padding:6px 8px;font-size:13px;border:0;background:transparent!important;color:var(--fg)!important}#routeOpts .roB::after{content:'';margin-left:auto;width:30px;height:16px;border:1px solid var(--bd);background:var(--bd2,#ddd);box-sizing:border-box;box-shadow:inset 15px 0 0 #fff}#routeOpts .roB.on::after{background:var(--fg);box-shadow:inset -15px 0 0 #fff}#routeOpts .roB:hover{background:var(--tab)!important}#top:not(.lay)>*:not(.brand){visibility:hidden}#top:not(.lay) .citysel{visibility:hidden}
 #amFly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}#amFly[hidden]{display:none}
 #amFly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}#amFly button:hover{background:var(--tab)}#amFly button.on{font-weight:700}
 #tip{position:fixed;z-index:5000;max-width:260px;padding:8px 11px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none}#tip[hidden]{display:none}#tip b{display:block;font-size:13px;margin-bottom:2px}#tip span{color:var(--mut)}
@@ -2524,7 +2527,12 @@ icons();applyUI();applyTab('t1');
  const sep=()=>{const d=document.createElement('div');d.className='tsep';return d};
  const am=$('#amode'),rb=$('#routebar'),g=document.createElement('div');g.className='tgrp';
  const amB=document.createElement('button');amB.className='b';amB.id='amBtn';amB.type='button';amB.setAttribute('aria-haspopup','menu');
- g.append(sep(),amB);['strictTr','owTr','closedTr'].forEach(id=>{const b=$('#'+id);if(b)g.appendChild(b)});[...rb.querySelectorAll('button')].forEach(b=>{if(!g.contains(b))g.appendChild(b)});T.appendChild(g);rb.style.display='none';rb.dataset.moved='1';
+ g.append(sep(),amB);T.appendChild(g);rb.style.display='none';rb.dataset.moved='1';
+ // the ways a route may be led (snapping, one-way streets, closed roads): a small box over the panel on the right, its switches named
+ const RO=document.createElement('div');RO.id='routeOpts';RO.innerHTML='<div class="roH">Prowadzenie trasy</div>';
+ [['strictTr','Przyciąganie'],['owTr','Ignoruj jednokierunkowość'],['closedTr','Ignoruj zakaz wjazdu']].forEach(([id,t])=>{const b=$('#'+id);if(!b)return;b.classList.remove('ico');b.classList.add('roB');b.appendChild(document.createTextNode(t));b.dataset.tl=t;RO.appendChild(b)});
+ [...rb.querySelectorAll('button')].forEach(b=>{if(!RO.contains(b)){b.classList.remove('ico');b.classList.add('roB');RO.appendChild(b)}});
+ const sd=$('#side');sd.insertBefore(RO,sd.querySelector('.tabs'));
  const KIND={tram:['tram','Linia tramwajowa'],street:['bus','Linia autobusowa'],rail:['train','Linia kolejowa']};
  const fly=document.createElement('div');fly.id='amFly';fly.hidden=true;fly.setAttribute('role','menu');document.body.appendChild(fly);
  const tip=document.createElement('div');tip.id='tip';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.appendChild(tip);
@@ -2546,7 +2554,7 @@ icons();applyUI();applyTab('t1');
   b.addEventListener('mouseleave',tipHide);b.addEventListener('click',tipHide)});
  syncLoopBtn();
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
- br.after(fdd);fdd.after(ldd);top.appendChild(cs);cs.style.marginLeft='8px';
+ br.after(fdd);fdd.after(ldd);top.appendChild(cs);cs.style.marginLeft='8px';top.classList.add('lay');
  applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
 map.on('zoomend',redraw);map.on('moveend',onMoveEnd);{const hh=()=>document.documentElement.style.setProperty('--hh',$('#top').getBoundingClientRect().height+'px');hh();addEventListener('resize',hh)}
 function bootData(){rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
