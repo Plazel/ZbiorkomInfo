@@ -1825,7 +1825,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794880471;
+const APP_BUILD=1794880654;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -9608,6 +9608,15 @@ document.addEventListener('dragstart',e=>{if(e.target.closest&&e.target.closest(
  document.addEventListener('pointerout',e=>{if(cur&&!(e.relatedTarget&&cur.contains(e.relatedTarget)))release()},true);
  document.addEventListener('pointermove',()=>{if(cur&&cur.hasAttribute('title')){take(cur);if(!T.hidden)show()}},true);
  ['pointerdown','keydown','wheel'].forEach(t=>document.addEventListener(t,vis,true));addEventListener('scroll',vis,true);addEventListener('blur',release)})();
+
+// ---- no suggestions of the browser in the fields (what was typed before): every field set so, also those made later; the sign-in
+// fields that ask for the password manager (username, passwords) keep it
+(function(){const KEEP=/^(username|current-password|new-password|one-time-code)$/;
+ const off=el=>{if(!el||el.type==='password'||KEEP.test(el.getAttribute('autocomplete')||''))return;if(el.getAttribute('autocomplete')!=='off')el.setAttribute('autocomplete','off')};
+ const all=r=>{(r.querySelectorAll?r.querySelectorAll('input,textarea'):[]).forEach(off);if(r.matches&&r.matches('input,textarea'))off(r)};
+ all(document);document.querySelectorAll('form').forEach(f=>f.setAttribute('autocomplete','off'));
+ new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)all(n)}))).observe(document.documentElement,{childList:true,subtree:true});
+ document.addEventListener('focusin',e=>{if(e.target&&e.target.matches&&e.target.matches('input,textarea'))off(e.target)},true)})();
 </script>
 
 </body>

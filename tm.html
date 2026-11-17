@@ -1018,7 +1018,7 @@ function drawStops(cb){
   if(nmShow){const cl=capLab.get(u.key);L.marker(cl?cl.ll:u.ll,{icon:L.divIcon({className:'',html:`<div class="stl" style="left:${(cl?Math.round(cl.hx+3):11)}px">${esc(multi?dispName(first):lab(first))}</div>`,iconSize:[0,0]}),interactive:false,zIndexOffset:300}).addTo(stopL)}
   m.bindPopup(()=>multi?popupGroup(u):popup(first),{closeButton:false,autoPan:false,offset:[0,-3]});
   m.on('mouseover',()=>{if(mode==='infra')return;document.body.classList.add('ovstop');keepPop();curM=m;if(!m.isPopupOpen())m.openPopup()});m.on('mouseout',()=>{document.body.classList.remove('ovstop');leavePop(m)});
-  m.on('click',()=>{if(vs&&vsPick(u.members.map(x=>x.id)))return;if(mode==='pick'){addToLine(first.id);map.closePopup()}else if(mode!=='nav')map.closePopup();if(mode==='draw'||mode==='infra')clickAt(u.ll)});
+  m.on('click',()=>{if(vs&&vsPick(u.members.map(x=>x.id)))return;if(mode==='pick'){const ok=u.members.find(pickOk);if(ok)addToLine(ok.id);else say('Narzędzie wybiera teraz tylko przystanki: '+pickName()+' (przytrzymaj je na pasku, aby zmienić).');map.closePopup()}else if(mode!=='nav')map.closePopup();if(mode==='draw'||mode==='infra')clickAt(u.ll)});
   
   m.addTo(stopL);if(m.bringToFront)m.bringToFront()})}
 function moveUnit(u,nl){
@@ -2565,6 +2565,12 @@ $('#hUndo').onclick=()=>histGo(-1);$('#hRedo').onclick=()=>histGo(1);
 document.addEventListener('keydown',e=>{if(!(e.ctrlKey||e.metaKey)||e.altKey||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')||document.querySelector('.mback'))return;
  const k=e.key.toLowerCase();if(k==='z'&&!e.shiftKey){e.preventDefault();histGo(-1)}else if(k==='y'||(k==='z'&&e.shiftKey)){e.preventDefault();histGo(1)}});
 icons();applyUI();applyTab('t1');
+// the kinds of stop the picking tool takes: chosen by holding it (Autobus / trolejbus, Tramwaj, Kolej), otherwise the line's own
+let PKSEL=null;try{PKSEL=localStorage.getItem('gdn-pk')||null}catch(e){}
+const PKN={bus:'autobusowe i trolejbusowe',tram:'tramwajowe',rail:'kolejowe'};
+function pickKind(){if(PKSEL)return PKSEL;const a=$('#amode').value;return a==='tram'?'tram':a==='rail'?'rail':'bus'}
+const pickName=()=>PKN[pickKind()];
+function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!st.tram:(!!st.bus||(!st.tram&&!st.rail))}
 // ---- the layout of the design programs: the tools moved into a column of icons on the left (each explained beside it on
 // hovering), the panel of lines, stops and tracks on the right; Plik and Warstwy beside the name, the city on the right
 (function toolsLayout(){const T=document.createElement('div');T.id='tools';T.setAttribute('role','toolbar');T.setAttribute('aria-label','Narzędzia');T.setAttribute('aria-orientation','vertical');
@@ -2582,9 +2588,9 @@ icons();applyUI();applyTab('t1');
  const fly=document.createElement('div');fly.id='amFly';fly.hidden=true;fly.setAttribute('role','menu');document.body.appendChild(fly);
  const tip=document.createElement('div');tip.id='tip';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.appendChild(tip);
  window.tipHide=()=>{tip.hidden=true};
- window.amShow=()=>{const cur=amCur(),k=KIND[cur]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===cur}" data-v="${v}" class="${v===cur?'on':''}">${ic(i)}${t}</button>`).join('');if(window.dShow)dShow()};
+ window.amShow=()=>{const cur=amCur(),k=KIND[cur]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===cur}" data-v="${v}" class="${v===cur?'on':''}">${ic(i)}${t}</button>`).join('');if(window.dShow)dShow();if(window.pShow)pShow()};
  amB.onclick=e=>{e.stopPropagation();if(!fly.hidden){fly.hidden=true;return}amShow();const r=amB.getBoundingClientRect();fly.hidden=false;fly.style.left=(innerWidth>700?r.right+6:r.left)+'px';fly.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
- fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;const v=b.dataset.v,amv=v==='trolley'?'street':v,l=selLine();if(l){if(v==='trolley')l.veh='trolley';else delete l.veh}if(am.value!==amv){am.value=amv;am.dispatchEvent(new Event('change'))}else if(l){save();renderLines()}amShow();const dB=T.querySelector('[data-m="draw"]');if(dB&&mode!=='draw'){window._dlp=false;dB.click()}};
+ fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;const v=b.dataset.v,amv=v==='trolley'?'street':v,l=selLine();if(l){if(v==='trolley')l.veh='trolley';else delete l.veh}if(am.value!==amv){am.value=amv;am.dispatchEvent(new Event('change'))}else if(l){save();renderLines()}PKSEL=null;try{localStorage.removeItem('gdn-pk')}catch(x){}if(window.pShow)pShow();amShow();const dB=T.querySelector('[data-m="draw"]');if(dB&&mode!=='draw'){window._dlp=false;dB.click()}};
  document.addEventListener('click',()=>{fly.hidden=true});
  const D={nav:['Wybór','Przeglądanie mapy; najechanie na przystanek pozwala go edytować.'],draw:['Rysuj linię','Rysowanie trasy kliknięciami na mapie.'],edit:['Edytuj linię','Przeciąganie punktów narysowanej linii zmienia jej przebieg; kliknięcie linii dodaje punkt.'],
   pick:['Wybieraj przystanki','Klikanie kolejnych przystanków linii – trasa prowadzi się między nimi sama.'],stop:['Dodaj przystanek','Dodawanie własnych przystanków.'],move:['Przenieś przystanek','Przeciąganie przystanków – przystanek zostaje przypisany do swoich linii.'],infra:['Dorysuj tor lub drogę','Dorysowanie toru lub drogi, których nie ma na mapie.'],
@@ -2622,6 +2628,18 @@ icons();applyUI();applyTab('t1');
   ['pointerup','pointerleave','pointercancel'].forEach(t=>db.addEventListener(t,()=>clearTimeout(lpT)));
   db.addEventListener('click',e=>{if(window._dlp){window._dlp=false;e.stopImmediatePropagation();e.preventDefault()}},true);
   db.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);window._dlp=false;dOpen()});dShow()}
+ // the picking tool right under the pencil; held (or right-clicked), the kinds of stop it takes
+ {const pb=T.querySelector('[data-m="pick"]'),db=T.querySelector('[data-m="draw"]'),PK={bus:['bus','Autobus / trolejbus'],tram:['tram','Tramwaj'],rail:['train','Kolej']},pfl=document.createElement('div');pfl.className='tfly';pfl.id='pkFly';pfl.hidden=true;pfl.setAttribute('role','menu');document.body.appendChild(pfl);
+  db.after(pb);pb.setAttribute('aria-haspopup','menu');let lpT=0,lpF=false;
+  window.pShow=()=>{const k=pickKind();pb.innerHTML=ic('listcheck')+'<span class="kd">'+ic(PK[k][0])+'</span>';pb.dataset.tl='Wybieraj przystanki: '+PKN[k];pb.dataset.td='Klikaj kolejne przystanki linii – trasa prowadzi się między nimi sama. Przytrzymaj, aby wybrać, jakie przystanki narzędzie przyjmuje: autobusowe i trolejbusowe, tramwajowe albo kolejowe.';pb.setAttribute('aria-label',pb.dataset.tl);
+   pfl.innerHTML=Object.entries(PK).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===k}" data-v="${v}" class="${v===k?'on':''}">${ic(i)}${t}</button>`).join('')};
+  const pOpen=()=>{pShow();const r=pb.getBoundingClientRect();pfl.hidden=false;pfl.style.left=(innerWidth>700?r.right+6:r.left)+'px';pfl.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
+  pb.addEventListener('pointerdown',e=>{if(e.button)return;lpF=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpF=true;pOpen()},450)});
+  ['pointerup','pointerleave','pointercancel'].forEach(t=>pb.addEventListener(t,()=>clearTimeout(lpT)));
+  pb.addEventListener('click',e=>{if(lpF){lpF=false;e.stopImmediatePropagation();e.preventDefault()}},true);
+  pb.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);lpF=false;pOpen()});
+  pfl.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;pfl.hidden=true;PKSEL=b.dataset.v;try{localStorage.setItem('gdn-pk',PKSEL)}catch(x){}pShow();lpF=false;if(mode!=='pick')pb.click();else say('Narzędzie wybiera teraz przystanki: '+PKN[PKSEL]+'.')};
+  document.addEventListener('click',()=>{pfl.hidden=true});pShow()}
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
  br.after(fdd);fdd.after(ldd);const asw=document.createElement('button');asw.type='button';asw.id='autoSw';asw.className='b flat';asw.setAttribute('role','switch');asw.innerHTML='Autozapis<i class="swk"></i>';asw.onclick=()=>svToggle();top.appendChild(asw);top.appendChild(cs);cs.style.marginLeft='8px';svUI();top.classList.add('lay');
  applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
@@ -2665,4 +2683,13 @@ setTimeout(()=>{try{ziExport()}catch(e){}},2500);   // (the network for Zbiorkom
  document.addEventListener('pointerout',e=>{if(cur&&!(e.relatedTarget&&cur.contains(e.relatedTarget)))release()},true);
  document.addEventListener('pointermove',()=>{if(cur&&cur.hasAttribute('title')){take(cur);if(!T.hidden)show()}},true);
  ['pointerdown','keydown','wheel'].forEach(t=>document.addEventListener(t,vis,true));addEventListener('scroll',vis,true);addEventListener('blur',release)})();
+
+// ---- no suggestions of the browser in the fields (what was typed before): every field set so, also those made later; the sign-in
+// fields that ask for the password manager (username, passwords) keep it
+(function(){const KEEP=/^(username|current-password|new-password|one-time-code)$/;
+ const off=el=>{if(!el||el.type==='password'||KEEP.test(el.getAttribute('autocomplete')||''))return;if(el.getAttribute('autocomplete')!=='off')el.setAttribute('autocomplete','off')};
+ const all=r=>{(r.querySelectorAll?r.querySelectorAll('input,textarea'):[]).forEach(off);if(r.matches&&r.matches('input,textarea'))off(r)};
+ all(document);document.querySelectorAll('form').forEach(f=>f.setAttribute('autocomplete','off'));
+ new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)all(n)}))).observe(document.documentElement,{childList:true,subtree:true});
+ document.addEventListener('focusin',e=>{if(e.target&&e.target.matches&&e.target.matches('input,textarea'))off(e.target)},true)})();
 </script></body></html>
