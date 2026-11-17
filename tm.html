@@ -1240,7 +1240,7 @@ function dragSort(handle,el,kind,key){
   handle.onpointerup=end;handle.onpointercancel=end} // a card is dragged once held a moment without moving (a click or a scroll stays what it is)
  if(hold){const go=handle.onpointerdown;handle.onpointerdown=e=>{if(e.button||e.target.closest('button,input,select,textarea,a,label,.vchip,.nt'))return;const x0=e.clientX,y0=e.clientY;
   const end=()=>{clearTimeout(t);removeEventListener('pointermove',mv,true);removeEventListener('pointerup',end,true);removeEventListener('pointercancel',end,true)},
-   mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>6)end()},t=setTimeout(()=>{end();el.classList.add('lift');go(e);const off=()=>{el.classList.remove('lift');removeEventListener('pointerup',off,true)};addEventListener('pointerup',off,true)},280);
+   mv=ev=>{if(Math.hypot(ev.clientX-x0,ev.clientY-y0)>6)end()},t=setTimeout(()=>{end();el.classList.add('lift');go(e);const off=()=>{el.classList.remove('lift');removeEventListener('pointerup',off,true)};addEventListener('pointerup',off,true)},180);
   addEventListener('pointermove',mv,true);addEventListener('pointerup',end,true);addEventListener('pointercancel',end,true)}}
 }
 function dragStopRow(handle,row,l,i){
@@ -2622,7 +2622,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
    ifl.innerHTML=Object.entries(IK).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===ik.value}" data-v="${v}" class="${v===ik.value?'on':''}">${ic(i)}${t}</button>`).join('')};
   const ikOpen=()=>{ikShow();const r=ib.getBoundingClientRect();ifl.hidden=false;ifl.style.left=(innerWidth>700?r.right+6:r.left)+'px';ifl.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
   let lpT=0,lpF=false;ib.setAttribute('aria-haspopup','menu');
-  ib.addEventListener('pointerdown',e=>{if(e.button)return;lpF=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpF=true;ikOpen()},450)});
+  ib.addEventListener('pointerdown',e=>{if(e.button)return;lpF=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpF=true;ikOpen()},250)});
   ['pointerup','pointerleave','pointercancel'].forEach(t=>ib.addEventListener(t,()=>clearTimeout(lpT)));
   ib.addEventListener('click',e=>{if(lpF){lpF=false;e.stopImmediatePropagation();e.preventDefault()}},true);
   ib.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);lpF=false;ikOpen()});
@@ -2632,7 +2632,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
  {const db=T.querySelector('[data-m="draw"]');let lpT=0;window._dlp=false;db.setAttribute('aria-haspopup','menu');
   window.dShow=()=>{const k=KIND[amCur()]||KIND.tram;db.innerHTML=ic('pencil')+'<span class="kd">'+ic(k[0])+'</span>';db.dataset.tl='Rysuj linię: '+k[1].replace('Linia ','');db.dataset.td='Klikaj kolejne punkty trasy na mapie. Przytrzymaj, aby wybrać rodzaj linii: tramwajową, autobusową, trolejbusową albo kolejową.';db.setAttribute('aria-label',db.dataset.tl)};
   const dOpen=()=>{amShow();const r=db.getBoundingClientRect();fly.hidden=false;fly.style.left=(innerWidth>700?r.right+6:r.left)+'px';fly.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
-  db.addEventListener('pointerdown',e=>{if(e.button)return;window._dlp=false;clearTimeout(lpT);lpT=setTimeout(()=>{window._dlp=true;dOpen()},450)});
+  db.addEventListener('pointerdown',e=>{if(e.button)return;window._dlp=false;clearTimeout(lpT);lpT=setTimeout(()=>{window._dlp=true;dOpen()},250)});
   ['pointerup','pointerleave','pointercancel'].forEach(t=>db.addEventListener(t,()=>clearTimeout(lpT)));
   db.addEventListener('click',e=>{if(window._dlp){window._dlp=false;e.stopImmediatePropagation();e.preventDefault()}},true);
   db.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);window._dlp=false;dOpen()});dShow()}
@@ -2642,7 +2642,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
   window.pShow=()=>{const k=pickKind();pb.innerHTML=ic('listcheck')+'<span class="kd">'+ic(PK[k][0])+'</span>';pb.dataset.tl='Wybieraj przystanki: '+PKN[k];pb.dataset.td='Klikaj kolejne przystanki linii – trasa prowadzi się między nimi sama. Przytrzymaj, aby wybrać, jakie przystanki narzędzie przyjmuje: autobusowe i trolejbusowe, tramwajowe albo kolejowe.';pb.setAttribute('aria-label',pb.dataset.tl);
    pfl.innerHTML=Object.entries(PK).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===k}" data-v="${v}" class="${v===k?'on':''}">${ic(i)}${t}</button>`).join('')};
   const pOpen=()=>{pShow();const r=pb.getBoundingClientRect();pfl.hidden=false;pfl.style.left=(innerWidth>700?r.right+6:r.left)+'px';pfl.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
-  pb.addEventListener('pointerdown',e=>{if(e.button)return;lpF=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpF=true;pOpen()},450)});
+  pb.addEventListener('pointerdown',e=>{if(e.button)return;lpF=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpF=true;pOpen()},250)});
   ['pointerup','pointerleave','pointercancel'].forEach(t=>pb.addEventListener(t,()=>clearTimeout(lpT)));
   pb.addEventListener('click',e=>{if(lpF){lpF=false;e.stopImmediatePropagation();e.preventDefault()}},true);
   pb.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);lpF=false;pOpen()});
