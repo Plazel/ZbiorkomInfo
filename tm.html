@@ -1944,12 +1944,21 @@ map.on('contextmenu',e=>{if(mode==='infra'){L.DomEvent.preventDefault(e.original
 // drawing a track or a road by dragging over the map, as with a pencil (besides clicking its points one by one): a point every few
 // pixels, the first and the last caught on the tracks and roads already there; while the drawing tool is on, the map does not move
 // under the mouse – held Space lets it be dragged
-{const kd=()=>$('#infraKind').value,end=()=>{if(!FH.on)return;const f=FH.on;FH.on=null;if(f.moved){const last=draft.pop();draft.push(snapInfra(last,kd(),null,false));drawDraft();FH.swallow=true;setTimeout(()=>{FH.swallow=false},60)}};
+{const kd=()=>$('#infraKind').value,end=()=>{if(!FH.on)return;const f=FH.on;FH.on=null;if(f.moved){fhSimplify(f.i0);const last=draft.pop();draft.push(snapInfra(last,kd(),null,false));drawDraft();FH.swallow=true;setTimeout(()=>{FH.swallow=false},60)}};
  map.on('mousedown',e=>{if(mode!=='infra'||infraEditId||FH.pan||e.originalEvent.button!==0)return;FH.on={px:e.containerPoint,ll:[e.latlng.lat,e.latlng.lng],moved:false}});
- map.on('mousemove',e=>{const f=FH.on;if(!f)return;if(e.containerPoint.distanceTo(f.px)<7)return;if(!f.moved){f.moved=true;draft.push(snapInfra(f.ll,kd(),null,draft.length===0))}f.px=e.containerPoint;draft.push([e.latlng.lat,e.latlng.lng]);drawDraft()});
+ map.on('mousemove',e=>{const f=FH.on;if(!f)return;if(e.containerPoint.distanceTo(f.px)<7)return;if(!f.moved){f.moved=true;f.i0=draft.length;draft.push(snapInfra(f.ll,kd(),null,draft.length===0))}f.px=e.containerPoint;draft.push([e.latlng.lat,e.latlng.lng]);drawDraft()});
  map.on('mouseup',end);document.addEventListener('mouseup',end,true);
  addEventListener('keydown',e=>{if(e.code==='Space'&&mode==='infra'&&!FH.pan&&!/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||'')){e.preventDefault();FH.pan=true;map.dragging.enable();map.getContainer().style.cursor='grab'}});
  addEventListener('keyup',e=>{if(e.code==='Space'&&FH.pan){FH.pan=false;fhDrag();map.getContainer().style.cursor=mode==='nav'||mode==='edit'||mode==='move'?'':'crosshair'}})}
+// narysowany płynnie odcinek: z setek punktów zostają początek, koniec i tylko te w środku, bez których kształt by się zmienił
+// (Douglas-Peucker z tolerancją ok. 6 px na ekranie, co najmniej 4 m), a punkty nie leżą bliżej niż ok. 25 px od siebie
+function fhSimplify(i0){if(!(i0>=0)||draft.length-i0<3)return;const P=draft.slice(i0),pr=P.map(q=>map.latLngToContainerPoint(q)),n=P.length,keep=new Uint8Array(n);keep[0]=keep[n-1]=1;
+ const mpp=40075016.686*Math.cos(map.getCenter().lat*Math.PI/180)/Math.pow(2,map.getZoom()+8),tol=Math.max(6,4/mpp),st=[[0,n-1]];
+ while(st.length){const [a,b]=st.pop(),A=pr[a],B=pr[b],dx=B.x-A.x,dy=B.y-A.y,L2=dx*dx+dy*dy;let md=0,mi=-1;
+  for(let i=a+1;i<b;i++){const t=L2?Math.max(0,Math.min(1,((pr[i].x-A.x)*dx+(pr[i].y-A.y)*dy)/L2)):0,d=Math.hypot(pr[i].x-A.x-t*dx,pr[i].y-A.y-t*dy);if(d>md){md=d;mi=i}}
+  if(mi>0&&md>tol){keep[mi]=1;st.push([a,mi],[mi,b])}}
+ const out=[];let lp=null;for(let i=0;i<n;i++){if(!keep[i])continue;if(lp&&i<n-1&&pr[i].distanceTo(lp)<25)continue;out.push(P[i]);lp=pr[i]}
+ draft.splice(i0,n,...out)}
 function fhDrag(){if(mode==='infra'&&!infraEditId&&!FH.pan)map.dragging.disable();else map.dragging.enable()}
 document.addEventListener('keydown',e=>{if(mode!=='infra'||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(e.key==='Enter')commitInfra();if(e.key==='Escape'){if(infraEditId){infraEditSet(null)}draft=[];drawDraft()}if(e.key==='Backspace'&&!infraEditId){e.preventDefault();if(draft.length){draft.pop();drawDraft();say(draft.length?'Cofnięto ostatni punkt.':'Usunięto wszystkie punkty.')}}});
 document.addEventListener('keydown',e=>{if(e.key!=='Backspace'||mode!=='draw'||busy||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')||document.querySelector('.mback'))return;
