@@ -1825,7 +1825,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794903659;
+const APP_BUILD=1794903731;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5581,7 +5581,7 @@ function lineSigns(html,lines){const set=new Set(lines||[]),deLn=/^(ber|ham)/.te
   const find=(n,kind)=>{const c=here.filter(r=>r.n===n);if(!c.length)return null;const want=kind&&/Tram/.test(kind)?['tram']:kind&&(/Bus|Autobus/.test(kind)||SEV_W.test(kind))?['repl','bus','night','exp']:null;
     return want?c.find(r=>want.includes(r.t))||null:c.find(r=>r.t!=='repl')||c[0]};   // (a bus 18 replacing tram 18 that the timetable lacks: the number, not the tram's sign)
   const tok='(?:[A-Z]{1,2}-?\\d{1,3}[A-Z]?|\\d{1,3}[A-Z]?)';html=html.replace(/\bl\.(?=[A-Z]{0,2}-?\d)/g,'l. ');   // ("l.106", "l.E-2": the lines; Warszawa's E-2 with its hyphen)
-  return html.replace(new RegExp('(?:\\b('+VEH_W+'|'+KEEP_W+')\\s+)?(?<![\\w./:#&-])(?<!\\d\\.\\s?)((?:'+tok+')(?:(?:\\s*,\\s*|\\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\\.)\\s+|\\s+)(?:'+tok+'))*)(?![\\d.:]\\d|:\\d|\\.\\s?\\d|-\\w)','g'),(m,veh,grp,off,all)=>{
+  return html.replace(new RegExp('(?:\\b('+VEH_W+'|'+KEEP_W+')\\s+)?(?<![\\w./:#&-])(?<!\\d\\.\\s?)((?:'+tok+')(?:(?:\\s*,\\s*|\\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\\.)\\s+|\\s+)(?:'+tok+'))*)(?![\\d.:]\\d|:\\d|\\.\\s?\\d|-\\w|\\s*(?:min\\b|min\\.|minut|sek|godz|km\\b|m\\b|%|zł|h\\b))','g'),(m,veh,grp,off,all)=>{
     const parts=grp.split(/(\s*,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)/);let any=false;
     const sepRe=/^(\s*,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)$/,toks=parts.filter(p=>!sepRe.test(p));
     const list=toks.length>=2&&toks.filter(p=>find(p,null)).length>=Math.max(2,toks.length*.6);   // (a list of two or more of the city's line numbers: lines, keyword or not)
@@ -5911,7 +5911,7 @@ function alertBar(){const el=document.getElementById('alertBar');if(!el)return;c
 const AB_ROT={t:0,k:0,open:false};
 // a notice easier to read: its times in bold, a sign never parted from the comma after it, the heading not repeated as its first line
 function alertFmt(h){h=h.replace(/\[([^\]\n]+)\]\((https?:\/\/[^)\s]+)\)/g,(m,t,u)=>`<a href="${u}" target="_blank" rel="noopener">${t}</a>`).replace(/\*\*\s*(.+?)\s*\*\*/g,'<b>$1</b>');   // (the source's bold and links: **…**, [text](url))
-  return h.replace(/(?<![\d:>.\/-])(\d{1,2}:\d{2})(?![\d:])/g,'<b>$1</b>')
+  return h.replace(/(?<![\d:>.\/-])(\d{1,2}:\d{2}(?:\s*[-–—]\s*\d{1,2}:\d{2})?)(?![\d:])/g,'<b>$1</b>')   // (a span of hours bold as a whole: "12:00-21:00")
   .replace(/(<(span|b|a) class="chip[^"]*"[^>]*>.*?<\/\2>)([,.;:)])/g,'<span class="nw">$1$3</span>')}
 // the notice's period under its heading ("od 9.11, 9:50 do 12.12, 23:59"; no end: "do odwołania"), when the source gives it
 // a notice in another language than the page's: a button by its period translating it (the browser's own translator), once
