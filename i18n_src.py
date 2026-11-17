@@ -843,6 +843,7 @@ ROWS = [
 ("Brak aktualności", "No news", "Keine Neuigkeiten", "Žiadne aktuality", "Žádné aktuality"),
 ("Przewoźnik nie opublikował teraz żadnych aktualności.", "The operator has no news at the moment.", "Der Betreiber hat derzeit keine Neuigkeiten.", "Dopravca momentálne nezverejnil žiadne aktuality.", "Dopravce momentálně nezveřejnil žádné aktuality."),
 ("Tymczasowa zmiana trasy", "Temporary route change", "Vorübergehende Linienänderung", "Dočasná zmena trasy", "Dočasná změna trasy"),
+("Trasa zmieniona", "Route changed", "Linienweg geändert", "Trasa zmenená", "Trasa změněna"),
 ]
 
 WEEKDAYS = {
