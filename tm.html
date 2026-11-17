@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TransitMaker – Gdańsk</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NetworkMaker – Gdańsk</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27%232456d6%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cpath%20d%3D%27M5%2019c0-6%2014-2%2014-9%27%2F%3E%3Ccircle%20cx%3D%275%27%20cy%3D%2719%27%20r%3D%272%27%2F%3E%3Ccircle%20cx%3D%2719%27%20cy%3D%277%27%20r%3D%272%27%2F%3E%3C%2Fsvg%3E">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
 <style>
@@ -180,7 +180,9 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 .tfly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}.tfly[hidden]{display:none}.tfly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}.tfly button:hover{background:var(--tab)}.tfly button.on{font-weight:700}
 #tools .b{position:relative}#tools .b .kd{position:absolute;right:2px;bottom:2px;display:flex;background:var(--bg);border-radius:2px}#tools .b .kd svg{width:11px;height:11px}#tools .b.on .kd{background:transparent}
 #sideFoot{display:flex;align-items:center;gap:6px;padding:6px 8px;border-top:1px solid var(--bd);background:var(--panel)}#sideFoot .b{width:36px;height:36px;padding:0;justify-content:center}#sideFoot .b svg{width:20px;height:20px;margin:0}
-.card .lnh{align-items:center}#lines .card[data-lid]{user-select:none}#lines .card.lift{box-shadow:0 6px 18px rgba(0,0,0,.18);cursor:grabbing}.card .lnh .dg{flex:none;margin:0 -2px 0 -6px;width:24px;height:36px;padding:0;justify-content:center}
+.card .lnh{align-items:center}
+/* the cards of the lines in the list: one row – the number, the route, the tools on the right */
+#lines .card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:6px;padding:5px 6px 5px 6px;margin-bottom:4px}#lines .card>.lnh{gap:9px;min-width:0}#lines .card .nb{min-width:0;padding:0}#lines .card .tools{margin-top:0;gap:0}#lines .card .tools .b{width:28px;height:28px;padding:0;justify-content:center}#lines .card .tools svg{width:16px;height:16px}#lines .card>:not(.lnh):not(.tools){grid-column:1/-1}#lines .card .route{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#lines .card .meta{font-size:11.5px}#lines .card[data-lid]{user-select:none}#lines .card.lift{box-shadow:0 6px 18px rgba(0,0,0,.18);cursor:grabbing}.card .lnh .dg{flex:none;margin:0 -2px 0 -6px;width:24px;height:36px;padding:0;justify-content:center}
 .lnModal{width:min(660px,100%)!important}.lnModal .mb{overflow:auto}.lnEd .lnh{margin-bottom:4px}.lnEd .lnSec{padding:14px 0 6px;border-top:1px solid var(--bd2);margin-top:12px}.lnEd .lnSec>h4{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}.lnEd .vwar .vrow .vn{display:none}
 .stTop{display:flex;gap:6px;margin-bottom:8px}.stTop .sq{position:relative;flex:1;min-width:0}.stTop .sq input{width:100%;padding-left:32px;height:36px}.stTop .sqi{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mut);display:inline-flex;pointer-events:none}.stTop .b.ico{width:36px;height:36px;padding:0;justify-content:center;flex:none}
 #cnt{margin:0 0 6px!important}#cnt:empty{display:none}.stEmpty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:56px 20px;color:var(--mut);font-size:14px;line-height:1.45}.stEmpty svg{width:44px;height:44px;margin:0;stroke-width:1.6}.stEmpty div{color:var(--fg);font-weight:600;max-width:260px}.stEmpty small{font-size:12px}
@@ -208,9 +210,12 @@ body{-webkit-user-select:none;user-select:none}input,textarea,select,[contentedi
 @media(max-width:700px){#tools{flex-direction:row;flex-wrap:wrap;justify-content:center;border-right:0;border-bottom:1px solid var(--bd)}#tools .tsep{width:0;height:28px;border-top:0;border-left:1px solid var(--bd);margin:0 4px}}
 #appTip{position:fixed;z-index:6000;max-width:min(300px,calc(100vw - 12px));padding:6px 10px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none;white-space:pre-line}#appTip[hidden]{display:none}
 body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--panel)!important}body.mapMv #side,body.mapMv #tools{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--bg)!important}
-</style></head><body>
+#needLand{display:none}
+/* a small screen held upright: the program does not fit – a word instead of it */
+@media (orientation:portrait) and (max-width:900px){#needLand{display:flex;position:fixed;inset:0;z-index:99999;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;background:var(--bg);color:var(--fg);font-size:16px;font-weight:600;line-height:1.45}#needLand div{max-width:320px}body>*:not(#needLand){display:none!important}}
+</style></head><body><div id="needLand" role="alert"><svg viewBox="0 0 24 24" width="52" height="52" aria-hidden="true"><path d="M12 2.8 1.6 21h20.8z" fill="#c4161c"/><path d="M12 9.2v5.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="#fff"/></svg><div>Aplikacja NetworkMaker wymaga do prawidłowego działania większego wyświetlacza w orientacji poziomej</div></div>
 <header id="top">
- <div class="brand"><i data-ic="route"></i><b>TransitMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
+ <div class="brand"><i data-ic="route"></i><b>NetworkMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
  <div class="hist"><button class="b ico" id="hUndo" title="Cofnij (Ctrl+Z)"><i data-ic="undo"></i></button><button class="b ico" id="hRedo" title="Ponów (Ctrl+Y)"><i data-ic="redo"></i></button></div>
  <span class="grow"></span>
  <span id="fChip"></span>
@@ -284,7 +289,6 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
  <div class="bar2 row" id="routebar"><span class="lab"><i data-ic="route"></i>Trasa</span><select id="amode" class="grow" title="Rodzaj linii – decyduje, po czym prowadzona jest trasa (rysowanie i wybór przystanków)"><option value="tram">Linia tramwajowa</option><option value="street">Linia autobusowa</option><option value="rail">Linia kolejowa</option></select><button class="b ico" id="strictTr" title="Przyciąganie: gdy włączone, linie są przyciągane i dopasowywane do torów/drogi (zależnie od rodzaju linii). Po wyłączeniu można rysować linię w dowolnym miejscu mapy."><i data-ic="magnet"></i></button><button class="b ico" id="closedTr" title="Zamknięte drogi: gdy włączone, trasy po ulicach (linie autobusowe) mogą prowadzić także po odcinkach zamkniętych dla ruchu – budowa, zakaz wjazdu, drogi prywatne. Takie odcinki rysowane są czerwoną linią przerywaną. Pierwsze użycie pobiera dane dróg z Overpass."><i data-ic="closed"></i></button><button class="b ico" id="owTr" title="Ignoruj jednokierunkowość: gdy włączone, trasy po ulicach (linie autobusowe) mogą prowadzić także pod prąd po ulicach jednokierunkowych (ronda pozostają jednokierunkowe). Trasę liczy wtedy lokalny routing na danych dróg z Overpass (tak jak przy „Zamknięte drogi”) – pierwsze użycie pobiera dane. Zwykły routing (OSRM) nie pozwala wyłączyć jednokierunkowości."><i data-ic="twoway"></i></button></div>
  <div class="bar2 row" id="stopbar" style="display:none"><span class="lab"><i data-ic="pin"></i>Rodzaj</span><select id="stopKind" class="grow" title="Rodzaj dodawanego przystanku"><option value="bus">Przystanek autobusowy</option><option value="tram">Przystanek tramwajowy</option><option value="both">Przystanek autobusowo-tramwajowy</option><option value="rail">Przystanek kolejowy</option></select><label class="chk" title="Na torze dwunitkowym dodaje dwa przystanki – po jednym na kierunek"><input type="checkbox" id="stopDbl">Podwójny</label></div>
  <div class="pane on" id="p1">
-  <div class="sech"><i data-ic="route"></i>Linie<span class="grow"></span><button class="b flat" id="toggleAll" title="Ukryj wszystkie linie"></button></div>
   <div id="lines"></div>
  </div>
  <div class="pane" id="p2">
@@ -295,12 +299,11 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
   <div class="secb" style="padding:0">
 
    <span hidden style="display:none"><select id="infraKind"><option value="tram">Tor tramwajowy</option><option value="rail">Tor kolejowy</option><option value="street">Droga</option></select><button id="infraStart"></button><button id="infraDone"></button><button id="infraCancel"></button></span>
-   <div class="row wrap" style="margin-top:6px"><label class="chk"><input type="checkbox" id="infraRound"><i data-ic="route"></i>Zaokrąglaj rogi automatycznie</label><span class="grow"></span><span class="small" style="margin:0">promień</span><input type="number" id="infraR" min="0" max="500" step="5" style="width:64px"><span class="small" style="margin:0">m</span></div>
-   <div class="row wrap" style="margin-top:6px"><label class="chk"><input type="checkbox" id="infraDbl"><i data-ic="route"></i>Tor podwójny (dwie nitki) – odznacz, by rysować pojedynczy</label></div>
+   <span hidden style="display:none"><input type="checkbox" id="infraRound"><input type="number" id="infraR"><input type="checkbox" id="infraDbl"></span>
    <div id="infraList"></div>
   </div>
  </div>
- <div id="sideFoot"><button class="b ico flat" id="addL" type="button" title="Nowa linia" aria-label="Nowa linia" aria-haspopup="menu"><i data-ic="plus"></i></button></div>
+ <div id="sideFoot"><button class="b ico flat" id="addL" type="button" title="Nowa linia" aria-label="Nowa linia" aria-haspopup="menu"><i data-ic="plus"></i></button><span class="grow"></span><button class="b ico flat" id="toggleAll" type="button" title="Ukryj wszystkie linie"></button></div>
  <details id="diag"><summary><i data-ic="activity"></i>Diagnostyka</summary><div class="secb"><textarea id="dbg" readonly style="height:140px;font:11px monospace"></textarea><div><button class="b" id="cpDbg"><i data-ic="copy"></i>Kopiuj</button></div></div></details>
 </div>
 <div id="map"></div>
@@ -518,7 +521,7 @@ function buildGraph(ways){
  g.br=bridge(g,12);if(g.br){g.comp=new Map();g.size=[];components(g)}
  for(const id of adj.keys())if(id>=1e12)g.keep.add(g.comp.get(id));
  return g}
-S.infraRound=S.infraRound||{on:true,r:25};
+S.infraRound={on:true,r:100};
 function roundPts(pts,r){
  if(!(r>0)||pts.length<3)return pts;
  const out=[pts[0]];
@@ -680,6 +683,7 @@ async function route(a,b,m,maxd,draw){
  const r=await osrm(a,b);if(nf)r._nf=nf;if(fb)r._fb=fb; // wynik awaryjny (brak danych o drogach) – segRoute nie zapisuje go w pamięci podręcznej
  return r}
 const selLine=()=>S.lines.find(l=>l.id===S.sel);
+const FH={on:null,swallow:false,pan:false};
 map.on('click',e=>clickAt([e.latlng.lat,e.latlng.lng]));
 function nearOn(pts,ll){let best=null,bd=1e9;const px=ll[1]*RX,py=ll[0]*R0;
  for(let i=1;i<pts.length;i++){const x0=pts[i-1][1]*RX,y0=pts[i-1][0]*R0,dx=pts[i][1]*RX-x0,dy=pts[i][0]*R0-y0,L2=dx*dx+dy*dy;let t=L2?((px-x0)*dx+(py-y0)*dy)/L2:0;t=Math.max(0,Math.min(1,t));const d=Math.hypot(px-(x0+t*dx),py-(y0+t*dy));if(d<bd){bd=d;best=[(y0+t*dy)/R0,(x0+t*dx)/RX]}}
@@ -697,7 +701,8 @@ async function clickAt(ll){
   const l=selLine();if(l&&!l.auto&&l.segs.length){const rs=routeStops(l);ids.forEach(id=>{const ix=rs.indexOf(id);if(ix>=0&&!l.stops.includes(id)){let at=0;for(let j=ix-1;j>=0;j--){const p=l.stops.indexOf(rs[j]);if(p>=0){at=p+1;break}}l.stops.splice(at,0,id)}})}}save();drawStops();renderStops();renderLines();
   const ls_=S.stops[S.stops.length-1],nss=ls_?(ls_.pair?S.stops.filter(x=>x.pair===ls_.pair):[ls_]):[],nv=await askPrompt('Nazwa przystanku:','',{title:nss.length>1?'Nowe przystanki (po jednym na kierunek)':'Nowy przystanek',ok:'Zapisz'});
   if(nv&&nv.trim()&&nss.length){nss.forEach(ns=>{ns.name=nv.trim();syncNum(ns)});save();drawStops();renderStops();renderLines()}return}
- if(mode==='infra'){if(infraEditId)return;draft.push(snapInfra(ll,$('#infraKind').value,null,draft.length===0));drawDraft();return}
+
+ if(mode==='infra'){if(infraEditId||FH.swallow)return;draft.push(snapInfra(ll,$('#infraKind').value,null,draft.length===0));drawDraft();return}
  if(mode!=='draw')return;
  const l=selLine();if(!l){say('Najpierw dodaj i zaznacz linię.');return}l.hidden=false;l.auto=false;
  if(busy)return;const am=curAm(),mm=am==='auto'?'tramfirst':am;
@@ -1273,7 +1278,7 @@ function renderLines(){syncAmode();syncVariants();
  const box=$('#lines');box.innerHTML='';
  {const ids=new Set(S.stops.map(s=>s.id));S.lines.forEach(l=>{if(l.stops.some(id=>!ids.has(id)))l.stops=l.stops.filter(id=>ids.has(id))})}
  const cats=catList();S.collapsed=S.collapsed||{};
- {const any=S.lines.some(l=>!l.hidden),t=$('#toggleAll');t.innerHTML=ic(any?'eyeoff':'eye')+(any?'Ukryj wszystkie':'Pokaż wszystkie');t.title=any?'Ukryj wszystkie linie':'Pokaż wszystkie linie';t.disabled=!S.lines.length}
+ {const any=S.lines.some(l=>!l.hidden),t=$('#toggleAll');t.innerHTML=ic(any?'eye':'eyeoff');t.title=any?'Ukryj wszystkie linie':'Pokaż wszystkie linie';t.setAttribute('aria-label',t.title);t.disabled=!S.lines.length}
  if(!S.lines.length)box.innerHTML='<div class="small">Brak linii. Dodaj ją przyciskiem + na dole panelu.</div>';
  cats.forEach(cn=>{
   const ls=S.lines.filter(l=>(l.cat||'')===cn&&!l.par),lsAll=S.lines.filter(l=>(l.cat||'')===cn),showH=cats.length>1||cn,col=showH&&!!S.collapsed[cn];
@@ -1328,7 +1333,7 @@ function lineCard(l,M){
  const vi=l.par?S.lines.filter(x=>x.par===l.par).indexOf(l):-1,vtag=l.par?`<div class="small" style="margin:0 0 2px;font-weight:700">${varLabel(l)}</div>`:'';
  const setp=M&&!l.par?`<div class="setg"><span class="lab">${ic('num',14)}Numer</span><input class="num2" maxlength="4" value="${esc(l.num)}"><span class="lab">${ic('palette',14)}Kolor</span><div class="cp"><div class="row"><button type="button" class="cps${ui.cp?' on':''}" title="Wybierz kolor (HSB)" style="--c:${l.color}"><i></i></button><input class="cpx" value="${l.color}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Kod koloru, np. #2456d6"></div><div class="cpp"${ui.cp?'':' hidden'}><div class="cpsb"><b></b></div><div class="cph"><b></b></div><div class="cpr"></div></div></div><span class="lab">${ic('sliders',14)}Grubość</span><div class="row"><input type="range" class="rw" min="2" max="14" value="${l.w||5}" style="flex:1"><b class="wv">${l.w||5}</b></div><span class="lab">${ic('dash',14)}Styl linii</span><div class="seg rs">${[['solid','',' ciągła'],['dashed','9 6','przerywana'],['dotted','0.1 7','kropkowana']].map(([v,d,t])=>`<button type="button" data-v="${v}" title="${t.trim()}"${(l.style||'solid')===v?' class="on"':''}><svg width="56" height="14" viewBox="0 0 56 14"><line x1="4" y1="7" x2="52" y2="7" stroke="currentColor" stroke-width="4" stroke-linecap="${v==='solid'?'butt':'round'}"${d?` stroke-dasharray="${d}"`:''}/></svg></button>`).join('')}</div><span class="lab">${ic('shapes',14)}Kształt numeru</span><div class="seg rsh">${[['square','0','kwadrat'],['round','12px','koło']].map(([v,r,t])=>`<button type="button" data-v="${v}" title="${t}"${(l.shape||'square')===v?' class="on"':''}><span class="badge" style="background:${l.color};color:${txt(l.color)};border-radius:${r}">${esc(l.num||'1')}</span></button>`).join('')}</div><span class="lab">${ic('tag',14)}Kategoria</span><select class="lc"><option value="">Bez kategorii</option>${S.cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}<option value="__new">+ Nowa kategoria…</option></select></div>`:'';
  const note=ui.note?`<textarea class="nt" rows="3" placeholder="Komentarz do linii…">${esc(l.note||'')}</textarea>`:'';
- c.innerHTML=`<div class="row lnh"><div class="nb" style="background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}">${esc(l.num)}</div><div class="grow">${vtag}<div class="route">${route}</div><div class="meta">${vars.length?`<span>${vars.length} ${vars.length===1?'wariant':vars.length<5?'warianty':'wariantów'}</span><span>·</span>`:''}<span style="display:inline-flex;align-items:center;gap:4px">${ic('pin',13)}${l.stops.length} przyst.</span><span>·</span><span style="display:inline-flex;align-items:center;gap:4px">${ic('ruler',13)}${fmtKm(lineLen(l))}</span></div></div></div>
+ c.innerHTML=`<div class="row lnh"><div class="nb" style="background:${l.color};color:${txt(l.color)};${M?bst(l,48,20,'10px'):bst(l,34,15,'7px')}">${esc(l.num)}</div><div class="grow">${vtag}<div class="route">${route}</div><div class="meta">${vars.length?`<span>${vars.length} ${vars.length===1?'wariant':vars.length<5?'warianty':'wariantów'}</span><span>·</span>`:''}<span style="display:inline-flex;align-items:center;gap:4px">${ic('pin',13)}${l.stops.length} przyst.</span><span>·</span><span style="display:inline-flex;align-items:center;gap:4px">${ic('ruler',13)}${fmtKm(lineLen(l))}</span></div></div></div>
  ${M?`<div class="lnSec"><h4>${ic('palette',14)}Wygląd</h4>${setp}</div><div class="lnSec"><h4>${ic('branch',14)}Warianty i przystanki</h4>${chips}${list}</div><div class="lnSec"><h4>${ic('clock',14)}Rozkład jazdy</h4><button class="b ttb${l.tt||l.tto?' act':''}" type="button">${ic('clock')}Edytuj rozkład jazdy</button></div>`:`<div class="tools"><button class="b ico flat eye" title="Pokaż/ukryj linię na mapie">${ic(l.hidden?'eyeoff':'eye')}</button>${l.par?'':`<button class="b ico flat gear" title="Ustawienia linii: wygląd, warianty i przystanki, rozkład jazdy">${ic('gear')}</button>`}<button class="b ico flat nbt${ui.note||l.note?' act':''}" title="${l.note?esc(l.note.slice(0,120)):'Dodaj komentarz do linii'}">${ic('message')}</button><button class="b ico flat del" title="Usuń linię">${ic('trash')}</button></div>${note}`}`;
  if(l.hidden)c.style.opacity=.55;
  if(M)c.className='lnEd';else c.onclick=()=>{if(!selHere)S.sel=l.id;renderLines();redraw()};
@@ -1365,7 +1370,7 @@ function lineCard(l,M){
  if(q('.vbt'))q('.vbt').onclick=e=>{e.stopPropagation();const open=ui.var&&selHere;ui.var=ui.lst=!open;if(!selHere){S.sel=l.id;renderLines();redraw()}else renderLines()};
  if(q('.del'))q('.del').onclick=async e=>{e.stopPropagation();const nv=l.par?0:S.lines.filter(x=>x.par===l.id).length;if(await askConfirm(l.par?'Usunąć ten wariant linii '+l.num+'?':'Usunąć linię '+l.num+(nv?' wraz z jej wariantami ('+nv+')':'')+'?',{title:l.par?'Usuń wariant':'Usuń linię',ok:'Usuń',danger:true})){S.lines=S.lines.filter(x=>x!==l&&x.par!==l.id);if(S.sel===l.id)S.sel=null;save();renderLines();redraw()}};
  if(M&&!l.par){const num=q('.num2'),rw=q('.rw'),lc=q('.lc'),nb=q('.nb');
-  num.oninput=()=>{if(num.value.length>4)num.value=num.value.slice(0,4);l.num=num.value;nb.textContent=num.value;nb.setAttribute('style',`background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}`);document.querySelectorAll('#lines [data-lid="'+l.id+'"] .nb').forEach(x=>{x.textContent=num.value;x.setAttribute('style',nb.getAttribute('style'))});
+  num.oninput=()=>{if(num.value.length>4)num.value=num.value.slice(0,4);l.num=num.value;nb.textContent=num.value;nb.setAttribute('style',`background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}`);document.querySelectorAll('#lines [data-lid="'+l.id+'"] .nb').forEach(x=>{x.textContent=num.value;x.setAttribute('style',`background:${l.color};color:${txt(l.color)};${bst(l,34,15,'7px')}`)});
    // pełne przerysowanie mapy i zapis dopiero po chwili bezruchu (opóźnienie dopasowane do kosztu poprzedniego przerysowania), a także przy opuszczeniu pola
    later('num:'+l.id,numDelay(),()=>{const t=performance.now();save();redraw();_numCost=performance.now()-t})};
   num.onblur=()=>flushLater('num:'+l.id);num.onchange=()=>flushLater('num:'+l.id);
@@ -1468,8 +1473,8 @@ $('#reloadStops').onclick=async()=>{
  say('Wczytano od nowa '+S.stops.length+' przystanków z OSM.'+(aff.length?' Przypięto do nich linie: '+aff.length+'.':'')+(lost?' Bez odpowiednika (usunięte z linii): '+lost+'.':''))};
 
 const MSG={move:'Przeciągaj przystanki na mapie. Przystanek zostaje przypisany do swoich linii; przystanki tramwajowe i kolejowe przyciągają się do toru. Przy scalonych nazwach przesuwana jest cała grupa.',edit:'Zaznacz linię narysowaną ręcznie. Kliknij linię w miejscu bez punktu, aby dodać punkt. Przeciągaj punkty, aby zmienić przebieg. Prawy przycisk myszy na punkcie usuwa go.',nav:'Tryb wyboru. Najedź na przystanek, aby zmienić jego nazwę lub numer albo dodać go do linii.',draw:'Klikaj na mapie kolejne punkty trasy. Sposób prowadzenia (tory, ulice, swobodnie) wybierasz listą „Trasa”.',stop:'Kliknij na mapie, aby dodać nowy przystanek.',pick:'Klikaj przystanki w kolejności przejazdu – trafiają do zaznaczonej linii. Trasa linii wyznaczy się automatycznie.',infra:'Klikaj kolejne punkty nowego toru lub drogi (rodzaj: przytrzymaj ołówek). Odcinek zapisuje się sam po wybraniu innego narzędzia, a także po Enter lub prawym przycisku myszy; Esc anuluje.'};
-document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(vs&&b.dataset.m!=='nav')vs=null;if(mode==='infra'&&b.dataset.m!=='infra'){if(draft.length>1)commitInfra();draft=[];drawDraft();infraEditId=null}mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));map.getContainer().style.cursor=(mode==='nav'||mode==='edit'||mode==='move')?'':'crosshair';drawStops();drawEdit();drawInfraEdit();say(MSG[mode])});
-function applyTab(t){{const sf=document.getElementById('sideFoot');if(sf)sf.style.display=t==='t1'?'':'none'}document.querySelectorAll('#modebar [data-t]').forEach(b=>b.style.display=b.dataset.t===t?'':'none');{const rb=$('#routebar'),tg=document.querySelector('#tools .tgrp');if(rb.dataset.moved){rb.style.display='none';if(tg)tg.style.display=t==='t1'?'contents':'none'}else rb.style.display=t==='t1'?'':'none'}$('#stopbar').style.display=t==='t2'?'':'none';const cur=document.querySelector('#modebar [data-m].on');if(cur&&cur.dataset.t&&cur.dataset.t!==t)document.querySelector('#modebar [data-m=nav]').click()}
+document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(vs&&b.dataset.m!=='nav')vs=null;if(mode==='infra'&&b.dataset.m!=='infra'){if(draft.length>1)commitInfra();draft=[];drawDraft();infraEditId=null}mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));map.getContainer().style.cursor=(mode==='nav'||mode==='edit'||mode==='move')?'':'crosshair';fhDrag();drawStops();drawEdit();drawInfraEdit();say(MSG[mode])});
+function applyTab(t){{const sf=document.getElementById('sideFoot');if(sf)sf.style.display=t==='t1'?'':'none';const ro=document.getElementById('routeOpts');if(ro){ro.style.display=t==='t2'?'none':'';ro.querySelectorAll('.roB').forEach(b=>b.style.display=(b.dataset.tab||'t1')===t?'':'none')}}document.querySelectorAll('#modebar [data-t]').forEach(b=>b.style.display=b.dataset.t===t?'':'none');{const rb=$('#routebar'),tg=document.querySelector('#tools .tgrp');if(rb.dataset.moved){rb.style.display='none';if(tg)tg.style.display=t==='t1'?'contents':'none'}else rb.style.display=t==='t1'?'':'none'}$('#stopbar').style.display=t==='t2'?'':'none';const cur=document.querySelector('#modebar [data-m].on');if(cur&&cur.dataset.t&&cur.dataset.t!==t)document.querySelector('#modebar [data-m=nav]').click()}
 [['t1','p1'],['t2','p2'],['t3','p3']].forEach(([t,p])=>$('#'+t).onclick=()=>{applyTab(t);['t1','t2','t3'].forEach(x=>$('#'+x).classList.toggle('on',x===t));['p1','p2','p3'].forEach(x=>$('#'+x).classList.toggle('on',x===p));if(p==='p2')renderStops();if(p==='p3')renderInfra()});
 
 let tramReady=null;
@@ -1749,7 +1754,7 @@ $('#lyLevel').onchange=()=>{if($('#lyStreet').checked)loadStreets()};
 $('#lyTram').onchange=()=>$('#lyTram').checked?map.addLayer(tracksL):map.removeLayer(tracksL);
 $('#cpDbg').onclick=()=>{const t=$('#dbg');t.value=LOG.join('\n');t.select();try{document.execCommand('copy')}catch(e){}};
 function setCity(k,go=true){
- if(!CITIES[k])k='gdansk';S.city=k;curCity=k;$('#citySel').value=k;document.title='TransitMaker – '+CITIES[k].n.replace(/ \(.*/,'');
+ if(!CITIES[k])k='gdansk';S.city=k;curCity=k;$('#citySel').value=k;document.title='NetworkMaker – '+CITIES[k].n.replace(/ \(.*/,'');
  if(go)map.setView(CITIES[k].c,CITIES[k].z);
  for(const q in sCache)delete sCache[q];streetL.clearLayers();OSMW=null;OSMR=null;rebuildGraphs();tracksL.clearLayers();railL.clearLayers();
  if($('#lyStreet').checked)loadStreets();tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
@@ -1791,11 +1796,11 @@ function drawInfraEditOne(c){
   if(onDel)m.on('contextmenu',e=>{L.DomEvent.stop(e);onDel()});m.addTo(infraEditL)};
  c.pts.forEach((p,i)=>mk(p,'',q=>{c.pts[i]=q;infraChanged();drawInfraEdit()},c.pts.length>2?()=>{c.pts.splice(i,1);infraChanged();drawInfraEdit()}:null));
  for(let i=0;i<c.pts.length-1;i++){const a=c.pts[i],b=c.pts[i+1];mk([(a[0]+b[0])/2,(a[1]+b[1])/2],' mid',q=>{c.pts.splice(i+1,0,q);infraChanged();drawInfraEdit()})}}
-function infraEditSet(on){infraEditId=on?1:null;if(on){if(draft.length>1)commitInfra();draft=[];drawDraft();if(mode!=='infra')document.querySelector('[data-m=infra]').click();infraEditId=1;say(S.custom.length?'Edycja torów i dróg: przeciągaj punkty, środkowe uchwyty dodają punkt, prawy przycisk na punkcie go usuwa. Esc kończy.':'Brak własnych torów i dróg do edycji.')}drawInfraEdit()}
+function infraEditSet(on){infraEditId=on?1:null;setTimeout(fhDrag,0);if(on){if(draft.length>1)commitInfra();draft=[];drawDraft();if(mode!=='infra')document.querySelector('[data-m=infra]').click();infraEditId=1;say(S.custom.length?'Edycja torów i dróg: przeciągaj punkty, środkowe uchwyty dodają punkt, prawy przycisk na punkcie go usuwa. Esc kończy.':'Brak własnych torów i dróg do edycji.')}drawInfraEdit()}
 $('#infraEdit').onclick=()=>infraEditSet(!infraEditId);
 const plen=pts=>pts.reduce((t,p,i)=>i?t+mdist(pts[i-1],p):0,0);
 function renderInfra(){const box=$('#infraList');box.innerHTML='';
- $('#infraRound').checked=!!S.infraRound.on;$('#infraR').value=S.infraRound.r;$('#infraDbl').checked=S.infraDbl!==false;$('#infraDbl').disabled=$('#infraKind').value==='street';
+ $('#infraRound').checked=!!S.infraRound.on;$('#infraR').value=S.infraRound.r;$('#infraDbl').checked=S.infraDbl!==false;$('#infraDbl').disabled=$('#infraKind').value==='street';if(window.dblSync)dblSync();
  if(!S.custom.length){box.innerHTML='<div class="small" style="margin:0">Brak własnych torów i dróg.</div>';return}
  S.custom.forEach((c,i)=>{const d=document.createElement('div');d.className='st';
   const def=c.kind==='tram'?'Tor '+(i+1):c.kind==='rail'?'Tor kolejowy '+(i+1):'Droga '+(i+1);
@@ -1818,6 +1823,16 @@ $('#infraR').onchange=e=>{S.infraRound.r=Math.max(0,+e.target.value||0);drawDraf
 $('#infraStart').onclick=()=>{infraEditSet(false);document.querySelector('[data-m=infra]').click()};
 $('#infraDone').onclick=commitInfra;$('#infraCancel').onclick=()=>{draft=[];drawDraft()};$('#infraKind').onchange=()=>{$('#infraDbl').disabled=$('#infraKind').value==='street';drawDraft()};
 map.on('contextmenu',e=>{if(mode==='infra'){L.DomEvent.preventDefault(e.originalEvent);commitInfra()}});
+// drawing a track or a road by dragging over the map, as with a pencil (besides clicking its points one by one): a point every few
+// pixels, the first and the last caught on the tracks and roads already there; while the drawing tool is on, the map does not move
+// under the mouse – held Space lets it be dragged
+{const kd=()=>$('#infraKind').value,end=()=>{if(!FH.on)return;const f=FH.on;FH.on=null;if(f.moved){const last=draft.pop();draft.push(snapInfra(last,kd(),null,false));drawDraft();FH.swallow=true;setTimeout(()=>{FH.swallow=false},60)}};
+ map.on('mousedown',e=>{if(mode!=='infra'||infraEditId||FH.pan||e.originalEvent.button!==0)return;FH.on={px:e.containerPoint,ll:[e.latlng.lat,e.latlng.lng],moved:false}});
+ map.on('mousemove',e=>{const f=FH.on;if(!f)return;if(e.containerPoint.distanceTo(f.px)<7)return;if(!f.moved){f.moved=true;draft.push(snapInfra(f.ll,kd(),null,draft.length===0))}f.px=e.containerPoint;draft.push([e.latlng.lat,e.latlng.lng]);drawDraft()});
+ map.on('mouseup',end);document.addEventListener('mouseup',end,true);
+ addEventListener('keydown',e=>{if(e.code==='Space'&&mode==='infra'&&!FH.pan&&!/INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||'')){e.preventDefault();FH.pan=true;map.dragging.enable();map.getContainer().style.cursor='grab'}});
+ addEventListener('keyup',e=>{if(e.code==='Space'&&FH.pan){FH.pan=false;fhDrag();map.getContainer().style.cursor=mode==='nav'||mode==='edit'||mode==='move'?'':'crosshair'}})}
+function fhDrag(){if(mode==='infra'&&!infraEditId&&!FH.pan)map.dragging.disable();else map.dragging.enable()}
 document.addEventListener('keydown',e=>{if(mode!=='infra'||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;if(e.key==='Enter')commitInfra();if(e.key==='Escape'){if(infraEditId){infraEditSet(null)}draft=[];drawDraft()}if(e.key==='Backspace'&&!infraEditId){e.preventDefault();if(draft.length){draft.pop();drawDraft();say(draft.length?'Cofnięto ostatni punkt.':'Usunięto wszystkie punkty.')}}});
 document.addEventListener('keydown',e=>{if(e.key!=='Backspace'||mode!=='draw'||busy||e.ctrlKey||e.metaKey||e.altKey||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||'')||document.querySelector('.mback'))return;
  const l=selLine();if(!l||!(l.wp&&l.wp.length))return;e.preventDefault();
@@ -1914,7 +1929,7 @@ const askConfirm=(msg,o={})=>modal({title:o.title||'Potwierdzenie',body:`<p styl
 // ---- the line's timetable, edited by hand: for each direction and kind of day the departures from the first stop (an hour per
 // row, its minutes), and the minutes from the first stop to each stop. Left as worked out (from the headways and the line's
 // hours, from the length and speed) until changed; "Przywróć wyliczone" goes back. ZbiorkomInfo's NM city shows it at once.
-Object.assign(ICON,{clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',trolley:'<rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 14h16M9 9 12 3M13 9l3-6M7 19v2M17 19v2"/>'});
+Object.assign(ICON,{dbltrack:'<path d="M6 2v20M18 2v20M3.5 6h5M3.5 12h5M3.5 18h5M15.5 6h5M15.5 12h5M15.5 18h5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',trolley:'<rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 14h16M9 9 12 3M13 9l3-6M7 19v2M17 19v2"/>'});
 const TT_DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 function ttEdit(l){const P=FP(),a=ziAuto(l,P);if(!a){say('Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.');return}
  const st={dk:'A',dy:'w',gen:false},b=document.createElement('div');b.className='ttEd';
@@ -1978,7 +1993,7 @@ function dlFile(name,text,type){const a=document.createElement('a');a.href=URL.c
 function applyProject(o){
  const p=o&&o.project?o.project:o;
  if(!p||!Array.isArray(p.lines)||!Array.isArray(p.stops))throw new Error('To nie jest plik projektu sieci.');
- NOSAVE=false;S=p;if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound=S.infraRound||{on:true,r:25};S.stops.forEach(x=>{if(!x.num)syncNum(x)});S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});
+ NOSAVE=false;S=p;if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound={on:true,r:100};S.stops.forEach(x=>{if(!x.num)syncNum(x)});S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});
  if(!S.lines.some(l=>l.id===S.sel))S.sel=null;
  save();rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();stopsTopUp();
  const all=S.lines.flatMap(l=>l.segs.flatMap(s=>s.pts));if(all.length)map.fitBounds(L.latLngBounds(all),{padding:[30,30]})}
@@ -2140,9 +2155,10 @@ function schemaRuntime(){
  function choose(id,add){var i=sel.indexOf(id);if(add||multi){var n=sel.slice();if(i>=0)n.splice(i,1);else n.push(id);setSel(n)}else setSel(i>=0&&sel.length===1?[]:[id])}
  function mod(e){return !!(e.ctrlKey||e.metaKey||e.shiftKey)}
  svg.addEventListener('wheel',function(e){e.preventDefault();zoom(e.deltaY<0?1.15:1/1.15,e.clientX,e.clientY)},{passive:false});
- svg.addEventListener('pointerdown',function(e){drag={x:e.clientX,y:e.clientY,vb:vb.slice()};moved=false});
- window.addEventListener('pointermove',function(e){if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;if(moved){vb=[drag.vb[0]-dx*drag.vb[2]/cw,drag.vb[1]-dy*drag.vb[3]/ch,drag.vb[2],drag.vb[3]];sched()}});
- window.addEventListener('pointerup',function(){drag=null});
+ var pts={},pinch=null;svg.style.touchAction='none';   // (two fingers: zoomed by how far apart they move, about the point between them)
+ svg.addEventListener('pointerdown',function(e){pts[e.pointerId]=[e.clientX,e.clientY];var k=Object.keys(pts);if(k.length===2){var a=pts[k[0]],b=pts[k[1]];pinch={d:Math.hypot(a[0]-b[0],a[1]-b[1])};drag=null;moved=true;return}drag={x:e.clientX,y:e.clientY,vb:vb.slice()};moved=false});
+ window.addEventListener('pointermove',function(e){if(pts[e.pointerId])pts[e.pointerId]=[e.clientX,e.clientY];if(pinch){var k=Object.keys(pts);if(k.length<2)return;var a=pts[k[0]],b=pts[k[1]],d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(d>0&&pinch.d>0&&Math.abs(d-pinch.d)>1){zoom(d/pinch.d,(a[0]+b[0])/2,(a[1]+b[1])/2);pinch.d=d}return}if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4)moved=true;if(moved){vb=[drag.vb[0]-dx*drag.vb[2]/cw,drag.vb[1]-dy*drag.vb[3]/ch,drag.vb[2],drag.vb[3]];sched()}});
+ function pend(e){delete pts[e.pointerId];if(Object.keys(pts).length<2)pinch=null;drag=null}window.addEventListener('pointerup',pend);window.addEventListener('pointercancel',pend);
  svg.addEventListener('click',function(e){if(moved){moved=false;return}var g=e.target.closest?e.target.closest('.ln'):null;if(g)choose(g.getAttribute('data-l'),mod(e));else if(sel.length)setSel([])});
  lgs.forEach(function(b){b.addEventListener('click',function(e){choose(b.getAttribute('data-l'),mod(e))})});
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sel.length)setSel([])});
@@ -2152,7 +2168,7 @@ function schemaRuntime(){
  function menu(o){dlm.hidden=!o;bdl.setAttribute('aria-expanded',String(o))}
  bdl.onclick=function(e){e.stopPropagation();menu(dlm.hidden)};document.addEventListener('click',function(){menu(false)});
  dlm.onclick=function(e){var b=e.target.closest('[data-dl]');if(!b)return;menu(false);var k=b.getAttribute('data-dl');
-  // PDF: the browser's print to a PDF file (the whole network on one page); HTML: this very page (inside TransitMaker – the file it made)
+  // PDF: the browser's print to a PDF file (the whole network on one page); HTML: this very page (inside NetworkMaker – the file it made)
   if(k==='pdf')window.print();else if(k==='svg')dlSvg();else if(inTM)parent.postMessage({schema:'html'},'*');else{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<!doctype html>\n'+document.documentElement.outerHTML],{type:'text/html'}));a.download='schemat-sieci.html';document.body.appendChild(a);a.click();a.remove()}};
  window.addEventListener('beforeprint',function(){var s=wr.style;s.transform='';s.left=s.top='0';s.width='100%';s.height='100%';svg.setAttribute('viewBox',vb.join(' '))});
  window.addEventListener('afterprint',commit);
@@ -2506,7 +2522,7 @@ function buildSchema(spread=1){
  const cats=catList(),dark=document.body.classList.contains('dark');
  let lg='';cats.forEach(c=>{const ls=lines.filter(l=>(l.cat||'')===c);if(!ls.length)return;if(cats.length>1||c)lg+=`<div class="lh">${esc(c||'Bez kategorii')}</div>`;
   ls.filter(l=>!(l.par&&lines.some(x=>x.id===l.par))).forEach(l=>{const vs=lines.filter(v=>v.par===l.id&&!(v.dir==='B'&&!v.segs.length)).map(v=>`<small>${v.dir==='B'?'kierunek B':'wariant'}: ${esc(routeText(v))} · ${fmtKm(lineLen(v))}</small>`).join('');lg+=`<button class="lg" data-l="${l.id}"><span class="bd" style="background:${l.color};color:${txt(l.color)};${bst(l,38,17,'8px')}">${esc(l.num)}</span><span class="rt">${esc(routeText(l))}<small>${fmtKm(lineLen(l))}${l.note?' · '+esc(l.note.slice(0,80)):''}</small>${vs}</span></button>`})});
- const date=new Date().toLocaleDateString('pl-PL',{day:'numeric',month:'long',year:'numeric'});
+ 
  const css=`:root{--bg:#fff;--ink:#1f2a37;--mut:#5d6977;--grey:#cfd3da;--pn:#f4f6f9;--bd:#d9dee5;--hd:#444b56}:root.dk{--bg:#14181d;--ink:#e7ebf0;--mut:#9aa5b2;--grey:#464b54;--pn:#1c2229;--bd:#323a44;--hd:#2b323b;color-scheme:dark}
 *{box-sizing:border-box}html,body{height:100%;margin:0}body{display:flex;flex-direction:column;font:14px/1.35 Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}button,input,select,textarea{font-family:inherit}.bd{font-family:"Roboto Condensed","Arial Narrow",sans-serif;font-weight:600}
 header{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--bd);background:var(--pn);flex-wrap:wrap}header .t{font-weight:700;font-size:15px}header .m{color:var(--mut);font-size:12px}.g{flex:1}
@@ -2520,7 +2536,7 @@ button.tb.ico{display:inline-flex;align-items:center;justify-content:center;widt
 button.tb.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 @media(max-width:700px){aside{width:100%;max-height:34%;border-right:0;border-bottom:1px solid var(--bd)}main{flex-direction:column}}
 @media print{@page{size:landscape;margin:8mm}header,aside{display:none}#cv{overflow:visible}}`;
- return `<!doctype html><html lang="pl"${dark?' class="dk"':''}><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schemat sieci transportu – ${esc(CITIES[cityKey()].n)}</title><style>${css}</style></head><body><header><span class="t">Schemat sieci transportu</span><span class="m">${esc(CITIES[cityKey()].n)} · ${esc(date)} · ${lines.length} lin. · ${N.length} przystanków</span><span class="g"></span><button class="tb ico" id="bfit" title="Dopasuj widok" aria-label="Dopasuj widok"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><span class="dl"><button class="tb ico" id="bdl" title="Pobierz jako" aria-label="Pobierz jako" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg></button><span class="dlm" id="dlm" role="menu" hidden><button role="menuitem" data-dl="pdf">Plik PDF</button><button role="menuitem" data-dl="svg">Plik SVG</button><button role="menuitem" data-dl="html">Plik HTML</button></span></span><button class="tb ico" id="bregen" title="Wygeneruj ponownie" aria-label="Wygeneruj ponownie" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button></header><main><aside>${lg}</aside><div id="cv"><div id="wr">${o}</div></div></main><script>(${schemaRuntime.toString()})();<\/script></body></html>`}
+ return `<!doctype html><html lang="pl"${dark?' class="dk"':''}><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Schemat sieci transportu – ${esc(CITIES[cityKey()].n)}</title><style>${css}</style></head><body><header><span class="t">Schemat sieci transportu</span><span class="m">${esc(CITIES[cityKey()].n)} · ${lines.length} lin. · ${N.length} przystanków</span><span class="g"></span><button class="tb ico" id="bfit" title="Dopasuj widok" aria-label="Dopasuj widok"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7"/><path d="m15.6 15.6 5.4 5.4"/><path d="M7.5 9V7.5H9M12 7.5h1.5V9M13.5 12v1.5H12M9 13.5H7.5V12"/></svg></button><span class="dl"><button class="tb ico" id="bdl" title="Pobierz jako" aria-label="Pobierz jako" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg></button><span class="dlm" id="dlm" role="menu" hidden><button role="menuitem" data-dl="pdf">Plik PDF</button><button role="menuitem" data-dl="svg">Plik SVG</button><button role="menuitem" data-dl="html">Plik HTML</button></span></span><button class="tb ico" id="bregen" title="Wygeneruj ponownie" aria-label="Wygeneruj ponownie" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button></header><main><aside>${lg}</aside><div id="cv"><div id="wr">${o}</div></div></main><script>(${schemaRuntime.toString()})();<\/script></body></html>`}
 let schemaHTML=null;
 async function openSchema(){
  closeMenus();say('Generowanie schematu…');
@@ -2577,7 +2593,7 @@ function histFlush(){if(_svT)saveNow();clearTimeout(HIST.t);const j=HIST.pend;HI
   HIST.i=HIST.h.length-1}
  histUI()}
 function histUI(){const u=$('#hUndo'),r=$('#hRedo');if(!u)return;u.disabled=HIST.i<=0&&HIST.pend==null;r.disabled=HIST.i>=HIST.h.length-1}
-function restoreState(j){HIST.rest=true;try{S=JSON.parse(j);if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound=S.infraRound||{on:true,r:25};S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});if(!S.lines.some(l=>l.id===S.sel))S.sel=null;save();rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();drawStops();if(window.stopDblUI)stopDblUI()}finally{HIST.rest=false}}
+function restoreState(j){HIST.rest=true;try{S=JSON.parse(j);if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound={on:true,r:100};S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});if(!S.lines.some(l=>l.id===S.sel))S.sel=null;save();rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();drawStops();if(window.stopDblUI)stopDblUI()}finally{HIST.rest=false}}
 function histGo(d){flushLater();histFlush();const k=HIST.i+d;if(k<0||k>=HIST.h.length){say(d<0?'Nie ma czego cofnąć.':'Nie ma czego ponowić.');return}
  HIST.i=k;restoreState(HIST.h[k]);histUI();say(d<0?'Cofnięto ostatnią zmianę.':'Ponowiono zmianę.')}
 $('#hUndo').onclick=()=>histGo(-1);$('#hRedo').onclick=()=>histGo(1);
@@ -2601,6 +2617,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
  // the ways a route may be led (snapping, one-way streets, closed roads): a small box over the panel on the right, its switches named
  const RO=document.createElement('div');RO.id='routeOpts';RO.innerHTML='<div class="roH">Prowadzenie trasy</div><div class="roG"></div>';const ROG=RO.lastChild;
  ['strictTr','owTr','closedTr'].forEach(id=>{const b=$('#'+id);if(!b)return;b.classList.remove('ico');b.classList.add('roB');ROG.appendChild(b)});
+ {const b=document.createElement('button');b.type='button';b.id='dblTr';b.className='b roB';b.dataset.tab='t3';b.title='Tor podwójny';b.innerHTML=ic('dbltrack');const cb=$('#infraDbl'),sync=()=>{cb.checked=S.infraDbl!==false;b.classList.toggle('on',cb.checked);b.disabled=$('#infraKind').value==='street'};b.onclick=()=>{cb.checked=!cb.checked;cb.dispatchEvent(new Event('change'));sync()};$('#infraKind').addEventListener('change',sync);ROG.appendChild(b);window.dblSync=sync;sync()}
  [...rb.querySelectorAll('button')].forEach(b=>{if(!RO.contains(b)){b.classList.remove('ico');b.classList.add('roB');ROG.appendChild(b)}});
  const sd=$('#side');sd.insertBefore(RO,sd.querySelector('.tabs'));
  const KIND={tram:['tram','Linia tramwajowa'],street:['bus','Linia autobusowa'],trolley:['trolley','Linia trolejbusowa'],rail:['train','Linia kolejowa']},amCur=()=>{const l=selLine();return am.value==='street'&&l&&l.veh==='trolley'?'trolley':am.value};
@@ -2613,7 +2630,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
  document.addEventListener('click',()=>{fly.hidden=true});
  const D={nav:['Wybór','Przeglądanie mapy; najechanie na przystanek pozwala go edytować.'],draw:['Rysuj linię','Rysowanie trasy kliknięciami na mapie.'],edit:['Edytuj linię','Przeciąganie punktów narysowanej linii zmienia jej przebieg; kliknięcie linii dodaje punkt.'],
   pick:['Wybieraj przystanki','Klikanie kolejnych przystanków linii – trasa prowadzi się między nimi sama.'],stop:['Dodaj przystanek','Dodawanie własnych przystanków.'],move:['Przenieś przystanek','Przeciąganie przystanków – przystanek zostaje przypisany do swoich linii.'],infra:['Dorysuj tor lub drogę','Dorysowanie toru lub drogi, których nie ma na mapie.'],
-  loopBtn:['Zamknij pętlą','Koniec trasy, który wraca w pobliże jej wcześniejszego przebiegu, zostaje płynnie dołączony do niego (pętla uliczna).'],amBtn:['Typ linii','Tramwajowa, autobusowa, trolejbusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],infraEdit:['Edytuj trasę toru lub drogi','Przeciąganie punktów własnych torów i dróg zmienia ich przebieg.'],infraDone:['Zakończ rysowanie','Zapisuje rysowany tor lub drogę (także Enter lub prawy przycisk myszy).'],infraCancel:['Anuluj rysowanie','Porzuca rysowany odcinek (także Esc).'],
+  loopBtn:['Zamknij pętlą','Koniec trasy, który wraca w pobliże jej wcześniejszego przebiegu, zostaje płynnie dołączony do niego (pętla uliczna).'],amBtn:['Typ linii','Tramwajowa, autobusowa, trolejbusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],dblTr:['Tor podwójny','Włączony: nowe tory mają dwie nitki, po jednej na kierunek. Wyłączony: tor pojedynczy. Nie dotyczy dróg.'],infraEdit:['Edytuj trasę toru lub drogi','Przeciąganie punktów własnych torów i dróg zmienia ich przebieg.'],infraDone:['Zakończ rysowanie','Zapisuje rysowany tor lub drogę (także Enter lub prawy przycisk myszy).'],infraCancel:['Anuluj rysowanie','Porzuca rysowany odcinek (także Esc).'],
   strictTr:['Przyciąganie','Linie dopasowują się do torów lub dróg (zależnie od typu linii). Wyłączone – można rysować w dowolnym miejscu mapy.'],owTr:['Ignoruj jednokierunkowość','Linie autobusowe mogą jechać pod prąd ulicami jednokierunkowymi (ronda pozostają jednokierunkowe).'],closedTr:['Ignoruj zakaz wjazdu','Linie autobusowe mogą prowadzić także odcinkami zamkniętymi dla ruchu – budowa, zakaz wjazdu, drogi prywatne (rysowane czerwoną przerywaną).']};
  amShow();
  T.querySelectorAll('.b').forEach(b=>{const k=b.dataset.m||b.id,d=D[k];const txt=[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
@@ -2629,7 +2646,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
   b.addEventListener('mouseleave',tipHide);b.addEventListener('click',tipHide)});
  // the pencil of the tracks and roads: held (or right-clicked), a small menu beside it – a tram track, a railway track or a road
  {const IK={tram:['tram','Tor tramwajowy'],rail:['train','Tor kolejowy'],street:['road','Droga']},ib=T.querySelector('[data-m="infra"]'),ik=$('#infraKind'),ifl=document.createElement('div');ifl.className='tfly';ifl.id='ikFly';ifl.hidden=true;ifl.setAttribute('role','menu');document.body.appendChild(ifl);
-  const ikShow=()=>{const k=IK[ik.value]||IK.tram;ib.innerHTML=ic('pencil')+'<span class="kd">'+ic(k[0])+'</span>';ib.dataset.tl='Dorysuj: '+k[1].toLowerCase();ib.dataset.td='Klikaj kolejne punkty na mapie. Przytrzymaj, aby wybrać rodzaj: tor tramwajowy, tor kolejowy albo drogę.';ib.setAttribute('aria-label',ib.dataset.tl);
+  const ikShow=()=>{const k=IK[ik.value]||IK.tram;ib.innerHTML=ic('pencil')+'<span class="kd">'+ic(k[0])+'</span>';ib.dataset.tl='Dorysuj: '+k[1].toLowerCase();ib.dataset.td='Klikaj kolejne punkty albo rysuj, przeciągając po mapie. Mapę przesuwa wtedy przeciąganie z wciśniętą spacją. Przytrzymaj, aby wybrać rodzaj: tor tramwajowy, tor kolejowy albo drogę.';ib.setAttribute('aria-label',ib.dataset.tl);
    ifl.innerHTML=Object.entries(IK).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===ik.value}" data-v="${v}" class="${v===ik.value?'on':''}">${ic(i)}${t}</button>`).join('')};
   const ikOpen=()=>{ikShow();const r=ib.getBoundingClientRect();ifl.hidden=false;ifl.style.left=(innerWidth>700?r.right+6:r.left)+'px';ifl.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
   let lpT=0,lpF=false;ib.setAttribute('aria-haspopup','menu');
@@ -2672,14 +2689,14 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
   if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
-function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
+function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
 if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) – wczytujemy go przed zapisami i pobieraniem danych z OSM
  say('Wczytywanie dużego projektu…');
  idb().then(d=>new Promise((res,rej)=>{const r=d.transaction('h').objectStore('h').get('net');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})).then(j=>{
   if(typeof j!=='string')throw new Error('brak danych');
-  S=JSON.parse(j);S.custom=S.custom||[];S.infraRound=S.infraRound||{on:true,r:25};S.lines=S.lines||[];S.stops=S.stops||[];S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});if(!S.lines.some(l=>l.id===S.sel))S.sel=null;
+  S=JSON.parse(j);S.custom=S.custom||[];S.infraRound={on:true,r:100};S.lines=S.lines||[];S.stops=S.stops||[];S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});if(!S.lines.some(l=>l.id===S.sel))S.sel=null;
   BOOTWAIT=false;_svSz=j.length;bootData();say('')
  }).catch(e=>{ // nie nadpisujemy zapisanego projektu pustym stanem, dopóki użytkownik sam nie wczyta danych
   BOOTWAIT=false;NOSAVE=true;bootData();say('Nie udało się odczytać dużego projektu z IndexedDB ('+((e&&e.message)||e)+'). Zmiany nie są zapisywane – wczytaj projekt z pliku (Plik → Otwórz plik projektu).')})
@@ -2702,6 +2719,11 @@ setTimeout(()=>{try{ziExport()}catch(e){}},2500);   // (the network for Zbiorkom
  document.addEventListener('pointermove',()=>{if(cur&&cur.hasAttribute('title')){take(cur);if(!T.hidden)show()}},true);
  ['pointerdown','keydown','wheel'].forEach(t=>document.addEventListener(t,vis,true));addEventListener('scroll',vis,true);addEventListener('blur',release)})();
 
+// ---- no zooming of the whole page with two fingers or Ctrl + the wheel (a touchpad's pinch): only the map and the schema zoom, by their own gestures
+(function(){const own=t=>t&&t.closest&&t.closest('#map,svg,.leaflet-container');
+ document.addEventListener('wheel',e=>{if(e.ctrlKey&&!own(e.target))e.preventDefault()},{passive:false,capture:true});
+ document.addEventListener('touchmove',e=>{if(e.touches.length>1&&!own(e.target))e.preventDefault()},{passive:false,capture:true});
+ ['gesturestart','gesturechange'].forEach(t=>document.addEventListener(t,e=>e.preventDefault(),{passive:false}))})();
 // ---- no suggestions of the browser in the fields (what was typed before): every field set so, also those made later; the sign-in
 // fields that ask for the password manager (username, passwords) keep it
 (function(){const KEEP=/^(username|current-password|new-password|one-time-code)$/;
