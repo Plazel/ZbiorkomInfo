@@ -940,7 +940,7 @@ function termMarkers(UOF,CB){
  by.forEach((e,k)=>{termSet.add(k);const s=stopOf(e.id);if(!s)return;if(CB&&!inBox(e.u.ll||s.ll,CB))return;
   const ml=new Map();e.ls.forEach(l=>{const k=l.num+'|'+l.color,o=ml.get(k);if(!o)ml.set(k,{l,v:!!l.par});else if(!l.par)o.v=false});
   const bad=[...ml.values()].map(({l,v})=>`<span class="tb" style="${v?`background:#fff;color:${l.color};border-color:${l.color};`:`background:${l.color};color:${txt(l.color)};`}box-sizing:border-box;${bst(l,32,16,'6px')}">${esc(l.num)}</span>`).join('');
-  L.marker(e.u.ll||s.ll,{icon:L.divIcon({className:'',html:`<div class="term">${bad}<span class="tn">${esc(dispName(s))}</span></div>`,iconSize:[0,0]}),interactive:false,zIndexOffset:500}).addTo(lineL)})}
+  L.marker(e.u.ll||s.ll,{icon:L.divIcon({className:'',html:`<div class="term">${bad}<span class="tn">${esc(s.name.replace(NUMRE,'$1'))}</span></div>`,iconSize:[0,0]}),interactive:false,zIndexOffset:500}).addTo(lineL)})}
 let capDrawn=new Set(),termSet=new Set(),capLab=new Map();
 function units(force){
  if(!force&&(!UI.mg||mode==='pick'||mode==='stop'))return S.stops.map(s=>({key:s.id,members:[s],ll:s.ll}));
