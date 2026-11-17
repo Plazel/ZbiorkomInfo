@@ -120,7 +120,7 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 
 .sw{width:14px;height:14px;border-radius:4px;display:inline-block}
 
-.section{display:grid;grid-template-columns:150px 1fr;gap:6px 18px;padding-block:14px;border-top:1px solid var(--line)}
+.section{display:grid;grid-template-columns:150px 1fr;gap:6px 18px;padding-block:14px;border-top:1px solid var(--line)}@media (min-width:761px){.section{grid-template-columns:128px 1fr;column-gap:14px}.section>.shead{padding-left:16px}}
 .section.first{border-top:0}
 .shead{display:flex;flex-direction:column;gap:8px}
 .shead h2{font-family:var(--font-display);font-weight:500;font-size:1rem;margin:0}
@@ -1825,7 +1825,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794905181;
+const APP_BUILD=1794905681;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5485,7 +5485,8 @@ const ALERT_IC='<svg viewBox="0 0 24 24" width="26" height="26" fill="currentCol
 // alerts (Warszawa and Łódź through zbiorkom.live's open API, Kraków from ZTP)
 const ALERT_SRC={tri:[['ztm']],waw:[['rt','https://api.zbiorkom.live/api6-open/warsaw/gtfsRealtime/default/serviceAlerts']],
   ldz:[['rt','https://api.zbiorkom.live/api6-open/lodz/gtfsRealtime/default/serviceAlerts']],
-  lub:[['rt','https://api.zbiorkom.live/api6-open/lublin/gtfsRealtime/default/serviceAlerts']],wro:[['rt','https://api.zbiorkom.live/api6-open/wroclaw/gtfsRealtime/default/serviceAlerts']],
+  lub:[['rt','https://api.zbiorkom.live/api6-open/lublin/gtfsRealtime/default/serviceAlerts']],wro:[['rt','https://api.zbiorkom.live/api6-open/wroclaw/gtfsRealtime/default/serviceAlerts'],['json','data/alerts_wro.json']],   // (Wrocław: also MPK's own "Zmiany w komunikacji" – its GTFS-RT alerts come empty)
+  
   krk:[['rt','https://gtfs.ztp.krakow.pl/ServiceAlerts_A.pb',1],['rt','https://gtfs.ztp.krakow.pl/ServiceAlerts_T.pb',1]],
   ber:[['bvg','data/alerts_ber.json']],
   // the operators' own notices, from their pages and feeds, taken by the build (utrudnienia_miast.py)
@@ -6193,9 +6194,11 @@ document.getElementById('topLoc').onclick=async()=>{const b=document.getElementB
   navigator.geolocation.getCurrentPosition(async p=>{try{await depNearest(p.coords.latitude,p.coords.longitude)}catch(e){st.textContent='Nie znaleziono przystanku w pobliżu'}},
     e=>{st.textContent=e.code===1?'Brak zgody na udostępnienie lokalizacji – wybierz przystanek w ustawieniach tablicy.':'Nie udało się ustalić lokalizacji.'},{enableHighAccuracy:true,timeout:10000,maximumAge:30000})};
 async function depNearest(la,lo){const st=document.getElementById('depStat');store.set('ztm.here',[la,lo,Date.now()]);
-  const names=new Set();IDX.routes.filter(r=>inCityOf(r,city)).forEach(r=>(r.sn||[]).forEach(n=>names.add(n)));
+  // (only the stops of the chosen city: a stop of the same name elsewhere – Drwęcka in Gdańsk for Warszawa's Drwęcka – is not it;
+  // the stops around the Tricity and Krynica, kept apart, count with those cities)
+  const names=new Set(),areas=new Set();IDX.routes.filter(r=>inCityOf(r,city)).forEach(r=>{(r.sn||[]).forEach(n=>names.add(n));(r.c||[]).forEach(c=>areas.add(c))});dtAreasOut(areas);
   const dist=(a,b,c,d)=>Math.hypot((d-b)*Math.cos(a*Math.PI/180)*111320,(c-a)*110540);
-  let best=null,bd=1e9;for(const [id,X] of Object.entries(IDX.stops)){if(!names.has(X[0]))continue;const d=dist(la,lo,X[2],X[3]);if(d<bd){bd=d;best=X[0]}}
+  let best=null,bd=1e9;for(const [id,X] of Object.entries(IDX.stops)){if(!names.has(X[0])||(X[4]&&!areas.has(X[4])))continue;const d=dist(la,lo,X[2],X[3]);if(d<bd){bd=d;best=X[0]}}
   if(!best||bd>5000){st.textContent='Nie znaleziono przystanku w pobliżu '+CITIES[city][1]+'.';return}
   // the way the vehicles leave each pole: towards the next stop of every route stopping there
   const vec={},head={};
@@ -9311,8 +9314,11 @@ function jpSteps(N,J){const h=[];const step=(t,ic,tx,cls)=>h.push(`<div class="j
 function jpStopPoint(name){const A=CITY_AREAS();let ids=Object.keys(IDX.stops).filter(id=>IDX.stops[id][0]===name&&A.includes(IDX.stops[id][4]));if(!ids.length)ids=Object.keys(IDX.stops).filter(id=>IDX.stops[id][0]===name);   // (names repeat in other cities)
   const n=ids.length||1;
   return {kind:'stop',name,label:name,lat:ids.reduce((s,id)=>s+IDX.stops[id][2],0)/n,lon:ids.reduce((s,id)=>s+IDX.stops[id][3],0)/n}}
-function jpNearestName(la,lo){let b=null,bd=1e9;const names=new Set();jpRoutes().forEach(r=>(r.sn||[]).forEach(n=>names.add(n)));
-  for(const [id,X] of Object.entries(IDX.stops)){if(!names.has(X[0]))continue;const d=distM(la,lo,X[2],X[3]);if(d<bd){bd=d;b=X[0]}}return b?[b,bd]:null}
+// the stops outside the cities' own areas that belong with them: around the Tricity ('oth': Rumia, Pruszcz…, its stations), around Krynica ('kmx')
+function dtAreasOut(A){if(A.has('gda')||A.has('gdy')||A.has('sop'))A.add('oth');if(A.has('km'))A.add('kmx');return A}
+function jpNearestName(la,lo){let b=null,bd=1e9;const names=new Set(),areas=new Set();jpRoutes().forEach(r=>{(r.sn||[]).forEach(n=>names.add(n));(r.c||[]).forEach(c=>areas.add(c))});dtAreasOut(areas);
+  for(const [id,X] of Object.entries(IDX.stops)){if(!names.has(X[0])||(X[4]&&!areas.has(X[4])))continue;   // (a stop of the same name in another city is not it)
+const d=distM(la,lo,X[2],X[3]);if(d<bd){bd=d;b=X[0]}}return b?[b,bd]:null}
 function jpPoint(la,lo,label){const nn=jpNearestName(la,lo);return {kind:'pt',lat:la,lon:lo,label:label||('Punkt na mapie'+(nn?' (okolice: '+nn[0]+')':''))}}
 function jpSet(which,P){JP[which]=P;document.getElementById(which==='from'?'jpFrom':'jpTo').value=P?P.label:'';
   if(which==='from'&&P&&!JP.to)jpPick('to');JP.res=[];JP.sel=-1;document.getElementById('jpRes').replaceChildren();document.getElementById('jpMsg').textContent='';jpDraw();

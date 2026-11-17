@@ -1,7 +1,7 @@
 name: Utrudnienia
 
 # Notices of disruptions, every hour: BVG's for Berlin (bvg_utrudnienia.py) and those of PID, ZTM Poznań, ZDMiKP,
-# MPK Nowy Sącz and MZK Wejherowo (utrudnienia_miast.py); only data/alerts_*.json, committed when they changed
+# MPK Nowy Sącz, MZK Wejherowo and MPK Wrocław (utrudnienia_miast.py); only data/alerts_*.json, committed when they changed
 on:
   schedule:
     - cron: '40 * * * *'

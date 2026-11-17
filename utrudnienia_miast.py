@@ -9,6 +9,8 @@ Sources (all open, no key, nothing behind a check):
   byd – ZDMiKP Bydgoszcz, RSS of "Aktualności komunikacyjne", the last two weeks'
   ns  – MPK Nowy Sącz, the notices its home page shows in its bar of notices (each read from its page)
   wej – MZK Wejherowo, "Wiadomości i komunikaty": the notices (komunikaty) of the last month
+  wro – MPK Wrocław, "Zmiany w komunikacji" (mpk.wroc.pl): each notice's lines and period as the list gives them, its text from its page;
+        those in force now or within three days (the GTFS-RT alerts of Wrocław come empty)
 A source that does not answer leaves its old file. Usage: python3 utrudnienia_miast.py [data folder]"""
 import datetime, email.utils, html, json, os, re, sys, urllib.request
 
@@ -165,6 +167,40 @@ def wejherowo(data):
     return 'https://mzkwejherowo.pl/wiadomosci-i-komunikaty', res
 
 
+def wroclaw(data):
+    import time, zoneinfo
+    WAW = zoneinfo.ZoneInfo('Europe/Warsaw'); base = 'https://mpk.wroc.pl/strefa-pasazera/zaplanuj-podroz/zmiany-w-komunikacji'
+    cards, seen = [], set()
+    for n in range(1, 7):   # (the list in pages of eight; it stops where a page brings nothing new)
+        try: page = get(base if n == 1 else base + '/p/%d' % n)
+        except Exception:
+            if n == 1: raise
+            break
+        new = 0
+        for c in re.split(r'<div class="message__card', page)[1:]:
+            m = re.search(r'href="(https://mpk\.wroc\.pl/komunikat/[^"]+)"[^>]*>(.*?)</a>', c, re.S)
+            if not m or m.group(1) in seen: continue
+            seen.add(m.group(1)); new += 1
+            if 'inactive__text' in c: continue   # (marked by the operator as no longer in force)
+            d = re.search(r'date__value">\s*(\d{2})\.(\d{2})\.(\d{4})(?:\s*-\s*(\d{2})\.(\d{2})\.(\d{4}))?', c)
+            st = datetime.datetime(int(d.group(3)), int(d.group(2)), int(d.group(1)), tzinfo=WAW) if d else None
+            en = datetime.datetime(int(d.group(6)), int(d.group(5)), int(d.group(4)), 23, 59, tzinfo=WAW) if d and d.group(4) else None
+            if en and en < NOW or st and st > NOW + datetime.timedelta(days=3): continue
+            lines = [x.strip() for x in re.findall(r'message__number">\s*([^<]+?)\s*<', c)]
+            cards.append((m.group(1), html.unescape(re.sub(r'<[^>]+>', '', m.group(2))).strip(), lines, st, en))
+        if not new: break
+        time.sleep(.3)
+    res = []
+    for u, t, lines, st, en in cards[:40]:
+        try: a = get(u); time.sleep(.3)
+        except Exception: continue
+        i = a.find('class="main__inner"'); body = a[a.find('>', i) + 1:a.find('</section>', i)] if i >= 0 else ''
+        tx = plain(re.sub(r'(?i)<br\s*/?>|\s+', ' ', body))   # (its paragraphs broken over lines – <br> in the middle of a sentence: one line each)
+        t = re.sub(r'^\d{1,2}\.\d{1,2}(?:\.\d{4})?\s*r?\.?\s*(?:\(\w+\))?\s*[-–]\s*', '', t) or t   # (the date in front of the title: the period is given apart)
+        res.append({'id': u, 'lines': lines, 'title': t, 'text': tx, 'start': iso(st), 'end': iso(en), 'url': u})
+    return base, res
+
+
 SOURCES = {
     'prg': prague,
     'poz': lambda d: recent_rss('https://www.ztm.poznan.pl/feed/?post_type=komunikaty', 'https://www.ztm.poznan.pl/pl/komunikaty/'),
@@ -172,6 +208,7 @@ SOURCES = {
                                 'https://zdmikp.bydgoszcz.pl/pl/transport/aktualnosci-komunikacyjne'),
     'ns': nowy_sacz,
     'wej': wejherowo,
+    'wro': wroclaw,
 }
 
 
