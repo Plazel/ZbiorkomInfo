@@ -842,6 +842,7 @@ ROWS = [
 ("Dni w rozkładzie", "Days in the timetable", "Tage im Fahrplan", "Dni v cestovnom poriadku", "Dny v jízdním řádu"),
 ("Brak aktualności", "No news", "Keine Neuigkeiten", "Žiadne aktuality", "Žádné aktuality"),
 ("Przewoźnik nie opublikował teraz żadnych aktualności.", "The operator has no news at the moment.", "Der Betreiber hat derzeit keine Neuigkeiten.", "Dopravca momentálne nezverejnil žiadne aktuality.", "Dopravce momentálně nezveřejnil žádné aktuality."),
+("Tymczasowa zmiana trasy", "Temporary route change", "Vorübergehende Linienänderung", "Dočasná zmena trasy", "Dočasná změna trasy"),
 ]
 
 WEEKDAYS = {
