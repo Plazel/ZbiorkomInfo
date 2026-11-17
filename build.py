@@ -1388,6 +1388,7 @@ for area, A in NEW_AREAS.items():
         if area in ('ber', 'ham'):
             DE_RAIL_NAMES[area] = {r['route_short_name'].strip() for r in rd(SCR + '/' + area + '/routes.txt') if r['route_type'] not in ('3', '700', '702', '704', '715')}
         rot, tmeta, rmeta = {}, {}, {}
+        NODIR = set()
         for fd, pre in A['feeds']:
             P = SCR + '/' + fd
             for r in rd(P + '/stops.txt'):
@@ -1409,6 +1410,7 @@ for area, A in NEW_AREAS.items():
                 if area in ('ber', 'ham') and rt['route_type'] in ('3', '700', '702') and short in DE_RAIL_NAMES[area]: rk += 'E'   # (bus S1 apart from train S1)
                 tid = pre + ':' + r['trip_id']
                 rot[tid] = (rk, pre + ':' + r['service_id']); tmeta[tid] = (r.get('direction_id') or '0',)
+                if not (r.get('direction_id') or '').strip(): NODIR.add(rk)   # (no direction in the feed: worked out from the stops below)
                 rmeta.setdefault(rk, (short, rt['route_type']))
                 if r.get('shape_id'): TSHAPE[tid] = pre + 's' + r['shape_id']
         # the calendars of all feeds of the city, with their service ids prefixed like the trips
@@ -1465,6 +1467,10 @@ for area, A in NEW_AREAS.items():
                 for rr in runs: groups[rk].append((k, False, tmeta[tid][0], rr))
                 if tid in TSHAPE: SHAPE_OF.setdefault((rk, tuple(x[0] for x in rows)), TSHAPE[tid])
         del st
+        # feeds without direction_id (Flensburg from gtfs.de): each trip oriented against the line's most common pattern, as for ZKM –
+        # otherwise every trip falls into one direction and the line looks one-way with half of its timetable
+        for rk in groups:
+            if rk in NODIR: groups[rk] = fix_dirs(groups[rk])
         for rk in groups:
             short, rtype = rmeta[rk]
             meta_of[rk] = {'id': rk, 'n': short, 't': city_kind(area, short, rtype), 'op': A['op'], 'dates': dates[rk]}
