@@ -278,6 +278,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
    <div class="row wrap"><label class="chk"><input type="checkbox" id="lyStreet"><i data-ic="road"></i>Szkielet ulic</label><select id="lyLevel" hidden style="display:none"><option value="all" selected>wszystkie</option></select><span id="lyStat" class="small" style="margin:0"></span></div>
    <div class="sech"><i data-ic="pin"></i>Przystanki</div>
    <label class="chk"><input type="checkbox" id="hideUnused"><i data-ic="eyeoff"></i>Ukryj przystanki nieużywane przez żadną linię</label>
+   <label class="chk"><input type="checkbox" id="hideAllSt"><i data-ic="eyeoff"></i>Ukryj wszystkie przystanki na mapie</label>
    <label class="chk"><input type="checkbox" id="mergeNames"><i data-ic="layers"></i>Scal przystanki o tej samej nazwie</label>
    <label class="chk"><input type="checkbox" id="showNames"><i data-ic="type"></i>Pokaż nazwy przystanków na mapie</label>
    <label hidden style="display:none"><input type="checkbox" id="namesUsed"></label>
@@ -1063,12 +1064,13 @@ const StopLab=(()=>{const MC=document.createElement('canvas').getContext('2d'),W
  return (ll,text,dx)=>new C(ll,{renderer:stlCv,interactive:false,radius:0,stroke:false,fill:false,text,dx})})();
 function drawStops(cb,U0){
  stopL.clearLayers();const CB=cb!==undefined?cb:cullBox(),SB=CB||stopBox();SDRAWN=SB;
+ if(UI.hs&&mode!=='stop'&&mode!=='move')return;   // wszystkie przystanki ukryte (poza dodawaniem i przenoszeniem przystanków)
  const usedBy=new Map();S.stops.forEach(s=>{if(linesOf(s.id).length){const k=baseName(s);(usedBy.get(k)||usedBy.set(k,[]).get(k)).push(s.ll)}});
  const sibUsed=u=>u.members.some(s=>(usedBy.get(baseName(s))||[]).some(ll=>mdist(ll,s.ll)<300));
  (U0||units()).forEach(u=>{
   if(SB&&!inBox(u.ll,SB))return;
   const first=u.members[0],multi=u.members.length>1,used=u.members.some(s=>linesOf(s.id).length);
-  if(UI.hu&&mode!=='pick'&&mode!=='draw'&&mode!=='edit'&&mode!=='stop'&&!used)return;
+  if(UI.hu&&mode!=='stop'&&!used)return;   // (in every tool but adding stops – before, the drawing and picking tools ignored it, so switching it there did nothing until a reload)
   if(CB&&!used&&map.getZoom()<14&&mode!=='pick'&&mode!=='stop')return; // przy dużym oddaleniu bardzo dużej sieci pomijamy nieużywane przystanki
   const ls=[...new Set(u.members.flatMap(s=>visOf(s.id)))],on=ls.length>0,capd=u.members.some(s=>capDrawn.has(s.id));
   const mvOn=mode==='move',hT=u.members.some(s=>s.tram),hR=u.members.some(s=>s.rail),hA=u.members.some(s=>s.bus||(!s.tram&&!s.rail)),k=hR&&!hT&&!hA?'r':(hT||hR)&&hA?'ta':(hT||hR)?'t':'a';
@@ -1979,7 +1981,7 @@ try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',ziTheme
 UI.dark=ziDark();UI.gl=false;UI.ga=100;UI.sc=100;
 function applyUI(){UI.br=Math.max(10,Math.min(110,+UI.br||100));document.body.classList.toggle('dark',!!UI.dark);try{if(stlCv._map)stlCv._redraw()}catch(e){}document.body.classList.toggle('noglass',!UI.gl);document.documentElement.style.setProperty('--g',UI.ga/100);document.documentElement.style.setProperty('--z',UI.sc/100);if(document.activeElement!==$('#uiScV')){$('#uiScV').value=UI.sc}$('#uiSc').value=UI.sc;{const h=document.querySelector('#top');if(h){document.documentElement.style.setProperty('--hh',h.getBoundingClientRect().height+'px')}}$('#uiGl').checked=!!UI.gl;$('#uiGa').value=UI.ga;$('#uiGa').disabled=!UI.gl;$('#uiGaV').textContent=UI.ga+'%';
  document.documentElement.style.setProperty('--mapf',(!UI.inv&&+UI.br===100&&+UI.co===100)?'none':`${UI.inv?'invert(1) hue-rotate(180deg) ':''}brightness(${UI.br}%) contrast(${UI.co}%)`);   // (no filter at all when nothing is changed: a filtered map is filtered again in every frame of dragging)
- $('#uiDark').checked=!!UI.dark;$('#uiInv').checked=!!UI.inv;$('#uiBr').value=UI.br;$('#uiCo').value=UI.co;$('#uiBrV').textContent=UI.br+'%';$('#uiCoV').textContent=UI.co+'%';$('#tdark').innerHTML=ic(UI.dark?'sun':'moon');$('#hideUnused').checked=!!UI.hu;$('#uiMc').checked=!!UI.mc;$('#showNames').checked=!!UI.nm;$('#namesUsed').checked=!!UI.nmu;$('#namesUsed').disabled=!UI.nm;$('#mergeNames').checked=!!UI.mg;setBase(UI.base);infraSig();document.querySelectorAll('[name=base]').forEach(r=>r.checked=r.value===curBase);
+ $('#uiDark').checked=!!UI.dark;$('#uiInv').checked=!!UI.inv;$('#uiBr').value=UI.br;$('#uiCo').value=UI.co;$('#uiBrV').textContent=UI.br+'%';$('#uiCoV').textContent=UI.co+'%';$('#tdark').innerHTML=ic(UI.dark?'sun':'moon');$('#hideUnused').checked=!!UI.hu;$('#hideAllSt').checked=!!UI.hs;$('#hideUnused').disabled=!!UI.hs;$('#uiMc').checked=!!UI.mc;$('#showNames').checked=!!UI.nm;$('#namesUsed').checked=!!UI.nmu;$('#namesUsed').disabled=!UI.nm;$('#mergeNames').checked=!!UI.mg;setBase(UI.base);infraSig();document.querySelectorAll('[name=base]').forEach(r=>r.checked=r.value===curBase);
  try{localStorage.setItem('gdn-ui',JSON.stringify(UI))}catch(e){}}
 const setDark=v=>{UI.dark=v;applyUI();redraw()};
 $('#uiDark').onchange=e=>setDark(e.target.checked);$('#tdark').onclick=()=>setDark(!UI.dark);
@@ -2006,6 +2008,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.query
   say(UI.ow?'Jednokierunkowość ignorowana: trasy po ulicach (linie autobusowe) mogą prowadzić pod prąd po ulicach jednokierunkowych (ronda pozostają jednokierunkowe) – dane dróg pobierane są z Overpass dla rysowanego odcinka. Dotyczy nowo wyznaczanych tras.'+(UI.strict?'':' Uwaga: przyciąganie (magnes) jest wyłączone, więc linie są rysowane swobodnie.')+($('#amode').value!=='street'?' Opcja działa dla linii autobusowych – wybierz na liście „Trasa” pozycję „Linia autobusowa”.':''):'Jednokierunkowość uwzględniana: trasy po ulicach liczy zwykły routing (OSRM), o ile nie jest włączona opcja „Zamknięte drogi”.')}}
 {const sb=$('#strictTr'),sy=()=>sb.classList.toggle('on',!!UI.strict);sy();sb.onclick=()=>{UI.strict=!UI.strict;rcache.clear();sy();applyUI();say(UI.strict?'Przyciąganie włączone: linie są prowadzone po torach/drogach.':'Przyciąganie wyłączone: linię można rysować w dowolnym miejscu mapy.')}}
 $('#hideUnused').onchange=e=>{UI.hu=e.target.checked;applyUI();drawStops()};
+$('#hideAllSt').onchange=e=>{UI.hs=e.target.checked;applyUI();drawStops()};
 $('#uiMc').onchange=e=>{UI.mc=e.target.checked;applyUI();redraw()};
 $('#showNames').onchange=e=>{UI.nm=e.target.checked;applyUI();drawStops()};
 $('#namesUsed').onchange=e=>{UI.nmu=e.target.checked;applyUI();drawStops()};
