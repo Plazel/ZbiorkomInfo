@@ -175,15 +175,16 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #tools .tsep{width:28px;border-top:1px solid var(--bd);margin:4px 0;flex:none}#tools #modebar,#tools .tgrp{display:contents}
 #pFile,#pLay{left:0;right:auto}
 #side>#modebar{display:none}
-#routeOpts{display:flex;flex-direction:column;gap:8px;margin:0;padding:12px;border:0;border-bottom:1px solid var(--bd);background:var(--panel)}#routeOpts .roH{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}#routeOpts .roG{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-#routeOpts .roB{display:flex;align-items:center;justify-content:center;height:46px;width:100%;padding:0;border:1px solid var(--bd)!important;background:var(--bg)!important;color:var(--fg)!important}#routeOpts .roB svg{width:21px;height:21px;margin:0}#routeOpts .roB:hover{background:var(--tab)!important}#routeOpts .roB.on{background:var(--fg)!important;color:var(--panel)!important;border-color:var(--fg)!important}
+#routeOpts{display:flex;flex-direction:column;gap:8px;margin:0;padding:12px;border:0;border-bottom:1px solid var(--bd);background:var(--panel)}#routeOpts .roH{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}#routeOpts .roG{display:flex;gap:4px}
+#routeOpts .roB{display:flex;align-items:center;justify-content:center;height:38px;width:38px;flex:none;padding:0;border:1px solid var(--bd)!important;background:var(--bg)!important;color:var(--fg)!important}#routeOpts .roB svg{width:19px;height:19px;margin:0}#routeOpts .roB:hover{background:var(--tab)!important}#routeOpts .roB.on{background:var(--fg)!important;color:var(--panel)!important;border-color:var(--fg)!important}
 .tfly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}.tfly[hidden]{display:none}.tfly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}.tfly button:hover{background:var(--tab)}.tfly button.on{font-weight:700}
 #tools .b{position:relative}#tools .b .kd{position:absolute;right:2px;bottom:2px;display:flex;background:var(--bg);border-radius:2px}#tools .b .kd svg{width:11px;height:11px}#tools .b.on .kd{background:transparent}
 #sideFoot{display:flex;align-items:center;gap:6px;padding:6px 8px;border-top:1px solid var(--bd);background:var(--panel)}#sideFoot .b{width:36px;height:36px;padding:0;justify-content:center}#sideFoot .b svg{width:20px;height:20px;margin:0}
 .card .lnh{align-items:center}.card .lnh .dg{flex:none;margin:0 -2px 0 -6px;width:24px;height:36px;padding:0;justify-content:center}
 .lnModal{width:min(660px,100%)!important}.lnModal .mb{overflow:auto}.lnEd .lnh{margin-bottom:4px}.lnEd .lnSec{padding:14px 0 6px;border-top:1px solid var(--bd2);margin-top:12px}.lnEd .lnSec>h4{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}.lnEd .vwar .vrow .vn{display:none}
 .stTop{display:flex;gap:6px;margin-bottom:8px}.stTop .sq{position:relative;flex:1;min-width:0}.stTop .sq input{width:100%;padding-left:32px;height:36px}.stTop .sqi{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mut);display:inline-flex;pointer-events:none}.stTop .b.ico{width:36px;height:36px;padding:0;justify-content:center;flex:none}
-#cnt{margin:0 0 6px!important}#stops{border-top:1px solid var(--bd2)}
+#cnt{margin:0 0 6px!important}#cnt:empty{display:none}.stEmpty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:56px 20px;color:var(--mut);font-size:14px;line-height:1.45}.stEmpty svg{width:44px;height:44px;margin:0;stroke-width:1.6}.stEmpty div{color:var(--fg);font-weight:600;max-width:260px}.stEmpty small{font-size:12px}
+#stops:has(.stEmpty){border-top:0}#stops{border-top:1px solid var(--bd2)}
 #stops .st{display:grid;grid-template-columns:34px minmax(0,1fr) auto 84px;align-items:center;gap:6px;margin:0;padding:3px 2px;min-height:40px;border:0;border-bottom:1px solid var(--bd2);background:none;border-radius:0}
 #stops .st.sub{padding-left:22px;background:var(--tab);margin:0;border-left:0}#stops .st.grp .sn{font-weight:700}
 #stops .sk{display:flex;justify-content:center;gap:1px;color:var(--mut)}#stops .sk svg{width:15px;height:15px;margin:0}
@@ -192,7 +193,7 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #stops .sa{display:grid;grid-template-columns:repeat(3,28px)}#stops .sa .b,#stops .gt{width:28px;height:28px;padding:0;border:0;background:transparent;justify-content:center;display:inline-flex;align-items:center}#stops .sa .b:hover,#stops .gt:hover{background:var(--bd2)}#stops .sa svg,#stops .gt svg{width:16px;height:16px;margin:0}#stops .gt{justify-self:center}
 #pFile{padding:4px;width:250px}#pFile .fmenu .b{padding:7px 10px;min-height:0}#pFile .fsep{border-top:1px solid var(--bd2);margin:3px 2px}
 body{-webkit-user-select:none;user-select:none}input,textarea,select,[contenteditable],[contenteditable] *{-webkit-user-select:text;user-select:text}
-#autoSw{display:inline-flex;align-items:center;gap:8px;font-size:13px;border:0;background:transparent;margin-left:8px;white-space:nowrap}#autoSw .swk{display:inline-block;width:30px;height:16px;border:1px solid var(--bd);background:var(--bd2,#ddd);box-sizing:border-box;box-shadow:inset 15px 0 0 #fff}#autoSw.on .swk{background:var(--fg);border-color:var(--fg);box-shadow:inset -15px 0 0 #fff}
+#autoSw{display:inline-flex;align-items:center;gap:8px;color:var(--fg)!important;border:0;background:transparent;margin-left:8px;white-space:nowrap}#autoSw .swk{display:inline-block;width:30px;height:16px;border:1px solid var(--bd);background:var(--bd2,#ddd);box-sizing:border-box;box-shadow:inset 15px 0 0 #fff}#autoSw.swOn .swk{background:var(--fg);border-color:var(--fg);box-shadow:inset -15px 0 0 #fff}
 #top:not(.lay)>*:not(.brand){visibility:hidden}#top:not(.lay) .citysel{visibility:hidden}
 #amFly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}#amFly[hidden]{display:none}
 #amFly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}#amFly button:hover{background:var(--tab)}#amFly button.on{font-weight:700}
@@ -204,6 +205,7 @@ body{-webkit-user-select:none;user-select:none}input,textarea,select,[contentedi
 .leaflet-left{margin-left:52px!important}.leaflet-right{margin-right:var(--sw,calc(392px*var(--z,1)))}
 #status{left:calc(52px + (100% - 52px - var(--sw,392px*var(--z,1)))/2)!important}}
 @media(max-width:700px){#tools{flex-direction:row;flex-wrap:wrap;justify-content:center;border-right:0;border-bottom:1px solid var(--bd)}#tools .tsep{width:0;height:28px;border-top:0;border-left:1px solid var(--bd);margin:0 4px}}
+#appTip{position:fixed;z-index:6000;max-width:min(300px,calc(100vw - 12px));padding:6px 10px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none;white-space:pre-line}#appTip[hidden]{display:none}
 </style></head><body>
 <header id="top">
  <div class="brand"><i data-ic="route"></i><b>TransitMaker</b><select id="citySel" class="citysel" title="Zmień miasto (obszar pobieranych danych OSM)"><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
@@ -331,7 +333,7 @@ function netStore(j){const seq=++_netSeq;let ok=false;
 // with "Autozapis na koncie" on – a few seconds after each change; read back from the menu ("Wczytaj z konta…")
 const SV={on:false,loc:null};try{const a=localStorage.getItem('gdn-autosave');SV.on=a==='1'||(a==null&&localStorage.getItem('gdn-acc-auto')==='1');SV.loc=localStorage.getItem('gdn-sv-loc')||(localStorage.getItem('gdn-acc-auto')==='1'?'acc':null)}catch(e){}
 function svApply(){FS.auto=!!(SV.on&&SV.loc==='file'&&FS.h);ACCP.auto=!!(SV.on&&SV.loc==='acc'&&accTok());try{localStorage.setItem('gdn-autosave',SV.on?'1':'0');if(SV.loc)localStorage.setItem('gdn-sv-loc',SV.loc);localStorage.setItem('gdn-acc-auto',ACCP.auto?'1':'0')}catch(e){}svUI()}
-function svUI(){const b=document.getElementById('autoSw');if(!b)return;b.classList.toggle('on',SV.on);b.setAttribute('aria-checked',String(SV.on));
+function svUI(){const b=document.getElementById('autoSw');if(!b)return;b.classList.toggle('swOn',SV.on);b.setAttribute('aria-checked',String(SV.on));
  b.title=!SV.on?'Autozapis: zmiany zapisują się same w miejscu, w którym zapisano lub otwarto projekt (plik albo konto)':SV.loc==='file'?(FS.h?'Autozapis do pliku „'+FS.h.name+'”':'Autozapis do pliku – połącz plik ponownie (Plik › Połącz z plikiem)'):'Autozapis na koncie ZbiorkomInfo'}
 function svLoc(x){SV.loc=x;svApply()}
 async function svToggle(){if(SV.on){SV.on=false;svApply();say('Autozapis wyłączony.');return}
@@ -1405,6 +1407,7 @@ function newLine(k){const rm=k==='tram'||k==='rail'?k:'street',l={id:'l'+Date.no
 const openGrp=new Set(),PLC=new Intl.Collator('pl');
 function renderStops(){
  const q=$('#flt').value.toLowerCase(),box=$('#stops');box.innerHTML='';
+ if(!q.trim()){$('#cnt').textContent='';box.innerHTML=`<div class="stEmpty">${ic('search')}<div>Wyszukaj przystanek, wpisując jego nazwę w polu powyżej.</div><small>Przystanków w projekcie: ${S.stops.length}</small></div>`;return}
  const all=S.stops.filter(s=>lab(s).toLowerCase().includes(q)||s.name.toLowerCase().includes(q)).sort((a,b)=>PLC.compare(a.name,b.name)||PLC.compare(a.num||'',b.num||''));
  const groups=[],gm=new Map();all.forEach(s=>{const k=baseName(s);let g=gm.get(k);if(!g){g={k,items:[]};gm.set(k,g);groups.push(g)}g.items.push(s)});
  $('#cnt').textContent=`Przystanki: ${all.length} z ${S.stops.length}`+(groups.length<all.length?` · ${groups.length} nazw`:'')+(groups.length>150?' (pokazano 150 – zawęź wyszukiwanie)':'');
@@ -2571,7 +2574,7 @@ icons();applyUI();applyTab('t1');
  const sep=()=>{const d=document.createElement('div');d.className='tsep';return d};
  const am=$('#amode'),rb=$('#routebar'),g=document.createElement('div');g.className='tgrp';
  const amB=document.createElement('button');amB.className='b';amB.id='amBtn';amB.type='button';amB.setAttribute('aria-haspopup','menu');
- g.append(sep(),amB);T.appendChild(g);rb.style.display='none';rb.dataset.moved='1';
+ amB.style.display='none';g.append(amB);T.appendChild(g);rb.style.display='none';rb.dataset.moved='1';
  // the ways a route may be led (snapping, one-way streets, closed roads): a small box over the panel on the right, its switches named
  const RO=document.createElement('div');RO.id='routeOpts';RO.innerHTML='<div class="roH">Prowadzenie trasy</div><div class="roG"></div>';const ROG=RO.lastChild;
  ['strictTr','owTr','closedTr'].forEach(id=>{const b=$('#'+id);if(!b)return;b.classList.remove('ico');b.classList.add('roB');ROG.appendChild(b)});
@@ -2581,9 +2584,9 @@ icons();applyUI();applyTab('t1');
  const fly=document.createElement('div');fly.id='amFly';fly.hidden=true;fly.setAttribute('role','menu');document.body.appendChild(fly);
  const tip=document.createElement('div');tip.id='tip';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.appendChild(tip);
  window.tipHide=()=>{tip.hidden=true};
- window.amShow=()=>{const cur=amCur(),k=KIND[cur]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===cur}" data-v="${v}" class="${v===cur?'on':''}">${ic(i)}${t}</button>`).join('')};
+ window.amShow=()=>{const cur=amCur(),k=KIND[cur]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===cur}" data-v="${v}" class="${v===cur?'on':''}">${ic(i)}${t}</button>`).join('');if(window.dShow)dShow()};
  amB.onclick=e=>{e.stopPropagation();if(!fly.hidden){fly.hidden=true;return}amShow();const r=amB.getBoundingClientRect();fly.hidden=false;fly.style.left=(innerWidth>700?r.right+6:r.left)+'px';fly.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
- fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;const v=b.dataset.v,amv=v==='trolley'?'street':v,l=selLine();if(l){if(v==='trolley')l.veh='trolley';else delete l.veh}if(am.value!==amv){am.value=amv;am.dispatchEvent(new Event('change'))}else if(l){save();renderLines()}amShow()};
+ fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;const v=b.dataset.v,amv=v==='trolley'?'street':v,l=selLine();if(l){if(v==='trolley')l.veh='trolley';else delete l.veh}if(am.value!==amv){am.value=amv;am.dispatchEvent(new Event('change'))}else if(l){save();renderLines()}amShow();const dB=T.querySelector('[data-m="draw"]');if(dB&&mode!=='draw'){window._dlp=false;dB.click()}};
  document.addEventListener('click',()=>{fly.hidden=true});
  const D={nav:['Wybór','Przeglądanie mapy; najechanie na przystanek pozwala go edytować.'],draw:['Rysuj linię','Rysowanie trasy kliknięciami na mapie.'],edit:['Edytuj linię','Przeciąganie punktów narysowanej linii zmienia jej przebieg; kliknięcie linii dodaje punkt.'],
   pick:['Wybieraj przystanki','Klikanie kolejnych przystanków linii – trasa prowadzi się między nimi sama.'],stop:['Dodaj przystanek','Dodawanie własnych przystanków.'],move:['Przenieś przystanek','Przeciąganie przystanków – przystanek zostaje przypisany do swoich linii.'],infra:['Dorysuj tor lub drogę','Dorysowanie toru lub drogi, których nie ma na mapie.'],
@@ -2613,6 +2616,14 @@ icons();applyUI();applyTab('t1');
   ib.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);lpF=false;ikOpen()});
   ifl.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;ifl.hidden=true;if(ik.value!==b.dataset.v){ik.value=b.dataset.v;ik.dispatchEvent(new Event('change'))}ikShow();lpF=false;if(mode!=='infra')ib.click()};
   document.addEventListener('click',()=>{ifl.hidden=true});ikShow()}
+ // the pencil of the lines: held (or right-clicked), the kinds of line beside it – what it draws, and what the selected line is
+ {const db=T.querySelector('[data-m="draw"]');let lpT=0;window._dlp=false;db.setAttribute('aria-haspopup','menu');
+  window.dShow=()=>{const k=KIND[amCur()]||KIND.tram;db.innerHTML=ic('pencil')+'<span class="kd">'+ic(k[0])+'</span>';db.dataset.tl='Rysuj linię: '+k[1].replace('Linia ','');db.dataset.td='Klikaj kolejne punkty trasy na mapie. Przytrzymaj, aby wybrać rodzaj linii: tramwajową, autobusową, trolejbusową albo kolejową.';db.setAttribute('aria-label',db.dataset.tl)};
+  const dOpen=()=>{amShow();const r=db.getBoundingClientRect();fly.hidden=false;fly.style.left=(innerWidth>700?r.right+6:r.left)+'px';fly.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
+  db.addEventListener('pointerdown',e=>{if(e.button)return;window._dlp=false;clearTimeout(lpT);lpT=setTimeout(()=>{window._dlp=true;dOpen()},450)});
+  ['pointerup','pointerleave','pointercancel'].forEach(t=>db.addEventListener(t,()=>clearTimeout(lpT)));
+  db.addEventListener('click',e=>{if(window._dlp){window._dlp=false;e.stopImmediatePropagation();e.preventDefault()}},true);
+  db.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);window._dlp=false;dOpen()});dShow()}
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
  br.after(fdd);fdd.after(ldd);const asw=document.createElement('button');asw.type='button';asw.id='autoSw';asw.className='b flat';asw.setAttribute('role','switch');asw.innerHTML='Autozapis<i class="swk"></i>';asw.onclick=()=>svToggle();top.appendChild(asw);top.appendChild(cs);cs.style.marginLeft='8px';svUI();top.classList.add('lay');
  applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
@@ -2641,4 +2652,19 @@ if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) �
 }else bootData();
 
 setTimeout(()=>{try{ziExport()}catch(e){}},2500);   // (the network for ZbiorkomInfo also right after opening)
+
+// ---- the app's own labels on hovering, in place of the browser's: an element's title is taken while the mouse is over it (and
+// given back when it leaves), its text shown in a small box below it (above, where there is no room)
+(function(){const T=document.createElement('div');T.id='appTip';T.setAttribute('role','tooltip');T.hidden=true;document.body.appendChild(T);
+ let cur=null,tm=0;
+ const take=el=>{const t=el.getAttribute('title');el.removeAttribute('title');if(t&&t.trim()){el.dataset.tipT=t;if(!el.hasAttribute('aria-label')&&!(el.textContent||'').trim())el.setAttribute('aria-label',t)}};
+ const vis=()=>{clearTimeout(tm);T.hidden=true};
+ const release=()=>{vis();if(cur){if(cur.dataset.tipT!=null&&!cur.hasAttribute('title'))cur.setAttribute('title',cur.dataset.tipT);delete cur.dataset.tipT;cur=null}};
+ const show=()=>{if(!cur||!cur.isConnected)return;const t=cur.dataset.tipT;if(!t)return;T.textContent=t;T.hidden=false;const r=cur.getBoundingClientRect(),w=T.offsetWidth,h=T.offsetHeight;
+  T.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+'px';T.style.top=(r.bottom+8+h>innerHeight-6?Math.max(6,r.top-h-8):r.bottom+8)+'px'};
+ document.addEventListener('pointerover',e=>{if(e.pointerType&&e.pointerType!=='mouse')return;const el=e.target.closest&&e.target.closest('[title],[data-tip-t]');if(el===cur)return;release();
+  if(!el||el.tagName==='IFRAME'||el.tagName==='HTML'||el.tagName==='BODY')return;cur=el;take(el);if(cur.dataset.tipT)tm=setTimeout(show,380)},true);
+ document.addEventListener('pointerout',e=>{if(cur&&!(e.relatedTarget&&cur.contains(e.relatedTarget)))release()},true);
+ document.addEventListener('pointermove',()=>{if(cur&&cur.hasAttribute('title')){take(cur);if(!T.hidden)show()}},true);
+ ['pointerdown','keydown','wheel'].forEach(t=>document.addEventListener(t,vis,true));addEventListener('scroll',vis,true);addEventListener('blur',release)})();
 </script></body></html>

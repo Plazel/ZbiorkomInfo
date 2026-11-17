@@ -868,6 +868,7 @@ ROWS = [
     ('Przyciąganie', 'Snapping', 'Einrasten', 'Prichytávanie', 'Přichytávání'),
     ('Ignoruj jednokierunkowość', 'Ignore one-way streets', 'Einbahnstraßen ignorieren', 'Ignorovať jednosmerky', 'Ignorovat jednosměrky'),
     ('Ignoruj zakaz wjazdu', 'Ignore no-entry', 'Einfahrverbot ignorieren', 'Ignorovať zákaz vjazdu', 'Ignorovat zákaz vjezdu'),
+    ('Funkcja niedostępna w TransitMaker', 'Not available in TransitMaker', 'In TransitMaker nicht verfügbar', 'V TransitMakeri nedostupné', 'V TransitMakeru nedostupné'),
 ]
 
 WEEKDAYS = {
