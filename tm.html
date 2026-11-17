@@ -2017,7 +2017,7 @@ const kindName=m=>m==='tram'?'Tramwaj':m==='rail'?'Kolej':'Autobus';
 // ================= NOWE: schemat interaktywny =================
 function schemaRuntime(){
  var $=function(i){return document.getElementById(i)};
- var svg=$('sv'),wr=$('wr'),cv=$('cv'),vb0=svg.getAttribute('viewBox').split(' ').map(Number),vb=vb0.slice(),vbC=vb0.slice(),cw=1,ch=1,mg=[0,0],drag=null,moved=false,gT=0,rq=0,multi=false,sel=[],cost=0;
+ var svg=$('sv'),wr=$('wr'),cv=$('cv'),vb0=svg.getAttribute('viewBox').split(' ').map(Number),vb=vb0.slice(),vbC=vb0.slice(),cw=1,ch=1,mg=[0,0],drag=null,moved=false,gT=0,rq=0,multi=true,sel=[],cost=0;svg.classList.add('shownums');
  var NS='http://www.w3.org/2000/svg',linesBox=svg.querySelector('#lines'),ORD=[].slice.call(linesBox.children),top=document.createElementNS(NS,'g');
  top.setAttribute('id','ltop');linesBox.parentNode.insertBefore(top,linesBox.nextSibling);
  // ---- widok: w trakcie przeciągania / przybliżania przesuwamy i skalujemy gotowy obraz (transformacja CSS warstwy-opakowania #wr – bez przemalowywania
@@ -2041,7 +2041,7 @@ function schemaRuntime(){
  function zoom(f,cx,cy){var r=cv.getBoundingClientRect(),px=cx==null?.5:(cx-r.left)/r.width,py=cy==null?.5:(cy-r.top)/r.height,nw=vb[2]/f,nh=vb[3]/f;vb=[vb[0]+(vb[2]-nw)*px,vb[1]+(vb[3]-nh)*py,nw,nh];sched()}
  // ---- zaznaczanie linii (jedna lub kilka naraz). Wygaszenie reszty robi jeden dynamiczny arkusz stylów (selektory po data-l / data-ls),
  // więc nie trzeba przełączać klas na tysiącach elementów; w DOM przestawiane są tylko zaznaczone linie (warstwa #ltop nad pozostałymi).
- var hint=$('hint'),lgs=[].slice.call(document.querySelectorAll('.lg')),selSt=document.createElement('style'),H0='Kliknij linię na schemacie lub w legendzie, aby wyszarzyć pozostałe. Ctrl lub Shift + klik (albo przycisk „Wiele linii”) zaznacza kilka linii naraz.';document.head.appendChild(selSt);
+ var hint=null,H0='',lgs=[].slice.call(document.querySelectorAll('.lg')),selSt=document.createElement('style');document.head.appendChild(selSt);
  function q(v){return '"'+String(v).replace(/["\\]/g,'\\$&')+'"'}
  function setSel(ids){
   sel=ids;var o={};ids.forEach(function(i){o[i]=1});svg.classList.toggle('has-sel',ids.length>0);
@@ -2061,20 +2061,23 @@ function schemaRuntime(){
  svg.addEventListener('click',function(e){if(moved){moved=false;return}var g=e.target.closest?e.target.closest('.ln'):null;if(g)choose(g.getAttribute('data-l'),mod(e));else if(sel.length)setSel([])});
  lgs.forEach(function(b){b.addEventListener('click',function(e){choose(b.getAttribute('data-l'),mod(e))})});
  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&sel.length)setSel([])});
- $('bzi').onclick=function(){zoom(1.3)};$('bzo').onclick=function(){zoom(1/1.3)};$('bfit').onclick=fit;
- $('bmulti').onclick=function(){multi=!multi;this.classList.toggle('on',multi)};
- $('bnum').onclick=function(){svg.classList.toggle('shownums');this.classList.toggle('on')};
- $('bthm').onclick=function(){document.documentElement.classList.toggle('dk')};
- $('bprn').onclick=function(){window.print()};
+ $('bfit').onclick=fit;
+ var inTM=window.parent!==window,dlm=$('dlm'),bdl=$('bdl');if(inTM)$('bregen').hidden=false;
+ $('bregen').onclick=function(){parent.postMessage({schema:'regen'},'*')};
+ function menu(o){dlm.hidden=!o;bdl.setAttribute('aria-expanded',String(o))}
+ bdl.onclick=function(e){e.stopPropagation();menu(dlm.hidden)};document.addEventListener('click',function(){menu(false)});
+ dlm.onclick=function(e){var b=e.target.closest('[data-dl]');if(!b)return;menu(false);var k=b.getAttribute('data-dl');
+  // PDF: the browser's print to a PDF file (the whole network on one page); HTML: this very page (inside TransitMaker – the file it made)
+  if(k==='pdf')window.print();else if(k==='svg')dlSvg();else if(inTM)parent.postMessage({schema:'html'},'*');else{var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<!doctype html>\n'+document.documentElement.outerHTML],{type:'text/html'}));a.download='schemat-sieci.html';document.body.appendChild(a);a.click();a.remove()}};
  window.addEventListener('beforeprint',function(){var s=wr.style;s.transform='';s.left=s.top='0';s.width='100%';s.height='100%';svg.setAttribute('viewBox',vb.join(' '))});
  window.addEventListener('afterprint',commit);
- $('bsvg').onclick=function(){
+ function dlSvg(){
   var c=svg.cloneNode(true),cs=getComputedStyle(document.documentElement),bg=cs.getPropertyValue('--bg').trim();
   c.removeAttribute('id');c.removeAttribute('style');c.setAttribute('viewBox',vb0.join(' '));c.setAttribute('width',vb0[2]);c.setAttribute('height',vb0[3]);c.removeAttribute('class');
   var tp=c.querySelector('#ltop');if(tp)tp.removeAttribute('id');
   var s=new XMLSerializer().serializeToString(c).replace(/var\(--(\w+)\)/g,function(m,n){return cs.getPropertyValue('--'+n).trim()||m});
   s=s.replace(/(<svg[^>]*>)/,'$1<rect x="'+vb0[0]+'" y="'+vb0[1]+'" width="'+vb0[2]+'" height="'+vb0[3]+'" fill="'+bg+'"/>');
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+s],{type:'image/svg+xml'}));a.download='schemat-sieci.svg';document.body.appendChild(a);a.click();a.remove()};
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+s],{type:'image/svg+xml'}));a.download='schemat-sieci.svg';document.body.appendChild(a);a.click();a.remove()}
  window.addEventListener('resize',fit);fit();setSel([])}
 
 function buildSchema(spread=1){
@@ -2428,10 +2431,11 @@ main{flex:1;display:flex;min-height:0}aside{width:270px;overflow:auto;padding:10
 .lg{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:5px 6px;border:1px solid transparent;border-radius:0;background:transparent;color:var(--ink);cursor:pointer;font:inherit}.lg:hover{background:var(--bg)}.lg.on{background:var(--bg);border-color:var(--ink)}
 .bd{min-width:34px;height:30px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex:none;padding:0 4px}.rt{display:flex;flex-direction:column;font-weight:600;font-size:13px;line-height:1.25}.rt small{font-weight:400;color:var(--mut);font-size:11px}
 #cv{flex:1;min-width:0;position:relative;overflow:hidden}#wr{position:absolute;left:0;top:0;width:100%;height:100%;will-change:transform}#sv{position:absolute;left:0;top:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none;user-select:none}#sv:active{cursor:grabbing}
-#nums{display:none}svg.shownums #nums{display:block}button.tb.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+button.tb.ico{display:inline-flex;align-items:center;justify-content:center;width:34px;height:32px;padding:0}.dl{position:relative;display:inline-flex}.dlm{position:absolute;right:0;top:calc(100% + 4px);z-index:5;display:flex;flex-direction:column;min-width:140px;background:var(--bg);border:1px solid var(--bd);box-shadow:0 6px 18px rgba(0,0,0,.18)}.dlm[hidden]{display:none}.dlm button{font:inherit;font-size:13px;text-align:left;padding:8px 12px;border:0;background:transparent;color:var(--ink);cursor:pointer}.dlm button:hover{background:var(--pn)}
+button.tb.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 @media(max-width:700px){aside{width:100%;max-height:34%;border-right:0;border-bottom:1px solid var(--bd)}main{flex-direction:column}}
-@media print{header,aside{display:none}#cv{overflow:visible}}`;
- return `<!doctype html><html lang="pl"${dark?' class="dk"':''}><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schemat sieci transportu – ${esc(CITIES[cityKey()].n)}</title><style>${css}</style></head><body><header><span class="t">Schemat sieci transportu</span><span class="m">${esc(CITIES[cityKey()].n)} · ${esc(date)} · ${lines.length} lin. · ${N.length} przystanków</span><span class="g"></span><button class="tb" id="bzi">Przybliż</button><button class="tb" id="bzo">Oddal</button><button class="tb" id="bfit">Dopasuj widok</button><button class="tb" id="bsvg">Pobierz SVG</button><button class="tb" id="bprn">Drukuj</button><button class="tb" id="bmulti" title="Włączone: kliknięcie linii dodaje ją do zaznaczenia (albo usuwa), zamiast zastępować zaznaczenie. Ctrl lub Shift + klik działa zawsze w ten sposób.">Wiele linii</button><button class="tb" id="bnum" title="Pokaż numery linii wzdłuż odcinków">Numery na liniach</button><button class="tb" id="bthm">Jasny / ciemny</button></header><main><aside><p id="hint"></p>${lg}</aside><div id="cv"><div id="wr">${o}</div></div></main><script>(${schemaRuntime.toString()})();<\/script></body></html>`}
+@media print{@page{size:landscape;margin:8mm}header,aside{display:none}#cv{overflow:visible}}`;
+ return `<!doctype html><html lang="pl"${dark?' class="dk"':''}><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Schemat sieci transportu – ${esc(CITIES[cityKey()].n)}</title><style>${css}</style></head><body><header><span class="t">Schemat sieci transportu</span><span class="m">${esc(CITIES[cityKey()].n)} · ${esc(date)} · ${lines.length} lin. · ${N.length} przystanków</span><span class="g"></span><button class="tb ico" id="bfit" title="Dopasuj widok" aria-label="Dopasuj widok"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button><span class="dl"><button class="tb ico" id="bdl" title="Pobierz jako" aria-label="Pobierz jako" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg></button><span class="dlm" id="dlm" role="menu" hidden><button role="menuitem" data-dl="pdf">Plik PDF</button><button role="menuitem" data-dl="svg">Plik SVG</button><button role="menuitem" data-dl="html">Plik HTML</button></span></span><button class="tb ico" id="bregen" title="Wygeneruj ponownie" aria-label="Wygeneruj ponownie" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button></header><main><aside>${lg}</aside><div id="cv"><div id="wr">${o}</div></div></main><script>(${schemaRuntime.toString()})();<\/script></body></html>`}
 let schemaHTML=null;
 async function openSchema(){
  closeMenus();say('Generowanie schematu…');
@@ -2440,7 +2444,11 @@ async function openSchema(){
  if(!html){say('Brak widocznych linii z co najmniej dwoma przystankami – nie ma z czego zbudować schematu.');return}
  schemaHTML=html;say('Schemat gotowy.');
  const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-downloads allow-modals');fr.srcdoc=html;fr.style.cssText='width:100%;height:100%;border:0;display:block;background:#fff';
- modal({title:'Schemat interaktywny sieci',body:fr,wide:true,flush:true,cancelV:true,btns:[{t:ic('refresh',14)+'Wygeneruj ponownie',fn:()=>{try{const h=buildSchema();if(h){schemaHTML=h;fr.srcdoc=h}}catch(e){say('Błąd: '+e.message)}}},{t:ic('download',14)+'Pobierz plik HTML',fn:()=>dlFile('schemat-sieci.html',schemaHTML,'text/html;charset=utf-8')},{t:'Zamknij',v:true,c:'pri'}]})}
+ const onMsg=e=>{if(e.source!==fr.contentWindow||!e.data)return;
+  if(e.data.schema==='regen'){try{const h=buildSchema();if(h){schemaHTML=h;fr.srcdoc=h}}catch(x){say('Błąd: '+x.message)}}
+  else if(e.data.schema==='html')dlFile('schemat-sieci.html',schemaHTML,'text/html;charset=utf-8')};
+ window.addEventListener('message',onMsg);
+ modal({title:'Schemat interaktywny sieci',body:fr,wide:true,flush:true,cancelV:true,btns:[{t:'Zamknij',v:true,c:'pri'}]}).finally(()=>window.removeEventListener('message',onMsg))}
 $('#fSchema').onclick=openSchema;
 
 // ---- pomoc: uruchomienie przez lokalny serwer (podkład OSM)
