@@ -1512,9 +1512,10 @@ function lineCard(l,M){
   if(a==='x'&&!own){const id=A[i],ix=T.stops.indexOf(id);
    if(ix>=0){if(!T.auto)(T.excl=T.excl||[]).push(id);T.stops.splice(ix,1)}
    else{T.excl=(T.excl||[]).filter(x=>x!==id);let at=0;for(let j=i-1;j>=0;j--){const p=T.stops.indexOf(A[j]);if(p>=0){at=p+1;break}}T.stops.splice(at,0,id)}
-   save();renderLines();drawStops();stopsChanged(T);return}
+   save();renderLines();drawStops();stopsChanged(T);if(ix>0&&ix<T.stops.length&&!T.auto)gapFix(T,ix);return}
+  const gap=a==='x'&&!O.auto&&i>0&&i<A.length-1;
   if(a==='x'){const rid=A[i];if(!O.auto)(O.excl=O.excl||[]).push(rid);A.splice(i,1);if(!O.par)S.lines.filter(x=>x.par===O.id).forEach(v=>{const k=v.stops.indexOf(rid);if(k<0)return;if(!v.auto)(v.excl=v.excl||[]).push(rid);v.stops.splice(k,1);stopsChanged(v)})}else if(a==='u'&&i>0)[A[i-1],A[i]]=[A[i],A[i-1]];else if(a==='d'&&i<A.length-1)[A[i+1],A[i]]=[A[i],A[i+1]];
-  save();renderLines();drawStops();stopsChanged(O)});
+  save();renderLines();drawStops();stopsChanged(O);if(gap)gapFix(O,i)});
  return c}
 // a new line of the kind chosen (+ at the foot of the panel): trams and trains with a round number, buses and trolleybuses a square one;
 // trolleybuses go along the streets as buses do – only their kind differs
@@ -1745,6 +1746,20 @@ async function rebuild(l,verbose,quiet){
  if(verbose){const all=l.segs.flatMap(x=>x.pts);if(all.length)map.fitBounds(L.latLngBounds(all),{padding:[30,30]});
   say(`Trasa gotowa: ${l.segs.length} odc.`+(nfl.length?` Uwaga: ${nfl.length} odc. poprowadzono zwykłym trasowaniem, bo routing lokalny (jednokierunkowość / zamknięte drogi) nie był tam możliwy: ${nfl[0].nf}.`:'')+(fbl.length?` Uwaga: ${fbl.length} odc. poprowadzono zwykłym trasowaniem, bo nie udało się pobrać danych dróg (${fbl[0].fbMsg}). Wynik nie jest zapamiętywany – następna zmiana przystanków tej linii ponowi próbę.`:'')+(badl.length?` Bez trasy: ${badl.length} odc. – `+badl.slice(0,2).join('; ')+(badl.length>2?'…':'')+'. Takie odcinki mają czerwoną kreskę pośrodku.':''))}}
 function trimToStops(l){const w=stripLoop(l);trimToStops0(l);if(w)reLoop(l)}
+// usunięcie przystanka ze środka narysowanej (ręcznie) trasy: odcinek między sąsiednimi przystankami jest prowadzony na nowo, jeśli narysowany
+// przebieg był wyraźnie dłuższy niż droga wprost między nimi (objazd do usuniętego przystanka: pętla, zjazd w bok) – wtedy linia przestaje do niego zajeżdżać;
+// gdy przystanek leżał na drodze, przebieg zostaje taki, jak go narysowano
+async function gapFix(l,k){
+ if(l.auto||l.loop||!l.segs.length||k<1||k>=l.stops.length)return;
+ const am=UI.strict?(l.rm||$('#amode').value):'free';if(am==='free')return;
+ const st=l.stops.map(id=>stopOf(id));if(st.some(x=>!x))return;
+ const ch=chainArcs(l.segs,st);if(!ch)return;const a0=ch.a[k-1],a1=ch.a[k];if(!(a1>a0))return;
+ const A=st[k-1],B=st[k],r=await segRoute(A,B,am);if(!r||r.bad||!r.pts||r.pts.length<2)return;
+ const rl=segsLen([{pts:r.pts}]),dl=a1-a0;if(dl<=rl*1.15+60)return;
+ const T=segsLen(l.segs),before=sliceSegs(l.segs,0,a0),after=sliceSegs(l.segs,a1,T+1);
+ l.segs=[...before,{mode:r.mode,pts:r.pts},...after].filter(x=>x.pts&&x.pts.length>1&&segsLen([x])>.5);
+ l.wp=[l.segs[0].pts[0],...l.segs.map(x=>x.pts[x.pts.length-1])];
+ save();redraw();renderLines();say(`Trasa poprowadzona na nowo między przystankami ${lab(A)} i ${lab(B)}.`)}
 // Położenie kolejnych przystanków (w kolejności listy) wzdłuż trasy. Gdy trasa mija przystanek kilka razy (przejazd tam i z powrotem po tych samych torach),
 // „najbliższy punkt trasy” bywa na drodze powrotnej – przycinanie trasy do przystanków zostawiało wtedy fragment przy usuniętym przystanku, a obcinało zupełnie
 // inny koniec. Wybieramy więc przejazdy zgodne z kolejnością listy: dla każdego przystanka pierwszy możliwy (wśród przejazdów niewiele gorszych od najbliższego;
