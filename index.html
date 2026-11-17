@@ -1823,7 +1823,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794878464;
+const APP_BUILD=1794879851;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7436,7 +7436,7 @@ function nmRoute(Lx){const keys=Object.keys(IDX.days||{w0:1,s0:1,h0:1});
     const nm=k=>IDX.stops[ids[k]][0];
     return {d:String(di),head:nm(ids.length-1),from:nm(0),stops:ids.map(id=>[id,0,0,'',0]),pats:[ids.map((_,i)=>i)],notes:[''],prof:[[0,d.off]],shape:d.sh&&d.sh.length>1?d.sh:null,
       plans:['w','s','h'].map(k=>((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(t=>[t,0,0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1]}});
-  return {id:'nml'+Lx.id,n:Lx.n,t:Lx.kind==='tram'?'tram':Lx.kind==='rail'?'rail':'bus',op:'NM',dates:IDX.days,dirs,lt:[]}}
+  return {id:'nml'+Lx.id,n:Lx.n,t:Lx.kind==='tram'?'tram':Lx.kind==='rail'?'rail':Lx.kind==='trolley'?'trol':'bus',op:'NM',dates:IDX.days,dirs,lt:[]}}
 // the network into the index (and the map's data): its stops and lines replace those put in before
 function nmInject(){if(!IDX)return;Object.keys(IDX.stops).forEach(k=>{if(k.startsWith('nm_')||k.startsWith('nmu_'))delete IDX.stops[k]});IDX.routes=IDX.routes.filter(r=>r.op!=='NM');Object.keys(CACHE).forEach(k=>{if(k.startsWith('nml'))delete CACHE[k]});
   if(MAP.data)Object.keys(MAP.data.routes).forEach(k=>{if(k.startsWith('nml'))delete MAP.data.routes[k]});

@@ -175,8 +175,25 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #tools .tsep{width:28px;border-top:1px solid var(--bd);margin:4px 0;flex:none}#tools #modebar,#tools .tgrp{display:contents}
 #pFile,#pLay{left:0;right:auto}
 #side>#modebar{display:none}
-#routeOpts{display:flex;flex-direction:column;gap:2px;margin:8px 10px 6px;padding:8px 10px;border:1px solid var(--bd);background:var(--panel)}#routeOpts .roH{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:2px}
-#routeOpts .roB{display:flex;align-items:center;gap:9px;width:100%;justify-content:flex-start;text-align:left;padding:6px 8px;font-size:13px;border:0;background:transparent!important;color:var(--fg)!important}#routeOpts .roB::after{content:'';margin-left:auto;width:30px;height:16px;border:1px solid var(--bd);background:var(--bd2,#ddd);box-sizing:border-box;box-shadow:inset 15px 0 0 #fff}#routeOpts .roB.on::after{background:var(--fg);box-shadow:inset -15px 0 0 #fff}#routeOpts .roB:hover{background:var(--tab)!important}#top:not(.lay)>*:not(.brand){visibility:hidden}#top:not(.lay) .citysel{visibility:hidden}
+#routeOpts{display:flex;flex-direction:column;gap:8px;margin:0;padding:12px;border:0;border-bottom:1px solid var(--bd);background:var(--panel)}#routeOpts .roH{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}#routeOpts .roG{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+#routeOpts .roB{display:flex;align-items:center;justify-content:center;height:46px;width:100%;padding:0;border:1px solid var(--bd)!important;background:var(--bg)!important;color:var(--fg)!important}#routeOpts .roB svg{width:21px;height:21px;margin:0}#routeOpts .roB:hover{background:var(--tab)!important}#routeOpts .roB.on{background:var(--fg)!important;color:var(--panel)!important;border-color:var(--fg)!important}
+.tfly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}.tfly[hidden]{display:none}.tfly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}.tfly button:hover{background:var(--tab)}.tfly button.on{font-weight:700}
+#tools .b{position:relative}#tools .b .kd{position:absolute;right:2px;bottom:2px;display:flex;background:var(--bg);border-radius:2px}#tools .b .kd svg{width:11px;height:11px}#tools .b.on .kd{background:transparent}
+#sideFoot{display:flex;align-items:center;gap:6px;padding:6px 8px;border-top:1px solid var(--bd);background:var(--panel)}#sideFoot .b{width:36px;height:36px;padding:0;justify-content:center}#sideFoot .b svg{width:20px;height:20px;margin:0}
+.card .lnh{align-items:center}.card .lnh .dg{flex:none;margin:0 -2px 0 -6px;width:24px;height:36px;padding:0;justify-content:center}
+.lnModal{width:min(660px,100%)!important}.lnModal .mb{overflow:auto}.lnEd .lnh{margin-bottom:4px}.lnEd .lnSec{padding:14px 0 6px;border-top:1px solid var(--bd2);margin-top:12px}.lnEd .lnSec>h4{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}.lnEd .vwar .vrow .vn{display:none}
+.stTop{display:flex;gap:6px;margin-bottom:8px}.stTop .sq{position:relative;flex:1;min-width:0}.stTop .sq input{width:100%;padding-left:32px;height:36px}.stTop .sqi{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mut);display:inline-flex;pointer-events:none}.stTop .b.ico{width:36px;height:36px;padding:0;justify-content:center;flex:none}
+#cnt{margin:0 0 6px!important}#stops{border-top:1px solid var(--bd2)}
+#stops .st{display:grid;grid-template-columns:34px minmax(0,1fr) auto 84px;align-items:center;gap:6px;margin:0;padding:3px 2px;min-height:40px;border:0;border-bottom:1px solid var(--bd2);background:none;border-radius:0}
+#stops .st.sub{padding-left:22px;background:var(--tab);margin:0;border-left:0}#stops .st.grp .sn{font-weight:700}
+#stops .sk{display:flex;justify-content:center;gap:1px;color:var(--mut)}#stops .sk svg{width:15px;height:15px;margin:0}
+#stops .sn{border:1px solid transparent;background:transparent;height:30px;padding:0 6px;font:inherit;font-size:13.5px;color:var(--fg);width:100%;min-width:0;flex:none}#stops .sn:hover{border-color:var(--bd)}#stops .sn:focus{border-color:var(--fg);background:var(--panel);outline:0}
+#stops .sl{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-end;align-items:center;max-width:132px}#stops .sl .badge{font-size:11px;padding:2px 5px;min-width:20px;text-align:center;line-height:1.25}#stops .sc{font-size:11.5px;color:var(--mut);white-space:nowrap;margin-right:2px}
+#stops .sa{display:grid;grid-template-columns:repeat(3,28px)}#stops .sa .b,#stops .gt{width:28px;height:28px;padding:0;border:0;background:transparent;justify-content:center;display:inline-flex;align-items:center}#stops .sa .b:hover,#stops .gt:hover{background:var(--bd2)}#stops .sa svg,#stops .gt svg{width:16px;height:16px;margin:0}#stops .gt{justify-self:center}
+#pFile{padding:4px;width:250px}#pFile .fmenu .b{padding:7px 10px;min-height:0}#pFile .fsep{border-top:1px solid var(--bd2);margin:3px 2px}
+body{-webkit-user-select:none;user-select:none}input,textarea,select,[contenteditable],[contenteditable] *{-webkit-user-select:text;user-select:text}
+#autoSw{display:inline-flex;align-items:center;gap:8px;font-size:13px;border:0;background:transparent;margin-left:8px;white-space:nowrap}#autoSw .swk{display:inline-block;width:30px;height:16px;border:1px solid var(--bd);background:var(--bd2,#ddd);box-sizing:border-box;box-shadow:inset 15px 0 0 #fff}#autoSw.on .swk{background:var(--fg);border-color:var(--fg);box-shadow:inset -15px 0 0 #fff}
+#top:not(.lay)>*:not(.brand){visibility:hidden}#top:not(.lay) .citysel{visibility:hidden}
 #amFly{position:fixed;z-index:4000;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);min-width:190px}#amFly[hidden]{display:none}
 #amFly button{display:flex;align-items:center;gap:9px;font:inherit;font-size:13px;padding:8px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;text-align:left}#amFly button:hover{background:var(--tab)}#amFly button.on{font-weight:700}
 #tip{position:fixed;z-index:5000;max-width:260px;padding:8px 11px;background:var(--panel);color:var(--fg);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);font-size:12.5px;line-height:1.4;pointer-events:none}#tip[hidden]{display:none}#tip b{display:block;font-size:13px;margin-bottom:2px}#tip span{color:var(--mut)}
@@ -200,17 +217,12 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
     <button class="b" id="fSaveL"><i data-ic="save"></i>Zapisz (lokalnie)</button>
     <button class="b" id="fAccSave"><i data-ic="upload"></i>Zapisz na koncie</button>
     <button class="b" id="fReconnect" style="display:none"></button>
-    <div class="sech"><i data-ic="refresh"></i>Autozapis</div>
-    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAuto" disabled>Do pliku po każdej zmianie</label>
-    <label class="chk" style="padding:4px 11px"><input type="checkbox" id="fAccAuto">Na koncie po każdej zmianie</label>
-    <div class="small" id="fAccSt" style="padding:0 11px 4px;color:var(--mut)"></div>
-    <div class="sech"></div>
+    <div class="fsep"></div>
     <button class="b" id="fSchema"><i data-ic="network"></i>Schemat…</button>
-    <div class="sech"></div>
     <button class="b" id="delAll" style="color:var(--dng,#c62828)"><i data-ic="trash"></i>Usuń wszystkie linie</button>
-    <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button></span>
+    <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button><input type="checkbox" id="fAuto" disabled><input type="checkbox" id="fAccAuto"><span id="fAccSt"></span></span>
    </div>
-   <div class="small" id="fStat" style="margin:6px 0 0"></div>
+   <div class="small" id="fStat" hidden style="display:none"></div>
    <input type="file" id="file" accept=".json,application/json" hidden>
   </div></div>
  <div class="dd"><button class="b" id="bLay"><i data-ic="layers"></i>Warstwy</button>
@@ -262,28 +274,31 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
   <button class="b" data-m="pick" data-t="t1" title="Klikanie kolejnych przystanków linii"><i data-ic="listcheck"></i>Wybieraj przystanki</button>
   <button class="b" data-m="stop" data-t="t2" title="Dodawanie własnych przystanków"><i data-ic="pinplus"></i>Dodaj przystanek</button>
   <button class="b" data-m="move" data-t="t2" title="Przeciągaj przystanki, aby zmienić ich położenie – przystanek zostaje przypisany do swoich linii"><i data-ic="move"></i>Przenieś przystanek</button>
-  <button class="b" data-m="infra" data-t="t3" title="Dorysowanie toru lub drogi, których nie ma na mapie"><i data-ic="road"></i>Dorysuj tor/drogę</button>
+  <button class="b" data-m="infra" data-t="t3" title="Dorysowanie toru lub drogi, których nie ma na mapie"><i data-ic="pencil"></i>Dorysuj tor/drogę</button>
+  <button class="b" id="infraEdit" data-t="t3" title="Korekta przebiegu torów i dróg: przeciągaj punkty, aby zmienić ich przebieg"><i data-ic="move"></i>Edytuj trasę</button>
+  <button class="b" id="infraDone" data-t="t3"><i data-ic="check"></i>Zakończ</button>
+  <button class="b" id="infraCancel" data-t="t3"><i data-ic="x"></i>Anuluj</button>
  </div>
  <div class="bar2 row" id="routebar"><span class="lab"><i data-ic="route"></i>Trasa</span><select id="amode" class="grow" title="Rodzaj linii – decyduje, po czym prowadzona jest trasa (rysowanie i wybór przystanków)"><option value="tram">Linia tramwajowa</option><option value="street">Linia autobusowa</option><option value="rail">Linia kolejowa</option></select><button class="b ico" id="strictTr" title="Przyciąganie: gdy włączone, linie są przyciągane i dopasowywane do torów/drogi (zależnie od rodzaju linii). Po wyłączeniu można rysować linię w dowolnym miejscu mapy."><i data-ic="magnet"></i></button><button class="b ico" id="closedTr" title="Zamknięte drogi: gdy włączone, trasy po ulicach (linie autobusowe) mogą prowadzić także po odcinkach zamkniętych dla ruchu – budowa, zakaz wjazdu, drogi prywatne. Takie odcinki rysowane są czerwoną linią przerywaną. Pierwsze użycie pobiera dane dróg z Overpass."><i data-ic="closed"></i></button><button class="b ico" id="owTr" title="Ignoruj jednokierunkowość: gdy włączone, trasy po ulicach (linie autobusowe) mogą prowadzić także pod prąd po ulicach jednokierunkowych (ronda pozostają jednokierunkowe). Trasę liczy wtedy lokalny routing na danych dróg z Overpass (tak jak przy „Zamknięte drogi”) – pierwsze użycie pobiera dane. Zwykły routing (OSRM) nie pozwala wyłączyć jednokierunkowości."><i data-ic="twoway"></i></button></div>
  <div class="bar2 row" id="stopbar" style="display:none"><span class="lab"><i data-ic="pin"></i>Rodzaj</span><select id="stopKind" class="grow" title="Rodzaj dodawanego przystanku"><option value="bus">Przystanek autobusowy</option><option value="tram">Przystanek tramwajowy</option><option value="both">Przystanek autobusowo-tramwajowy</option><option value="rail">Przystanek kolejowy</option></select><label class="chk" title="Na torze dwunitkowym dodaje dwa przystanki – po jednym na kierunek"><input type="checkbox" id="stopDbl">Podwójny</label></div>
  <div class="pane on" id="p1">
-  <div class="row wrap"><button class="b pri" id="addL"><i data-ic="plus"></i>Nowa linia</button><span class="grow"></span></div>
   <div class="sech"><i data-ic="route"></i>Linie<span class="grow"></span><button class="b flat" id="toggleAll" title="Ukryj wszystkie linie"></button></div>
   <div id="lines"></div>
  </div>
  <div class="pane" id="p2">
-  <div class="row" style="margin-bottom:8px"><div class="grow" style="position:relative"><input id="flt" placeholder="Szukaj przystanku…" style="width:100%;padding-left:30px"><span style="position:absolute;left:9px;top:8px;color:var(--mut);display:inline-flex"><i data-ic="search"></i></span></div></div><div class="row" style="margin-bottom:8px;gap:6px"><button class="b" id="load" title="Pobiera przystanki z OSM dla bieżącego obszaru – także te, które wcześniej usunąłeś ręcznie"><i data-ic="download"></i>Pobierz z OSM</button><button class="b" id="reloadStops" title="Usuwa wszystkie przystanki tego miasta i wczytuje je od nowa z OSM"><i data-ic="refresh"></i>Wczytaj od nowa</button></div>
-  <div class="row" style="margin-bottom:6px"><div class="small grow" id="cnt" style="margin:0"></div><button class="b" id="clrNums" title="Usuwa numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="trash"></i>Usuń numery</button></div><div id="stops"></div>
+  <div class="stTop"><div class="sq"><input id="flt" placeholder="Szukaj przystanku…"><span class="sqi"><i data-ic="search"></i></span></div><button class="b ico" id="load" title="Pobierz z OSM – przystanki bieżącego obszaru, także te usunięte wcześniej ręcznie"><i data-ic="download"></i></button><button class="b ico" id="reloadStops" title="Wczytaj od nowa – usuwa wszystkie przystanki tego miasta i wczytuje je ponownie z OSM"><i data-ic="refresh"></i></button><button class="b ico" id="clrNums" title="Usuń numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="num"></i></button></div>
+  <div class="small" id="cnt"></div><div id="stops"></div>
  </div>
  <div class="pane" id="p3">
   <div class="secb" style="padding:0">
-   <div class="small" style="margin:0">Dorysuj infrastrukturę, której nie ma na mapie, i prowadź po niej linie. Tory są używane w trybach torowych, drogi – w trybie „po ulicach”, gdy oba końce odcinka leżą przy własnej drodze. Początek nowego toru przyciąga się do istniejących torów, a kolejne punkty tylko do końców własnych torów (żeby można było rysować nitki równolegle). Alt wyłącza przyciąganie.</div>
-   <div class="row wrap"><select id="infraKind"><option value="tram">Tor tramwajowy</option><option value="rail">Tor kolejowy</option><option value="street">Droga</option></select><button class="b pri" id="infraStart"><i data-ic="pencil"></i>Rysuj</button><button class="b" id="infraDone"><i data-ic="check"></i>Zakończ</button><button class="b" id="infraCancel"><i data-ic="x"></i>Anuluj</button><button class="b" id="infraEdit" title="Korekta przebiegu torów i dróg: przeciągaj punkty, aby zmienić ich przebieg"><i data-ic="move"></i>Edytuj trasę</button></div>
+   <div class="small" style="margin:0">Dorysuj infrastrukturę, której nie ma na mapie, i prowadź po niej linie (ołówek na pasku narzędzi – przytrzymaj go, aby wybrać tor tramwajowy, kolejowy albo drogę). Tory są używane w trybach torowych, drogi – w trybie „po ulicach”, gdy oba końce odcinka leżą przy własnej drodze. Początek nowego toru przyciąga się do istniejących torów, a kolejne punkty tylko do końców własnych torów (żeby można było rysować nitki równolegle). Alt wyłącza przyciąganie.</div>
+   <span hidden style="display:none"><select id="infraKind"><option value="tram">Tor tramwajowy</option><option value="rail">Tor kolejowy</option><option value="street">Droga</option></select><button id="infraStart"></button></span>
    <div class="row wrap" style="margin-top:6px"><label class="chk"><input type="checkbox" id="infraRound"><i data-ic="route"></i>Zaokrąglaj rogi automatycznie</label><span class="grow"></span><span class="small" style="margin:0">promień</span><input type="number" id="infraR" min="0" max="500" step="5" style="width:64px"><span class="small" style="margin:0">m</span></div>
    <div class="row wrap" style="margin-top:6px"><label class="chk"><input type="checkbox" id="infraDbl"><i data-ic="route"></i>Tor podwójny (dwie nitki) – odznacz, by rysować pojedynczy</label></div>
    <div id="infraList"></div>
   </div>
  </div>
+ <div id="sideFoot"><button class="b ico flat" id="addL" type="button" title="Nowa linia" aria-label="Nowa linia" aria-haspopup="menu"><i data-ic="plus"></i></button></div>
  <details id="diag"><summary><i data-ic="activity"></i>Diagnostyka</summary><div class="secb"><textarea id="dbg" readonly style="height:140px;font:11px monospace"></textarea><div><button class="b" id="cpDbg"><i data-ic="copy"></i>Kopiuj</button></div></div></details>
 </div>
 <div id="map"></div>
@@ -314,9 +329,23 @@ function netStore(j){const seq=++_netSeq;let ok=false;
   else if(Date.now()-_netW>20000){_netW=Date.now();say('Projekt nie mieści się w pamięci przeglądarki i nie udało się go zapisać w IndexedDB – zapisz go do pliku (menu Plik).')}})}
 // ---- the project on the ZbiorkomInfo account this browser is logged in to (the same site): saved from the File menu, and –
 // with "Autozapis na koncie" on – a few seconds after each change; read back from the menu ("Wczytaj z konta…")
+const SV={on:false,loc:null};try{const a=localStorage.getItem('gdn-autosave');SV.on=a==='1'||(a==null&&localStorage.getItem('gdn-acc-auto')==='1');SV.loc=localStorage.getItem('gdn-sv-loc')||(localStorage.getItem('gdn-acc-auto')==='1'?'acc':null)}catch(e){}
+function svApply(){FS.auto=!!(SV.on&&SV.loc==='file'&&FS.h);ACCP.auto=!!(SV.on&&SV.loc==='acc'&&accTok());try{localStorage.setItem('gdn-autosave',SV.on?'1':'0');if(SV.loc)localStorage.setItem('gdn-sv-loc',SV.loc);localStorage.setItem('gdn-acc-auto',ACCP.auto?'1':'0')}catch(e){}svUI()}
+function svUI(){const b=document.getElementById('autoSw');if(!b)return;b.classList.toggle('on',SV.on);b.setAttribute('aria-checked',String(SV.on));
+ b.title=!SV.on?'Autozapis: zmiany zapisują się same w miejscu, w którym zapisano lub otwarto projekt (plik albo konto)':SV.loc==='file'?(FS.h?'Autozapis do pliku „'+FS.h.name+'”':'Autozapis do pliku – połącz plik ponownie (Plik › Połącz z plikiem)'):'Autozapis na koncie ZbiorkomInfo'}
+function svLoc(x){SV.loc=x;svApply()}
+async function svToggle(){if(SV.on){SV.on=false;svApply();say('Autozapis wyłączony.');return}
+ SV.on=true;const fileOn=async()=>{svLoc('file');if(await writeFile())say('Autozapis włączony – zmiany zapisują się w pliku „'+FS.h.name+'”.')},accOn=()=>{svLoc('acc');accSaveNet(true);say('Autozapis włączony – zmiany zapisują się na koncie.')};
+ if(SV.loc==='file'&&FS.h)return fileOn();
+ if(SV.loc==='file'&&FS.pend){svApply();$('#fReconnect').click();return}
+ if(SV.loc==='acc'&&accTok())return accOn();
+ if(FS.h)return fileOn();
+ if(accTok())return accOn();
+ if(FS.ok){svApply();await $('#fSaveAs').onclick();if(!FS.h){SV.on=false;svApply()}return}
+ SV.on=false;svApply();say('Autozapis wymaga zapisania projektu w pliku (Chrome lub Edge) albo zalogowania się w ZbiorkomInfo.')}
 const ACCP={url:'https://divine-limit-0a3b.latka1500.workers.dev/konto/tm',t:null,auto:false};try{ACCP.auto=localStorage.getItem('gdn-acc-auto')==='1'}catch(e){}
 function accTok(){try{return JSON.parse(localStorage.getItem('ztm.token')||'""')||''}catch(e){return''}}
-function accStat(t){const e=document.getElementById('fAccSt');if(!e)return;const on=!!accTok();['fAccSave','fAccLoad','fAccAuto'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!on});
+function accStat(t){try{svApply()}catch(x){}const e=document.getElementById('fAccSt');if(!e)return;const on=!!accTok();['fAccSave','fAccLoad','fAccAuto'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!on});
  const a=document.getElementById('fAccAuto');if(a)a.checked=on&&ACCP.auto;e.textContent=t!=null?t:on?(ACCP.last?'Ostatni zapis na koncie: '+new Date(ACCP.last).toLocaleTimeString():''):'Zaloguj się w ZbiorkomInfo, aby zapisywać projekt na koncie.'}
 async function accSaveNet(quiet){clearTimeout(ACCP.t);ACCP.t=null;const tok=accTok();if(!tok||BOOTWAIT||NOSAVE){accStat();return false}
  try{const r=await fetch(ACCP.url,{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),net:S})});
@@ -364,7 +393,7 @@ function ttOf(l,dk,a){const d=a[dk];if(!d)return null;const tt=((l.tt||{})[dk])|
 function ziExport(){try{
   const P=FP(),lines=[];
   S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>ttOf(l,dk,a)).filter(Boolean).map(({st,off,sh,dep})=>({st,off,sh,dep}));
-    lines.push({id:l.id,n:String(l.num||''),color:l.color||'#555',kind:lineMode(l),dirs:D})});
+    lines.push({id:l.id,n:String(l.num||''),color:l.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
   const k=cityKey(),out={v:1,t:Date.now(),city:k,cityName:CITIES[k].n.replace(/\s*\(.*\)$/,''),lines};
   localStorage.setItem('gdn-zi',JSON.stringify(out));try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}
  }catch(e){try{dbg('Eksport do ZbiorkomInfo: '+(e&&e.message||e))}catch(x){}}}
@@ -379,14 +408,14 @@ const ic=(n,z=16)=>`<svg class="ic" width="${z}" height="${z}" viewBox="0 0 24 2
 const icons=()=>document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic));
 const LOG=[];const dbg=m=>{LOG.push(new Date().toLocaleTimeString()+' '+m);if(LOG.length>300)LOG.shift();const t=$('#dbg');if(t){t.value=LOG.join('\n');t.scrollTop=t.scrollHeight}};
 dbg('start: '+location.protocol+' | '+navigator.userAgent.slice(0,70));
-const map=L.map('map',{preferCanvas:true,zoomControl:false}).setView([54.352,18.6466],13);
+const map=L.map('map',{preferCanvas:true,zoomControl:false,maxZoom:20}).setView([54.352,18.6466],13);
 L.control.zoom({position:'bottomright',zoomInTitle:'Przybliż',zoomOutTitle:'Oddal'}).addTo(map);
-const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'});
-const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap contributors'});
+const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:19,attribution:'© OpenStreetMap contributors'});
+const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,attribution:'© OpenStreetMap contributors'});
 const fromFile=location.protocol==='file:';
 // CARTO (Voyager; Dark Matter in the dark theme of ZbiorkomInfo) with ZbiorkomInfo's key, as the alternative to OSM
 const CARTO_KEY='cb1_4vdw_1_23a15f607749c4261b38e021';
-const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
+const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
 const BASES={osm,osmde,carto:cartoMake(false)};let curBase=null,cartoDk=false;
 function setBase(k){
  if(k==='maptiler')k='carto';
@@ -461,6 +490,7 @@ async function loadStops(o){
   const n=cnt[1]+cnt[2]+cnt[3];
   dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}`);
   if(!auto&&S.rmStops&&added.size)S.rmStops=S.rmStops.filter(id=>!added.has(id));
+  if(added.size)setTimeout(()=>ziNums(added),0);
   S.stopBB=bb();
   save();drawStops();renderStops();
   const alt=cnt[2]+cnt[3]?` W tym ${cnt[2]} z peronów i ${cnt[3]} z pozycji zatrzymania (przystanki opisane w OSM inaczej niż tagiem bus_stop).`:'';
@@ -1145,7 +1175,7 @@ async function openVariantMenu(root){
  body.innerHTML='<div style="display:flex;flex-direction:column;gap:7px;font-size:13px"><div><b>Inna trasa</b> – kopia linii, której przebieg zmieniasz na mapie (objazd, inna ulica). Wspólne odcinki łączą się w jedną linię.</div><div><b>Skrócony</b> – wariant kończący się na wybranym przystanku.</div><div><b>Wydłużony</b> – wariant, który jedzie dalej niż linia podstawowa.</div><div><b>Tylko POWRÓT</b> – osobna trasa powrotna, gdy w drugą stronę linia jedzie inaczej.</div></div>';
  const k=await modal({title:'Nowy wariant linii '+root.num,body,cancelV:false,btns:[{t:'Anuluj',v:false},{t:'Tylko POWRÓT',v:'B'},{t:'Wydłużony',v:'ext'},{t:'Skrócony',v:'short'},{t:'Inna trasa',c:'pri',v:'route'}]});
  if(k)createVariant(root,k)}
-function createVariant(root,kind,fwd){
+function createVariant(root,kind,fwd){lmClose();
  const src=fwd||root,ex=kind==='B'?S.lines.find(x=>x.dir==='B'&&x.par===root.id&&(x.rev||x.par)===src.id):null;
  const ui=(cardUI[root.id]=cardUI[root.id]||{});ui.var=true;
  if(ex){S.sel=ex.id;ui.lst=true;renderLines();redraw();if(!ex.segs.length){ins={lid:ex.id,id:ex.stops[ex.stops.length-1]};const pb=document.querySelector('[data-m="pick"]');if(pb)pb.click();say('Klikaj kolejne przystanki trasy powrotnej.');return}const eb=document.querySelector('[data-m="edit"]');if(eb)eb.click();say('POWRÓT już istnieje – edytujesz jego trasę. Przeciągaj punkty, kliknij linię, by dodać punkt.');return}
@@ -1225,7 +1255,7 @@ function renderLines(){syncAmode();syncVariants();
  {const ids=new Set(S.stops.map(s=>s.id));S.lines.forEach(l=>{if(l.stops.some(id=>!ids.has(id)))l.stops=l.stops.filter(id=>ids.has(id))})}
  const cats=catList();S.collapsed=S.collapsed||{};
  {const any=S.lines.some(l=>!l.hidden),t=$('#toggleAll');t.innerHTML=ic(any?'eyeoff':'eye')+(any?'Ukryj wszystkie':'Pokaż wszystkie');t.title=any?'Ukryj wszystkie linie':'Pokaż wszystkie linie';t.disabled=!S.lines.length}
- if(!S.lines.length)box.innerHTML='<div class="small">Brak linii. Kliknij „Nowa linia”.</div>';
+ if(!S.lines.length)box.innerHTML='<div class="small">Brak linii. Dodaj ją przyciskiem + na dole panelu.</div>';
  cats.forEach(cn=>{
   const ls=S.lines.filter(l=>(l.cat||'')===cn&&!l.par),lsAll=S.lines.filter(l=>(l.cat||'')===cn),showH=cats.length>1||cn,col=showH&&!!S.collapsed[cn];
   if(showH){const h=document.createElement('div');h.className='cat';
@@ -1234,12 +1264,19 @@ function renderLines(){syncAmode();syncVariants();
    q('.tg').onclick=tgl;q('.tgn').onclick=tgl;if(cn){dragSort(q('.dg'),h,'cat',cn);q('.rn').onclick=e=>{e.stopPropagation();renameCat(cn)}}h.dataset.cat=cn;
    q('.ey').onclick=()=>{const hide=lsAll.some(l=>!l.hidden);lsAll.forEach(l=>l.hidden=hide);save();renderLines();redraw()};
    box.appendChild(h)}
-  if(!col)ls.forEach(l=>box.appendChild(lineCard(l)))})}
+  if(!col)ls.forEach(l=>box.appendChild(lineCard(l)))});
+ lmRefresh()}
+// the line's settings in a window of their own (the gear on its card): the look, the variants and stops, the timetable
+const LM={id:null,box:null};
+function lmClose(){const x=LM.box&&LM.box.closest('.mback');if(x)x.querySelector('.mx').click()}
+function lmRefresh(){if(!LM.id||!LM.box)return;const L=S.lines.find(x=>x.id===LM.id);if(!L){lmClose();return}const sc=LM.box.parentNode,t=sc?sc.scrollTop:0;LM.box.replaceChildren(lineCard(L,true));if(sc)sc.scrollTop=t}
+function lineDlg(l){const ui=cardUI[l.id]||(cardUI[l.id]={});ui.var=ui.lst=true;if(!(S.sel===l.id||S.lines.some(v=>v.par===l.id&&v.id===S.sel)))S.sel=l.id;LM.id=l.id;LM.box=document.createElement('div');
+ modal({title:'Linia '+(l.num||''),cls:'lnModal',body:LM.box,btns:[{t:'Gotowe',v:true,c:'pri'}],onClose:()=>{LM.id=null;LM.box=null;renderLines()}});renderLines();redraw()}
 function normHex(t){t=String(t||'').trim().replace(/^#/,'');if(/^[0-9a-f]{3}$/i.test(t))t=t.replace(/./g,c=>c+c);return /^[0-9a-f]{6}$/i.test(t)?'#'+t.toLowerCase():null}
 function hsv2hex(h,s,v){h=((h%360)+360)%360;const f=n=>{const k=(n+h/60)%6;return v-v*s*Math.max(0,Math.min(k,4-k,1))};return '#'+[f(5),f(3),f(1)].map(x=>Math.round(x*255).toString(16).padStart(2,'0')).join('')}
 function hex2hsv(x){const n=normHex(x)||'#000000',r=parseInt(n.slice(1,3),16)/255,g=parseInt(n.slice(3,5),16)/255,b=parseInt(n.slice(5,7),16)/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4;h*=60;if(h<0)h+=360}return[h,mx?d/mx:0,mx]}
 const cardUI={};let _numCost=0;const numDelay=()=>Math.max(220,Math.min(900,Math.round(_numCost*2)));
-function lineCard(l){
+function lineCard(l,M){
  const vars=S.lines.filter(x=>x.par===l.id),selHere=l.id===S.sel||vars.some(v=>v.id===S.sel),act=S.lines.find(x=>x.id===S.sel);
  const c=document.createElement('div');c.className='card'+(selHere?' sel':'');
  const st=l.stops.map(id=>stopOf(id)),ui=cardUI[l.id]||(cardUI[l.id]={}),bn=s=>s.name.replace(NUMRE,'$1');
@@ -1255,7 +1292,7 @@ function lineCard(l){
  const vrows=i=>vInfo.filter(o=>!o.hide&&(o.left?l.stops.indexOf(o.left)+1:0)===i).map(brBlock).join('');
  {const o=!!(ui.var||ui.lst);ui.var=ui.lst=o}
  const curV=act&&(act.id===l.id||act.par===l.id)?act:l;
- const chips=selHere&&ui.var?(()=>{
+ const chips=M?(()=>{
   const cur=act&&(act.id===l.id||act.par===l.id)?act:l,nmv=v=>v===l?'Podstawowy':esc(varLabel(v)),gv=(k)=>{const x=((cur.op||{})[k]||{}).h;return x===undefined?'':x};
   const chip=(v,t)=>`<button class="b flat vchip${v.id===cur.id?' on':''}" data-v="${v.id}" title="${v.dir==='B'?'Trasa powrotna':v===l?'Trasa podstawowa linii':'Wariant: '+esc(varLabel(v))}"><span class="vdot" style="background:${v.color}"></span>${t}</button>`,retOf=f=>vars.find(v=>v.dir==='B'&&(v.rev||v.par)===f.id);
   const chs=[l,...vars.filter(v=>v.dir!=='B')].map(f=>{const r=retOf(f),nf=f===l?'Podstawowy':esc(varLabel(f));
@@ -1268,25 +1305,25 @@ function lineCard(l){
     </div>`}
   const rr0=retOf(l),canSwap=!!(rr0&&rr0.segs.length&&rr0.stops.length>1);
   return `<div class="vpn vwar"><div class="vrow"><b class="vn" style="min-width:0">Warianty</b><span class="grow"></span>${canSwap?`<button class="b flat vsw" title="Zamień kierunki: trasa TAM stanie się trasą POWRÓT, a POWRÓT – trasą TAM">${ic('twoway',14)}Zamień TAM ↔ POWRÓT</button>`:''}<button class="b flat vpadd" title="Dodaj wariant tej linii: inna trasa, skrócony, wydłużony lub tylko jeden kierunek">${ic('plus',14)}Wariant</button></div><div class="vchips">${chs}</div>${det}</div>`})():''
- const list=selHere&&ui.lst&&curV===l?(LS.length?vrows(0)+LS.map((s,i)=>{const dim=!own&&!T.stops.includes(s.id);return `<div class="st${ins&&ins.lid===T.id&&ins.id===s.id?' anch':''}"${dim?' style="opacity:.45"':''}><span class="small" style="width:24px;margin:0">${i+1}.</span><span class="grow" style="cursor:pointer${dim?';text-decoration:line-through':''}" data-a="z" data-i="${i}">${esc(lab(s))}</span>${dirSet.has(i)?'<span class="small" title="Ta część trasy dotyczy tylko kierunku A – w drugą stronę linia jedzie inaczej" style="margin-right:4px">→</span>':''}${!dim?`<button class="b ico flat tm${termIds(T).includes(s.id)?' on':''}" data-a="t" data-i="${i}" title="Przystanek końcowy – kliknij, aby zaznaczyć lub odznaczyć (domyślnie pierwszy i ostatni)">${ic('flag',14)}</button>`:''}${own?`<button class="b ico flat" data-g="${i}" title="Przytrzymaj i przeciągnij, aby zmienić kolejność" style="cursor:grab;touch-action:none">${ic('grip',14)}</button>`:''}<button class="b ico flat" data-a="x" data-i="${i}" title="${own?'Usuń przystanek z linii':dim?'Przywróć na wariancie':'Usuń z wariantu'}">${ic(dim?'plus':'x',14)}</button></div>`+vrows(i+1)}).join(''):'<div class="small">Brak przystanków. Użyj trybu „Wybieraj przystanki” albo przycisku plus na liście przystanków.</div>'):'';
+ const list=M&&curV===l?(LS.length?vrows(0)+LS.map((s,i)=>{const dim=!own&&!T.stops.includes(s.id);return `<div class="st${ins&&ins.lid===T.id&&ins.id===s.id?' anch':''}"${dim?' style="opacity:.45"':''}><span class="small" style="width:24px;margin:0">${i+1}.</span><span class="grow" style="cursor:pointer${dim?';text-decoration:line-through':''}" data-a="z" data-i="${i}">${esc(lab(s))}</span>${dirSet.has(i)?'<span class="small" title="Ta część trasy dotyczy tylko kierunku A – w drugą stronę linia jedzie inaczej" style="margin-right:4px">→</span>':''}${!dim?`<button class="b ico flat tm${termIds(T).includes(s.id)?' on':''}" data-a="t" data-i="${i}" title="Przystanek końcowy – kliknij, aby zaznaczyć lub odznaczyć (domyślnie pierwszy i ostatni)">${ic('flag',14)}</button>`:''}${own?`<button class="b ico flat" data-g="${i}" title="Przytrzymaj i przeciągnij, aby zmienić kolejność" style="cursor:grab;touch-action:none">${ic('grip',14)}</button>`:''}<button class="b ico flat" data-a="x" data-i="${i}" title="${own?'Usuń przystanek z linii':dim?'Przywróć na wariancie':'Usuń z wariantu'}">${ic(dim?'plus':'x',14)}</button></div>`+vrows(i+1)}).join(''):'<div class="small">Brak przystanków. Użyj trybu „Wybieraj przystanki” albo przycisku plus na liście przystanków.</div>'):'';
  const vi=l.par?S.lines.filter(x=>x.par===l.par).indexOf(l):-1,vtag=l.par?`<div class="small" style="margin:0 0 2px;font-weight:700">${varLabel(l)}</div>`:'';
- const setp=ui.set&&!l.par?`<div class="setg"><span class="lab">${ic('num',14)}Numer</span><input class="num2" maxlength="4" value="${esc(l.num)}"><span class="lab">${ic('palette',14)}Kolor</span><div class="cp"><div class="row"><button type="button" class="cps${ui.cp?' on':''}" title="Wybierz kolor (HSB)" style="--c:${l.color}"><i></i></button><input class="cpx" value="${l.color}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Kod koloru, np. #2456d6"></div><div class="cpp"${ui.cp?'':' hidden'}><div class="cpsb"><b></b></div><div class="cph"><b></b></div><div class="cpr"></div></div></div><span class="lab">${ic('sliders',14)}Grubość</span><div class="row"><input type="range" class="rw" min="2" max="14" value="${l.w||5}" style="flex:1"><b class="wv">${l.w||5}</b></div><span class="lab">${ic('dash',14)}Styl linii</span><div class="seg rs">${[['solid','',' ciągła'],['dashed','9 6','przerywana'],['dotted','0.1 7','kropkowana']].map(([v,d,t])=>`<button type="button" data-v="${v}" title="${t.trim()}"${(l.style||'solid')===v?' class="on"':''}><svg width="56" height="14" viewBox="0 0 56 14"><line x1="4" y1="7" x2="52" y2="7" stroke="currentColor" stroke-width="4" stroke-linecap="${v==='solid'?'butt':'round'}"${d?` stroke-dasharray="${d}"`:''}/></svg></button>`).join('')}</div><span class="lab">${ic('shapes',14)}Kształt numeru</span><div class="seg rsh">${[['square','0','kwadrat'],['round','12px','koło']].map(([v,r,t])=>`<button type="button" data-v="${v}" title="${t}"${(l.shape||'square')===v?' class="on"':''}><span class="badge" style="background:${l.color};color:${txt(l.color)};border-radius:${r}">${esc(l.num||'1')}</span></button>`).join('')}</div><span class="lab">${ic('tag',14)}Kategoria</span><select class="lc"><option value="">Bez kategorii</option>${S.cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}<option value="__new">+ Nowa kategoria…</option></select></div>`:'';
+ const setp=M&&!l.par?`<div class="setg"><span class="lab">${ic('num',14)}Numer</span><input class="num2" maxlength="4" value="${esc(l.num)}"><span class="lab">${ic('palette',14)}Kolor</span><div class="cp"><div class="row"><button type="button" class="cps${ui.cp?' on':''}" title="Wybierz kolor (HSB)" style="--c:${l.color}"><i></i></button><input class="cpx" value="${l.color}" maxlength="7" spellcheck="false" autocomplete="off" aria-label="Kod koloru, np. #2456d6"></div><div class="cpp"${ui.cp?'':' hidden'}><div class="cpsb"><b></b></div><div class="cph"><b></b></div><div class="cpr"></div></div></div><span class="lab">${ic('sliders',14)}Grubość</span><div class="row"><input type="range" class="rw" min="2" max="14" value="${l.w||5}" style="flex:1"><b class="wv">${l.w||5}</b></div><span class="lab">${ic('dash',14)}Styl linii</span><div class="seg rs">${[['solid','',' ciągła'],['dashed','9 6','przerywana'],['dotted','0.1 7','kropkowana']].map(([v,d,t])=>`<button type="button" data-v="${v}" title="${t.trim()}"${(l.style||'solid')===v?' class="on"':''}><svg width="56" height="14" viewBox="0 0 56 14"><line x1="4" y1="7" x2="52" y2="7" stroke="currentColor" stroke-width="4" stroke-linecap="${v==='solid'?'butt':'round'}"${d?` stroke-dasharray="${d}"`:''}/></svg></button>`).join('')}</div><span class="lab">${ic('shapes',14)}Kształt numeru</span><div class="seg rsh">${[['square','0','kwadrat'],['round','12px','koło']].map(([v,r,t])=>`<button type="button" data-v="${v}" title="${t}"${(l.shape||'square')===v?' class="on"':''}><span class="badge" style="background:${l.color};color:${txt(l.color)};border-radius:${r}">${esc(l.num||'1')}</span></button>`).join('')}</div><span class="lab">${ic('tag',14)}Kategoria</span><select class="lc"><option value="">Bez kategorii</option>${S.cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}<option value="__new">+ Nowa kategoria…</option></select></div>`:'';
  const note=ui.note?`<textarea class="nt" rows="3" placeholder="Komentarz do linii…">${esc(l.note||'')}</textarea>`:'';
- c.innerHTML=`<div class="row"><div class="nb" style="background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}">${esc(l.num)}</div><div class="grow">${vtag}<div class="route">${route}</div><div class="meta">${vars.length?`<span>${vars.length} ${vars.length===1?'wariant':vars.length<5?'warianty':'wariantów'}</span><span>·</span>`:''}<span style="display:inline-flex;align-items:center;gap:4px">${ic('pin',13)}${l.stops.length} przyst.</span><span>·</span><span style="display:inline-flex;align-items:center;gap:4px">${ic('ruler',13)}${fmtKm(lineLen(l))}</span></div></div></div>
- <div class="tools">${l.par?'':`<button class="b ico flat dg" title="Przytrzymaj i przeciągnij, aby zmienić kolejność w kategorii" style="cursor:grab;touch-action:none">${ic('grip')}</button>`}<button class="b ico flat eye" title="Pokaż/ukryj linię na mapie">${ic(l.hidden?'eyeoff':'eye')}</button><button class="b ico flat vbt${ui.var&&selHere?' act':''}" title="${ui.var&&selHere?'Ukryj':'Pokaż'} przystanki i warianty linii (${l.stops.length} przyst.${vars.length?', '+vars.length+' war.':''})">${ic('branch')}</button>${l.par?'':`<button class="b ico flat gear${ui.set?' act':''}" title="Ustawienia linii (numer, kolor, styl, grubość, kształt)">${ic('gear')}</button>`}${l.par?'':`<button class="b ico flat ttb${l.tt||l.tto?' act':''}" title="Rozkład jazdy linii (odjazdy i czasy przejazdu)">${ic('clock')}</button>`}<button class="b ico flat nbt${ui.note||l.note?' act':''}" title="${l.note?esc(l.note.slice(0,120)):'Dodaj komentarz do linii'}">${ic('message')}</button><button class="b ico flat del" title="Usuń linię">${ic('trash')}</button></div>${setp}${note}${chips}${list}`;
+ c.innerHTML=`<div class="row lnh">${!M&&!l.par?`<button class="b ico flat dg" title="Przytrzymaj i przeciągnij, aby zmienić kolejność w kategorii" style="cursor:grab;touch-action:none">${ic('grip')}</button>`:''}<div class="nb" style="background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}">${esc(l.num)}</div><div class="grow">${vtag}<div class="route">${route}</div><div class="meta">${vars.length?`<span>${vars.length} ${vars.length===1?'wariant':vars.length<5?'warianty':'wariantów'}</span><span>·</span>`:''}<span style="display:inline-flex;align-items:center;gap:4px">${ic('pin',13)}${l.stops.length} przyst.</span><span>·</span><span style="display:inline-flex;align-items:center;gap:4px">${ic('ruler',13)}${fmtKm(lineLen(l))}</span></div></div></div>
+ ${M?`<div class="lnSec"><h4>${ic('palette',14)}Wygląd</h4>${setp}</div><div class="lnSec"><h4>${ic('branch',14)}Warianty i przystanki</h4>${chips}${list}</div><div class="lnSec"><h4>${ic('clock',14)}Rozkład jazdy</h4><button class="b ttb${l.tt||l.tto?' act':''}" type="button">${ic('clock')}Edytuj rozkład jazdy</button></div>`:`<div class="tools"><button class="b ico flat eye" title="Pokaż/ukryj linię na mapie">${ic(l.hidden?'eyeoff':'eye')}</button>${l.par?'':`<button class="b ico flat gear" title="Ustawienia linii: wygląd, warianty i przystanki, rozkład jazdy">${ic('gear')}</button>`}<button class="b ico flat nbt${ui.note||l.note?' act':''}" title="${l.note?esc(l.note.slice(0,120)):'Dodaj komentarz do linii'}">${ic('message')}</button><button class="b ico flat del" title="Usuń linię">${ic('trash')}</button></div>${note}`}`;
  if(l.hidden)c.style.opacity=.55;
- c.onclick=()=>{if(!selHere)S.sel=l.id;renderLines();redraw()};
+ if(M)c.className='lnEd';else c.onclick=()=>{if(!selHere)S.sel=l.id;renderLines();redraw()};
  const q=x=>c.querySelector(x);
  c.querySelectorAll('input,select,textarea,.tools button').forEach(x=>x.onclick=e=>e.stopPropagation());
- if(!l.par){dragSort(q('.dg'),c,'line',l.id);c.dataset.lid=l.id}
- c.querySelectorAll('[data-badd]').forEach(b=>b.onclick=e=>{e.stopPropagation();const [pid,aid]=b.dataset.badd.split(':');S.sel=pid;ui.lst=true;ins=aid?{lid:pid,id:aid}:null;renderLines();redraw();const pb=document.querySelector('[data-m="pick"]');if(pb)pb.click();say('Klikaj przystanki – trafią do tej gałęzi (pod ostatnim jej przystankiem).')});
- const selPart=(pid,edit)=>{S.sel=pid;ui.lst=true;ins=null;renderLines();redraw();if(edit){const eb=document.querySelector('[data-m="edit"]');if(eb)eb.click();say('Edycja gałęzi: przeciągaj punkty, kliknij linię aby dodać punkt, prawy przycisk usuwa punkt.')}};
+ if(!l.par&&!M){dragSort(q('.dg'),c,'line',l.id);c.dataset.lid=l.id}
+ c.querySelectorAll('[data-badd]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(M)lmClose();const [pid,aid]=b.dataset.badd.split(':');S.sel=pid;ui.lst=true;ins=aid?{lid:pid,id:aid}:null;renderLines();redraw();const pb=document.querySelector('[data-m="pick"]');if(pb)pb.click();say('Klikaj przystanki – trafią do tej gałęzi (pod ostatnim jej przystankiem).')});
+ const selPart=(pid,edit)=>{if(M&&edit)lmClose();S.sel=pid;ui.lst=true;ins=null;renderLines();redraw();if(edit){const eb=document.querySelector('[data-m="edit"]');if(eb)eb.click();say('Edycja gałęzi: przeciągaj punkty, kliknij linię aby dodać punkt, prawy przycisk usuwa punkt.')}};
  c.querySelectorAll('[data-bsel]').forEach(b=>b.onclick=e=>{e.stopPropagation();selPart(b.dataset.bsel,true)});
  c.querySelectorAll('.brh').forEach(h=>h.onclick=e=>{if(e.target.closest('button'))return;e.stopPropagation();const bn=h.closest('.brn');const pid=bn&&bn.dataset.p;if(pid)selPart(pid,false)});
  c.querySelectorAll('.vchip').forEach(b=>b.onclick=e=>{e.stopPropagation();S.sel=b.dataset.v;renderLines();redraw()});
  {const pa=q('.vpadd');if(pa)pa.onclick=e=>{e.stopPropagation();openVariantMenu(l)};
   const sw=q('.vsw');if(sw)sw.onclick=e=>{e.stopPropagation();swapDirections(l)};
-  c.querySelectorAll('[data-vm]').forEach(b=>b.onclick=e=>{e.stopPropagation();const v=act&&act.par===l.id?act:null;if(!v)return;S.sel=v.id;const m=b.dataset.vm,go=x=>{const t=document.querySelector('[data-m="'+x+'"]');if(t)t.click()};
+  c.querySelectorAll('[data-vm]').forEach(b=>b.onclick=e=>{e.stopPropagation();if(M&&b.dataset.vm!=='mirror')lmClose();const v=act&&act.par===l.id?act:null;if(!v)return;S.sel=v.id;const m=b.dataset.vm,go=x=>{const t=document.querySelector('[data-m="'+x+'"]');if(t)t.click()};
    if(m==='from'){go('nav');vs={id:v.id,next:'draw'};say('Kliknij na mapie przystanek, od którego wariant ma się różnić (Esc – anuluj). Dalsza część wariantu zostanie usunięta, potem rysujesz trasę lub wybierasz przystanki.');return}
    if(m==='mirror'){const f=S.lines.find(x=>x.id===(v.rev||v.par));if(!f)return;v.stops=f.stops.slice().reverse();v.segs=revSegs(f.segs);v.wp=(f.wp||[]).slice().reverse();v.excl=[];save();renderLines();redraw();say('Trasa powrotna ustawiona jako odwrócona trasa TAM.');return}
    if(m==='pick'){ins=v.stops.length?{lid:v.id,id:v.stops[v.stops.length-1]}:null;renderLines();go('pick');say('Klikaj przystanki – trafią do wariantu pod ostatnim przystankiem, a trasa poprowadzi przez nie.')}
@@ -1302,14 +1339,14 @@ function lineCard(l){
  c.querySelectorAll('[data-vr]').forEach(b=>b.onclick=e=>{e.stopPropagation();const [id,ix]=b.dataset.vr.split(':'),v=S.lines.find(x=>x.id===id);if(!v)return;const rid=v.stops[+ix],root=S.lines.find(x=>x.id===v.par),hit=root&&!v.auto?branchRuns(root,v).find(o=>o.left&&o.right&&o.items.length===1&&o.items[0]===rid):null;if(!v.auto)(v.excl=v.excl||[]).push(rid);v.stops.splice(+ix,1);
   if(hit){collapseSection(root,v,hit.left,hit.right);save();renderLines();redraw();drawStops();say('Usunięto ostatni przystanek rozgałęzienia – ta część trasy wróciła do przebiegu głównego.');return}
   save();renderLines();drawStops();stopsChanged(v)});
- q('.eye').onclick=e=>{e.stopPropagation();l.hidden=!l.hidden;save();renderLines();redraw()};
- if(!l.par)q('.gear').onclick=e=>{e.stopPropagation();ui.set=!ui.set;renderLines()};
- q('.nbt').onclick=e=>{e.stopPropagation();ui.note=!ui.note;renderLines()};
+ if(q('.eye'))q('.eye').onclick=e=>{e.stopPropagation();l.hidden=!l.hidden;save();renderLines();redraw()};
+ if(q('.gear'))q('.gear').onclick=e=>{e.stopPropagation();lineDlg(l)};
+ if(q('.nbt'))q('.nbt').onclick=e=>{e.stopPropagation();ui.note=!ui.note;renderLines()};
  {const tb=c.querySelector('.ttb');if(tb)tb.onclick=e=>{e.stopPropagation();ttEdit(l)}}
- q('.vbt').onclick=e=>{e.stopPropagation();const open=ui.var&&selHere;ui.var=ui.lst=!open;if(!selHere){S.sel=l.id;renderLines();redraw()}else renderLines()};
- q('.del').onclick=async e=>{e.stopPropagation();const nv=l.par?0:S.lines.filter(x=>x.par===l.id).length;if(await askConfirm(l.par?'Usunąć ten wariant linii '+l.num+'?':'Usunąć linię '+l.num+(nv?' wraz z jej wariantami ('+nv+')':'')+'?',{title:l.par?'Usuń wariant':'Usuń linię',ok:'Usuń',danger:true})){S.lines=S.lines.filter(x=>x!==l&&x.par!==l.id);if(S.sel===l.id)S.sel=null;save();renderLines();redraw()}};
- if(ui.set){const num=q('.num2'),rw=q('.rw'),lc=q('.lc'),nb=q('.nb');
-  num.oninput=()=>{if(num.value.length>4)num.value=num.value.slice(0,4);l.num=num.value;nb.textContent=num.value;nb.setAttribute('style',`background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}`);
+ if(q('.vbt'))q('.vbt').onclick=e=>{e.stopPropagation();const open=ui.var&&selHere;ui.var=ui.lst=!open;if(!selHere){S.sel=l.id;renderLines();redraw()}else renderLines()};
+ if(q('.del'))q('.del').onclick=async e=>{e.stopPropagation();const nv=l.par?0:S.lines.filter(x=>x.par===l.id).length;if(await askConfirm(l.par?'Usunąć ten wariant linii '+l.num+'?':'Usunąć linię '+l.num+(nv?' wraz z jej wariantami ('+nv+')':'')+'?',{title:l.par?'Usuń wariant':'Usuń linię',ok:'Usuń',danger:true})){S.lines=S.lines.filter(x=>x!==l&&x.par!==l.id);if(S.sel===l.id)S.sel=null;save();renderLines();redraw()}};
+ if(M&&!l.par){const num=q('.num2'),rw=q('.rw'),lc=q('.lc'),nb=q('.nb');
+  num.oninput=()=>{if(num.value.length>4)num.value=num.value.slice(0,4);l.num=num.value;nb.textContent=num.value;nb.setAttribute('style',`background:${l.color};color:${txt(l.color)};${bst(l,48,20,'10px')}`);document.querySelectorAll('#lines [data-lid="'+l.id+'"] .nb').forEach(x=>{x.textContent=num.value;x.setAttribute('style',nb.getAttribute('style'))});
    // pełne przerysowanie mapy i zapis dopiero po chwili bezruchu (opóźnienie dopasowane do kosztu poprzedniego przerysowania), a także przy opuszczeniu pola
    later('num:'+l.id,numDelay(),()=>{const t=performance.now();save();redraw();_numCost=performance.now()-t})};
   num.onblur=()=>flushLater('num:'+l.id);num.onchange=()=>flushLater('num:'+l.id);
@@ -1323,7 +1360,7 @@ function lineCard(l){
     const m=sb.firstChild;m.style.left=(s*100)+'%';m.style.top=((1-v)*100)+'%';hb.firstChild.style.left=(h/360*100)+'%';
     rd.textContent=`H ${Math.round(h)}°  ·  S ${Math.round(s*100)}%  ·  B ${Math.round(v*100)}%`};
    // zmiana koloru: natychmiast tylko barwa istniejących polilinii; zapis i pełne przerysowanie po chwili bezruchu lub po puszczeniu myszy
-   const setCol=(hex,fromTxt)=>{l.color=hex;nb.style.background=hex;nb.style.color=txt(hex);cps.style.setProperty('--c',hex);c.querySelectorAll('.rsh .badge').forEach(b=>{b.style.background=hex;b.style.color=txt(hex)});if(!fromTxt){cpx.value=hex;cpx.classList.remove('bad')}paint();
+   const setCol=(hex,fromTxt)=>{l.color=hex;[nb,...document.querySelectorAll('#lines [data-lid="'+l.id+'"] .nb')].forEach(x=>{x.style.background=hex;x.style.color=txt(hex)});cps.style.setProperty('--c',hex);c.querySelectorAll('.rsh .badge').forEach(b=>{b.style.background=hex;b.style.color=txt(hex)});if(!fromTxt){cpx.value=hex;cpx.classList.remove('bad')}paint();
     if(!cR)cR=requestAnimationFrame(fast);clearTimeout(cT);cT=setTimeout(commit,350)};
    const drag=(el,fn)=>{el.onpointerdown=e=>{e.preventDefault();e.stopPropagation();el.setPointerCapture(e.pointerId);
      const mv=ev=>{const r=el.getBoundingClientRect();fn(Math.max(0,Math.min(1,(ev.clientX-r.left)/(r.width||1))),Math.max(0,Math.min(1,(ev.clientY-r.top)/(r.height||1))))};
@@ -1345,7 +1382,7 @@ function lineCard(l){
   lc.onchange=async()=>{let v=lc.value;
    if(v==='__new'){const n=await askPrompt('Nazwa nowej kategorii:','',{title:'Nowa kategoria'});v=(n||'').trim();if(!v){lc.value=l.cat||'';return}if(!S.cats.includes(v))S.cats.push(v)}
    if(v)l.cat=v;else delete l.cat;save();renderLines();redraw()}}
- if(ui.note){const nt=q('.nt');nt.oninput=()=>{l.note=nt.value;save()};nt.onchange=()=>renderLines()}
+ if(ui.note&&!M){const nt=q('.nt');nt.oninput=()=>{l.note=nt.value;save()};nt.onchange=()=>renderLines()}
  c.querySelectorAll('[data-g]').forEach(b=>dragStopRow(b,b.closest('.st'),T.dir==='B'?T:l,+b.dataset.g));
  c.querySelectorAll('[data-a]').forEach(b=>b.onclick=e=>{e.stopPropagation();const i=+b.dataset.i,a=b.dataset.a,O=T.dir==='B'?T:l,A=O.stops;
   if(a==='z'){map.setView(LS[i].ll,17);if(own)toggleAnchor(T,LS[i].id);return}
@@ -1357,7 +1394,13 @@ function lineCard(l){
   if(a==='x'){const rid=A[i];if(!O.auto)(O.excl=O.excl||[]).push(rid);A.splice(i,1);if(!O.par)S.lines.filter(x=>x.par===O.id).forEach(v=>{const k=v.stops.indexOf(rid);if(k<0)return;if(!v.auto)(v.excl=v.excl||[]).push(rid);v.stops.splice(k,1);stopsChanged(v)})}else if(a==='u'&&i>0)[A[i-1],A[i]]=[A[i],A[i-1]];else if(a==='d'&&i<A.length-1)[A[i+1],A[i]]=[A[i],A[i+1]];
   save();renderLines();drawStops();stopsChanged(O)});
  return c}
-$('#addL').onclick=()=>{const l={id:'l'+Date.now(),num:String(S.lines.length+1),color:PAL[S.lines.length%PAL.length],w:5,style:'solid',segs:[],wp:[],stops:[]};S.lines.push(l);S.sel=l.id;save();renderLines();redraw()};
+// a new line of the kind chosen (+ at the foot of the panel): trams and trains with a round number, buses and trolleybuses a square one;
+// trolleybuses go along the streets as buses do – only their kind differs
+function newLine(k){const rm=k==='tram'||k==='rail'?k:'street',l={id:'l'+Date.now(),num:String(S.lines.length+1),color:PAL[S.lines.length%PAL.length],w:5,style:'solid',segs:[],wp:[],stops:[],rm,shape:k==='tram'||k==='rail'?'round':'square'};if(k==='trolley')l.veh='trolley';
+ S.lines.push(l);S.sel=l.id;UI.am=rm;save();applyUI();renderLines();redraw()}
+{const NK=[['tram','tram','Linia tramwajowa'],['bus','bus','Linia autobusowa'],['trolley','trolley','Linia trolejbusowa'],['rail','train','Linia kolejowa']],ab=$('#addL'),f=document.createElement('div');f.className='tfly';f.id='nlFly';f.hidden=true;f.setAttribute('role','menu');document.body.appendChild(f);
+ ab.onclick=e=>{e.stopPropagation();if(!f.hidden){f.hidden=true;return}f.innerHTML=NK.map(([k,i,t])=>`<button type="button" role="menuitem" data-k="${k}">${ic(i)}${t}</button>`).join('');f.hidden=false;const r=ab.getBoundingClientRect();f.style.left=r.left+'px';f.style.top=Math.max(4,r.top-f.offsetHeight-6)+'px'};
+ f.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-k]');if(!b)return;f.hidden=true;newLine(b.dataset.k)};document.addEventListener('click',()=>{f.hidden=true})}
 
 const openGrp=new Set(),PLC=new Intl.Collator('pl');
 function renderStops(){
@@ -1367,22 +1410,23 @@ function renderStops(){
  $('#cnt').textContent=`Przystanki: ${all.length} z ${S.stops.length}`+(groups.length<all.length?` · ${groups.length} nazw`:'')+(groups.length>150?' (pokazano 150 – zawęź wyszukiwanie)':'');
  const kindIc=s=>s.tram&&s.bus?ic('tram')+ic('bus'):ic(s.rail?'train':s.tram?'tram':'bus'),kindTt=s=>s.rail?'przystanek kolejowy':s.tram&&s.bus?'autobusowo-tramwajowy':s.tram?'tramwajowy':'autobusowy';
  const badges=a=>{const seen=new Map();a.forEach(s=>linesOf(s.id).forEach(l=>seen.set(l.id,l)));return [...seen.values()].map(l=>`<span class="badge" style="background:${l.color};color:${txt(l.color)}">${esc(l.num)}</span>`).join('')};
+ const lb=a=>a.map(l=>`<span class="badge" style="background:${l.color};color:${txt(l.color)}">${esc(l.num)}</span>`).join('');
  const mkRow=(s,sub)=>{
   const d=document.createElement('div');d.className='st'+(sub?' sub':'');
-  d.innerHTML=`<span class="tt" title="${kindTt(s)}">${kindIc(s)}</span><input value="${esc(s.name)}">${linesOf(s.id).map(l=>`<span class="badge" style="background:${l.color};color:${txt(l.color)}">${esc(l.num)}</span>`).join('')}<button class="b ico" title="Dodaj do zaznaczonej linii">${ic('plus')}</button><button class="b ico" title="Pokaż na mapie">${ic('target')}</button><button class="b ico" title="Usuń przystanek">${ic('trash')}</button>`;
+  d.innerHTML=`<span class="sk" title="${kindTt(s)}">${kindIc(s)}</span><input class="sn" value="${esc(s.name)}" aria-label="Nazwa przystanku"><span class="sl">${lb(linesOf(s.id))}</span><span class="sa"><button class="b" title="Dodaj do zaznaczonej linii">${ic('plus')}</button><button class="b" title="Pokaż na mapie">${ic('target')}</button><button class="b" title="Usuń przystanek">${ic('trash')}</button></span>`;
   const i=d.querySelector('input');
   i.onchange=()=>{s.name=i.value.trim()||s.name;syncNum(s);save();drawStops();renderLines();renderStops()};
-  const bt=d.querySelectorAll('button');bt[0].onclick=()=>addToLine(s.id);bt[1].onclick=()=>map.setView(s.ll,17);bt[2].onclick=()=>delStop(s);
+  const bt=d.querySelectorAll('.sa button');bt[0].onclick=()=>addToLine(s.id);bt[1].onclick=()=>map.setView(s.ll,17);bt[2].onclick=()=>delStop(s);
   return d};
  groups.slice(0,150).forEach(g=>{
   if(g.items.length===1){box.appendChild(mkRow(g.items[0],false));return}
   const open=openGrp.has(g.k)||(q&&g.items.length<=12),base=g.items[0].name.replace(NUMRE,'$1');
-  const h=document.createElement('div');h.className='st grp';
-  h.innerHTML=`<button class="b ico flat gt" title="${open?'Zwiń':'Rozwiń'} listę przystanków">${open?'▾':'▸'}</button><input value="${esc(base)}" title="Nazwa wspólna – zmiana dotyczy wszystkich przystanków w grupie"><span class="small" style="margin:0;white-space:nowrap">${g.items.length} przyst.</span>${badges(g.items)}<button class="b ico" title="Pokaż wszystkie na mapie">${ic('target')}</button>`;
+  const h=document.createElement('div');h.className='st grp'+(open?' open':'');
+  h.innerHTML=`<button class="b gt" title="${open?'Zwiń':'Rozwiń'} listę przystanków" aria-expanded="${open}">${ic(open?'down':'right')}</button><input class="sn" value="${esc(base)}" title="Nazwa wspólna – zmiana dotyczy wszystkich przystanków w grupie"><span class="sl"><span class="sc">${g.items.length} przyst.</span>${badges(g.items)}</span><span class="sa"><i></i><button class="b gf" title="Pokaż wszystkie na mapie">${ic('target')}</button><i></i></span>`;
   const tog=()=>{openGrp.has(g.k)?openGrp.delete(g.k):openGrp.add(g.k);renderStops()};
   h.querySelector('.gt').onclick=tog;
   h.querySelector('input').onchange=e=>{const nv=e.target.value.trim();if(!nv)return;g.items.forEach(s=>{const m=s.name.match(NUMRE);s.name=m?nv+' '+m[2]:nv});save();drawStops();renderLines();renderStops()};
-  h.querySelector('.b.ico:last-child').onclick=()=>map.fitBounds(L.latLngBounds(g.items.map(s=>s.ll)),{padding:[60,60],maxZoom:18});
+  h.querySelector('.gf').onclick=()=>map.fitBounds(L.latLngBounds(g.items.map(s=>s.ll)),{padding:[60,60],maxZoom:18});
   box.appendChild(h);
   if(open)g.items.forEach(s=>box.appendChild(mkRow(s,true)))})}
 $('#flt').oninput=renderStops;$('#load').onclick=()=>loadStops();
@@ -1405,7 +1449,7 @@ $('#reloadStops').onclick=async()=>{
 
 const MSG={move:'Przeciągaj przystanki na mapie. Przystanek zostaje przypisany do swoich linii; przystanki tramwajowe i kolejowe przyciągają się do toru. Przy scalonych nazwach przesuwana jest cała grupa.',edit:'Zaznacz linię narysowaną ręcznie. Kliknij linię w miejscu bez punktu, aby dodać punkt. Przeciągaj punkty, aby zmienić przebieg. Prawy przycisk myszy na punkcie usuwa go.',nav:'Tryb wyboru. Najedź na przystanek, aby zmienić jego nazwę lub numer albo dodać go do linii.',draw:'Klikaj na mapie kolejne punkty trasy. Sposób prowadzenia (tory, ulice, swobodnie) wybierasz listą „Trasa”.',stop:'Kliknij na mapie, aby dodać nowy przystanek.',pick:'Klikaj przystanki w kolejności przejazdu – trafiają do zaznaczonej linii. Trasa linii wyznaczy się automatycznie.',infra:'Klikaj kolejne punkty nowego toru lub drogi (rodzaj wybierasz w sekcji „Własne tory i drogi”). Enter lub prawy przycisk myszy kończy, Esc anuluje.'};
 document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{if(vs&&b.dataset.m!=='nav')vs=null;if(mode==='infra'&&b.dataset.m!=='infra'){draft=[];drawDraft();infraEditId=null}mode=b.dataset.m;document.querySelectorAll('[data-m]').forEach(x=>x.classList.toggle('on',x===b));map.getContainer().style.cursor=(mode==='nav'||mode==='edit'||mode==='move')?'':'crosshair';drawStops();drawEdit();drawInfraEdit();say(MSG[mode])});
-function applyTab(t){document.querySelectorAll('#modebar [data-t]').forEach(b=>b.style.display=b.dataset.t===t?'':'none');{const rb=$('#routebar'),tg=document.querySelector('#tools .tgrp');if(rb.dataset.moved){rb.style.display='none';if(tg)tg.style.display=t==='t1'?'contents':'none'}else rb.style.display=t==='t1'?'':'none'}$('#stopbar').style.display=t==='t2'?'':'none';const cur=document.querySelector('#modebar [data-m].on');if(cur&&cur.dataset.t&&cur.dataset.t!==t)document.querySelector('#modebar [data-m=nav]').click()}
+function applyTab(t){{const sf=document.getElementById('sideFoot');if(sf)sf.style.display=t==='t1'?'':'none'}document.querySelectorAll('#modebar [data-t]').forEach(b=>b.style.display=b.dataset.t===t?'':'none');{const rb=$('#routebar'),tg=document.querySelector('#tools .tgrp');if(rb.dataset.moved){rb.style.display='none';if(tg)tg.style.display=t==='t1'?'contents':'none'}else rb.style.display=t==='t1'?'':'none'}$('#stopbar').style.display=t==='t2'?'':'none';const cur=document.querySelector('#modebar [data-m].on');if(cur&&cur.dataset.t&&cur.dataset.t!==t)document.querySelector('#modebar [data-m=nav]').click()}
 [['t1','p1'],['t2','p2'],['t3','p3']].forEach(([t,p])=>$('#'+t).onclick=()=>{applyTab(t);['t1','t2','t3'].forEach(x=>$('#'+x).classList.toggle('on',x===t));['p1','p2','p3'].forEach(x=>$('#'+x).classList.toggle('on',x===p));if(p==='p2')renderStops();if(p==='p3')renderInfra()});
 
 let tramReady=null;
@@ -1720,7 +1764,7 @@ function drawDraft(){draftL.clearLayers();const kd=$('#infraKind').value,k=infra
  draft.forEach(p=>L.circleMarker(p,{radius:4,color:k,weight:2,fillColor:'#fff',fillOpacity:1,interactive:false,pane:'infraPane',renderer:infraCv}).addTo(draftL))}
 function drawInfra(){infraL.clearLayers();S.custom.forEach(c=>cways(c).forEach(w=>infraAdd(infraL,w,c.kind,1)))}
 let infraEditId=null;const infraEditL=L.layerGroup().addTo(map);
-function drawInfraEdit(){infraEditL.clearLayers();$('#infraEdit').classList.toggle('pri',!!infraEditId);if(!infraEditId||mode!=='infra')return;S.custom.forEach(drawInfraEditOne)}
+function drawInfraEdit(){infraEditL.clearLayers();$('#infraEdit').classList.toggle('on',!!infraEditId);if(!infraEditId||mode!=='infra')return;S.custom.forEach(drawInfraEditOne)}
 function drawInfraEditOne(c){
  const mk=(ll,cls,onEnd,onDel)=>{const m=L.marker(ll,{draggable:true,icon:L.divIcon({className:'',html:`<div class="eh${cls}"></div>`,iconSize:[16,16],iconAnchor:[8,8]}),zIndexOffset:900,bubblingMouseEvents:false});
   m.on('dragend',e=>{const q=e.target.getLatLng();onEnd(snapInfra([q.lat,q.lng],c.kind,c))});
@@ -1850,7 +1894,7 @@ const askConfirm=(msg,o={})=>modal({title:o.title||'Potwierdzenie',body:`<p styl
 // ---- the line's timetable, edited by hand: for each direction and kind of day the departures from the first stop (an hour per
 // row, its minutes), and the minutes from the first stop to each stop. Left as worked out (from the headways and the line's
 // hours, from the length and speed) until changed; "Przywróć wyliczone" goes back. ZbiorkomInfo's NM city shows it at once.
-Object.assign(ICON,{clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'});
+Object.assign(ICON,{clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',trolley:'<rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 14h16M9 9 12 3M13 9l3-6M7 19v2M17 19v2"/>'});
 const TT_DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 function ttEdit(l){const P=FP(),a=ziAuto(l,P);if(!a){say('Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.');return}
  const st={dk:'A',dy:'w',gen:false},b=document.createElement('div');b.className='ttEd';
@@ -1932,7 +1976,7 @@ function fsStat(msg){
  else if(FS.h)t=`Plik: „${FS.h.name}” · autozapis ${FS.auto?'włączony':'wyłączony'}${FS.last?' · ostatni zapis '+hhmm(FS.last):''}`;
  else t='Dane są zapamiętywane w przeglądarce. Zapisz projekt do pliku, aby mieć kopię poza przeglądarką.';
  st.textContent=msg||t;
- chip.textContent=(FS.h&&FS.auto)?(FS.last?'Zapisano '+hhmm(FS.last):'Autozapis włączony'):'';chip.title=FS.h?FS.h.name:''}
+ chip.textContent='';if(typeof svUI==='function')svUI()}
 function scheduleFile(){if(FS.h&&FS.auto){clearTimeout(FS.t);FS.t=setTimeout(writeFile,900)}}
 async function writeFile(){
  if(!FS.h)return false;
@@ -1944,7 +1988,7 @@ async function idbGet(k){const d=await idb();return new Promise((res,rej)=>{cons
 function closeMenus(){document.querySelectorAll('.pop').forEach(p=>p.classList.remove('open'))}
 $('#fSaveAs').onclick=async()=>{closeMenus();
  if(!FS.ok){dlFile('siec-gdansk.json',projectJSON());say('Pobrano kopię projektu. Autozapis do pliku wymaga Chrome lub Edge.');return}
- try{const h=await showSaveFilePicker({suggestedName:'siec-gdansk.json',types:JT});FS.h=h;FS.auto=true;FS.pend=null;await idbSet('h',h);if(await writeFile())say(`Projekt zapisany w pliku „${h.name}”. Kolejne zmiany zapisują się automatycznie.`)}
+ try{const h=await showSaveFilePicker({suggestedName:'siec-gdansk.json',types:JT});FS.h=h;FS.pend=null;await idbSet('h',h);svLoc('file');if(await writeFile())say(`Projekt zapisany w pliku „${h.name}”.`+(SV.on?' Kolejne zmiany zapisują się automatycznie.':''))}
  catch(e){if(e.name!=='AbortError')say('Nie udało się zapisać pliku: '+(e.message||e))}};
 $('#fSaveNow').onclick=async()=>{closeMenus();if(FS.h){if(await writeFile())say(`Zapisano w pliku „${FS.h.name}”.`)}else{dlFile('siec-gdansk.json',projectJSON());say('Pobrano kopię projektu (JSON).')}};
 $('#fOpen').onclick=async()=>{closeMenus();
@@ -1955,23 +1999,23 @@ $('#fOpen').onclick=async()=>{closeMenus();
   if(!await confirmReplace())return;
   applyProject(o);
   let p='denied';try{p=await h.requestPermission({mode:'readwrite'})}catch(e){}
-  if(p==='granted'){FS.h=h;FS.auto=true;FS.pend=null;await idbSet('h',h);fsStat();say(`Wczytano projekt z pliku „${h.name}”. Zmiany będą zapisywane w tym pliku automatycznie.`)}
+  if(p==='granted'){FS.h=h;FS.pend=null;await idbSet('h',h);svLoc('file');fsStat();say(`Wczytano projekt z pliku „${h.name}”.`+(SV.on?' Zmiany będą zapisywane w tym pliku automatycznie.':''))}
   else{FS.h=null;fsStat();say(`Wczytano projekt z pliku „${h.name}” (bez zgody na zapis – autozapis wyłączony).`)}}
  catch(e){if(e.name!=='AbortError')say('Nie udało się otworzyć pliku: '+(e.message||e))}};
 $('#fReconnect').onclick=async()=>{closeMenus();const h=FS.pend;if(!h)return;
  if(!await askConfirm(`Połączyć z plikiem „${h.name}”? Jego zawartość zostanie nadpisana bieżącym projektem, a kolejne zmiany będą zapisywane automatycznie.`,{title:'Wznów autozapis',ok:'Połącz i zapisz'}))return;
  try{let p=await h.queryPermission({mode:'readwrite'});if(p!=='granted')p=await h.requestPermission({mode:'readwrite'});
   if(p!=='granted'){say('Brak zgody na zapis do pliku.');return}
-  FS.h=h;FS.auto=true;FS.pend=null;if(await writeFile())say(`Autozapis wznowiony: „${h.name}”.`)}catch(e){say('Nie udało się połączyć z plikiem: '+(e.message||e))}};
+  FS.h=h;FS.pend=null;SV.on=true;svLoc('file');if(await writeFile())say(`Autozapis wznowiony: „${h.name}”.`)}catch(e){say('Nie udało się połączyć z plikiem: '+(e.message||e))}};
 $('#fAuto').onchange=async e=>{FS.auto=e.target.checked;if(FS.auto)await writeFile();fsStat()};
-$('#fAccSave').onclick=()=>{closeMenus();accSaveNet(false)};
+$('#fAccSave').onclick=async()=>{closeMenus();if(await accSaveNet(false))svLoc('acc')};
 $('#fAccAuto').onchange=e=>{ACCP.auto=e.target.checked;try{localStorage.setItem('gdn-acc-auto',ACCP.auto?'1':'0')}catch(x){}if(ACCP.auto)accSaveNet(true);accStat()};
 $('#fAccLoad').onclick=async()=>{closeMenus();const tok=accTok();if(!tok)return;let d;
  try{const r=await fetch(ACCP.url,{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)throw new Error(r.status===404||r.status===405?'serwer nie obsługuje zapisu projektu – wdróż najnowszy worker.js':'HTTP '+r.status);d=await r.json()}
  catch(e){say('Nie udało się wczytać projektu z konta: '+e.message+'.');return}
  if(!d||!d.net){say('Na koncie nie ma jeszcze zapisanego projektu.');return}
  if(!await askConfirm('Wczytać projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'? Zastąpi on bieżący projekt (można to cofnąć przyciskiem Cofnij).',{title:'Wczytaj z konta',ok:'Wczytaj'}))return;
- NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();say('Wczytano projekt z konta.')};
+ NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Wczytano projekt z konta.')};
 accStat();addEventListener('storage',e=>{if(e.key==='ztm.token')accStat()});
 // Zapisz (lokalnie): to the file the project is joined to; none yet – a file chosen (then saved there after each change), or – where
 // the browser cannot write files – the project downloaded (JSON either way)
@@ -2059,7 +2103,7 @@ function schemaRuntime(){
   var st=wr.style;st.transformOrigin=mg[0]+'px '+mg[1]+'px';st.transform='translate('+tx+'px,'+ty+'px) scale('+k+')'}
  function sched(){if(!rq)rq=requestAnimationFrame(frame);clearTimeout(gT);gT=setTimeout(commit,Math.min(700,Math.max(170,Math.round(cost*1.3))))}
  function fit(){dims();var k=Math.max(vb0[2]/cw,vb0[3]/ch);vb=[vb0[0]-(cw*k-vb0[2])/2,vb0[1]-(ch*k-vb0[3])/2,cw*k,ch*k];commit()}
- function zoom(f,cx,cy){var r=cv.getBoundingClientRect(),px=cx==null?.5:(cx-r.left)/r.width,py=cy==null?.5:(cy-r.top)/r.height,nw=vb[2]/f,nh=vb[3]/f;vb=[vb[0]+(vb[2]-nw)*px,vb[1]+(vb[3]-nh)*py,nw,nh];sched()}
+ function zoom(f,cx,cy){var fw=Math.max(vb0[2]/cw,vb0[3]/ch)*cw,tw=Math.min(fw*1.6,Math.max(fw/10,vb[2]/f));f=vb[2]/tw;if(Math.abs(f-1)<1e-6)return;var r=cv.getBoundingClientRect(),px=cx==null?.5:(cx-r.left)/r.width,py=cy==null?.5:(cy-r.top)/r.height,nw=vb[2]/f,nh=vb[3]/f;vb=[vb[0]+(vb[2]-nw)*px,vb[1]+(vb[3]-nh)*py,nw,nh];sched()}
  // ---- zaznaczanie linii (jedna lub kilka naraz). Wygaszenie reszty robi jeden dynamiczny arkusz stylów (selektory po data-l / data-ls),
  // więc nie trzeba przełączać klas na tysiącach elementów; w DOM przestawiane są tylko zaznaczone linie (warstwa #ltop nad pozostałymi).
  var hint=null,H0='',lgs=[].slice.call(document.querySelectorAll('.lg')),selSt=document.createElement('style');document.head.appendChild(selSt);
@@ -2529,35 +2573,61 @@ icons();applyUI();applyTab('t1');
  const amB=document.createElement('button');amB.className='b';amB.id='amBtn';amB.type='button';amB.setAttribute('aria-haspopup','menu');
  g.append(sep(),amB);T.appendChild(g);rb.style.display='none';rb.dataset.moved='1';
  // the ways a route may be led (snapping, one-way streets, closed roads): a small box over the panel on the right, its switches named
- const RO=document.createElement('div');RO.id='routeOpts';RO.innerHTML='<div class="roH">Prowadzenie trasy</div>';
- [['strictTr','Przyciąganie'],['owTr','Ignoruj jednokierunkowość'],['closedTr','Ignoruj zakaz wjazdu']].forEach(([id,t])=>{const b=$('#'+id);if(!b)return;b.classList.remove('ico');b.classList.add('roB');b.appendChild(document.createTextNode(t));b.dataset.tl=t;RO.appendChild(b)});
- [...rb.querySelectorAll('button')].forEach(b=>{if(!RO.contains(b)){b.classList.remove('ico');b.classList.add('roB');RO.appendChild(b)}});
+ const RO=document.createElement('div');RO.id='routeOpts';RO.innerHTML='<div class="roH">Prowadzenie trasy</div><div class="roG"></div>';const ROG=RO.lastChild;
+ ['strictTr','owTr','closedTr'].forEach(id=>{const b=$('#'+id);if(!b)return;b.classList.remove('ico');b.classList.add('roB');ROG.appendChild(b)});
+ [...rb.querySelectorAll('button')].forEach(b=>{if(!RO.contains(b)){b.classList.remove('ico');b.classList.add('roB');ROG.appendChild(b)}});
  const sd=$('#side');sd.insertBefore(RO,sd.querySelector('.tabs'));
- const KIND={tram:['tram','Linia tramwajowa'],street:['bus','Linia autobusowa'],rail:['train','Linia kolejowa']};
+ const KIND={tram:['tram','Linia tramwajowa'],street:['bus','Linia autobusowa'],trolley:['trolley','Linia trolejbusowa'],rail:['train','Linia kolejowa']},amCur=()=>{const l=selLine();return am.value==='street'&&l&&l.veh==='trolley'?'trolley':am.value};
  const fly=document.createElement('div');fly.id='amFly';fly.hidden=true;fly.setAttribute('role','menu');document.body.appendChild(fly);
  const tip=document.createElement('div');tip.id='tip';tip.hidden=true;tip.setAttribute('role','tooltip');document.body.appendChild(tip);
  window.tipHide=()=>{tip.hidden=true};
- window.amShow=()=>{const k=KIND[am.value]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===am.value}" data-v="${v}" class="${v===am.value?'on':''}">${ic(i)}${t}</button>`).join('')};
+ window.amShow=()=>{const cur=amCur(),k=KIND[cur]||KIND.tram;amB.innerHTML=ic(k[0]);amB.dataset.tl='Typ linii: '+k[1].replace('Linia ','');amB.setAttribute('aria-label',amB.dataset.tl);fly.innerHTML=Object.entries(KIND).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===cur}" data-v="${v}" class="${v===cur?'on':''}">${ic(i)}${t}</button>`).join('')};
  amB.onclick=e=>{e.stopPropagation();if(!fly.hidden){fly.hidden=true;return}amShow();const r=amB.getBoundingClientRect();fly.hidden=false;fly.style.left=(innerWidth>700?r.right+6:r.left)+'px';fly.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
- fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;if(am.value!==b.dataset.v){am.value=b.dataset.v;am.dispatchEvent(new Event('change'))}amShow()};
+ fly.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;fly.hidden=true;const v=b.dataset.v,amv=v==='trolley'?'street':v,l=selLine();if(l){if(v==='trolley')l.veh='trolley';else delete l.veh}if(am.value!==amv){am.value=amv;am.dispatchEvent(new Event('change'))}else if(l){save();renderLines()}amShow()};
  document.addEventListener('click',()=>{fly.hidden=true});
  const D={nav:['Wybór','Przeglądanie mapy; najechanie na przystanek pozwala go edytować.'],draw:['Rysuj linię','Rysowanie trasy kliknięciami na mapie.'],edit:['Edytuj linię','Przeciąganie punktów narysowanej linii zmienia jej przebieg; kliknięcie linii dodaje punkt.'],
   pick:['Wybieraj przystanki','Klikanie kolejnych przystanków linii – trasa prowadzi się między nimi sama.'],stop:['Dodaj przystanek','Dodawanie własnych przystanków.'],move:['Przenieś przystanek','Przeciąganie przystanków – przystanek zostaje przypisany do swoich linii.'],infra:['Dorysuj tor lub drogę','Dorysowanie toru lub drogi, których nie ma na mapie.'],
-  loopBtn:['Zamknij pętlą','Koniec trasy, który wraca w pobliże jej wcześniejszego przebiegu, zostaje płynnie dołączony do niego (pętla uliczna).'],amBtn:['Typ linii','Tramwajowa, autobusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],
+  loopBtn:['Zamknij pętlą','Koniec trasy, który wraca w pobliże jej wcześniejszego przebiegu, zostaje płynnie dołączony do niego (pętla uliczna).'],amBtn:['Typ linii','Tramwajowa, autobusowa, trolejbusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],infraEdit:['Edytuj trasę toru lub drogi','Przeciąganie punktów własnych torów i dróg zmienia ich przebieg.'],infraDone:['Zakończ rysowanie','Zapisuje rysowany tor lub drogę (także Enter lub prawy przycisk myszy).'],infraCancel:['Anuluj rysowanie','Porzuca rysowany odcinek (także Esc).'],
   strictTr:['Przyciąganie','Linie dopasowują się do torów lub dróg (zależnie od typu linii). Wyłączone – można rysować w dowolnym miejscu mapy.'],owTr:['Ignoruj jednokierunkowość','Linie autobusowe mogą jechać pod prąd ulicami jednokierunkowymi (ronda pozostają jednokierunkowe).'],closedTr:['Ignoruj zakaz wjazdu','Linie autobusowe mogą prowadzić także odcinkami zamkniętymi dla ruchu – budowa, zakaz wjazdu, drogi prywatne (rysowane czerwoną przerywaną).']};
  amShow();
  T.querySelectorAll('.b').forEach(b=>{const k=b.dataset.m||b.id,d=D[k];const txt=[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
   [...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});const tl=b.getAttribute('title')||'';b.removeAttribute('title');
   if(k!=='amBtn'||b.dataset.tl==null)b.dataset.tl=d&&k!=='amBtn'?d[0]:(b.dataset.tl||txt||tl.split(':')[0]);b.dataset.td=d?d[1]:(tl.includes(':')?tl.split(':').slice(1).join(':').trim():tl);b.setAttribute('aria-label',b.dataset.tl);
-  b.addEventListener('mouseenter',()=>{if(!fly.hidden)return;tip.innerHTML=`<b>${esc(b.dataset.tl)}</b><span>${esc(b.dataset.td||'')}</span>`;tip.hidden=false;const r=b.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+  b.addEventListener('mouseenter',()=>{if(!fly.hidden||document.querySelector('.tfly:not([hidden])'))return;tip.innerHTML=`<b>${esc(b.dataset.tl)}</b><span>${esc(b.dataset.td||'')}</span>`;tip.hidden=false;const r=b.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
    if(innerWidth>700){tip.style.left=(r.right+8)+'px';tip.style.top=Math.max(4,Math.min(innerHeight-h-4,r.top+r.height/2-h/2))+'px'}else{tip.style.left=Math.max(4,Math.min(innerWidth-w-4,r.left))+'px';tip.style.top=(r.bottom+6)+'px'}});
   b.addEventListener('mouseleave',tipHide);b.addEventListener('click',tipHide)});
  syncLoopBtn();
+ // the route options over the panel: icons only, each named on hovering (below it)
+ ROG.querySelectorAll('.roB').forEach(b=>{const d=D[b.id];const tl=b.getAttribute('title')||'';b.removeAttribute('title');[...b.childNodes].forEach(n=>{if(n.nodeType===3)n.remove()});b.dataset.tl=d?d[0]:tl.split(':')[0];b.dataset.td=d?d[1]:'';b.setAttribute('aria-label',b.dataset.tl);
+  b.addEventListener('mouseenter',()=>{tip.innerHTML=`<b>${esc(b.dataset.tl)}</b><span>${esc(b.dataset.td||'')}</span>`;tip.hidden=false;const r=b.getBoundingClientRect(),w=tip.offsetWidth;tip.style.left=Math.max(4,Math.min(innerWidth-w-4,r.left+r.width/2-w/2))+'px';tip.style.top=(r.bottom+6)+'px'});
+  b.addEventListener('mouseleave',tipHide);b.addEventListener('click',tipHide)});
+ // the pencil of the tracks and roads: held (or right-clicked), a small menu beside it – a tram track, a railway track or a road
+ {const IK={tram:['tram','Tor tramwajowy'],rail:['train','Tor kolejowy'],street:['road','Droga']},ib=T.querySelector('[data-m="infra"]'),ik=$('#infraKind'),ifl=document.createElement('div');ifl.className='tfly';ifl.id='ikFly';ifl.hidden=true;ifl.setAttribute('role','menu');document.body.appendChild(ifl);
+  const ikShow=()=>{const k=IK[ik.value]||IK.tram;ib.innerHTML=ic('pencil')+'<span class="kd">'+ic(k[0])+'</span>';ib.dataset.tl='Dorysuj: '+k[1].toLowerCase();ib.dataset.td='Klikaj kolejne punkty na mapie. Przytrzymaj, aby wybrać rodzaj: tor tramwajowy, tor kolejowy albo drogę.';ib.setAttribute('aria-label',ib.dataset.tl);
+   ifl.innerHTML=Object.entries(IK).map(([v,[i,t]])=>`<button type="button" role="menuitemradio" aria-checked="${v===ik.value}" data-v="${v}" class="${v===ik.value?'on':''}">${ic(i)}${t}</button>`).join('')};
+  const ikOpen=()=>{ikShow();const r=ib.getBoundingClientRect();ifl.hidden=false;ifl.style.left=(innerWidth>700?r.right+6:r.left)+'px';ifl.style.top=(innerWidth>700?r.top:r.bottom+6)+'px';tipHide()};
+  let lpT=0,lpF=false;ib.setAttribute('aria-haspopup','menu');
+  ib.addEventListener('pointerdown',e=>{if(e.button)return;lpF=false;clearTimeout(lpT);lpT=setTimeout(()=>{lpF=true;ikOpen()},450)});
+  ['pointerup','pointerleave','pointercancel'].forEach(t=>ib.addEventListener(t,()=>clearTimeout(lpT)));
+  ib.addEventListener('click',e=>{if(lpF){lpF=false;e.stopImmediatePropagation();e.preventDefault()}},true);
+  ib.addEventListener('contextmenu',e=>{e.preventDefault();clearTimeout(lpT);lpF=false;ikOpen()});
+  ifl.onclick=e=>{e.stopPropagation();const b=e.target.closest('[data-v]');if(!b)return;ifl.hidden=true;if(ik.value!==b.dataset.v){ik.value=b.dataset.v;ik.dispatchEvent(new Event('change'))}ikShow();lpF=false;if(mode!=='infra')ib.click()};
+  document.addEventListener('click',()=>{ifl.hidden=true});ikShow()}
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
- br.after(fdd);fdd.after(ldd);top.appendChild(cs);cs.style.marginLeft='8px';top.classList.add('lay');
+ br.after(fdd);fdd.after(ldd);const asw=document.createElement('button');asw.type='button';asw.id='autoSw';asw.className='b flat';asw.setAttribute('role','switch');asw.innerHTML='Autozapis<i class="swk"></i>';asw.onclick=()=>svToggle();top.appendChild(asw);top.appendChild(cs);cs.style.marginLeft='8px';svUI();top.classList.add('lay');
  applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
 map.on('zoomend',redraw);map.on('moveend',onMoveEnd);{const hh=()=>document.documentElement.style.setProperty('--hh',$('#top').getBoundingClientRect().height+'px');hh();addEventListener('resize',hh)}
-function bootData(){rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
+// the numbers of the posts missing in OSM (e.g. Królewskie Wzgórze, Łabędzia): taken from ZbiorkomInfo's own stops (data/index.json,
+// the Tricity's operators) – the nearest post of the same name within 40 m; once per project, then for the stops loaded later
+let ZIST=null;
+async function ziNums(ids){if(!ids&&S.numZI)return;try{
+  if(!ZIST){const r=await fetch('data/index.json',{cache:'force-cache'});if(!r.ok)return;const j=await r.json(),g=new Map();
+   Object.values(j.stops||{}).forEach(v=>{if(!v||!/^(gda|gdy|sop|tri)/.test(v[4]||'')||!/^\d{2}$/.test(v[1]||''))return;const k=Math.floor(v[2]*900)+','+Math.floor(v[3]*900);(g.get(k)||g.set(k,[]).get(k)).push({n:norm(v[0]),num:v[1],ll:[v[2],v[3]]})});ZIST=g}
+  let n=0;S.stops.forEach(st=>{if(ids&&!ids.has(st.id))return;if(st.num||NUMRE.test(st.name)||st.name==='(bez nazwy)')return;const a=Math.floor(st.ll[0]*900),b=Math.floor(st.ll[1]*900),bn=norm(st.name);let best=null,bd=40;
+   for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++)for(const q of ZIST.get((a+i)+','+(b+k))||[]){if(q.n!==bn)continue;const d=mdist(q.ll,st.ll);if(d<bd){bd=d;best=q}}
+   if(best){st.num=best.num;n++}});
+  if(!ids)S.numZI=1;if(n||!ids){save();drawStops();renderStops();renderLines();redraw()}if(n)dbg('Numery słupków uzupełnione z danych ZbiorkomInfo: '+n)}catch(e){dbg('Numery słupków z ZbiorkomInfo: '+(e&&e.message||e))}}
+function bootData(){setTimeout(()=>ziNums(),1800);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
 if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) – wczytujemy go przed zapisami i pobieraniem danych z OSM
