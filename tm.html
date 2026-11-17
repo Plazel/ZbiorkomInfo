@@ -104,6 +104,7 @@ input[type=checkbox],input[type=range],input[type=radio]{padding:0;accent-color:
 .ttEd input.auto{color:var(--mut)}
 .mh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px 18px;border-bottom:1px solid var(--bd2)}.mh b{font-size:15px}
 .mb{padding:16px 18px;overflow:auto;flex:1;min-height:0}.mb.flush{padding:0;overflow:hidden}
+.schWrap{display:flex;flex-direction:column;height:100%}.schBar{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--panel);flex:none}
 .mf{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid var(--bd2);flex-wrap:wrap}
 .b.dng{background:#c62828;border-color:#c62828;color:#fff}.b.dng:hover{filter:brightness(1.08);color:#fff}
 #fChip{font-size:12px;color:var(--mut)}
@@ -2281,6 +2282,7 @@ function schemaRuntime(){
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+s],{type:'image/svg+xml'}));a.download='schemat-sieci.svg';document.body.appendChild(a);a.click();a.remove()}
  window.addEventListener('resize',fit);fit();setSel([])}
 
+let CLSC={};   // (styl klasyczny: wynik rozsuwania węzłów, ponownie użyty, gdy schemat jest budowany jeszcze raz z większym odstępem dla nazw)
 function buildSchema(spread=1){
  syncVariants();const lines=orderedLines().filter(l=>!l.hidden&&l.stops.length>1);
  if(!lines.length)return null;
@@ -2413,6 +2415,79 @@ function buildSchema(spread=1){
   const P=[P0,...W,P1],keep=new Array(P.length).fill(false);keep[0]=keep[P.length-1]=true;
   const dp=(a,b)=>{let md=0,mi=-1;const dx=P[b].x-P[a].x,dy=P[b].y-P[a].y,L=Math.hypot(dx,dy)||1;for(let k=a+1;k<b;k++){const d=Math.abs((P[k].x-P[a].x)*dy-(P[k].y-P[a].y)*dx)/L;if(d>md){md=d;mi=k}}if(md>2.5&&mi>0){keep[mi]=true;dp(a,mi);dp(mi,b)}};dp(0,P.length-1);
   e.W=P.filter((q,k)=>keep[k]&&k>0&&k<P.length-1);e.SA=e.sA?P0:null;e.SB=e.sB?P1:null});
+ // ---- styl „Klasyczny”: układ jak w dawnych schematach miast ZbiorkomInfo (schemat2.py): korytarze między węzłami, węzły rozsunięte tak,
+ // by przystanki leżały w równych odstępach (spadek gradientu: długości korytarzy wg liczby przystanków, kierunki jak w rzeczywistości,
+ // słabo – rzeczywiste położenie, węzły z dala od siebie), powiększone centrum, każdy korytarz w ośmiu kierunkach (prosto albo prosto i 45°),
+ // przystanki rozłożone równo wzdłuż niego
+ if(UI.schStyle==='classic'){const NN=N.length,adj=N.map(()=>new Map());
+  E.forEach(e=>{if(e.i===e.j)return;const A=adj[e.i],B=adj[e.j];(A.get(e.j)||A.set(e.j,[]).get(e.j)).push(e);(B.get(e.i)||B.set(e.i,[]).get(e.i)).push(e)});
+  const lk=(a,b)=>[...new Set(adj[a].get(b).flatMap(e=>[...e.ls]))].sort((x,y)=>x-y).join(',');
+  const fwd=new Map(),ends=new Set();seqs.forEach(q=>{if(!q)return;const ix=q.map(k=>idx.get(k));ends.add(ix[0]);ends.add(ix[ix.length-1]);for(let i=1;i<ix.length;i++){const k=ix[i-1]+'>'+ix[i];fwd.set(k,(fwd.get(k)||0)+1)}});
+  const keyN=new Set();for(let n=0;n<NN;n++){if(!adj[n].size)continue;const nb=[...adj[n].keys()];if(nb.length!==2||ends.has(n)||lk(n,nb[0])!==lk(n,nb[1]))keyN.add(n)}
+  const pk=(a,b)=>a<b?a+'_'+b:b+'_'+a;let chains=[];
+  for(let guard=0;guard<50;guard++){chains=[];const seen=new Set();
+   [...keyN].sort((a,b)=>a-b).forEach(u=>[...adj[u].keys()].sort((a,b)=>a-b).forEach(v=>{if(seen.has(pk(u,v)))return;const ch=[u,v];seen.add(pk(u,v));
+    while(!keyN.has(ch[ch.length-1])){const c=ch[ch.length-1],p=ch[ch.length-2],nx=[...adj[c].keys()].sort((a,b)=>a-b).find(x=>x!==p);if(nx===undefined)break;seen.add(pk(c,nx));ch.push(nx);if(ch.length>NN+2)break}
+    chains.push(ch)}));
+   // (a ring with no junction on it: one of its stops becomes a node)
+   let miss=-1;for(let n=0;n<NN&&miss<0;n++)for(const m of adj[n].keys())if(!seen.has(pk(n,m))){miss=n;break}
+   if(miss<0)break;keyN.add(miss)}
+  const ST=N.map(n=>[n.ox,n.oy]);
+  const dpKeep=(P,tol)=>{const keep=new Set([0,P.length-1]),st=[[0,P.length-1]];while(st.length){const [i0,i1]=st.pop(),a=P[i0],b=P[i1],dx=b[0]-a[0],dy=b[1]-a[1],l2=dx*dx+dy*dy;let bd=0,bi=-1;
+    for(let i=i0+1;i<i1;i++){const px=P[i][0]-a[0],py=P[i][1]-a[1],t=l2?Math.max(0,Math.min(1,(px*dx+py*dy)/l2)):0,d=Math.hypot(px-t*dx,py-t*dy);if(d>bd){bd=d;bi=i}}
+    if(bi>=0&&bd>tol){keep.add(bi);st.push([i0,bi],[bi,i1])}}return [...keep].sort((a,b)=>a-b)};
+  const cnt=new Map();chains.forEach(c=>{const k=pk(c[0],c[c.length-1]);cnt.set(k,(cnt.get(k)||0)+1)});
+  const cors=[];chains.forEach(ch=>{let cuts=dpKeep(ch.map(n=>ST[n]),300);
+   if((cnt.get(pk(ch[0],ch[ch.length-1]))>1||ch[0]===ch[ch.length-1])&&ch.length>2&&cuts.length===2)cuts=[...new Set([...cuts,ch.length>>1])].sort((a,b)=>a-b);
+   if(ch[0]===ch[ch.length-1]&&ch.length>3&&cuts.length<4)cuts=[...new Set([...cuts,Math.floor(ch.length/3),Math.floor(2*ch.length/3)])].sort((a,b)=>a-b);
+   for(let k=1;k<cuts.length;k++){const part=ch.slice(cuts[k-1],cuts[k]+1);if(part.length<2)continue;
+    let ow=0;if(part.every((a,i)=>i===0||!fwd.get(a+'>'+part[i-1])))ow=1;else if(part.every((a,i)=>i===0||!fwd.get(part[i-1]+'>'+a)))ow=-1;
+    cors.push({ch:part,nl:lk(part[0],part[1]).split(',').length,ow})}});
+  const KN=[...new Set(cors.flatMap(c=>[c.ch[0],c.ch[c.ch.length-1]]))];
+  if(cors.length&&KN.length>1){
+   const dd=cors.flatMap(c=>c.ch.slice(1).map((b,k)=>Math.hypot(ST[b][0]-ST[c.ch[k]][0],ST[b][1]-ST[c.ch[k]][1]))).sort((a,b)=>a-b),u0=dd[dd.length>>1]||400;
+   const SU=ST.map(p=>[p[0]/u0,p[1]/u0]);
+   const deg=new Map();cors.forEach(c=>[c.ch[0],c.ch[c.ch.length-1]].forEach(n=>deg.set(n,(deg.get(n)||0)+c.nl)));
+   const cn=KN.reduce((b,n)=>(deg.get(n)>deg.get(b)||(deg.get(n)===deg.get(b)&&n<b))?n:b,KN[0]),cx=SU[cn];
+   const lmin=c=>{const n=c.ch.length-1,w=.17*c.nl;let L=Math.max(n,1.2+1.2*w,n===1?2:0);if(c.ow)L=Math.max(L,2.6);
+    const a=SU[c.ch[0]],b=SU[c.ch[c.ch.length-1]],m=[(a[0]+b[0])/2,(a[1]+b[1])/2];L*=1+Math.max(0,1-Math.hypot(m[0]-cx[0],m[1]-cx[1])/8);return L};
+   // even_out (Adam)
+   const ki=new Map(KN.map((n,i)=>[n,i])),K=KN.length,C=cors.length,Ai=cors.map(c=>ki.get(c.ch[0])),Bi=cors.map(c=>ki.get(c.ch[c.ch.length-1])),Lm=cors.map(lmin);
+   const X0=KN.map(n=>SU[n]),U0=cors.map((c,k)=>{const dx=X0[Bi[k]][0]-X0[Ai[k]][0],dy=X0[Bi[k]][1]-X0[Ai[k]][1],l=Math.max(Math.hypot(dx,dy),1e-9);return[dx/l,dy/l]});
+   const rs=cors.map((c,k)=>Lm[k]/Math.max(Math.hypot(X0[Bi[k]][0]-X0[Ai[k]][0],X0[Bi[k]][1]-X0[Ai[k]][1]),1e-6)).sort((a,b)=>a-b),sc0=rs[rs.length>>1];
+   const X=X0.map(p=>[p[0]*sc0,p[1]*sc0]),G0=X.map(p=>p.slice()),joined=new Set();cors.forEach((c,k)=>{joined.add(Ai[k]+'_'+Bi[k]);joined.add(Bi[k]+'_'+Ai[k])});
+   const m1=X.map(()=>[0,0]),v1=X.map(()=>[0,0]);let lr=.05;const IT=Math.min(2500,Math.max(600,Math.floor(3e7/(K*K+C+1))));
+   const sig=KN.join(',')+'#'+cors.map(c=>c.ch.join('-')).join('|')+'#'+KN.map(n=>SU[n][0].toFixed(3)+','+SU[n][1].toFixed(3)).join(';');
+   if(CLSC.sig===sig)CLSC.X.forEach((p,i)=>{X[i][0]=p[0];X[i][1]=p[1]});else{
+   for(let it=0;it<IT;it++){const g=X.map(()=>[0,0]);
+    for(let k=0;k<C;k++){const a=Ai[k],b=Bi[k],dx=X[b][0]-X[a][0],dy=X[b][1]-X[a][1],ln=Math.max(Math.hypot(dx,dy),1e-9),ux=dx/ln,uy=dy/ln,L=Lm[k];
+     const f=(ln-L)/(L*L)*2;g[b][0]+=f*ux;g[b][1]+=f*uy;g[a][0]-=f*ux;g[a][1]-=f*uy;
+     const ex=ux-U0[k][0],ey=uy-U0[k][1],eu=ex*ux+ey*uy,Jx=(ex-eu*ux)/ln*3,Jy=(ey-eu*uy)/ln*3;g[b][0]+=Jx;g[b][1]+=Jy;g[a][0]-=Jx;g[a][1]-=Jy}
+    for(let i=0;i<K;i++){g[i][0]+=.02*(X[i][0]-G0[i][0]);g[i][1]+=.02*(X[i][1]-G0[i][1])}
+    if(it%5===0)for(let i=0;i<K;i++)for(let j=i+1;j<K;j++){const dx=X[i][0]-X[j][0],dy=X[i][1]-X[j][1],r=Math.hypot(dx,dy);if(r<2.2&&!joined.has(i+'_'+j)){const w=(2.2-r)*2/Math.max(r,1e-6);g[i][0]-=w*dx;g[i][1]-=w*dy;g[j][0]+=w*dx;g[j][1]+=w*dy}}
+    const b1=1-Math.pow(.9,it+1),b2=1-Math.pow(.999,it+1);
+    for(let i=0;i<K;i++)for(let d=0;d<2;d++){m1[i][d]=.9*m1[i][d]+.1*g[i][d];v1[i][d]=.999*v1[i][d]+.001*g[i][d]*g[i][d];X[i][d]-=lr*(m1[i][d]/b1)/(Math.sqrt(v1[i][d]/b2)+1e-8)}
+    if(it===IT>>1)lr=.02}
+   CLSC.sig=sig;CLSC.X=X.map(p=>p.slice())}
+   const P=new Map(KN.map((n,i)=>[n,X[i]]));
+   const scs=cors.map(c=>{const a=c.ch[0],b=c.ch[c.ch.length-1],pa=P.get(a),pb=P.get(b);return Math.hypot(pb[0]-pa[0],pb[1]-pa[1])/Math.max(1e-6,Math.hypot(SU[b][0]-SU[a][0],SU[b][1]-SU[a][1]))}).sort((a,b)=>a-b),sc1=scs[scs.length>>1];
+   // octi_path: dwa odcinki ośmiokierunkowe (prosty i pod 45°), załamanie po stronie, po której leżą przystanki między nimi
+   const octi=(a,b,mids)=>{const dx=b[0]-a[0],dy=b[1]-a[1],ax=Math.abs(dx),ay=Math.abs(dy),sx=Math.sign(dx)||1,sy=Math.sign(dy)||1;
+    if(Math.min(ax,ay)<1e-6||Math.abs(ax-ay)<1e-6)return[a,b];const m=Math.min(ax,ay),c1=[a[0]+sx*m,a[1]+sy*m],c2=[b[0]-sx*m,b[1]-sy*m];if(!mids.length)return[a,c1,b];
+    const near=c=>{let t=0;for(const p of mids){let best=1e9;for(const [u,v] of[[a,c],[c,b]]){const wx=v[0]-u[0],wy=v[1]-u[1],l2=wx*wx+wy*wy,tt=l2?Math.max(0,Math.min(1,((p[0]-u[0])*wx+(p[1]-u[1])*wy)/l2)):0;best=Math.min(best,Math.hypot(p[0]-u[0]-tt*wx,p[1]-u[1]-tt*wy))}t+=best}return t};
+    return near(c1)<=near(c2)?[a,c1,b]:[a,c2,b]};
+   const along=(poly,n)=>{const L=[0];for(let i=1;i<poly.length;i++)L.push(L[i-1]+Math.hypot(poly[i][0]-poly[i-1][0],poly[i][1]-poly[i-1][1]));const pts=[];
+    for(let i=0;i<=n;i++){const t=L[L.length-1]*i/n;let j=0;while(j<L.length-2&&L[j+1]<t)j++;const f=(t-L[j])/((L[j+1]-L[j])||1);pts.push([[poly[j][0]+(poly[j+1][0]-poly[j][0])*f,poly[j][1]+(poly[j+1][1]-poly[j][1])*f],t])}
+    const out=[];for(let i=0;i<n;i++){const t0=pts[i][1],t1=pts[i+1][1],mid=[];for(let k=1;k<poly.length-1;k++)if(t0<L[k]&&L[k]<t1)mid.push(poly[k]);out.push([pts[i][0],...mid,pts[i+1][0]])}return out};
+   const SP=new Map(),pieces=[];
+   cors.forEach(c=>{const a=c.ch[0],b=c.ch[c.ch.length-1],n=c.ch.length-1,pa=P.get(a),ga=SU[a];
+    const mids=c.ch.slice(1,-1).map(x=>[pa[0]+(SU[x][0]-ga[0])*sc1,pa[1]+(SU[x][1]-ga[1])*sc1]),poly=octi(pa,P.get(b),mids),segs=n>1?along(poly,n):[poly];
+    for(let k=0;k<n;k++){const x=c.ch[k],y=c.ch[k+1];if(!SP.has(x))SP.set(x,segs[k][0]);if(!SP.has(y))SP.set(y,segs[k][segs[k].length-1]);pieces.push([x,y,segs[k]])}});
+   // jednostka schematu: odstęp przystanków (jak w dawnych schematach – równy w całej sieci)
+   const UK=92;SP.forEach((p,n)=>{N[n].x=p[0]*UK;N[n].y=p[1]*UK});
+   const done=new Set();pieces.forEach(([x,y,seg])=>{const es=(adj[x].get(y)||[]);es.forEach(e=>{if(done.has(e))return;done.add(e);const q=e.i===x?seg:seg.slice().reverse();
+    e.W=q.slice(1,-1).map(p=>({x:p[0]*UK,y:p[1]*UK}));e.SA=e.SB=null})});
+   E.forEach(e=>{if(!done.has(e)){e.W=[];e.SA=e.SB=null}})}}
  const eachW=f=>E.forEach(e=>{if(e.W)e.W.forEach(f);if(e.SA)f(e.SA);if(e.SB)f(e.SB)});
  if(spread!==1){N.forEach(n=>{n.x*=spread;n.y*=spread});eachW(q=>{q.x*=spread;q.y*=spread})}
  const mnx=Math.min(...N.map(n=>n.x)),mny=Math.min(...N.map(n=>n.y));N.forEach(n=>{n.x+=90-mnx;n.y+=90-mny});eachW(q=>{q.x+=90-mnx;q.y+=90-mny});
@@ -2644,12 +2719,20 @@ async function openSchema(){
  let html=null;try{html=buildSchema()}catch(e){dbg('Schemat: '+(e.stack||e));say('Nie udało się wygenerować schematu: '+(e.message||e));return}
  if(!html){say('Brak widocznych linii z co najmniej dwoma przystankami – nie ma z czego zbudować schematu.');return}
  schemaHTML=html;say('Schemat gotowy.');
- const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-downloads allow-modals');fr.srcdoc=html;fr.style.cssText='width:100%;height:100%;border:0;display:block;background:#fff';
+ const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-downloads allow-modals');fr.srcdoc=html;fr.style.cssText='width:100%;flex:1;min-height:0;border:0;display:block;background:#fff';
+ // styl schematu: aktualny albo klasyczny (jak dawne schematy miast w ZbiorkomInfo)
+ const wrap=document.createElement('div');wrap.className='schWrap';const bar=document.createElement('div');bar.className='schBar';
+ const cur=()=>UI.schStyle==='classic'?'classic':'cur';
+ bar.innerHTML=`<span class="lab">${ic('network',14)}Styl schematu</span><div class="cpc schSt" role="tablist">${[['cur','Aktualny','Układ wierny mapie: przebieg linii jak w rzeczywistości, wyprostowany do kątów 45°'],['classic','Klasyczny','Układ jak w dawnych schematach miast w ZbiorkomInfo: proste odcinki w ośmiu kierunkach, przystanki w równych odstępach, powiększone centrum']].map(([v,t,d])=>`<button type="button" role="tab" data-s="${v}" title="${d}" class="${cur()===v?'on':''}" aria-selected="${cur()===v}">${t}</button>`).join('')}</div>`;
+ bar.onclick=async e=>{const b=e.target.closest('[data-s]');if(!b||b.dataset.s===cur())return;UI.schStyle=b.dataset.s==='classic'?'classic':'';applyUI();
+  bar.querySelectorAll('[data-s]').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',String(on))});say('Generowanie schematu…');await new Promise(r=>setTimeout(r,30));
+  try{const h=buildSchema();if(h){schemaHTML=h;fr.srcdoc=h;say('Schemat gotowy.')}}catch(x){dbg('Schemat: '+(x.stack||x));say('Nie udało się wygenerować schematu: '+(x.message||x))}};
+ wrap.append(bar,fr);
  const onMsg=e=>{if(e.source!==fr.contentWindow||!e.data)return;
   if(e.data.schema==='regen'){try{const h=buildSchema();if(h){schemaHTML=h;fr.srcdoc=h}}catch(x){say('Błąd: '+x.message)}}
   else if(e.data.schema==='html')dlFile('schemat-sieci.html',schemaHTML,'text/html;charset=utf-8')};
  window.addEventListener('message',onMsg);
- modal({title:'Schemat interaktywny sieci',body:fr,wide:true,flush:true,cancelV:true,btns:[{t:'Zamknij',v:true,c:'pri'}]}).finally(()=>window.removeEventListener('message',onMsg))}
+ modal({title:'Schemat interaktywny sieci',body:wrap,wide:true,flush:true,cancelV:true,btns:[{t:'Zamknij',v:true,c:'pri'}]}).finally(()=>window.removeEventListener('message',onMsg))}
 $('#fSchema').onclick=openSchema;
 
 // ---- pomoc: uruchomienie przez lokalny serwer (podkład OSM)
