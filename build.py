@@ -118,19 +118,24 @@ for key in ('wro', 'lub', 'bts'):
 if _lost:
     print('BRAK DANYCH (i brak zachowanej kopii): %s – dane bez zmian, ponowna próba za godzinę' % ', '.join(_lost))
     os.makedirs(OUT, exist_ok=True); write_missing(); shutil.rmtree(SCR, ignore_errors=True); sys.exit(0)
-# Flensburg (Aktiv Bus Flensburg): cut out of the Schleswig-Holstein GTFS (opendata.schleswig-holstein.de), kept a week in cache/fl
+# Flensburg (Aktiv Bus Flensburg): cut out of the Schleswig-Holstein GTFS (opendata.schleswig-holstein.de), its platforms from gtfs.de, kept a week in cache/fl
 try:
     import flensburg_gtfs
     _fc = os.path.join(HERE, 'cache', 'fl')
-    # gtfs.de first (each stop's platforms, B1, B2…); the Schleswig-Holstein file when it cannot be read
-    _fresh = os.path.exists(_fc + '/stop_times.txt') and os.path.exists(_fc + '/zrodlo.txt') and (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) < 6 * 86400
+    # the timetable from the Schleswig-Holstein file (its trips carry their directions); only the platforms (B1, B2…) from gtfs.de
+    _src = open(_fc + '/zrodlo.txt').read().strip() if os.path.exists(_fc + '/zrodlo.txt') else ''
+    _fresh = os.path.exists(_fc + '/stop_times.txt') and _src.startswith('sh') and (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) < 6 * 86400
     if not _fresh:
         os.makedirs(os.path.dirname(_fc), exist_ok=True)
         try:
-            flensburg_gtfs.build_de(_fc); open(_fc + '/zrodlo.txt', 'w').write('gtfs.de')
+            _nw = _fc + '.new'; shutil.rmtree(_nw, ignore_errors=True); os.makedirs(_nw)   # (built aside, put in place of the old folder only when complete)
+            flensburg_gtfs.build(flensburg_gtfs.current_url(), _nw); _src = 'sh'
+            try: flensburg_gtfs.platforms_de(_nw); _src = 'sh+gtfs.de'
+            except Exception as e: print('Flensburg: perony z gtfs.de pominięte (%s)' % e)
+            open(_nw + '/zrodlo.txt', 'w').write(_src); shutil.rmtree(_fc, ignore_errors=True); os.replace(_nw, _fc)
         except Exception as e:
-            print('Flensburg: gtfs.de niedostępne (%s), dane Szlezwika-Holsztyna' % e)
-            if not os.path.exists(_fc + '/stop_times.txt'): flensburg_gtfs.build(flensburg_gtfs.current_url(), _fc)
+            print('Flensburg: dane Szlezwika-Holsztyna niedostępne (%s)' % e)
+            if not os.path.exists(_fc + '/stop_times.txt'): flensburg_gtfs.build_de(_fc); open(_fc + '/zrodlo.txt', 'w').write('gtfs.de')
     shutil.copytree(_fc, os.path.join(SCR, 'fl'))
 except Exception as e: print('Flensburg: bez danych (%s)' % e)
 
