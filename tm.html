@@ -468,11 +468,12 @@ async function loadStops(o){
  if(!quiet)say(auto?'Pobieranie przystanków z OSM dla nowego obszaru…':'Pobieranie przystanków z OSM…');
  try{const j=await ov(stopQuery(BX));
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
-  const md=x=>x.rail?'r':x.tram?'t':'a',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):''})};
+  const md=x=>x.rail?'r':x.tram?'t':'a',pn=(name,st)=>(st&&st.num)||((String(name||'').match(NUMRE)||[])[2])||'',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):'',p:pn(name,st)})};
   // ten sam przystanek opisany drugi raz (peron / pozycja zatrzymania): tylko w obrębie tego samego rodzaju – peron tramwajowy obok
   // przystanku autobusowego o tej samej nazwie (np. Sikorskiego) to osobny przystanek; tuż obok (< 25 m) – wspólny przystanek A+T
-  const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
-   for(const q of c){const d=mdist(q.ll,ll);if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
+  // (two posts of one stop with different numbers – e.g. Warneńska 01 and 02 on both sides of the street – are never one and the same)
+  const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st),p0=pn(name,st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
+   for(const q of c){const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
     if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(added.has(q.st.id)){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
   // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
   // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
@@ -2658,7 +2659,7 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
   if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
-function bootData(){setTimeout(()=>ziNums(),1800);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
+function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&!S.stFix2)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true})}catch(e){}S.stFix2=1;save()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
 if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) – wczytujemy go przed zapisami i pobieraniem danych z OSM
