@@ -451,8 +451,9 @@ const stopClass=e=>{const t=e.tags||{};if(t.public_transport==='stop_position')r
 function stopFromOsm(e,c){
  const t=e.tags||{},ll=e.type==='node'?[e.lat,e.lon]:(e.center?[e.center.lat,e.center.lon]:null);if(!ll||!isFinite(ll[0])||!isFinite(ll[1]))return null;
  const nm=t.name||'(bez nazwy)',mm=nm.match(/^(.*\S)\s+(\d{2})$/);let nu='';if(mm)nu=mm[2];else if(/^\d{2}$/.test(t.local_ref||''))nu=t.local_ref;
- const rail=/^(station|halt)$/.test(t.railway||''),tram=t.railway==='tram_stop'||(c>1&&t.tram==='yes'&&!rail),o={id:(e.type==='way'?'w':'n')+e.id,name:nm,num:nu,ll,tram,rail};
- if(c>1&&tram&&(t.bus==='yes'||t.trolleybus==='yes'||t.highway==='bus_stop'))o.bus=true;return o}
+ // (a stop of buses and trams together – A+T, e.g. Warneńska – is often one bus_stop node with tram=yes: it takes both kinds of line)
+ const rail=/^(station|halt)$/.test(t.railway||''),tram=t.railway==='tram_stop'||(t.tram==='yes'&&!rail),o={id:(e.type==='way'?'w':'n')+e.id,name:nm,num:nu,ll,tram,rail};
+ if(tram&&(t.bus==='yes'||t.trolleybus==='yes'||t.highway==='bus_stop'))o.bus=true;return o}
 const STOPBB_OLD={gdansk:'54.27,18.43,54.46,18.85',trojmiasto:'54.27,18.40,54.58,18.85'}; // obszar z wcześniejszych wersji (kończył się na 18,85°E – bez wschodniej części Wyspy Sobieszewskiej)
 // starsze projekty: dobieramy przystanki tylko z dołączonego pasa na wschodzie (nic nie nadpisujemy, pomijamy ręcznie usunięte); znacznik S.stopBB zapisuje, jaki obszar już zaimportowano
 function stopsTopUp(){
@@ -483,16 +484,17 @@ async function loadStops(o){
   const nameFix=st=>{if(st.name!=='(bez nazwy)')return false;const q=nameNear(st.ll,st.tram);if(!q)return false;st.name=q.name;const mm=q.name.match(NUMRE);st.num=mm?mm[2]:(q.ref||st.num||'');if(st.num&&!mm&&q.ref)st.name=q.name+' '+q.ref;return true};
   let fixed=0;S.stops.forEach(s=>{if(nameFix(s))fixed++});if(fixed)dbg('Uzupełniono nazwy przystanków bez nazwy: '+fixed);
   S.stops.forEach(s=>addCov(s.ll,s.name,s));
-  const cnt=[0,0,0,0];let skD=0,skM=0;
+  const cnt=[0,0,0,0];let skD=0,skM=0,fixAT=0;
   (j.elements||[]).filter(e=>e.tags).map(e=>({e,c:stopClass(e)})).sort((a,b)=>a.c-b.c).forEach(({e,c})=>{
    const st=stopFromOsm(e,c);if(!st)return;nameFix(st);const old=have.get(st.id);
    if(old){ // już w projekcie: nie nadpisujemy; liczymy te, które użytkownik zmienił (nazwa, położenie, rodzaj)
+    if(o&&o.fixAT&&st.tram&&st.bus&&!old.tram&&!old.rail){old.tram=true;old.bus=true;fixAT++;return} // (A+T wczytane wcześniej jako sam autobus)
     if(old.name!==st.name||mdist(old.ll,st.ll)>1||!!old.tram!==!!st.tram||!!old.rail!==!!st.rail||!!old.bus!==!!st.bus)skM++;return}
    if(gone.has(st.id)){skD++;addCov(st.ll,st.name,st);return}
    if(c>1&&covered(st.ll,st.name,st))return; // ten sam przystanek opisany także jako peron / pozycja zatrzymania
    S.stops.push(st);added.add(st.id);addCov(st.ll,st.name,st);cnt[c]++});
   const n=cnt[1]+cnt[2]+cnt[3];
-  dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}`);
+  dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}, uzupełnione A+T: ${fixAT}`);
   if(!auto&&S.rmStops&&added.size)S.rmStops=S.rmStops.filter(id=>!added.has(id));
   if(added.size)setTimeout(()=>ziNums(added),0);
   S.stopBB=bb();
@@ -803,7 +805,13 @@ function viewBox(f){try{const b=map.getBounds().pad(f);return{s:b.getSouth(),n:b
 const cullBox=()=>cullOn()?viewBox(.5):null;
 const inBox=(ll,B)=>ll[0]>=B.s&&ll[0]<=B.n&&ll[1]>=B.w&&ll[1]<=B.e;
 function segHit(pts,B){let la0=1e9,la1=-1e9,lo0=1e9,lo1=-1e9;for(let i=0;i<pts.length;i++){const p=pts[i];if(p[0]<la0)la0=p[0];if(p[0]>la1)la1=p[0];if(p[1]<lo0)lo0=p[1];if(p[1]>lo1)lo1=p[1]}return la1>=B.s&&la0<=B.n&&lo1>=B.w&&lo0<=B.e}
-function onMoveEnd(){if(!DRAWN||!cullOn())return;const b=viewBox(.15);if(!b)return;if(b.s<DRAWN.s||b.n>DRAWN.n||b.w<DRAWN.w||b.e>DRAWN.e){clearTimeout(_rdT);_rdT=setTimeout(redraw,60)}}
+// the stops (and their names) are drawn only around the view once there are more than a few hundred of them – thousands of
+// markers and labels on the map made dragging it slow; past that margin they are drawn again
+let SDRAWN=null,_sdT=null;const stopBox=()=>S.stops.length>400?viewBox(.35):null;
+const outOf=(b,D)=>b.s<D.s||b.n>D.n||b.w<D.w||b.e>D.e;
+function onMoveEnd(){const b=viewBox(.1);if(!b)return;
+ if(DRAWN&&cullOn()&&outOf(b,DRAWN)){clearTimeout(_rdT);clearTimeout(_sdT);_rdT=setTimeout(redraw,60);return}
+ if(SDRAWN&&outOf(b,SDRAWN)){clearTimeout(_sdT);_sdT=setTimeout(()=>drawStops(),40)}}
 function buildPaths(vis,CB){
  const paths=[];
  // tryb ograniczonego rysowania (duże sieci): przy małym zbliżeniu punkty trasy są rzadsze (co ~mpp·1,2 m, 8–24 m), bo na ekranie i tak leżą w odległości kilku pikseli
@@ -974,7 +982,7 @@ function redraw(){
   else{L.polyline([e.en[a].pos,e.en[b].pos],{color:'#1c1f24',weight:W+9,lineCap:'round',interactive:false}).addTo(lineL);L.polyline([e.en[a].pos,e.en[b].pos],{color:'#fff',weight:W+4,lineCap:'round',interactive:false}).addTo(lineL)}
   {const cx=(px[a][0]+px[b][0])/2,cy=(px[a][1]+px[b][1])/2;capLab.set(e.u.key,{ll:toLL(cx,cy),hx:Math.max(...px.map(q=>Math.abs(q[0]-cx)))+W/2+9})}
   e.en.forEach(x=>L.circleMarker(x.pos,{radius:Math.max(2,(x.l.w||5)/2-.5),stroke:false,fillColor:x.l.color,fillOpacity:1,interactive:false}).addTo(lineL))});
- termMarkers(UOF,CB);drawStops(CB)}
+ termMarkers(UOF,CB);drawStops(CB,U)}
 // indeks przystanek -> linie; przebudowywany, gdy zmieni się lista linii, tablica przystanków linii albo jej długość (wszystkie zmiany składu linii zmieniają długość lub tablicę)
 const LX={L:null,obj:[],arr:[],len:[],m:new Map()},NOLINES=Object.freeze([]);
 function lineIdx(){const L=S.lines;let ok=LX.L===L&&LX.obj.length===L.length;
@@ -1001,12 +1009,12 @@ const StopMk=(()=>{try{const C=L.CircleMarker.extend({_updatePath(){
   ctx.fillStyle='#fff';ctx.font=(o.k==='ta'?'700 8px':'700 10px')+' Roboto,Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,p.x,p.y+.5);ctx.restore()}});
   new C([0,0],{radius:5});
   return function(ll,o){o=o||{};const k=o.k||'a';return new C(ll,{...o,color:k==='ta'?'#d32f2f':'#fff',weight:k==='ta'?2.5:1.5,opacity:1,fillColor:k==='t'?'#d32f2f':k==='r'?'#1b8a3a':'#1e6fe0',fillOpacity:1})}}catch(e){return function(ll,o){return L.circleMarker(ll,{radius:o&&o.radius?o.radius/2:4,weight:2,color:'#d32f2f',fillColor:'#fff',fillOpacity:1,bubblingMouseEvents:false})}}})();
-function drawStops(cb){
- stopL.clearLayers();const CB=cb!==undefined?cb:cullBox();
+function drawStops(cb,U0){
+ stopL.clearLayers();const CB=cb!==undefined?cb:cullBox(),SB=CB||stopBox();SDRAWN=SB;
  const usedBy=new Map();S.stops.forEach(s=>{if(linesOf(s.id).length){const k=baseName(s);(usedBy.get(k)||usedBy.set(k,[]).get(k)).push(s.ll)}});
  const sibUsed=u=>u.members.some(s=>(usedBy.get(baseName(s))||[]).some(ll=>mdist(ll,s.ll)<300));
- units().forEach(u=>{
-  if(CB&&!inBox(u.ll,CB))return;
+ (U0||units()).forEach(u=>{
+  if(SB&&!inBox(u.ll,SB))return;
   const first=u.members[0],multi=u.members.length>1,used=u.members.some(s=>linesOf(s.id).length);
   if(UI.hu&&mode!=='pick'&&mode!=='draw'&&mode!=='edit'&&mode!=='stop'&&!used)return;
   if(CB&&!used&&map.getZoom()<14&&mode!=='pick'&&mode!=='stop')return; // przy dużym oddaleniu bardzo dużej sieci pomijamy nieużywane przystanki
@@ -2631,11 +2639,11 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
   document.addEventListener('click',()=>{ifl.hidden=true});ikShow()}
  // the pencil of the lines: what it draws follows the kind of the selected line (chosen when the line was added) – shown by its small mark
  {const db=T.querySelector('[data-m="draw"]');
-  window.dShow=()=>{const k=KIND[amCur()]||KIND.tram;db.innerHTML=ic('pencil')+'<span class="kd">'+ic(k[0])+'</span>';db.dataset.tl='Rysuj linię: '+k[1].replace('Linia ','');db.dataset.td='Klikaj kolejne punkty trasy na mapie. Trasa prowadzi się zgodnie z rodzajem linii wybranym przy jej dodawaniu.';db.setAttribute('aria-label',db.dataset.tl)};dShow()}
+  window.dShow=()=>{const k=KIND[amCur()]||KIND.tram;db.innerHTML=ic('pencil');db.dataset.tl='Rysuj linię: '+k[1].replace('Linia ','');db.dataset.td='Klikaj kolejne punkty trasy na mapie. Trasa prowadzi się zgodnie z rodzajem linii wybranym przy jej dodawaniu.';db.setAttribute('aria-label',db.dataset.tl)};dShow()}
  // the picking tool right under the pencil: it takes the stops of the selected line's kind
  {const pb=T.querySelector('[data-m="pick"]'),db=T.querySelector('[data-m="draw"]'),PK={bus:['bus','Autobus / trolejbus'],tram:['tram','Tramwaj'],rail:['train','Kolej']};
   db.after(pb);
-  window.pShow=()=>{const k=pickKind();pb.innerHTML=ic('listcheck')+'<span class="kd">'+ic(PK[k][0])+'</span>';pb.dataset.tl='Wybieraj przystanki: '+PKN[k];pb.dataset.td='Klikaj kolejne przystanki linii – trasa prowadzi się między nimi sama. Narzędzie przyjmuje przystanki zgodne z rodzajem linii.';pb.setAttribute('aria-label',pb.dataset.tl);
+  window.pShow=()=>{const k=pickKind();pb.innerHTML=ic('listcheck');pb.dataset.tl='Wybieraj przystanki: '+PKN[k];pb.dataset.td='Klikaj kolejne przystanki linii – trasa prowadzi się między nimi sama. Narzędzie przyjmuje przystanki zgodne z rodzajem linii.';pb.setAttribute('aria-label',pb.dataset.tl);
    };
 pShow()}
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
@@ -2659,7 +2667,7 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
   if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
-function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&!S.stFix2)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true})}catch(e){}S.stFix2=1;save()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
+function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='TransitMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
 if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) – wczytujemy go przed zapisami i pobieraniem danych z OSM
