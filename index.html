@@ -544,6 +544,7 @@ span.chip{cursor:inherit}
 /* printed stop timetable (A4 landscape) */
 #printSheet{display:none}
 .btDirs{display:flex;flex-direction:column;gap:4px;margin:10px 0}.btDirs small{color:var(--muted)}.btFmt{display:flex;gap:14px}.btFmt label{display:flex;align-items:center;gap:5px}
+.persRst{justify-content:flex-end}.persRst #persReset{border:1px solid var(--line);background:var(--bg);color:var(--fg);font-weight:400;padding:8px 14px}.persRst #persReset:hover{background:var(--stripe)}
 .newsH{margin:0 0 14px}.newsBox{display:flex;flex-direction:column;gap:14px}.newsBox details.aItem{border:1px solid var(--line);background:var(--bg);padding:14px 18px 6px}.newsBox .aItem+.aItem{margin-top:0;padding-top:14px;border-top:1px solid var(--line)}.newsBox details.aItem:not([open]){padding-bottom:14px}.newsBox details.aItem>summary h3{color:var(--fg);margin:0}.newsBox details.aItem[open]>summary{margin-bottom:12px}
 .newsNone .bgWarn{color:var(--muted);margin-bottom:6px}
 .depDlg .depBox.pdfPvBox{width:min(1180px,100%);max-width:none;height:min(92vh,980px);max-height:calc(100dvh - var(--top-h) - 40px);display:flex;flex-direction:column;background:var(--bg);color:var(--fg);border-color:var(--line)}
@@ -1809,7 +1810,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794876251;
+const APP_BUILD=1794876361;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -8696,7 +8697,7 @@ function mkNav(){const drv=!!(ACC.user&&ACC.mode==='driver');window.ACC_DRV=drv;
 // or not at all, their order; and, where the bar has no room (a phone), the last ones put into "Więcej" by themselves. Kept
 // with the account. (A section the account or the settings do not offer – the tools, mKomputer… – is listed only when offered)
 const NAV_N={hub:'Hub',tt:'Rozkłady',map:'Mapa',dep:'Odjazdy',jp:'Połączenia',news:'Aktualności',guide:'mSIP',mk:'mKomputer',bryg:'Brygady',takt:'Takty',adm:'Konta',mkadm:'Zarządzanie',msgadm:'Wiadomości',tm:'TransitMaker',dbd:'dBoard'};
-const persCfg=()=>{const c=ACC.data.navCfg=ACC.data.navCfg||{place:{},auto:true};c.place=c.place||{};if(c.auto==null)c.auto=true;if(!c.dbd0){c.dbd0=1;if(!c.place.dbd)c.place.dbd='off'}if(!c.hub0){c.hub0=1;if(!c.place.hub)c.place.hub='off'}return c};   // (dBoard and the Hub: hidden until shown in the personalisation)
+const persCfg=()=>{const c=ACC.data.navCfg=ACC.data.navCfg||{place:{},auto:true};c.place=c.place||{};c.auto=true;   /* (what does not fit on the bar always goes to „Więcej”) */if(!c.dbd0){c.dbd0=1;if(!c.place.dbd)c.place.dbd='off'}if(!c.hub0){c.hub0=1;if(!c.place.hub)c.place.hub='off'}return c};   // (dBoard and the Hub: hidden until shown in the personalisation)
 function navApply(){const nav=document.querySelector('nav.rail');if(!nav)return;const c=ACC.user?persCfg():{place:{dbd:'off'},auto:false};
   const all=[...nav.querySelectorAll('[data-nav]:not([data-nav=more])')];all.forEach(b=>{const pl=c.place[b.dataset.nav]||'bar';b.classList.toggle('navOff',pl!=='bar'&&b.dataset.nav!=='tt');b.classList.remove('navOver')});
   // (no room: the last ones on the bar into "Więcej")
@@ -8723,8 +8724,7 @@ function persRender(){const B=document.getElementById('persBody');if(!B||documen
   const items=[...nav.querySelectorAll('[data-nav]:not([data-nav=more])')].filter(b=>!b.hidden||b.classList.contains('navOff'));
   const nerd=document.querySelector('label[for=toolsSw]');if(nerd)document.getElementById('persKeep').append(nerd);
   B.innerHTML=`<ul class="persList"></ul>
-    <label class="sw-depot" for="persAuto"><input type="checkbox" id="persAuto" role="switch"${c.auto?' checked':''}><span class="track" aria-hidden="true"></span><span class="swt">${esc(trS('Gdy brakuje miejsca na pasku, przenoś ostatnie pozycje do menu „Więcej”'))}</span></label>
-    <span id="persNerd"></span><div class="accRow"><button type="button" class="accBtn" id="persReset">${esc(trS('Przywróć domyślne'))}</button></div>`;
+    <span id="persNerd"></span><div class="accRow persRst"><button type="button" class="accBtn" id="persReset">${esc(trS('Przywróć domyślne'))}</button></div>`;
   if(nerd)B.querySelector('#persNerd').replaceWith(nerd);
   const ul=B.querySelector('.persList');
   items.forEach((b,i)=>{const k=b.dataset.nav,pl=c.place[k]||'bar',li=document.createElement('li');
@@ -8740,7 +8740,7 @@ function persRender(){const B=document.getElementById('persBody');if(!B||documen
       ACC.data.nav=o.map(x=>set.has(x)?sel[j++]:x);accSave();navOrder();navApply();persRender()};
     g.onpointerdown=e=>{e.preventDefault();document.addEventListener('pointermove',mv);document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);hold=setTimeout(()=>{on=true;li.classList.add('persDrag');if(navigator.vibrate)try{navigator.vibrate(15)}catch(_){}},180)};
     });
-  document.getElementById('persAuto').onchange=e=>{c.auto=e.target.checked;accSave();navApply()};
+
   document.getElementById('persReset').onclick=()=>{ACC.data.navCfg={place:{},auto:true};delete ACC.data.nav;accSave();navOrder();navApply();persRender()}}
 {const n=document.querySelector('label[for=toolsSw]');if(n)document.getElementById('persKeep').append(n)}   // ("Dla nerdów" lives in the personalisation)
 {const d=document.getElementById('persDlg');document.getElementById('persClose').onclick=()=>d.hidden=true;d.onclick=e=>{if(e.target===d)d.hidden=true};document.addEventListener('keydown',e=>{if(e.key==='Escape')d.hidden=true})}
