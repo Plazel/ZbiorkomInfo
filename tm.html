@@ -7,6 +7,7 @@
 <style>
 :root{--bg:#f4f6f9;--panel:#fff;--fg:#1f2a37;--mut:#5d6977;--bd:#d9dee5;--bd2:#e3e7ec;--tab:#f2f4f7;--acc:#d71920;--warn:#fff6d6;--head:#444b56;--focus:#f5b400;--mapf:none}
 body.dark{--bg:#14181d;--panel:#1c2229;--fg:#e7ebf0;--mut:#9aa5b2;--bd:#323a44;--bd2:#2a3139;--tab:#1a1f25;--acc:#ef4b52;--warn:#3b3720;--head:#2b323b;color-scheme:dark}
+html.accAdm{--acc:#1565c0}html.accAdm body.dark{--acc:#5c9ded}
 *{box-sizing:border-box}body{margin:0;font:14px/1.35 Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;height:100vh;color:var(--fg);background:var(--bg)}
 #top{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--bd);position:relative;z-index:3000}
 .brand{display:flex;align-items:center;gap:8px;font-size:14px}.mut{color:var(--mut)}
@@ -193,6 +194,9 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #infraList .icard .tools{display:flex;gap:0}#infraList .icard .tools .b{width:28px;height:28px;padding:0;justify-content:center}#infraList .icard .tools svg{width:16px;height:16px}
 #lines .card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:6px;padding:5px 6px 5px 6px;margin-bottom:4px}#lines .card>.lnh{gap:9px;min-width:0}#lines .card .nb{min-width:0;padding:0}#lines .card .tools{margin-top:0;gap:0}#lines .card .tools .b{width:28px;height:28px;padding:0;justify-content:center}#lines .card .tools svg{width:16px;height:16px}#lines .card>:not(.lnh):not(.tools){grid-column:1/-1}#lines .card .route{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#lines .card .meta{font-size:11.5px}#lines .card[data-lid]{user-select:none}#lines .card.lift{box-shadow:0 6px 18px rgba(0,0,0,.18);cursor:grabbing}.card .lnh .dg{flex:none;margin:0 -2px 0 -6px;width:24px;height:36px;padding:0;justify-content:center}
 .lnModal{width:min(660px,100%)!important}.lnModal .mb{overflow:auto}.lnEd .lnh{margin-bottom:4px}.lnEd .lnSec{padding:14px 0 6px;border-top:1px solid var(--bd2);margin-top:12px}.lnEd .lnSec>h4{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}.lnEd .vwar .vrow .vn{display:none}
+.txModal .mb{max-height:min(72vh,760px);overflow:auto}.txEd textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:84px;font:inherit;padding:8px 10px;border:1px solid var(--bd);background:var(--panel);color:var(--fg);border-radius:0}
+.txEd .txSg{align-items:start}.txEd .txSg .lab{padding-top:8px}.txEd .txAc input,.txEd .txN{width:100%;box-sizing:border-box}.txEd .txR{display:flex;flex-direction:column;gap:8px}
+.txEd .txV{border:1px solid var(--bd);padding:10px;margin-bottom:8px;background:var(--tab)}.txEd .txVb{display:flex;align-items:center;justify-content:space-between;margin-top:6px}.txEd .txB button{font-size:13.5px}
 .lnInl{margin-top:6px;cursor:default}.lnInl .vwar .vrow .vn{display:none}
 .lnInl .vpn.vwar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 8px;margin:0;background:var(--tab)}
 .lnInl .vwar>.vchips{order:1;flex:1 1 auto;padding:0;gap:6px}.lnInl .vwar>.vrow{order:2;border:0;padding:0;margin-left:auto}.lnInl .vwar>.vdet{order:3;flex-basis:100%}
@@ -307,6 +311,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
   <button class="b" data-m="edit" data-t="t1" title="Edycja narysowanej linii: przeciągaj punkty na linii, aby zmienić jej przebieg"><i data-ic="move"></i>Edytuj linię</button>
   <button class="b" id="loopBtn" data-t="t1" title="Zamyka linię pętlą uliczną: koniec trasy, który wraca w pobliże wcześniejszego przebiegu, zostaje gładko dołączony do niego"><i data-ic="refresh"></i>Zamknij pętlą</button>
   <button class="b" data-m="pick" data-t="t1" title="Klikanie kolejnych przystanków linii"><i data-ic="listcheck"></i>Wybieraj przystanki</button>
+  <button class="b" id="txtBtn" data-t="t1" title="Trasa tekstowa: wpisz ulice, którymi jedzie linia – trasa i przystanki zostaną dodane same"><i data-ic="type"></i>Trasa tekstowa</button>
   <button class="b" data-m="stop" data-t="t2" title="Dodawanie własnych przystanków"><i data-ic="pinplus"></i>Dodaj przystanek</button>
   <button class="b" data-m="move" data-t="t2" title="Przeciągaj przystanki, aby zmienić ich położenie – przystanek zostaje przypisany do swoich linii"><i data-ic="move"></i>Przenieś przystanek</button>
   <button class="b" data-m="infra" data-t="t3" title="Dorysowanie toru lub drogi, których nie ma na mapie"><i data-ic="pencil"></i>Dorysuj tor/drogę</button>
@@ -337,6 +342,10 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
+// kolor akcentów jak w ZbiorkomInfo: w sekcji administratora niebieski (strona ustawia data-mode=admin), w pozostałych czerwony
+(()=>{const f=()=>{let m='';try{m=parent!==window?parent.document.documentElement.dataset.mode||'':JSON.parse(localStorage.getItem('ztm.lastMode')||'""')}catch(e){}document.documentElement.classList.toggle('accAdm',m==='admin')};f();
+ try{if(parent!==window)new parent.MutationObserver(f).observe(parent.document.documentElement,{attributes:true,attributeFilter:['data-mode']})}catch(e){}})();
+
 const CITIES={gdansk:{n:'Gdańsk',bb:'54.27,18.43,54.46,19.02',c:[54.352,18.6466],z:13},gdynia:{n:'Gdynia',bb:'54.40,18.40,54.57,18.60',c:[54.5,18.5],z:13},sopot:{n:'Sopot',bb:'54.42,18.52,54.48,18.60',c:[54.447,18.565],z:14},
  trojmiasto:{n:'Trójmiasto (Gdańsk, Gdynia, Sopot)',bb:'54.27,18.40,54.58,19.02',c:[54.44,18.58],z:11},bydgoszcz:{n:'Bydgoszcz',bb:'53.06,17.85,53.21,18.20',c:[53.123,18.008],z:13},krynica:{n:'Krynica-Zdrój',bb:'49.395,20.92,49.445,21.00',c:[49.421,20.959],z:14}};
 let curCity='gdansk';const cityKey=()=>CITIES[S.city]?S.city:'gdansk',bb=()=>CITIES[cityKey()].bb,PAL=['#e6194b','#3cb44b','#4363d8','#f58231','#911eb4','#008080','#9a6324','#800000','#000075','#e6a800'];
@@ -1024,7 +1033,8 @@ function redraw(){
  // symbole przystanków obsługiwanych przez linie: biała kapsuła z kropkami w kolorach linii
  const U=units(),UOF=new Map(),SM=new Map(S.stops.map(s=>[s.id,s]));U.forEach(u=>u.members.forEach(s=>UOF.set(s.id,u)));
  capDrawn=new Set();capLab=new Map();const serve=new Map();
- paths.forEach(p=>p.l.stops.forEach(id=>{const s=SM.get(id),u=UOF.get(id);if(!s||!u)return;if(CB&&!inBox(s.ll,CB))return;
+ const hsAll=UI.hs&&mode!=='stop'&&mode!=='move';   // (wszystkie przystanki ukryte: także ich znaczniki na liniach)
+ paths.forEach(p=>!hsAll&&p.l.stops.forEach(id=>{const s=SM.get(id),u=UOF.get(id);if(!s||!u)return;if(CB&&!inBox(s.ll,CB))return;
   let bi=-1,bd=150*150;for(let i=0;i<p.pts.length;i++){const dx=(p.pts[i][1]-s.ll[1])*RX,dy=(p.pts[i][0]-s.ll[0])*R0,d=dx*dx+dy*dy;if(d<bd){bd=d;bi=i}}
   if(bi<0)return;capDrawn.add(id);let e=serve.get(u.key);if(!e)serve.set(u.key,e={u,en:[]});if(!e.en.some(x=>x.l===p.l))e.en.push({l:p.l,pos:p.disp[bi]})}));
  serve.forEach(e=>{const W=Math.max(...e.en.map(x=>lw(x.l))),px=e.en.map(x=>toPx(x.pos));let a=0,b=0,best=-1;
@@ -2036,7 +2046,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.query
   say(UI.ow?'Jednokierunkowość ignorowana: trasy po ulicach (linie autobusowe) mogą prowadzić pod prąd po ulicach jednokierunkowych (ronda pozostają jednokierunkowe) – dane dróg pobierane są z Overpass dla rysowanego odcinka. Dotyczy nowo wyznaczanych tras.'+(UI.strict?'':' Uwaga: przyciąganie (magnes) jest wyłączone, więc linie są rysowane swobodnie.')+($('#amode').value!=='street'?' Opcja działa dla linii autobusowych – wybierz na liście „Trasa” pozycję „Linia autobusowa”.':''):'Jednokierunkowość uwzględniana: trasy po ulicach liczy zwykły routing (OSRM), o ile nie jest włączona opcja „Zamknięte drogi”.')}}
 {const sb=$('#strictTr'),sy=()=>sb.classList.toggle('on',!!UI.strict);sy();sb.onclick=()=>{UI.strict=!UI.strict;rcache.clear();sy();applyUI();say(UI.strict?'Przyciąganie włączone: linie są prowadzone po torach/drogach.':'Przyciąganie wyłączone: linię można rysować w dowolnym miejscu mapy.')}}
 $('#hideUnused').onchange=e=>{UI.hu=e.target.checked;applyUI();drawStops()};
-$('#hideAllSt').onchange=e=>{UI.hs=e.target.checked;applyUI();drawStops()};
+$('#hideAllSt').onchange=e=>{UI.hs=e.target.checked;$('#hideUnused').disabled=UI.hs;applyUI();redraw()};
 $('#uiMc').onchange=e=>{UI.mc=e.target.checked;applyUI();redraw()};
 $('#showNames').onchange=e=>{UI.nm=e.target.checked;applyUI();drawStops()};
 $('#namesUsed').onchange=e=>{UI.nmu=e.target.checked;applyUI();drawStops()};
@@ -2138,6 +2148,145 @@ function askPrompt(msg,def,o={}){
  w.innerHTML=`<div style="margin-bottom:8px">${esc(msg)}</div>`;w.appendChild(inp);
  return modal({title:o.title||'Wpisz wartość',body:w,btns:[{t:'Anuluj',v:null},{t:o.ok||'OK',v:()=>inp.value,c:'pri'}],cancelV:null,init:(bx)=>{inp.onkeydown=e=>{if(e.key==='Enter')bx.querySelector('.pri').click()};inp.select()}})}
 
+// ---- trasa tekstowa: linia wytyczona z listy ulic (OSM: ulice o tych nazwach w obszarze miasta), przystanki dobierane wzdłuż niej
+// przebieg: każda ulica od miejsca wjazdu do skrzyżowania z następną (kierunek jazdy zgodny z jednokierunkowością jezdni – po prawej),
+// przystanki leżące przy tym przebiegu (z dwóch peronów o tej samej nazwie ten po prawej stronie jazdy), odcinki między przystankami
+// wyznaczane zwykłym trasowaniem; gdy trasowanie odbiega od podanych ulic, odcinek biegnie wzdłuż ulicy
+const TXT={};
+const txF=s=>String(s||'').toLocaleLowerCase('pl').replace(/ł/g,'l').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const txNorm=s=>String(s||'').trim().replace(/\s+/g,' ').replace(/^(ul\.?|ulica|al\.?|aleja|aleje|pl\.?|plac|os\.?|osiedle|rondo|skwer)\s+/i,'');
+const txKey=s=>txF(txNorm(s)).replace(/[^\p{L}\d]+/gu,' ').trim();
+const txSplit=t=>String(t||'').split(/\n|;|,(?!\d)|\s+[–—-]\s+|→/).map(txNorm).filter(Boolean);
+async function txWays(names){const want=[...new Set(names.map(txKey))].filter(Boolean),k=want.join('|')+'@'+bb();if(TXT[k])return TXT[k];
+ const esq=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\\\$&').replace(/"/g,'\\"');
+ const alt=`^((aleja|aleje|ulica|plac|rondo|skwer|osiedle|al\\\\.|ul\\\\.|pl\\\\.|os\\\\.) )?(${[...new Set(names.map(txNorm))].map(esq).join('|')})$`;
+ const j=await ov(`[out:json][timeout:120];way["highway"]["highway"!~"^(footway|path|cycleway|steps|pedestrian|track|bridleway|corridor|elevator|proposed|construction)$"]["name"~"${alt}",i](${bb()});out body geom;`,130000);
+ const W=(j.elements||[]).filter(e=>e.geometry&&e.nodes&&e.geometry.length===e.nodes.length).map(e=>({key:txKey((e.tags||{}).name),ow:(e.tags||{}).oneway==='yes'||(e.tags||{}).junction==='roundabout'?1:(e.tags||{}).oneway==='-1'?-1:0,nodes:e.nodes,pts:e.geometry.map(p=>[p.lat,p.lon])}));
+ return TXT[k]=W}
+// graf jednej ulicy (wszystkie drogi o tej nazwie); kierunek jednokierunkowych jezdni zachowany (dir), wersja bez kierunków (und) – gdy z kierunkiem się nie da
+function txGraph(ways){const pos=new Map(),dir=new Map(),und=new Map(),add=(m,a,b,d)=>{let x=m.get(a);if(!x)m.set(a,x=[]);x.push([b,d])};
+ ways.forEach(w=>{for(let i=0;i<w.nodes.length;i++){pos.set(w.nodes[i],w.pts[i]);if(!i)continue;const a=w.nodes[i-1],b=w.nodes[i],d=mdist(w.pts[i-1],w.pts[i]);
+  add(und,a,b,d);add(und,b,a,d);if(w.ow!==-1)add(dir,a,b,d);if(w.ow!==1)add(dir,b,a,d)}});
+ return{pos,dir,und}}
+function txDij(adj,s,t){const g={adj};if(t!=null)return dijkstra(s,t,g);
+ const dist=new Map([[s,0]]),h=[[0,s]];while(h.length){h.sort((a,b)=>b[0]-a[0]);const [d,u]=h.pop();if(d>dist.get(u))continue;for(const [v,w] of adj.get(u)||[]){const nd=d+w;if(nd<(dist.has(v)?dist.get(v):1e18)){dist.set(v,nd);h.push([nd,v])}}}return dist}
+const txRev=adj=>{const r=new Map();adj.forEach((es,a)=>es.forEach(([b,d])=>{let x=r.get(b);if(!x)r.set(b,x=[]);x.push([a,d])}));return r};
+const txNear=(pos,ll)=>{let b=null,bd=1e18;pos.forEach((p,id)=>{const d=mdist(p,ll);if(d<bd){bd=d;b=id}});return[b,bd]};
+// węzeł ulicy przy punkcie, z którego (do którego) da się dojechać zgodnie z kierunkiem jezdni – przy dwóch jezdniach wybiera właściwą
+const txSnap=(g,ll,other,start)=>{const c=[];g.pos.forEach((p,id)=>c.push([mdist(p,ll),id]));c.sort((a,b)=>a[0]-b[0]);const best=c[0]?c[0][1]:null;if(other==null)return best;
+ for(const [d,id] of c.slice(0,16)){if(d>c[0][0]+40)break;if(start?txDij(g.dir,id,other):txDij(g.dir,other,id))return id}return best};
+// przebieg wzdłuż ulic: [{ll}], kolejne ulice łączone w najbliższym miejscu (wspólny węzeł albo najbliższe punkty, do 150 m)
+function txGuide(ways,names,from,to,pin={}){const G=names.map(n=>{const k=txKey(n),w=ways.filter(x=>x.key===k);if(!w.length)throw new Error(`Nie znaleziono ulicy „${n}” w obszarze ${CITIES[cityKey()].n.replace(/ \(.*/,'')}.`);return txGraph(w)});
+ const J=[];for(let i=0;i+1<G.length;i++){const A=G[i],B=G[i+1];let best=null,bd=1e18;
+  for(const [id,p] of A.pos){if(B.pos.has(id)){best=[id,id];bd=0;break}}
+  if(!best){const cell=new Map(),ck=p=>Math.floor(p[0]/.0015)+':'+Math.floor(p[1]/.0025);B.pos.forEach((p,id)=>{const k=ck(p);let x=cell.get(k);if(!x)cell.set(k,x=[]);x.push(id)});
+   A.pos.forEach((p,id)=>{const a=Math.floor(p[0]/.0015),b=Math.floor(p[1]/.0025);for(let u=-1;u<=1;u++)for(let v=-1;v<=1;v++)for(const q of cell.get((a+u)+':'+(b+v))||[]){const d=mdist(p,B.pos.get(q));if(d<bd){bd=d;best=[id,q]}}})}
+  if(!best||bd>150)throw new Error(`Ulice „${names[i]}” i „${names[i+1]}” nie łączą się ze sobą (najbliżej ${best?Math.round(bd)+' m':'– brak'}). Sprawdź kolejność ulic albo dopisz ulicę łączącą.`);
+  J.push(best)}
+ const legs=[];
+ for(let i=0;i<G.length;i++){const g=G[i];let s=i?J[i-1][1]:null,t=i<J.length?J[i][0]:null;
+  if(s==null){if(from)s=txSnap(g,from,t,true);else if(t!=null){const D=txDij(txRev(g.dir),t);let far=null,fd=-1;D.forEach((d,id)=>{if(d>fd){fd=d;far=id}});if(fd<=0){const U=txDij(g.und,t);U.forEach((d,id)=>{if(d>fd){fd=d;far=id}})}s=far}}
+  if(t==null){if(to)t=txSnap(g,to,s,false);else{const st0=s;const D=txDij(g.dir,st0);let far=null,fd=-1;D.forEach((d,id)=>{if(d>fd){fd=d;far=id}});if(fd<=0){const U=txDij(g.und,st0);U.forEach((d,id)=>{if(d>fd){fd=d;far=id}})}t=far}}
+  if(s==null&&t==null){// jedna ulica, bez przystanków początkowego i końcowego: jej dwa najdalsze końce
+   const ids=[...g.pos.keys()];const D0=txDij(g.und,ids[0]);let a=ids[0],ad=-1;D0.forEach((d,id)=>{if(d>ad){ad=d;a=id}});const D1=txDij(g.und,a);let b=a,bd2=-1;D1.forEach((d,id)=>{if(d>bd2){bd2=d;b=id}});s=a;t=b}
+  let p=s===t?[s]:(txDij(g.dir,s,t)||txDij(g.und,s,t));if(!p)throw new Error(`Ulica „${names[i]}” nie jest ciągła między wjazdem a skrzyżowaniem z następną ulicą.`);
+  legs.push(p.map(id=>g.pos.get(id)))}
+ const out=[];legs.forEach(L=>L.forEach(p=>{if(!out.length||mdist(out[out.length-1],p)>.5)out.push(p)}));
+ if(pin.from&&from&&mdist(out[0],from)>3)out.unshift(from);if(pin.to&&to&&mdist(out[out.length-1],to)>3)out.push(to);
+ out.e0=from&&!pin.from?mdist(out[0],from)+60:80;out.e1=to&&!pin.to?mdist(out[out.length-1],to)+60:80;   // (zasięg przed początkiem i za końcem przebiegu, w którym szukane są przystanki)
+ return out}
+// przystanki przy przebiegu: odległość do 35 m (tramwaj 30 m), z peronów jednej nazwy w tym samym miejscu – po prawej stronie jazdy
+function txStops(guide,kind,fromS,toS){const m=guide.map(p=>[p[1]*RX,p[0]*R0]),cum=[0];for(let i=1;i<m.length;i++)cum.push(cum[i-1]+Math.hypot(m[i][0]-m[i-1][0],m[i][1]-m[i-1][1]));
+ const thr=kind==='tram'?30:35,la=guide.map(p=>p[0]),lo=guide.map(p=>p[1]),pd=(Math.max(guide.e0||80,guide.e1||80,thr)+20)/R0,pl=pd*R0/RX,bx=[Math.min(...la)-pd,Math.max(...la)+pd,Math.min(...lo)-pl,Math.max(...lo)+pl];
+ const C=[];S.stops.forEach(s=>{if(!sKinds(s).includes(kind))return;const [a,b]=s.ll;if(a<bx[0]||a>bx[1]||b<bx[2]||b>bx[3])return;const px=b*RX,py=a*R0;let bd=1e9,al=0,side=0;
+  for(let i=1;i<m.length;i++){const [x0,y0]=m[i-1],[x1,y1]=m[i],dx=x1-x0,dy=y1-y0,L2=dx*dx+dy*dy;if(!L2)continue;let t=((px-x0)*dx+(py-y0)*dy)/L2;
+   // (przy końcach przebiegu także przystanki do 80 m przed jego początkiem i za końcem – peron przy samym krańcu)
+   const Ls=Math.sqrt(L2);t=Math.max(i===1?-(guide.e0||80)/Ls:0,Math.min(i===m.length-1?1+(guide.e1||80)/Ls:1,t));const d=Math.hypot(px-(x0+t*dx),py-(y0+t*dy));
+   if(d<bd){bd=d;al=cum[i-1]+t*Ls;side=dx*(py-y0)-dy*(px-x0)}}
+  if(bd<=thr)C.push({s,d:bd,al,right:side<0,base:txF(s.name.replace(/\s+\d{2}$/,''))})});
+ C.sort((a,b)=>a.al-b.al);const pick=[];
+ for(let i=0;i<C.length;){let j=i+1;while(j<C.length&&C[j].base===C[i].base&&C[j].al-C[i].al<160)j++;const g=C.slice(i,j);i=j;
+  const r=g.filter(x=>x.right).sort((a,b)=>a.d-b.d);let c=r[0];if(!c){const n=g.sort((a,b)=>a.d-b.d)[0];if(g.length===1&&n.d<=12)c=n}if(c)pick.push(c)}
+ const grp=x=>x?txF(x.name.replace(/\s+\d{2}$/,'')):null,gf=grp(fromS),gt=grp(toS);
+ let ids=pick.filter(c=>!((fromS&&c.base===gf&&mdist(c.s.ll,fromS.ll)<120)||(toS&&c.base===gt&&mdist(c.s.ll,toS.ll)<120))).map(c=>c.s.id);if(fromS){ids=ids.filter(x=>x!==fromS.id);ids.unshift(fromS.id)}if(toS){ids=ids.filter(x=>x!==toS.id);ids.push(toS.id)}
+ return ids}
+// odcinki między przystankami: zwykłe trasowanie; gdy odbiega od podanych ulic o ponad 60 m – odcinek wzdłuż przebiegu ulic
+async function txSegs(ids,guide,am,mode){const st=ids.map(stopOf),m=guide.map(p=>[p[1]*RX,p[0]*R0]),cum=[0];for(let i=1;i<m.length;i++)cum.push(cum[i-1]+Math.hypot(m[i][0]-m[i-1][0],m[i][1]-m[i-1][1]));
+ const proj=ll=>{const px=ll[1]*RX,py=ll[0]*R0;let bd=1e18,al=0;for(let i=1;i<m.length;i++){const [x0,y0]=m[i-1],[x1,y1]=m[i],dx=x1-x0,dy=y1-y0,L2=dx*dx+dy*dy;if(!L2)continue;let t=((px-x0)*dx+(py-y0)*dy)/L2;t=Math.max(0,Math.min(1,t));const d=Math.hypot(px-(x0+t*dx),py-(y0+t*dy));if(d<bd){bd=d;al=cum[i-1]+t*Math.sqrt(L2)}}return{d:bd,al}};
+ const slice=(a0,a1)=>{const out=[];for(let i=1;i<m.length;i++){if(cum[i]<a0)continue;if(cum[i-1]>a1)break;const at=a=>{const f=(a-cum[i-1])/((cum[i]-cum[i-1])||1);return[guide[i-1][0]+(guide[i][0]-guide[i-1][0])*f,guide[i-1][1]+(guide[i][1]-guide[i-1][1])*f]};
+  if(!out.length)out.push(at(Math.max(a0,cum[i-1])));out.push(at(Math.min(a1,cum[i])))}return out};
+ const segs=[];let alt=0;
+ for(let i=0;i+1<st.length;i++){const A=st[i],B=st[i+1];let r=null;try{r=await segRoute(A,B,am)}catch(e){}
+  const pa=proj(A.ll),pb=proj(B.ll);let ok=r&&!r.bad&&r.pts&&r.pts.length>1;
+  if(ok){let mx=0;const dp=densify(r.pts,25);for(let k=0;k<dp.length;k+=Math.max(1,dp.length>>8)){mx=Math.max(mx,proj(dp[k]).d)}ok=mx<=60&&segsLen([{pts:r.pts}])<=Math.max(1,pb.al-pa.al)*1.6+150}
+  if(ok)segs.push({mode:r.mode,pts:r.pts});
+  else{const p=pb.al>pa.al?slice(pa.al,pb.al):[];segs.push({mode,pts:[A.ll,...p,B.ll]});alt++}}
+ return{segs,alt}}
+async function txBuild(spec,kind){const names=txSplit(spec.streets);if(!names.length)throw new Error('Wpisz co najmniej jedną ulicę.');
+ const fromS=spec.from?txStopBy(spec.from,kind):null,toS=spec.to?txStopBy(spec.to,kind):null;
+ if(spec.from&&!fromS)throw new Error(`Nie znaleziono przystanku „${spec.from}”.`);if(spec.to&&!toS)throw new Error(`Nie znaleziono przystanku „${spec.to}”.`);
+ const W=await txWays(names),guide=txGuide(W,names,fromS?fromS.ll:spec.fromLL,toS?toS.ll:spec.toLL,{from:!!fromS,to:!!toS}),sk=kind==='tram'?'tram':'bus',ids=txStops(guide,sk,fromS,toS);
+ if(ids.length<2)throw new Error(`Przy ulicach ${names.map(n=>'„'+n+'”').join(', ')} nie ma co najmniej dwóch przystanków ${kind==='tram'?'tramwajowych':'autobusowych'} – pobierz przystanki z OSM albo podaj przystanek początkowy i końcowy.`);
+ const am=UI.strict?(kind==='tram'?'tram':'street'):'free',r=await txSegs(ids,guide,am,kind==='tram'?'tram':'street');
+ return{ids,segs:r.segs,alt:r.alt,names}}
+function txStopBy(q,kind){const k=txF(String(q).trim()),num=(String(q).match(/\s(\d{2})$/)||[])[1],sk=kind==='tram'?'tram':'bus';
+ const c=S.stops.filter(s=>sKinds(s).includes(sk)&&(txF(lab(s))===k||txF(s.name)===k||txF(s.name.replace(/\s+\d{2}$/,''))===k.replace(/\s+\d{2}$/,'')&&(!num||(s.num||'')===num)));
+ return c[0]||null}
+function txApply(l,b){l.stops=b.ids;l.segs=b.segs;l.auto=false;l.excl=[];l.wp=[l.segs[0].pts[0],...l.segs.map(x=>x.pts[x.pts.length-1])]}
+function txVar(root,src,b,o){const v=JSON.parse(JSON.stringify(src));v.id='l'+Date.now()+Math.floor(Math.random()*1e4);v.par=root.id;v.hidden=false;
+ ['note','terms','loop','loopBak','loopWant','excl','rev','dir','vname','op','win','tt','tto'].forEach(x=>delete v[x]);if(o.back){v.dir='B';v.rev=src.id}if(o.name)v.vname=o.name;txApply(v,b);S.lines.push(v);return v}
+// okno: linia (nowa danego rodzaju albo istniejąca), TAM (przystanek początkowy, ulice, przystanek końcowy), POWRÓT (tymi samymi ulicami / inną trasą / bez), warianty
+function txDlg(){closeMenus&&closeMenus();const sel=selLine(),root=sel?(sel.par?S.lines.find(x=>x.id===sel.par):sel):null;
+ const box=document.createElement('div');box.className='lnEd txEd';const V=[];let back='same';
+ const stopNames=[...new Set(S.stops.map(s=>lab(s)))].sort((a,b)=>a.localeCompare(b,'pl'));
+ const route=(k,ttl,o={})=>`<div class="txR" data-r="${k}">${o.name?`<div class="setg"><span class="lab">${ic('tag',14)}Nazwa</span><input class="txN" value="${esc(o.name)}" aria-label="Nazwa wariantu"></div>`:''}
+   <div class="setg"><span class="lab">${ic('pole',14)}Od przystanku</span><div class="txAc"><input class="txF" placeholder="(niewymagany)" autocomplete="off" aria-label="Przystanek początkowy"></div></div>
+   <div class="setg txSg"><span class="lab">${ic('road',14)}Ulice</span><textarea class="txS" rows="4" placeholder="Grunwaldzka&#10;Aleja Zwycięstwa&#10;Hucisko" aria-label="Ulice ${ttl}, po kolei"></textarea></div>
+   <div class="setg"><span class="lab">${ic('pole',14)}Do przystanku</span><div class="txAc"><input class="txT" placeholder="(niewymagany)" autocomplete="off" aria-label="Przystanek końcowy"></div></div></div>`;
+ const draw=()=>{const vals=[...box.querySelectorAll('.txR')].map(r=>({k:r.dataset.r,n:(r.querySelector('.txN')||{}).value,f:r.querySelector('.txF').value,s:r.querySelector('.txS').value,t:r.querySelector('.txT').value}));
+  box.innerHTML=`<div class="lnSec"><div class="setg"><span class="lab">${ic('route',14)}Linia</span><select class="txL">${[['n:bus','Nowa linia autobusowa'],['n:trolley','Nowa linia trolejbusowa'],['n:tram','Nowa linia tramwajowa'],...(root?[['l:'+root.id,'Linia '+(root.num||'')+' – zastąp jej trasę']]:[])].map(([v,t])=>`<option value="${v}"${(box.dataset.l||(root?'l:'+root.id:'n:bus'))===v?' selected':''}>${esc(t)}</option>`).join('')}</select></div></div>
+   <div class="lnSec"><h4>${ic('right',14)}TAM</h4>${route('A','TAM')}</div>
+   <div class="lnSec"><h4>${ic('route',14)}POWRÓT</h4><div class="setg"><span class="lab">${ic('branch',14)}Trasa</span><div class="seg txB">${[['same','Tymi samymi ulicami'],['own','Inną trasą'],['none','Bez powrotu']].map(([v,t])=>`<button type="button" data-b="${v}" class="${back===v?'on':''}">${t}</button>`).join('')}</div></div>${back==='own'?route('B','POWRÓT'):''}</div>
+   <div class="lnSec"><h4>${ic('branch',14)}Warianty</h4>${V.map((v,i)=>`<div class="txV">${route('V'+i,'wariantu',{name:v.name})}<div class="txVb"><label class="chk"><input type="checkbox" class="txVr" data-i="${i}"${v.back?' checked':''}>Powrót tymi samymi ulicami</label><button type="button" class="b ico flat txVx" data-i="${i}" title="Usuń wariant">${ic('trash')}</button></div></div>`).join('')}<button type="button" class="b txVadd">${ic('plus')}Dodaj wariant</button></div>`;
+  vals.forEach(v=>{const r=box.querySelector(`.txR[data-r="${v.k}"]`);if(!r)return;if(r.querySelector('.txN')&&v.n!=null)r.querySelector('.txN').value=v.n;r.querySelector('.txF').value=v.f;r.querySelector('.txS').value=v.s;r.querySelector('.txT').value=v.t});
+  box.querySelector('.txL').onchange=e=>{box.dataset.l=e.target.value};
+  box.querySelectorAll('.txB [data-b]').forEach(x=>x.onclick=()=>{const was=back;back=x.dataset.b;draw();
+   if(back==='own'&&was!=='own'){const A=box.querySelector('.txR[data-r="A"]'),B=box.querySelector('.txR[data-r="B"]');if(A&&B&&!B.querySelector('.txS').value){B.querySelector('.txS').value=txSplit(A.querySelector('.txS').value).reverse().join('\n');B.querySelector('.txF').value=A.querySelector('.txT').value;B.querySelector('.txT').value=A.querySelector('.txF').value}}});
+  box.querySelectorAll('.txVr').forEach(x=>x.onchange=()=>{V[+x.dataset.i].back=x.checked});
+  box.querySelectorAll('.txVx').forEach(x=>x.onclick=()=>{V.splice(+x.dataset.i,1);draw()});
+  box.querySelector('.txVadd').onclick=()=>{V.push({name:'Wariant '+(V.length+1),back:true});draw();const r=box.querySelector(`.txR[data-r="V${V.length-1}"] .txS`);if(r)r.focus()};
+  box.querySelectorAll('.txN').forEach((x,i)=>x.oninput=()=>{V[i].name=x.value});
+  box.querySelectorAll('.txF,.txT').forEach(acStops);
+  };
+ // podpowiedzi nazw przystanków (lista w stylu strony)
+ const acStops=inp=>{let menu=null;const close=()=>{if(menu){menu.remove();menu=null}};
+  const show=()=>{close();const q=txF(inp.value.trim());if(!q)return;const hits=stopNames.filter(n=>txF(n).includes(q)).slice(0,8);if(!hits.length||hits.length===1&&hits[0]===inp.value)return;
+   menu=document.createElement('div');menu.className='fsMenu txMenu';const r=inp.getBoundingClientRect();menu.style.cssText=`position:fixed;left:${r.left}px;top:${r.bottom+2}px;width:${r.width}px;z-index:10050`;
+   menu.innerHTML=hits.map(n=>`<button type="button" >${esc(n)}</button>`).join('');menu.onmousedown=e=>{const b=e.target.closest('button');if(b){e.preventDefault();inp.value=b.textContent;close()}};document.body.appendChild(menu)};
+  inp.addEventListener('input',show);inp.addEventListener('blur',()=>setTimeout(close,120));inp.addEventListener('keydown',e=>{if(e.key==='Escape')close()})};
+ draw();
+ const read=k=>{const r=box.querySelector(`.txR[data-r="${k}"]`);return r?{from:r.querySelector('.txF').value.trim(),streets:r.querySelector('.txS').value,to:r.querySelector('.txT').value.trim(),name:((r.querySelector('.txN')||{}).value||'').trim()}:null};
+ modal({title:'Trasa tekstowa',body:box,cls:'lnModal txModal',cancelV:null,btns:[{t:'Anuluj',v:null},{t:'Wytycz trasę',c:'pri',v:()=>({A:read('A'),B:back==='own'?read('B'):null,back,L:box.querySelector('.txL').value,V:V.map((v,i)=>({...read('V'+i),back:v.back}))})}]}).then(async o=>{if(!o)return;
+  try{if(!txSplit(o.A.streets).length){say('Wpisz ulice trasy TAM.');return}
+   const lk=o.L.startsWith('l:')?S.lines.find(x=>x.id===o.L.slice(2)):null,kind=lk?(lk.veh==='trolley'?'trolley':lk.rm==='tram'?'tram':lk.rm==='rail'?'rail':'bus'):o.L.slice(2);
+   if(kind==='rail'){say('Trasa tekstowa prowadzi po ulicach – nie dotyczy linii kolejowych.');return}
+   say('Trasa tekstowa: wyszukiwanie ulic w OSM…');
+   const bA=await txBuild(o.A,kind);
+   // (powrót zaczyna się tam, gdzie kończy się TAM, i kończy tam, gdzie TAM się zaczyna – także gdy przystanków nie podano; wtedy to tylko kierunek)
+   const anc=(sp,b)=>({...sp,fromLL:stopOf(b.ids[b.ids.length-1]).ll,toLL:stopOf(b.ids[0]).ll});
+   const rev=(s,b)=>anc({from:s.to,to:s.from,streets:txSplit(s.streets).reverse().join('\n')},b);
+   const bB=o.back==='own'?await txBuild(anc(o.B,bA),kind):o.back==='same'?await txBuild(rev(o.A,bA),kind).catch(e=>{dbg('Trasa tekstowa (powrót): '+e.message);return null}):null;
+   const bV=[];for(const v of o.V){if(!txSplit(v.streets).length)continue;const b=await txBuild(v,kind);const bb=v.back?await txBuild(rev(v,b),kind).catch(()=>null):null;bV.push({v,b,bb})}
+   let l=lk;if(!l){newLine(kind);l=S.lines[S.lines.length-1]}
+   else S.lines=S.lines.filter(x=>x.par!==l.id||x.dir!=='B'||x.rev!==l.id);   // (dotychczasowy POWRÓT tej linii zastępuje nowy)
+   txApply(l,bA);if(bB)txVar(l,l,bB,{back:true});
+   bV.forEach(({v,b,bb})=>{const x=txVar(l,l,b,{name:v.name||'Wariant'});if(bb)txVar(l,x,bb,{back:true})});
+   S.sel=l.id;syncVariants();save();renderLines();redraw();const all=l.segs.flatMap(x=>x.pts);if(all.length)map.fitBounds(L.latLngBounds(all),{padding:[30,30]});
+   const alt=bA.alt+(bB?bB.alt:0)+bV.reduce((t,x)=>t+x.b.alt+(x.bb?x.bb.alt:0),0);
+   const pz=n=>n+' '+(n===1?'przystanek':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'przystanki':'przystanków');
+   say(`Linia ${l.num}: ${pz(bA.ids.length)} TAM`+(bB?`, ${pz(bB.ids.length)} POWRÓT`:o.back==='same'?' (powrotu tymi samymi ulicami nie udało się wytyczyć)':'')+(bV.length?`, wariantów: ${bV.length}`:'')+'.'+(alt?` ${alt} odc. poprowadzono wzdłuż ulic, bo trasowanie wybierało inną drogę.`:''))}
+  catch(e){dbg('Trasa tekstowa: '+(e.stack||e.message));say(e.message||String(e))}})}
+$('#txtBtn').onclick=()=>txDlg();
 // ---- usuwanie wszystkich linii (dwa potwierdzenia)
 $('#delAll').onclick=async()=>{closeMenus();
  const n=S.lines.length;if(!n){say('Nie ma żadnych linii do usunięcia.');return}
