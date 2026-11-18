@@ -66,6 +66,13 @@ input[type=color]{width:44px;height:28px;padding:0;border:0;background:none}
 .cpsb b,.cph b{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.55),0 1px 4px rgba(0,0,0,.5);pointer-events:none;box-sizing:border-box}.cph b{top:50%}
 .cpr{font-size:11.5px;color:var(--mut);font-variant-numeric:tabular-nums}
 input[type=checkbox],input[type=range],input[type=radio]{padding:0;accent-color:var(--fg)}
+input[type=range]{-webkit-appearance:none;appearance:none;height:18px;background:transparent;border:0;border-radius:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--bd);border-radius:0}
+input[type=range]::-moz-range-track{height:4px;background:var(--bd);border-radius:0}
+input[type=range]::-moz-range-progress{height:4px;background:var(--acc)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:16px;margin-top:-6px;background:var(--acc);border:2px solid var(--bg);border-radius:0;box-shadow:0 0 0 1px var(--acc)}
+input[type=range]::-moz-range-thumb{width:10px;height:14px;background:var(--acc);border:2px solid var(--bg);border-radius:0;box-shadow:0 0 0 1px var(--acc)}
+input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .small{font-size:12px;color:var(--mut);margin-top:5px}
 .st.sub{margin-left:22px;padding-left:8px;border-left:2px solid var(--bd2)}.st.grp{background:var(--tab);border-radius:0;padding:3px 4px}.st{display:flex;gap:6px;align-items:center;margin-bottom:5px}.st input{flex:1;min-width:0}.st select{width:86px}.st .tt{color:var(--mut);display:inline-flex}
 .badge{display:inline-block;padding:1px 6px;font-size:11px;font-weight:700;border-radius:0}
@@ -182,7 +189,7 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #tools{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;z-index:1000;background:var(--bg);border-right:1px solid var(--bd)}
 #tools .b{width:38px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;gap:0}#tools .b svg{width:19px;height:19px;margin:0}
 #tools .tsep{width:28px;border-top:1px solid var(--bd);margin:4px 0;flex:none}#tools #modebar,#tools .tgrp{display:contents}
-#pFile,#pLay{left:0;right:auto}
+#pFile,#pEdit,#pLay{left:0;right:auto}
 #side>#modebar{display:none}
 #routeOpts{display:flex;flex-direction:column;gap:8px;margin:0;padding:12px;border:0;border-bottom:1px solid var(--bd);background:var(--panel)}#routeOpts .roH{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut)}#routeOpts .roG{display:flex;gap:4px}
 #routeOpts .roB{display:flex;align-items:center;justify-content:center;height:38px;width:38px;flex:none;padding:0;border:1px solid var(--bd)!important;background:var(--bg)!important;color:var(--fg)!important}#routeOpts .roB svg{width:19px;height:19px;margin:0}#routeOpts .roB:hover{background:var(--tab)!important}#routeOpts .roB.on{background:var(--fg)!important;color:var(--panel)!important;border-color:var(--fg)!important}
@@ -222,7 +229,7 @@ body.dark .chk input[type=checkbox]::after{background:#14181d}
 #stops .sn{border:1px solid transparent;background:transparent;height:30px;padding:0 6px;font:inherit;font-size:13.5px;color:var(--fg);width:100%;min-width:0;flex:none}#stops .sn:hover{border-color:var(--bd)}#stops .sn:focus{border-color:var(--fg);background:var(--panel);outline:0}
 #stops .sl{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-end;align-items:center;max-width:132px}#stops .sl .badge{font-size:11px;padding:2px 5px;min-width:20px;text-align:center;line-height:1.25}#stops .sc{font-size:11.5px;color:var(--mut);white-space:nowrap;margin-right:2px}
 #stops .sa{display:grid;grid-template-columns:repeat(3,28px)}#stops .sa .b,#stops .gt{width:28px;height:28px;padding:0;border:0;background:transparent;justify-content:center;display:inline-flex;align-items:center}#stops .sa .b:hover,#stops .gt:hover{background:var(--bd2)}#stops .sa svg,#stops .gt svg{width:16px;height:16px;margin:0}#stops .gt{justify-self:center}
-#pFile{padding:4px;width:250px}#pFile .fmenu .b{padding:7px 10px;min-height:0}#pFile .fsep{border-top:1px solid var(--bd2);margin:3px 2px}
+#pFile,#pEdit{padding:4px;width:250px}#pFile .fmenu .b,#pEdit .fmenu .b{padding:7px 10px;min-height:0}#pFile .fsep{border-top:1px solid var(--bd2);margin:3px 2px}
 body{-webkit-user-select:none;user-select:none}input,textarea,select,[contenteditable],[contenteditable] *{-webkit-user-select:text;user-select:text}
 #autoSw,#autoSw:hover{background:transparent!important;box-shadow:none!important}#autoSw{display:inline-flex;align-items:center;gap:8px;color:var(--fg)!important;border:0;background:transparent;margin-left:8px;white-space:nowrap}#autoSw .swk{display:inline-block;position:relative;width:36px;height:20px;flex:none;background:var(--bd2);box-shadow:inset 0 0 0 1px var(--mut);transition:background .15s}#autoSw .swk::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}body.dark #autoSw .swk::after{background:#14181d}#autoSw.swOn .swk{background:var(--fg);box-shadow:none}#autoSw.swOn .swk::after{left:18px}
 #top:not(.lay)>*:not(.brand){visibility:hidden}#top:not(.lay) .citysel{visibility:hidden}
@@ -259,19 +266,24 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
     <button class="b" id="fReconnect" style="display:none"></button>
     <div class="fsep"></div>
     <button class="b" id="fSchema"><i data-ic="network"></i>Schemat…</button>
-    <button class="b" id="delAll" style="color:var(--dng,#c62828)"><i data-ic="trash"></i>Usuń wszystkie linie</button>
-    <button class="b" id="clrNums" title="Usuń numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="numx"></i>Usuń wszystkie numery przystanków</button>
     <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button><input type="checkbox" id="fAuto" disabled><input type="checkbox" id="fAccAuto"><span id="fAccSt"></span></span>
    </div>
    <div class="small" id="fStat" hidden style="display:none"></div>
    <input type="file" id="file" accept=".json,application/json" hidden>
+  </div></div>
+ <div class="dd"><button class="b" id="bEdit"><i data-ic="pencil"></i>Edycja</button>
+  <div class="pop" id="pEdit">
+   <div class="fmenu">
+    <button class="b" id="delAll" style="color:var(--dng,#c62828)"><i data-ic="trash"></i>Usuń wszystkie linie</button>
+    <button class="b" id="clrNums" title="Usuń numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="numx"></i>Usuń wszystkie numery przystanków</button>
+   </div>
   </div></div>
  <div class="dd"><button class="b" id="bLay"><i data-ic="layers"></i>Warstwy</button>
   <div class="pop" id="pLay">
    <div class="sech" style="margin:0"><i data-ic="layers"></i>Podkład mapy</div>
    <div class="row wrap"><label class="chk"><input type="radio" name="base" value="osm">OSM</label><label class="chk"><input type="radio" name="base" value="carto">CARTO</label></div>
    <div class="sech" style="display:flex;align-items:center"><i data-ic="palette"></i><span style="flex:1">Wygląd mapy</span><button class="b ico flat" id="uiReset" title="Przywróć domyślne" aria-label="Przywróć domyślne"><i data-ic="reset"></i></button></div>
-   <label class="chk"><input type="checkbox" id="uiInv"><i data-ic="contrast"></i>Ciemny podkład (odwrócenie kolorów)</label>
+   <label class="chk"><input type="checkbox" id="uiInv"><i data-ic="contrast"></i>Ciemny podkład</label>
    <div class="row"><span class="lab" style="width:84px"><i data-ic="sun"></i>Jasność</span><input type="range" id="uiBr" min="10" max="110" class="grow"><b id="uiBrV" style="width:44px;text-align:right"></b></div>
    <div class="row"><span class="lab" style="width:84px"><i data-ic="contrast"></i>Kontrast</span><input type="range" id="uiCo" min="50" max="170" class="grow"><b id="uiCoV" style="width:44px;text-align:right"></b></div>
    <hr style="border:0;border-top:1px solid var(--bd2);width:100%;margin:4px 0">
@@ -290,8 +302,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
    <label class="chk"><input type="checkbox" id="mergeNames"><i data-ic="layers"></i>Scal przystanki o tej samej nazwie</label>
    <label class="chk"><input type="checkbox" id="showNames"><i data-ic="type"></i>Pokaż nazwy przystanków na mapie</label>
    <label hidden style="display:none"><input type="checkbox" id="namesUsed"></label>
-   <div class="small" style="margin:0 0 0 25px">Nazwy pojawiają się od przybliżenia 14. Nazwy przystanków końcowych są pokazywane zawsze.</div>
-   <div class="row small" style="margin:6px 0 0"><span class="grow"><span id="gstat">Torowiska: ładowanie…</span><br><span id="rstat">Tory kolejowe: ładowanie…</span></span><button class="b ico" id="retryTram" title="Pobierz torowiska ponownie"><i data-ic="refresh"></i></button></div>
+   <div class="row" style="margin:6px 0 0"><button class="b" id="retryTram" title="Pobierz ponownie tory tramwajowe i kolejowe z OSM (szczegóły w sekcji Diagnostyka)"><i data-ic="refresh"></i>Odśwież dane</button></div>
   </div></div>
  <div class="dd" hidden style="display:none"><button class="b" id="bView"><i data-ic="palette"></i>Wygląd</button>
   <div class="pop" id="pView">
@@ -338,7 +349,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
   </div>
  </div>
  <div id="sideFoot"><button class="b ico flat" id="addL" type="button" title="Nowa linia" aria-label="Nowa linia" aria-haspopup="menu"><i data-ic="plus"></i></button><span class="grow"></span><button class="b ico flat" id="catMgB" type="button" title="Kategorie linii: dodawanie, zmiana nazwy, kolejność, usuwanie" aria-label="Kategorie linii"><i data-ic="tag"></i></button><button class="b ico flat" id="toggleAll" type="button" title="Ukryj wszystkie linie"></button></div>
- <details id="diag"><summary><i data-ic="activity"></i>Diagnostyka</summary><div class="secb"><textarea id="dbg" readonly style="height:140px;font:11px monospace"></textarea><div><button class="b" id="cpDbg"><i data-ic="copy"></i>Kopiuj</button></div></div></details>
+ <details id="diag"><summary><i data-ic="activity"></i>Diagnostyka</summary><div class="secb"><div class="small" style="margin:0 0 6px"><span id="gstat">Torowiska: ładowanie…</span><br><span id="rstat">Tory kolejowe: ładowanie…</span></div><textarea id="dbg" readonly style="height:140px;font:11px monospace"></textarea><div><button class="b" id="cpDbg"><i data-ic="copy"></i>Kopiuj</button></div></div></details>
 </div>
 <div id="map"></div>
 <div id="status" style="opacity:0"></div>
@@ -2623,6 +2634,9 @@ function buildSchema(spread=1){
   seqs.push(seq.length>1?seq:null);
   if(seq.length>1){let tk=[...new Set(termIds(l).map(id=>(UOF.get(id)||{}).key).filter(k=>k&&seq.includes(k)))];if(!tk.length)tk=[seq[0],seq[seq.length-1]];tk.forEach(k=>{nodes.get(k).term=true;nodes.get(k).tl.add(gid0[li]);if(isMain(li))nodes.get(k).tm.add(gid0[li])})}});
  const realK=seqs.map(q=>q?new Set(q):null); // przystanki, na których linia faktycznie się zatrzymuje
+ const LPATH=lines.map(l=>{const p=[];(l.segs||[]).forEach(sg=>(sg.pts||[]).forEach(q=>p.push(q)));return p}),SRV=new Map();
+ realK.forEach((K,li)=>K&&K.forEach(k=>{let a=SRV.get(k);if(!a)SRV.set(k,a=[]);a.push(li)}));
+ const dPath=(q,P)=>{let d=1e18;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],ax=(a[1]-q[1])*65000,ay=(a[0]-q[0])*111000,dx=(b[1]-a[1])*65000,dy=(b[0]-a[0])*111000,L2=dx*dx+dy*dy;let t=L2?-(ax*dx+ay*dy)/L2:0;t=Math.max(0,Math.min(1,t));const v=Math.hypot(ax+dx*t,ay+dy*t);if(v<d)d=v}return d};
  // przystanki, które linia mija bez zatrzymania (wg rzeczywistej geometrii trasy) – tylko dla spójnej topologii/pasów, bez ich obsługiwania
  const NL=[...nodes.values()];
  // siatka węzłów (komórka ok. 120 m): dla każdej linii sprawdzamy tylko węzły leżące w pobliżu jej przebiegu, a nie wszystkie węzły sieci (wynik ten sam – dalsze węzły i tak odpadały na progu odległości)
@@ -2643,6 +2657,12 @@ function buildSchema(spread=1){
    if(bc){ // węzeł leżący praktycznie w tym samym miejscu co przystanek tej linii (< 45 m wzdłuż trasy) – wstawienie dałoby zygzak, więc pomijamy
     const sOf=x=>{const j=Math.min(Math.floor(x),PP.n-2);return PP.cum[j]+(x-j)*(PP.cum[j+1]-PP.cum[j])},sb=sOf(bc.p);
     if(pos.some(x=>Math.abs(sOf(x)-sb)<45))continue;
+    // mijany przystanek wstawiamy tylko wtedy, gdy linia przejeżdża przez niego RAZEM z linią, która się na nim zatrzymuje (wspólny przebieg ok. 60 m przed i za nim).
+    // Linia, która dopiero w tym miejscu dołącza do innych albo od nich odbija (skrzyżowanie przy przystanku), nie jest przez niego prowadzona – inaczej schemat
+    // pokazywał ją tak, jakby się tam zatrzymywała
+    const atS=sv=>{let j=0;while(j<PP.n-2&&PP.cum[j+1]<sv)j++;const L=PP.cum[j+1]-PP.cum[j],t=L?Math.max(0,Math.min(1,(sv-PP.cum[j])/L)):0;return[path[j][0]+(path[j+1][0]-path[j][0])*t,path[j][1]+(path[j+1][1]-path[j][1])*t]};
+    const qb=atS(Math.max(0,sb-60)),qa=atS(Math.min(PP.cum[PP.n-1],sb+60));
+    if(!(SRV.get(n.key)||[]).some(lj=>lj!==li&&LPATH[lj].length>1&&dPath(qb,LPATH[lj])<25&&dPath(qa,LPATH[lj])<25))continue;
     ins.push({k:bc.k,p:bc.p,key:n.key})}}
   if(!ins.length)return;
   ins.sort((a,b)=>a.p-b.p);const out=[];
@@ -2668,8 +2688,14 @@ function buildSchema(spread=1){
    vv.forEach(ix=>{if(ix.length<2)return;const Q=ix.map(i=>at(pos[i]));let far=false;for(let x=0;x<Q.length&&!far;x++)for(let y=x+1;y<Q.length;y++)if(mdist(Q[x],Q[y])>100){far=true;break}if(far)ix.forEach(i=>aS.add(i))}) }
   {const last=new Map();aS.forEach(i=>{const k=seq[i];if(!(last.get(k)>=i))last.set(k,i)});ANC[li]={set:aS,last}}
   for(let i=1;i<seq.length;i++){const a=seq[i-1],b=seq[i];if(a===b)continue;const e=edges.get(a<b?a+'|'+b:b+'|'+a);if(!e)continue;
-   const p0=pos[i-1],p1=pos[i];if(!(p1>p0+.02))continue;
-   const g=[at(p0)];for(let j=Math.floor(p0)+1;j<=Math.floor(p1);j++)if(j<path.length&&j>p0&&j<p1)g.push(path[j]);g.push(at(p1));
+   let p0=pos[i-1],p1=pos[i];
+   // kolejność przystanków niezgodna z przebiegiem w tym miejscu (np. trasa narysowana przed zmianą kolejności, pętla, dojazd tam i z powrotem): zamiast prostej
+   // kreski przez pół mapy bierzemy fragment przebiegu między najbliższymi tym przystankom punktami trasy, jeśli jest sensownej długości
+   if(!(p1>p0+.02)){const PPa=prep(M),ca=cands(PPa,m(nodes.get(a).ll),3).filter(c=>c.d<60),cb=cands(PPa,m(nodes.get(b).ll),3).filter(c=>c.d<60);let bst=null;
+    const st=mdist(nodes.get(a).ll,nodes.get(b).ll);for(const x of ca)for(const y of cb){if(Math.abs(y.p-x.p)<=.02)continue;const L=Math.abs(y.s-x.s);if(L<st*2.5+150&&(!bst||L<bst.L))bst={L,p0:x.p,p1:y.p}}
+    if(!bst)continue;p0=bst.p0;p1=bst.p1}
+   const rv=p1<p0;if(rv)[p0,p1]=[p1,p0];
+   const g=[at(p0)];for(let j=Math.floor(p0)+1;j<=Math.floor(p1);j++)if(j<path.length&&j>p0&&j<p1)g.push(path[j]);g.push(at(p1));if(rv)g.reverse();
    if(a!==e.a)g.reverse();{const tr=TR.get(li*1e6+i);tr.g=g;const h0=aS.has(i-1),h1=aS.has(i);if(a===e.a){tr.aA=h0;tr.aB=h1}else{tr.aA=h1;tr.aB=h0}}
    if(!e.geo||g.length>e.geo.length)e.geo=g}});
  // Linia, która dwa razy jedzie między tą samą parą węzłów RÓŻNYMI drogami (np. dojazd do pętli i powrót inną ulicą, gdy platformy o tej samej nazwie scalono w jeden węzeł),
@@ -2994,7 +3020,7 @@ function buildSchema(spread=1){
  if(MAPM){const C=2*Math.PI*RE,toU=(mx,my)=>[(mx-mx0)*mc*MT.S+MT.ox,-(my-my0)*mc*MT.S+MT.oy],fromU=(x,y)=>[(x-MT.ox)/(mc*MT.S)+mx0,-(y-MT.oy)/(mc*MT.S)+my0];
   const [ax,ay]=fromU(minx,miny),[bx,by]=fromU(maxx,maxy);let z=Math.round(Math.log2(C*mc*MT.S/256*2));z=Math.max(9,Math.min(18,z));
   const ti=(mx,my,zz)=>[Math.floor((mx+C/2)/C*2**zz),Math.floor((C/2-my)/C*2**zz)];let A,B;
-  for(;;){A=ti(ax,ay,z);B=ti(bx,by,z);if((B[0]-A[0]+1)*(B[1]-A[1]+1)<=400||z<=9)break;z--}
+  for(;;){A=ti(ax,ay,z);B=ti(bx,by,z);if((B[0]-A[0]+1)*(B[1]-A[1]+1)<=260||z<=9)break;z--}
   const ts=C/2**z,dk=!!UI.dark;o+=`<g id="mapbg" opacity="${dk?.7:.6}" pointer-events="none">`;
   for(let x=A[0];x<=B[0];x++)for(let y=A[1];y<=B[1];y++){const [u0,v0]=toU(-C/2+x*ts,C/2-y*ts),[u1,v1]=toU(-C/2+(x+1)*ts,C/2-(y+1)*ts);
    o+=`<image href="https://${'abcd'[(x+y)&3]}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/${z}/${x}/${y}.png?key=${CARTO_KEY}" x="${f2(u0)}" y="${f2(v0)}" width="${f2(u1-u0+.4)}" height="${f2(v1-v0+.4)}" preserveAspectRatio="none"/>`}
@@ -3032,23 +3058,33 @@ button.tb.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
 @media print{@page{size:landscape;margin:8mm}header,aside{display:none}#cv{overflow:visible}}`;
  return `<!doctype html><html lang="pl"${dark?' class="dk"':''}><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Condensed:wght@600&display=swap"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>Schemat sieci transportu – ${esc(CITIES[cityKey()].n)}</title><style>${css}</style></head><body><header><span class="t">Schemat sieci transportu</span><span class="m">${esc(CITIES[cityKey()].n)} · ${lines.length} lin. · ${N.length} przystanków</span><span class="g"></span><button class="tb ico" id="bfit" title="Dopasuj widok" aria-label="Dopasuj widok"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="7"/><path d="m15.6 15.6 5.4 5.4"/><path d="M7.5 9V7.5H9M12 7.5h1.5V9M13.5 12v1.5H12M9 13.5H7.5V12"/></svg></button><span class="dl"><button class="tb ico" id="bdl" title="Pobierz jako" aria-label="Pobierz jako" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg></button><span class="dlm" id="dlm" role="menu" hidden><button role="menuitem" data-dl="pdf">Plik PDF</button><button role="menuitem" data-dl="svg">Plik SVG</button><button role="menuitem" data-dl="html">Plik HTML</button></span></span><button class="tb ico" id="bregen" title="Wygeneruj ponownie" aria-label="Wygeneruj ponownie" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button></header><main><aside>${lg}</aside><div id="cv"><div id="wr">${o}</div></div></main><script>(${schemaRuntime.toString()})();<\/script></body></html>`}
 let schemaHTML=null;
+// podkład stylu „Mapa”: schemat działa w odizolowanej ramce (i jako pobrany plik), skąd serwer kafelków CARTO nie widzi adresu strony i odmawia –
+// kafelki pobiera więc NetworkMaker i wkleja do schematu jako obrazy w treści (działają też w pobranym pliku HTML)
+const TILEC=new Map();
+async function schTiles(h){const urls=[...new Set([...h.matchAll(/href="(https:\/\/[abcd]\.basemaps\.cartocdn\.com\/[^"]+)"/g)].map(m=>m[1]))];if(!urls.length)return h;
+ const get=async u=>{if(TILEC.has(u))return TILEC.get(u);const r=await fetch(u.replace(/&amp;/g,'&'),{mode:'cors',credentials:'omit'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();
+  const d=await new Promise((ok,no)=>{const f=new FileReader();f.onload=()=>ok(f.result);f.onerror=no;f.readAsDataURL(b)});if(TILEC.size>1500)TILEC.clear();TILEC.set(u,d);return d};
+ const M=new Map();let i=0,bad=0;await Promise.all(Array.from({length:6},async()=>{while(i<urls.length){const u=urls[i++];try{M.set(u,await get(u))}catch(e){bad++}}}));
+ if(bad)dbg(`Schemat – podkład: nie pobrano ${bad} z ${urls.length} kafelków`);if(!M.size)return h;
+ return h.replace(/href="(https:\/\/[abcd]\.basemaps\.cartocdn\.com\/[^"]+)"/g,(m,u)=>M.has(u)?`href="${M.get(u)}"`:m)}
 async function openSchema(){
  closeMenus();say('Generowanie schematu…');
  await new Promise(r=>setTimeout(r,30));
  let html=null;try{html=buildSchema()}catch(e){dbg('Schemat: '+(e.stack||e));say('Nie udało się wygenerować schematu: '+(e.message||e));return}
  if(!html){say('Brak widocznych linii z co najmniej dwoma przystankami – nie ma z czego zbudować schematu.');return}
- schemaHTML=html;say('Schemat gotowy.');
- const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-downloads allow-modals');fr.srcdoc=html;fr.style.cssText='width:100%;flex:1;min-height:0;border:0;display:block;background:#fff';
+ say('Schemat gotowy.');
+ const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-downloads allow-modals');fr.style.cssText='width:100%;flex:1;min-height:0;border:0;display:block;background:#fff';
+ const show=h=>{schemaHTML=h;fr.srcdoc=h;if(/basemaps\.cartocdn\.com/.test(h)){say('Pobieranie podkładu mapy…');schTiles(h).then(h2=>{if(schemaHTML===h&&h2!==h){schemaHTML=h2;fr.srcdoc=h2;say('Schemat gotowy.')}}).catch(()=>{})}};show(html);
  // styl schematu: aktualny albo klasyczny (jak dawne schematy miast w ZbiorkomInfo)
  const wrap=document.createElement('div');wrap.className='schWrap';const bar=document.createElement('div');bar.className='schBar';
  const cur=()=>UI.schStyle==='classic'||UI.schStyle==='map'?UI.schStyle:'cur';
  bar.innerHTML=`<span class="lab">${ic('network',14)}Styl schematu</span><div class="cpc schSt" role="tablist">${[['cur','Aktualny','Układ wierny mapie: przebieg linii jak w rzeczywistości, wyprostowany do kątów 45°'],['classic','Klasyczny','Układ jak w dawnych schematach miast w ZbiorkomInfo: proste odcinki w ośmiu kierunkach, przystanki w równych odstępach, powiększone centrum'],['map','Mapa','Linie na mapie w rzeczywistym przebiegu, z cechami schematu: przystanki zgrupowane w jeden znak, linie biegnące razem obok siebie, numery przy krawędziach']].map(([v,t,d])=>`<button type="button" role="tab" data-s="${v}" title="${d}" class="${cur()===v?'on':''}" aria-selected="${cur()===v}">${t}</button>`).join('')}</div>`;
  bar.onclick=async e=>{const b=e.target.closest('[data-s]');if(!b||b.dataset.s===cur())return;UI.schStyle=b.dataset.s==='cur'?'':b.dataset.s;applyUI();
   bar.querySelectorAll('[data-s]').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-selected',String(on))});say('Generowanie schematu…');await new Promise(r=>setTimeout(r,30));
-  try{const h=buildSchema();if(h){schemaHTML=h;fr.srcdoc=h;say('Schemat gotowy.')}}catch(x){dbg('Schemat: '+(x.stack||x));say('Nie udało się wygenerować schematu: '+(x.message||x))}};
+  try{const h=buildSchema();if(h){say('Schemat gotowy.');show(h)}}catch(x){dbg('Schemat: '+(x.stack||x));say('Nie udało się wygenerować schematu: '+(x.message||x))}};
  wrap.append(bar,fr);
  const onMsg=e=>{if(e.source!==fr.contentWindow||!e.data)return;
-  if(e.data.schema==='regen'){try{const h=buildSchema();if(h){schemaHTML=h;fr.srcdoc=h}}catch(x){say('Błąd: '+x.message)}}
+  if(e.data.schema==='regen'){try{const h=buildSchema();if(h)show(h)}catch(x){say('Błąd: '+x.message)}}
   else if(e.data.schema==='html')dlFile('schemat-sieci.html',schemaHTML,'text/html;charset=utf-8')};
  window.addEventListener('message',onMsg);
  modal({title:'Schemat interaktywny sieci',body:wrap,wide:true,flush:true,cancelV:true,btns:[{t:'Zamknij',v:true,c:'pri'}]}).finally(()=>window.removeEventListener('message',onMsg))}
@@ -3169,7 +3205,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
    };
 pShow()}
  const top=$('#top'),br=top.querySelector('.brand'),cs=$('#citySel'),fdd=$('#bFile').closest('.dd'),ldd=$('#bLay').closest('.dd');
- br.after(fdd);fdd.after(ldd);const asw=document.createElement('button');asw.type='button';asw.id='autoSw';asw.className='b flat';asw.setAttribute('role','switch');asw.innerHTML='Autozapis<i class="swk"></i>';asw.onclick=()=>svToggle();top.appendChild(asw);top.appendChild(cs);cs.style.marginLeft='8px';svUI();top.classList.add('lay');
+ const edd=$('#bEdit').closest('.dd');br.after(fdd);fdd.after(edd);edd.after(ldd);const asw=document.createElement('button');asw.type='button';asw.id='autoSw';asw.className='b flat';asw.setAttribute('role','switch');asw.innerHTML='Autozapis<i class="swk"></i>';asw.onclick=()=>svToggle();top.appendChild(asw);top.appendChild(cs);cs.style.marginLeft='8px';svUI();top.classList.add('lay');
  applyTab(document.querySelector('.tabs button.on')?document.querySelector('.tabs button.on').id:'t1')})();
 // (kilka kroków kółkiem myszy z rzędu: jedno przerysowanie po ich zakończeniu, a nie po każdym kroku)
 {let zT=0;map.on('zoomstart',()=>clearTimeout(zT));map.on('zoomend',()=>{clearTimeout(zT);zT=setTimeout(redraw,110)})}map.on('moveend',onMoveEnd);
