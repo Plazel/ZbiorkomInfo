@@ -1827,7 +1827,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1794960180;
+const APP_BUILD=1794960447;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6564,7 +6564,9 @@ const NAV0=(()=>{let v='';try{v=sessionStorage.getItem('ztm.nav')||''}catch(e){}
   if(document.readyState==='loading')await new Promise(r=>document.addEventListener('DOMContentLoaded',r,{once:true}));
   IDX=j;IDX_HAS.add(j.area||'*');cityAvail();hideRoutes();nightTrams();setByName();setCorridors();await route();if(typeof alertBar==='function')alertBar();
   NAV_READY=true;{const hs=location.hash.slice(1),hv=Object.keys(NAV_HASH).find(k=>NAV_HASH[k]===hs);const v0=hv||(location.hash&&!hv?'':NAV0);   // (an address of a section opens it; a timetable's address its timetable)
-    if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click();else{NAV_PEND=v0;const d=document.documentElement;   // (still hidden while the account logs in – the section opens then, with no glimpse of the timetables; no account: shown at once)
+    if(v0&&v0!=='tt'){const b=document.querySelector(`[data-nav="${v0}"]`);if(b&&!b.hidden)b.click();else if(v0==='tm'&&(ACC.token||store.get('ztm.token',''))&&store.get('ztm.lastMode',null)==='admin'&&ACC.state!=='bad'){   // (NetworkMaker left open by the administrator: opened at once, not after the account's login – which only confirms it; a failed login closes it again)
+      window.ACC_ADMIN=true;NAV_PEND='';openTool('tm')}
+    else{NAV_PEND=v0;const d=document.documentElement;   // (still hidden while the account logs in – the section opens then, with no glimpse of the timetables; no account: shown at once)
       if(!(ACC.token||store.get('ztm.token',''))||ACC.state==='out'||ACC.state==='bad'||ACC.state==='nosrv'||ACC.state==='net')d.classList.remove('navBoot');else setTimeout(()=>d.classList.remove('navBoot'),6500)}}else document.documentElement.classList.remove('navBoot')}})   // (a section of the account's not there yet: opened once logged in)
  .catch(()=>{app.innerHTML='<p class="loading err">Nie udało się wczytać rozkładów</p>'});
 </script>
@@ -6685,7 +6687,7 @@ function accShow(){const on=!!ACC.user;accTools(on);accMode();try{compApply()}ca
   if(GUIDE.tmode!==ACC_ADMIN){if(GUIDE.open)gdTSet(ACC_ADMIN);else GUIDE.tmode=ACC_ADMIN}if(typeof mkNav==='function')mkNav();document.querySelectorAll('nav.rail .railHub').forEach(b=>b.hidden=!on);
   document.querySelectorAll('nav.rail .railAdm').forEach(b=>b.hidden=b.dataset.nav==='tm'?!tmOk():!ACC_ADMIN);   // (the administrator's sections: whether the tools are on or not)
   const t=document.getElementById('accTop');if(t){t.classList.toggle('on',on);t.title=on?ACC.user.name:trS('Zaloguj');t.setAttribute('aria-label',t.title)}
-  accRender();if(TD.view==='hub')hubRender();if(TD.view==='adm'){if(ACC_ADMIN)accAdminRender();else closeTool()}if(TD.view==='mkadm'){if(ACC_ADMIN)mkAdmRender();else closeTool()}if(TD.view==='msgadm'){if(ACC_ADMIN)msgAdmRender();else closeTool()}if(TD.view==='tm'){if(tmOk())krRender();else closeTool()}
+  accRender();if(TD.view==='hub')hubRender();if(TD.view==='adm'){if(ACC_ADMIN)accAdminRender();else closeTool()}if(TD.view==='mkadm'){if(ACC_ADMIN)mkAdmRender();else closeTool()}if(TD.view==='msgadm'){if(ACC_ADMIN)msgAdmRender();else closeTool()}if(TD.view==='tm'&&!tmOk())closeTool();
   if(typeof netSync==='function')netSync();
   document.querySelectorAll('.hubStar').forEach(b=>b.hidden=!on)}
 function accOpen(){document.getElementById('setPanel').hidden=true;document.getElementById('accDlg').hidden=false;accRender();setTimeout(()=>{const i=document.getElementById('accTok');if(i)i.focus()},50)}
