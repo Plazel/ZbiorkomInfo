@@ -1828,7 +1828,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795009160;
+const APP_BUILD=1795009177;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5591,7 +5591,7 @@ function lineSigns(html,lines){const set=new Set(lines||[]),deLn=/^(ber|ham)/.te
   const tok='(?:[A-Z]{1,2}-?\\d{1,3}[A-Z]?|\\d{1,3}[A-Z]?)';html=html.replace(/\bl\.(?=[A-Z]{0,2}-?\d)/g,'l. ');   // ("l.106", "l.E-2": the lines; Warszawa's E-2 with its hyphen)
   return html.replace(new RegExp('(?:\\b('+VEH_W+'|'+KEEP_W+')\\s+)?(?<![\\w./:#&-])(?<!\\d\\.\\s?)((?:'+tok+')(?:(?:\\s*,\\s*|\\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\\.)\\s+|\\s+)(?:'+tok+'))*)(?![\\d.:]\\d|:\\d|\\.\\s?\\d|-\\w|\\s*(?:min\\b|min\\.|minut|sek|godz|km\\b|m\\b|%|zł|h\\b))','g'),(m,veh,grp,off,all)=>{
     // (a telephone number – "na čísle 296 19 18 17", "tel. 58 524 44 00" – is not a list of lines)
-    if(/\b(?:čísl\p{L}*|číslo|tel\.?|telefon\p{L}*|infolini\p{L}*|nr\.?\s*tel\.?|phone|Telefon|Tel\.?)\s*:?\s*$/iu.test(all.slice(Math.max(0,off-30),off))||/^\d{2,3}(?:\s\d{2,3}){2,}$/.test(grp.trim()))return m;
+    if(/(?<!\p{L})(?:čísl\p{L}*|číslo|tel\.?|telefon\p{L}*|infolini\p{L}*|nr\.?\s*tel\.?|phone|Telefon|Tel\.?)\s*:?\s*$/iu.test(all.slice(Math.max(0,off-30),off))||/^\d{2,3}(?:\s\d{2,3}){2,}$/.test(grp.trim()))return m;
     const parts=grp.split(/(\s*,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)/);let any=false;
     const sepRe=/^(\s*,\s*|\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\.)\s+|\s+)$/,toks=parts.filter(p=>!sepRe.test(p));
     const list=toks.length>=2&&toks.filter(p=>find(p,null)).length>=Math.max(2,toks.length*.6);   // (a list of two or more of the city's line numbers: lines, keyword or not)
