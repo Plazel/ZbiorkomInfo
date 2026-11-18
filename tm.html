@@ -145,6 +145,7 @@ body{position:relative;display:block}
 body.ovstop .leaflet-tooltip{display:none!important}
 .vwar{padding:6px 8px 8px}.vchips{display:flex;flex-direction:column;gap:3px;padding:4px 0}.vgrp{display:flex;flex-wrap:wrap;align-items:center;gap:5px}.vgl{font-size:11px;font-weight:700;min-width:78px;opacity:.85}.vchip .vdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}.vdet{margin-top:6px;border-top:1px solid var(--bd);padding-top:6px}.vpf label{display:flex;flex-direction:column;font-size:11px;gap:2px}.vpf input{width:62px}
 .vpn{margin:8px 0 2px;border:1px solid var(--bd);border-radius:0;overflow:hidden}.vrow{display:flex;align-items:center;gap:6px;padding:5px 8px}.vrow+.vrow{border-top:1px solid var(--bd2)}.vn{min-width:84px;font-weight:600;font-size:12px}.vchip.on{background:var(--fg);border-color:var(--fg);color:var(--panel)}
+.vnumT{margin-left:4px;padding:0 4px;border:1.5px solid currentColor;font-size:11px}.vnumC{display:inline-flex;margin-top:6px}
 .vdn{width:52px;height:28px;padding:2px 6px;font:600 13px Roboto,Arial,sans-serif;text-align:center;box-sizing:border-box}
 .dnums{display:flex;flex-direction:column;gap:2px;align-self:center;flex:none}.dnums span{font:700 11px/1.15 Roboto,Arial,sans-serif;padding:1px 4px;border:1.5px solid var(--fg);color:var(--fg);text-align:center;min-width:24px}
 .b.ghost{opacity:.75;border-style:dashed}
@@ -425,12 +426,13 @@ function ziAuto(l,P){P=P||FP();const pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.som
   const dir=(x,ids,F,t1)=>{const st=ids.map(stopOf).filter(Boolean);if(st.length<2)return null;const D=plen(F)||1;const dd=F.length>1?alongAll(F,st):st.map(()=>0);
     for(let i=1;i<dd.length;i++)if(dd[i]<dd[i-1])dd[i]=dd[i-1];
     return {st:st.map(q=>({id:q.id,n:String(q.name).replace(NUMRE,'$1'),num:q.num||((String(q.name).match(NUMRE)||[])[2]||''),ll:[+q.ll[0].toFixed(6),+q.ll[1].toFixed(6)]})),off:dd.map(d=>Math.round(t1*d/D)),sh:thin(F)}};
-  if(l.par||!l.stops||l.stops.length<2||!l.segs||!l.segs.length)return null;
+  if((l.par&&!l.vnum)||l.dir==='B'||!l.stops||l.stops.length<2||!l.segs||!l.segs.length)return null;
+  const opL=l.par?S.lines.find(x=>x.id===l.par)||l:l;   // (wariant z osobnym numerem: częstotliwość i godziny jego linii)
   const r=calcLine(l,P),t1=r.ok?r.t1:Math.max(1,lineLen(l)/1000/20*60),F=pathOf(l);
   const A=dir(l,l.stops,F,t1);if(!A)return null;
   const B0=S.lines.find(x=>x.dir==='B'&&x.par===l.id&&(x.rev||x.par)===l.id&&x.segs&&x.segs.length&&x.stops.length>1);
-  const B=B0?dir(B0,B0.stops,pathOf(B0),t1):dir(l,l.stops.slice().reverse(),F.slice().reverse(),t1);
-  const w=deps(l,'w'),we=deps(l,'we');return {A,B,dep:{w,s:we,h:we}}}
+  const B=l.oneway?null:B0?dir(B0,B0.stops,pathOf(B0),t1):dir(l,l.stops.slice().reverse(),F.slice().reverse(),t1);
+  const w=deps(opL,'w'),we=deps(opL,'we');return {A,B,dep:{w,s:we,h:we}}}
 // the timetable of one direction (A: TAM, B: POWRÓT) with the hand edits: the departures of each kind of day, the minutes to the stops
 const TT_D=['w','s','h'];
 function ttOf(l,dk,a){const d=a[dk];if(!d)return null;const tt=((l.tt||{})[dk])||{},to=((l.tto||{})[dk]);
@@ -439,7 +441,7 @@ function ttOf(l,dk,a){const d=a[dk];if(!d)return null;const tt=((l.tt||{})[dk])|
 function ziExport(){try{
   const P=FP(),lines=[];
   S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>ttOf(l,dk,a)).filter(Boolean).map(({st,off,sh,dep})=>({st,off,sh,dep}));
-    lines.push({id:l.id,n:String(l.num||''),color:l.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
+    const rt=l.par?S.lines.find(x=>x.id===l.par)||l:l;lines.push({id:l.id,n:String((l.par?l.vnum:l.num)||rt.num||''),color:rt.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
   const k=cityKey(),out={v:1,t:Date.now(),city:k,cityName:CITIES[k].n.replace(/\s*\(.*\)$/,''),lines};
   localStorage.setItem('gdn-zi',JSON.stringify(out));try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}
  }catch(e){try{dbg('Eksport do ZbiorkomInfo: '+(e&&e.message||e))}catch(x){}}}
@@ -1308,20 +1310,20 @@ async function openVariantMenu(root){
 function isCirc(f){if(!f||f.stops.length<3)return false;const a=stopOf(f.stops[0]),b=stopOf(f.stops[f.stops.length-1]);if(!a||!b)return false;
  if(a.id===b.id)return true;const bn=s=>String(s.name||'').replace(/\s+\d{2}$/,'').trim().toLowerCase();return bn(a)===bn(b)&&mdist(a.ll,b.ll)<300}
 // numery kierunków (np. 8A / 8B) przy numerze linii na kafelku
-function dnums(l){if(l.par)return'';const all=[l,...S.lines.filter(v=>v.par===l.id)].filter(v=>v.dnum);if(!all.length)return'';
- return `<div class="dnums">${all.map(v=>`<span title="${v.dir==='B'?'Kierunek przeciwny':v===l?'Kierunek podstawowy':esc(varLabel(v))}">${esc(v.dnum)}</span>`).join('')}</div>`}
+function dnums(l){if(l.par)return'';const all=[l,...S.lines.filter(v=>v.par===l.id)].flatMap(v=>[v.dnum?[v.dnum,v.dir==='B'?'Kierunek przeciwny':v===l?'Kierunek podstawowy':'Kierunek: '+varLabel(v)]:null,v.vnum&&v.dir!=='B'?[v.vnum,'Wariant z osobnym numerem: '+varLabel(v)]:null]).filter(Boolean);if(!all.length)return'';
+ return `<div class="dnums">${all.map(([n,t])=>`<span title="${esc(t)}">${esc(n)}</span>`).join('')}</div>`}
 // przystanek dla przeciwnego kierunku: peron o tej samej nazwie po drugiej stronie ulicy / torów (do 250 m; para torów – jej drugi przystanek)
 function oppStop(id){const s=stopOf(id);if(!s)return id;if(s.pair){const m=S.stops.find(x=>x.pair===s.pair&&x.id!==s.id);if(m)return m.id}
  const bn=x=>String(x.name||'').replace(/\s+\d{2}$/,'').trim().toLowerCase(),k=sKinds(s);let best=null,bd=250;
  S.stops.forEach(x=>{if(x.id===s.id||bn(x)!==bn(s)||!sKinds(x).some(q=>k.includes(q)))return;const d=mdist(x.ll,s.ll);if(d<bd){bd=d;best=x}});return best?best.id:id}
 // kierunek przeciwny linii okrężnej: przystanki w odwrotnej kolejności, każdy zamieniony na peron dla tamtego kierunku, trasa wyznaczona na nowo
-async function oppGen(root,f){lmClose();if(!f)return;if(S.lines.some(x=>x.dir==='B'&&x.par===root.id&&(x.rev||x.par)===f.id)){say('Kierunek przeciwny już istnieje.');return}
+async function oppGen(root,f){lmClose();if(!f)return;if(S.lines.some(x=>x.dir==='B'&&x.par===root.id&&(x.rev||x.par)===f.id)){say(isCirc(f)?'Kierunek przeciwny już istnieje.':'Trasa powrotna już istnieje.');return}
  const v=JSON.parse(JSON.stringify(f));v.id='l'+Date.now();v.par=root.id;v.hidden=false;['note','terms','loop','loopBak','loopWant','excl','vname','op','win','tt','tto','dnum'].forEach(x=>delete v[x]);
  v.dir='B';v.rev=f.id;v.stops=f.stops.slice().reverse().map(oppStop);v.stops=v.stops.filter((x,i)=>i===0||x!==v.stops[i-1]);v.segs=[];v.wp=[];v.excl=[];v.auto=true;
- if(/\d$/.test(root.num||'')&&!f.dnum&&f===root){f.dnum=root.num+'A';v.dnum=root.num+'B'}
+ if(isCirc(f)&&/\d$/.test(root.num||'')&&!f.dnum&&f===root){f.dnum=root.num+'A';v.dnum=root.num+'B'}
  S.lines.push(v);S.sel=v.id;const ui=(cardUI[root.id]=cardUI[root.id]||{});ui.var=true;ui.lst=true;syncVariants();save();renderLines();redraw();
- say('Wyznaczanie trasy w przeciwnym kierunku…');await rebuild(v,true);
- const same=v.stops.filter((x,i)=>x===[...f.stops].reverse()[i]).length;if(same)say(`Kierunek przeciwny gotowy. ${same} przystanków nie ma osobnego peronu dla tego kierunku – zostały te same; popraw je w razie potrzeby.`)}
+ delete f.oneway;say(isCirc(f)?'Wyznaczanie trasy w przeciwnym kierunku…':'Wyznaczanie trasy powrotnej…');await rebuild(v,true);
+ const same=v.stops.filter((x,i)=>x===[...f.stops].reverse()[i]).length;if(same)say(`${isCirc(f)?'Kierunek przeciwny':'Trasa powrotna'} gotowa. ${same} przystanków nie ma osobnego peronu dla tego kierunku – zostały te same; popraw je w razie potrzeby.`)}
 function createVariant(root,kind,fwd){lmClose();
  const src=fwd||root,ex=kind==='B'?S.lines.find(x=>x.dir==='B'&&x.par===root.id&&(x.rev||x.par)===src.id):null;
  const ui=(cardUI[root.id]=cardUI[root.id]||{});ui.var=true;
@@ -1459,12 +1461,14 @@ function lineCard(l,M){
  const chips=XP?(()=>{
   const cur=act&&(act.id===l.id||act.par===l.id)?act:l,nmv=v=>v===l?'Podstawowy':esc(varLabel(v)),gv=(k)=>{const x=((cur.op||{})[k]||{}).h;return x===undefined?'':x};
   const chip=(v,t)=>`<button class="b flat vchip${v.id===cur.id?' on':''}" data-v="${v.id}" title="${v.dir==='B'?'Trasa powrotna':v===l?'Trasa podstawowa linii':'Wariant: '+esc(varLabel(v))}"><span class="vdot" style="background:${v.color}"></span>${t}</button>`,retOf=f=>vars.find(v=>v.dir==='B'&&(v.rev||v.par)===f.id);
-  const chs=[l,...vars.filter(v=>v.dir!=='B')].map(f=>{const r=retOf(f),nf=f===l?'Podstawowy':esc(varLabel(f));
+  const chs=[l,...vars.filter(v=>v.dir!=='B')].map(f=>{const r=retOf(f),nf=(f===l?'Podstawowy':esc(varLabel(f)))+(f.vnum?` <b class="vnumT">${esc(f.vnum)}</b>`:'');
    const ok=isCirc(f),dn=v=>ok?`<input class="vdn" data-vdn="${v.id}" value="${esc(v.dnum||'')}" maxlength="5" placeholder="nr" title="Osobny numer tego kierunku (np. ${esc((l.num||'8')+(v.dir==='B'?'B':'A'))}) – widoczny obok numeru linii" aria-label="Numer kierunku">`:'';
-   return `<div class="vgrp"><span class="vgl">${nf}</span>${chip(f,ok?'KIERUNEK 1':'TAM')}${dn(f)}${r?chip(r,ok?'KIERUNEK 2':'POWRÓT')+dn(r):ok?`<span class="small vsame" title="Linia zaczyna się i kończy na tym samym przystanku">Linia okrężna</span><button class="b flat vopp" data-vopp="${f.id}" title="Wygeneruj trasę w przeciwnym kierunku – po drugiej stronie ulicy / torów, przez przystanki dla tamtego kierunku">${ic('twoway',14)}Kierunek przeciwny</button>`:`<span class="small vsame" title="Bez osobnej trasy powrotnej linia wraca tą samą trasą co TAM">POWRÓT = TAM</span><button class="b flat vbk" data-vbk="${f.id}" title="Dodaj osobną trasę powrotną dla tego wariantu">${ic('plus',14)}Osobna trasa</button>`}</div>`}).join('');
+   return `<div class="vgrp"><span class="vgl">${nf}</span>${chip(f,ok?'KIERUNEK 1':'TAM')}${dn(f)}${r?chip(r,ok?'KIERUNEK 2':'POWRÓT')+dn(r):ok?`<span class="small vsame" title="Linia zaczyna się i kończy na tym samym przystanku">Linia okrężna</span><button class="b flat vopp" data-vopp="${f.id}" title="Wygeneruj trasę w przeciwnym kierunku – po drugiej stronie ulicy / torów, przez przystanki dla tamtego kierunku">${ic('twoway',14)}Kierunek przeciwny</button>`:f.oneway?`<span class="small vsame">tylko w jedną stronę</span><button class="b flat vow" data-vow="${f.id}" title="Linia wraca – przywróć kierunek powrotny">${ic('plus',14)}Powrót</button>`
+     :`<button class="b flat vchip vbk" data-vbk="${f.id}" title="Trasa powrotna: na razie ta sama co TAM w odwrotną stronę – kliknij, aby ją wyznaczyć (przystanki po drugiej stronie ulicy, z ich numerami) i móc zmieniać"><span class="vdot" style="background:${f.color};opacity:.5"></span>POWRÓT</button><button class="b ico flat vnow" data-vnow="${f.id}" title="Linia kursuje tylko w jednym kierunku">${ic('x',14)}</button>`}</div>`}).join('');
   let det='';
   if(cur!==l){const isB=cur.dir==='B';
    det=`<div class="vdet"><div class="row" style="gap:6px;align-items:center"><input class="vpname" value="${esc(cur.vname||'')}" placeholder="Nazwa wariantu" title="Nazwa wariantu" style="flex:1;min-width:0"><button class="b ico flat" data-vdel="${cur.id}" title="Usuń wariant">${ic('trash',14)}</button></div>
+    ${isB?'':`<label class="chk vnumC" title="Wariant z własnym numerem jest częścią tej linii, ale w rozkładach jazdy ZbiorkomInfo pokazywany jako osobna linia"><input type="checkbox" class="vnumK"${cur.vnum!=null?' checked':''}>Osobny numer linii</label>${cur.vnum!=null?`<input class="vnumI" value="${esc(cur.vnum)}" maxlength="5" placeholder="${esc((l.num||'1')+'A')}" aria-label="Numer linii wariantu" style="width:80px;margin-left:8px">`:''}`}
     ${isB?`<div class="row vpm" style="gap:5px;flex-wrap:wrap;margin-top:6px"><button class="b flat" data-vm="mirror" title="Trasa powrotna = trasa TAM w odwrotną stronę">${ic('refresh',14)}Odwróć TAM</button></div>`:''}
     ${`<div class="small" style="margin:8px 0 3px">${isB?'Przystanki trasy powrotnej':'Przystanki wariantu'} (${cur.stops.length}) – zaznacz przystanek, by kolejny dodany trafił pod niego:</div>${cur.stops.length?cur.stops.map((id,ix)=>`<div class="st${ins&&ins.lid===cur.id&&ins.id===id?' anch':''}"><span class="small" style="width:22px;margin:0">${ix+1}.</span><span class="grow" style="cursor:pointer" data-vz="${id}" data-vp="${cur.id}" title="Kliknij, aby zaznaczyć – kolejny dodany przystanek trafi pod ten">${nm(id)}</span><button class="b ico flat tm${termIds(cur).includes(id)?' on':''}" data-vt="${cur.id}:${id}" title="Przystanek końcowy">${ic('flag',14)}</button><button class="b ico flat" data-gv="${cur.id}:${ix}" title="Przytrzymaj i przeciągnij, aby zmienić kolejność" style="cursor:grab;touch-action:none">${ic('grip',14)}</button><button class="b ico flat" data-vr="${cur.id}:${ix}" title="Usuń przystanek z trasy">${ic('x',14)}</button></div>`).join(''):'<div class="small">brak przystanków</div>'}${isB&&cur.stops.length<2?'<div class="small" style="margin-top:4px">Trasa powrotna zaczyna się na ostatnim przystanku TAM – klikaj kolejne przystanki na mapie albo użyj „Odwróć TAM”.</div>':''}`}
     </div>`}
@@ -1495,9 +1499,14 @@ function lineCard(l,M){
    if(m==='pick'){ins=v.stops.length?{lid:v.id,id:v.stops[v.stops.length-1]}:null;renderLines();go('pick');say('Klikaj przystanki – trafią do wariantu pod ostatnim przystankiem, a trasa poprowadzi przez nie.')}
    else if(m==='draw'){go('draw');say('Rysuj dalszy ciąg trasy wariantu: klikaj kolejne punkty na mapie (przystanki na trasie dodadzą się same).')}
    else{go('edit');say('Przeciągaj punkty trasy, kliknij linię, aby dodać punkt, prawy przycisk usuwa punkt.')}});
-  c.querySelectorAll('.vbk').forEach(b=>b.onclick=e=>{e.stopPropagation();createVariant(l,'B',S.lines.find(x=>x.id===b.dataset.vbk))});
+  c.querySelectorAll('.vbk').forEach(b=>b.onclick=e=>{e.stopPropagation();oppGen(l,S.lines.find(x=>x.id===b.dataset.vbk))});
+  c.querySelectorAll('.vnow').forEach(b=>b.onclick=e=>{e.stopPropagation();const f=S.lines.find(x=>x.id===b.dataset.vnow);if(!f)return;f.oneway=true;save();renderLines();say('Linia kursuje teraz tylko w jednym kierunku.')});
+  c.querySelectorAll('.vow').forEach(b=>b.onclick=e=>{e.stopPropagation();const f=S.lines.find(x=>x.id===b.dataset.vow);if(!f)return;delete f.oneway;save();renderLines()});
   c.querySelectorAll('.vopp').forEach(b=>b.onclick=e=>{e.stopPropagation();oppGen(l,S.lines.find(x=>x.id===b.dataset.vopp))});
   c.querySelectorAll('.vdn').forEach(x=>{x.onclick=e=>e.stopPropagation();x.oninput=()=>{const v=S.lines.find(y=>y.id===x.dataset.vdn);if(!v)return;v.dnum=x.value.trim();if(!v.dnum)delete v.dnum;save()};x.onchange=()=>renderLines()});
+  {const k=q('.vnumK'),ni=q('.vnumI'),v=act&&act.par===l.id?act:null;
+   if(k){k.onclick=e=>e.stopPropagation();k.onchange=()=>{if(!v)return;if(k.checked)v.vnum=v.vnum||'';else delete v.vnum;save();renderLines();setTimeout(()=>{const x=document.querySelector('#lines .vnumI');if(x)x.focus()},30)}}
+   if(ni){ni.onclick=e=>e.stopPropagation();ni.oninput=()=>{if(v){v.vnum=ni.value.trim();save()}};ni.onchange=()=>renderLines()}}
   const pn=q('.vpname');if(pn){pn.onclick=e=>e.stopPropagation();pn.onchange=()=>{const v=act&&act.par===l.id?act:null;if(!v)return;const t=pn.value.trim();if(t)v.vname=t;else delete v.vname;save();renderLines();redraw()}}
   c.querySelectorAll('.vpf input').forEach(i=>{i.onclick=e=>e.stopPropagation();i.oninput=()=>{const v=act&&act.par===l.id?act:null;if(!v)return;const k=i.dataset.k;v.op=v.op||{};const x=v.op[k]=v.op[k]||{};if(i.value==='')delete x.h;else x.h=+i.value;if(!Object.keys(x).length)delete v.op[k];if(!Object.keys(v.op).length)delete v.op;save()}})}
  c.querySelectorAll('[data-vdel]').forEach(b=>b.onclick=async e=>{e.stopPropagation();if(!await askConfirm('Usunąć ten wariant linii?',{title:'Usuń wariant',ok:'Usuń',danger:true}))return;const id=b.dataset.vdel;S.lines=S.lines.filter(x=>x.id!==id&&x.rev!==id);if(!S.lines.some(x=>x.id===S.sel))S.sel=l.id;save();renderLines();redraw()});
@@ -2265,18 +2274,18 @@ function txDlg(){closeMenus();const sel=selLine(),root=sel?(sel.par?S.lines.find
  if(!root){say('Najpierw zaznacz linię na liście (albo dodaj nową) – trasa tekstowa dotyczy zaznaczonej linii.');return}
  const kind=root.veh==='trolley'?'trolley':root.rm==='tram'?'tram':root.rm==='rail'?'rail':'bus';
  if(kind==='rail'){say('Trasa tekstowa prowadzi po ulicach – nie dotyczy linii kolejowych.');return}
- const D=JSON.parse(JSON.stringify(root.txs||{g:[{name:'',A:{},back:'same',B:{}}]}));D.g=D.g&&D.g.length?D.g:[{name:'',A:{},back:'same',B:{}}];
+ const D=JSON.parse(JSON.stringify(root.txs||{g:[{name:'',A:{},back:'auto',B:{}}]}));D.g=D.g&&D.g.length?D.g:[{name:'',A:{},back:'auto',B:{}}];
  if(!root.txs&&root.stops.length>1){const a=stopOf(root.stops[0]),b=stopOf(root.stops[root.stops.length-1]);if(a&&b){D.g[0].A.from=lab(a);D.g[0].A.to=lab(b)}}
  let cur={g:0,k:'A'};
  const stopNames=[...new Set(S.stops.filter(s=>sKinds(s).includes(kind==='tram'?'tram':'bus')).map(s=>lab(s)))].sort((a,b)=>a.localeCompare(b,'pl'));
  const circ=sp=>sp&&sp.from&&sp.to&&txF(sp.from.replace(/\s+\d{2}$/,''))===txF(sp.to.replace(/\s+\d{2}$/,''));
  const box=document.createElement('div');box.className='lnEd txEd';
  const keep=()=>{const f=box.querySelector('.txForm');if(!f)return;const g=D.g[cur.g],sp=cur.k==='A'?g.A:g.B;sp.from=f.querySelector('.txF').value.trim();sp.streets=f.querySelector('.txS').value;sp.to=f.querySelector('.txT').value.trim();const n=f.querySelector('.txN');if(n)g.name=n.value.trim()};
- const draw=()=>{const g=D.g[cur.g],sp=cur.k==='A'?g.A:g.B,ok=circ(g.A);
+ const autoB=x=>{const sa=txStopBy(x.A.from||'',kind),sb=txStopBy(x.A.to||'',kind),c=circ(x.A);return{from:sb?lab(stopOf(oppStop(sb.id))):x.A.to||'',to:sa?lab(stopOf(oppStop(sa.id))):x.A.from||'',streets:txSplit(x.A.streets).reverse().join(' - '),c}};
+ const draw=()=>{const g=D.g[cur.g];if(g.back==='same')g.back='auto';if(cur.k==='B'&&g.back!=='own')g.B=autoB(g);const sp=cur.k==='A'?g.A:g.B,ok=circ(g.A);
   const chip=(gi,k,t)=>`<button type="button" class="b flat vchip${cur.g===gi&&cur.k===k?' on':''}" data-gi="${gi}" data-k="${k}"><span class="vdot" style="background:${root.color}"></span>${t}</button>`;
-  const rows=D.g.map((x,gi)=>{const c=circ(x.A),bk=x.back==='own'?chip(gi,'B',c?'KIERUNEK 2':'POWRÓT')+`<button type="button" class="b ico flat txBx" data-gi="${gi}" title="Usuń osobną trasę – ${c?'kierunek przeciwny wygenerowany automatycznie':'powrót tymi samymi ulicami'}">${ic('x',14)}</button>`
-    :x.back==='none'?`<span class="small vsame">${c?'bez kierunku przeciwnego':'bez powrotu'}</span><button type="button" class="b flat txBs" data-gi="${gi}">${ic('plus',14)}${c?'Kierunek przeciwny':'Powrót'}</button>`
-    :`<span class="small vsame" title="${c?'Druga strona ulic, przystanki dla tamtego kierunku':'Ulice w odwrotnej kolejności, przystanki po drugiej stronie'}">${c?'Kierunek przeciwny: automatycznie':'POWRÓT = TAM'}</span><button type="button" class="b flat txBo" data-gi="${gi}" title="Wpisz inną trasę">${ic('plus',14)}Osobna trasa</button><button type="button" class="b ico flat txBn" data-gi="${gi}" title="${c?'Bez kierunku przeciwnego':'Bez powrotu'}">${ic('x',14)}</button>`;
+  const rows=D.g.map((x,gi)=>{const c=circ(x.A),bk=x.back==='none'?`<span class="small vsame">${c?'bez kierunku przeciwnego':'tylko w jedną stronę'}</span><button type="button" class="b flat txBs" data-gi="${gi}">${ic('plus',14)}${c?'Kierunek przeciwny':'Powrót'}</button>`
+    :chip(gi,'B',c?'KIERUNEK 2':'POWRÓT')+`<button type="button" class="b ico flat txBn" data-gi="${gi}" title="${c?'Bez kierunku przeciwnego':'Linia kursuje tylko w jednym kierunku'}">${ic('x',14)}</button>`;
    return `<div class="vgrp"><span class="vgl">${gi?esc(x.name||'Wariant '+gi):'Podstawowy'}</span>${chip(gi,'A',c?'KIERUNEK 1':'TAM')}${bk}${gi?`<button type="button" class="b ico flat txVx" data-gi="${gi}" title="Usuń wariant">${ic('trash',14)}</button>`:''}</div>`}).join('');
   box.innerHTML=`<div class="vpn vwar"><div class="vrow"><span class="grow"></span><button type="button" class="b flat txVadd">${ic('plus',14)}Wariant</button></div><div class="vchips">${rows}</div></div>
    <div class="lnSec txForm"><h4>${ic('route',14)}${cur.k==='B'?(ok?'Kierunek 2':'Powrót'):(ok?'Kierunek 1':'Tam')}${cur.g?' – '+esc(g.name||'Wariant '+cur.g):''}</h4>
@@ -2286,12 +2295,12 @@ function txDlg(){closeMenus();const sel=selLine(),root=sel?(sel.par?S.lines.find
     <div class="setg"><span class="lab">${ic('pole',14)}Do przystanku</span><div class="txAc"><input class="txT" value="${esc(sp.to||'')}" autocomplete="off" aria-label="Przystanek końcowy" required></div></div></div>`;
   box.querySelectorAll('.vchip').forEach(b=>b.onclick=()=>{keep();cur={g:+b.dataset.gi,k:b.dataset.k};draw()});
   const gi=b=>+b.dataset.gi;
-  box.querySelectorAll('.txBo').forEach(b=>b.onclick=()=>{keep();const x=D.g[gi(b)];x.back='own';if(!x.B||!x.B.streets){const c=circ(x.A);x.B={from:c?x.A.from:x.A.to,to:c?x.A.to:x.A.from,streets:txSplit(x.A.streets).reverse().join(' - ')}}cur={g:gi(b),k:'B'};draw()});
-  box.querySelectorAll('.txBx').forEach(b=>b.onclick=()=>{keep();D.g[gi(b)].back='same';if(cur.k==='B')cur={g:gi(b),k:'A'};draw()});
-  box.querySelectorAll('.txBn').forEach(b=>b.onclick=()=>{keep();D.g[gi(b)].back='none';draw()});
-  box.querySelectorAll('.txBs').forEach(b=>b.onclick=()=>{keep();D.g[gi(b)].back='same';draw()});
+  box.querySelectorAll('.txBn').forEach(b=>b.onclick=()=>{keep();D.g[gi(b)].back='none';if(cur.k==='B'&&cur.g===gi(b))cur={g:gi(b),k:'A'};draw()});
+  box.querySelectorAll('.txBs').forEach(b=>b.onclick=()=>{keep();D.g[gi(b)].back='auto';draw()});
+  // (powrót wyliczany z TAM, dopóki nie zostanie zmieniony ręcznie: wtedy staje się osobną trasą)
+  if(cur.k==='B'&&g.back!=='own')box.querySelectorAll('.txForm input').forEach(i=>i.addEventListener('input',()=>{g.back='own'}));
   box.querySelectorAll('.txVx').forEach(b=>b.onclick=()=>{keep();D.g.splice(gi(b),1);cur={g:0,k:'A'};draw()});
-  box.querySelector('.txVadd').onclick=()=>{keep();D.g.push({name:'',A:{from:D.g[0].A.from||'',to:D.g[0].A.to||''},back:'same',B:{}});cur={g:D.g.length-1,k:'A'};draw();box.querySelector('.txS').focus()};
+  box.querySelector('.txVadd').onclick=()=>{keep();D.g.push({name:'',A:{from:D.g[0].A.from||'',to:D.g[0].A.to||''},back:'auto',B:{}});cur={g:D.g.length-1,k:'A'};draw();box.querySelector('.txS').focus()};
   const n=box.querySelector('.txN');if(n)n.oninput=()=>{D.g[cur.g].name=n.value;const lb=box.querySelectorAll('.vgl')[cur.g];if(lb)lb.textContent=n.value||'Wariant '+cur.g};
   box.querySelectorAll('.txF,.txT').forEach(acStops);
   box.querySelectorAll('.txF,.txT').forEach(i=>i.addEventListener('input',()=>{keep();const was=box.dataset.circ==='1',now=circ(D.g[cur.g].A);if(was!==now&&cur.k==='A'){box.dataset.circ=now?'1':'0';const a=document.activeElement&&document.activeElement.className;draw();const f=box.querySelector('.'+a);if(f){f.focus();f.setSelectionRange(f.value.length,f.value.length)}}}));
@@ -2313,11 +2322,11 @@ function txDlg(){closeMenus();const sel=selLine(),root=sel?(sel.par?S.lines.find
    const rev=(sp,b)=>{const f=oppStop(b.ids[b.ids.length-1]),t=oppStop(b.ids[0]);return anc({from:sp.to,to:sp.from,fromId:f,toId:t,streets:txSplit(sp.streets).reverse().join(' - ')},b)};   // (krańce: perony dla przeciwnego kierunku, jeśli są)
    const out=[];
    for(const x of D.g){const a=await txBuild(x.A,kind);let bk=null;
-    if(x.back==='own')bk=await txBuild(anc(x.B,a),kind);else if(x.back==='same')bk=await txBuild(rev(x.A,a),kind).catch(e=>{dbg('Trasa tekstowa (powrót): '+e.message);return null});
+    if(x.back==='own')bk=await txBuild(anc(x.B,a),kind);else if(x.back!=='none')bk=await txBuild(rev(x.A,a),kind).catch(e=>{dbg('Trasa tekstowa (powrót): '+e.message);return null});
     out.push({x,a,bk})}
    const l=root;S.lines=S.lines.filter(v=>v.par!==l.id);   // (warianty i powrót tej linii zastąpione nowymi)
-   txApply(l,out[0].a);if(out[0].bk)txVar(l,l,out[0].bk,{back:true});
-   out.slice(1).forEach(({x,a,bk})=>{const v=txVar(l,l,a,{name:x.name||'Wariant'});if(bk)txVar(l,v,bk,{back:true})});
+   txApply(l,out[0].a);if(out[0].x.back==='none')l.oneway=true;else delete l.oneway;if(out[0].bk)txVar(l,l,out[0].bk,{back:true});
+   out.slice(1).forEach(({x,a,bk})=>{const v=txVar(l,l,a,{name:x.name||'Wariant'});if(x.back==='none')v.oneway=true;if(bk)txVar(l,v,bk,{back:true})});
    S.sel=l.id;syncVariants();save();renderLines();redraw();const all=l.segs.flatMap(q=>q.pts);if(all.length)map.fitBounds(L.latLngBounds(all),{padding:[30,30]});
    const pz=n=>n+' '+(n===1?'przystanek':n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?'przystanki':'przystanków');
    const alt=out.reduce((t,o)=>t+o.a.alt+(o.bk?o.bk.alt:0),0),miss=out.filter(o=>o.x.back!=='none'&&!o.bk).length;
