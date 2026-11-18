@@ -2821,7 +2821,15 @@ function buildSchema(spread=1){
    const UK=92;SP.forEach((p,n)=>{N[n].x=p[0]*UK;N[n].y=p[1]*UK});
    const done=new Set();pieces.forEach(([x,y,seg])=>{const es=(adj[x].get(y)||[]);es.forEach(e=>{if(done.has(e))return;done.add(e);const q=e.i===x?seg:seg.slice().reverse();
     e.W=q.slice(1,-1).map(p=>({x:p[0]*UK,y:p[1]*UK}));e.SA=e.SB=null})});
-   E.forEach(e=>{if(!done.has(e)){e.W=[];e.SA=e.SB=null}})}}
+   E.forEach(e=>{if(!done.has(e)){e.W=[];e.SA=e.SB=null}});
+   // przystanek na załamaniu (zakręt o 60° i więcej): przystanek przesuwa się na dłuższe ramię, a linia skręca obok niego – nie na samym przystanku
+   {const inc=N.map(()=>[]);E.forEach(e=>{if(e.i===e.j)return;inc[e.i].push(e);inc[e.j].push(e)});
+    N.forEach((n,ni)=>{const es=inc[ni];if(es.length!==2||n.term)return;
+     const nb=e=>{const P=[{x:N[e.i].x,y:N[e.i].y},...e.W,{x:N[e.j].x,y:N[e.j].y}];return e.i===ni?P[1]:P[P.length-2]};
+     const u=es.map(e=>{const p=nb(e),dx=p.x-n.x,dy=p.y-n.y,l=Math.hypot(dx,dy);return l>1?{x:dx/l,y:dy/l,l}:null});if(!u[0]||!u[1])return;
+     if(u[0].x*u[1].x+u[0].y*u[1].y<-.5)return;
+     const k=u[0].l>=u[1].l?0:1,sl=Math.min(UK*.6,u[k].l*.5),P0={x:n.x,y:n.y},eo=es[1-k];
+     n.x+=u[k].x*sl;n.y+=u[k].y*sl;if(eo.i===ni)eo.W.unshift(P0);else eo.W.push(P0)})}}}
  const eachW=f=>E.forEach(e=>{if(e.W)e.W.forEach(f);if(e.SA)f(e.SA);if(e.SB)f(e.SB)});
  if(spread!==1){N.forEach(n=>{n.x*=spread;n.y*=spread});eachW(q=>{q.x*=spread;q.y*=spread})}
  const mnx=Math.min(...N.map(n=>n.x)),mny=Math.min(...N.map(n=>n.y));N.forEach(n=>{n.x+=90-mnx;n.y+=90-mny});eachW(q=>{q.x+=90-mnx;q.y+=90-mny});
@@ -2872,9 +2880,24 @@ function buildSchema(spread=1){
     const pp=u===e.a?e.pts:e.pts.slice().reverse();
     {const an=ANC[li]; // odwiedziny zakotwiczone w miejscu postoju: prostokąt przystanku rysujemy tylko przy ostatnich z nich (inaczej obejmowałby oba perony i był pusty w środku)
      const skS=an&&an.set.has(i-1)&&an.last.get(u)!==i-1,skE=an&&an.set.has(i)&&an.last.get(v)!==i;
-     pp.forEach((q,k)=>{if(V.length&&k===0)return;V.push({x:q.x,y:q.y,nk:k===0?(skS?null:u):(k===pp.length-1?(skE?null:v):null)})})}}
+     pp.forEach((q,k)=>{if(V.length&&k===0){V[V.length-1].w=Math.max(V[V.length-1].w||0,e.bw||0);return}V.push({x:q.x,y:q.y,w:e.bw||0,nk:k===0?(skS?null:u):(k===pp.length-1?(skE?null:v):null)})})}}
    const VV=[];V.forEach(q=>{const pv=VV[VV.length-1];if(pv&&Math.hypot(pv.x-q.x,pv.y-q.y)<.01){if(q.nk)pv.nk=q.nk;return}VV.push({...q})});
    if(VV.length<2){LS.push(null);return}
+   // załamania osi zaokrąglone łukiem o promieniu większym niż połowa szerokości wiązki: pasy przesunięte wzdłuż normalnej tworzą wtedy współśrodkowe łuki
+   // (jak na drukowanych schematach), zamiast ściętych, krzyżujących się narożników. Promień zależy tylko od geometrii odcinków i szerokości wiązki,
+   // więc linie jadące razem dostają ten sam łuk
+   const FV=[VV[0]],fput=q=>{const pv=FV[FV.length-1];if(Math.hypot(pv.x-q.x,pv.y-q.y)<.05){if(q.nk)pv.nk=q.nk;return}FV.push(q)};
+   // potrzebna długość styczna każdego załamania; gdy dwa sąsiednie się nie mieszczą na odcinku między nimi, oba są proporcjonalnie zmniejszane
+   const TN=VV.map((b,k)=>{if(MAPM||k===0||k===VV.length-1)return 0;const a=VV[k-1],c=VV[k+1],l1=Math.hypot(b.x-a.x,b.y-a.y),l2=Math.hypot(c.x-b.x,c.y-b.y);if(l1<.01||l2<.01)return 0;
+    const th=Math.acos(Math.max(-1,Math.min(1,((b.x-a.x)*(c.x-b.x)+(b.y-a.y)*(c.y-b.y))/l1/l2)));if(th<.05||th>2.4)return 0;return(Math.max(a.w||0,b.w||0,c.w||0)/2+14)*Math.tan(th/2)});
+   const TC=TN.slice();for(let k=0;k<VV.length-1;k++){const L=Math.hypot(VV[k+1].x-VV[k].x,VV[k+1].y-VV[k].y),sm=TN[k]+TN[k+1];if(sm>L*.98){const f=L*.98/sm;TC[k]=Math.min(TC[k],TN[k]*f);TC[k+1]=Math.min(TC[k+1],TN[k+1]*f)}}
+   for(let k=1;k<VV.length-1;k++){const a=VV[k-1],b=VV[k],c=VV[k+1],d1x=b.x-a.x,d1y=b.y-a.y,l1=Math.hypot(d1x,d1y),d2x=c.x-b.x,d2y=c.y-b.y,l2=Math.hypot(d2x,d2y);
+    if(!TC[k]){fput({...b});continue}
+    const u1x=d1x/l1,u1y=d1y/l1,u2x=d2x/l2,u2y=d2y/l2,th=Math.acos(Math.max(-1,Math.min(1,u1x*u2x+u1y*u2y))),tt=Math.tan(th/2),t=TC[k],r=t/tt;
+    const p0x=b.x-u1x*t,p0y=b.y-u1y*t,sg=(u1x*u2y-u1y*u2x)>0?1:-1,cx=p0x-u1y*sg*r,cy=p0y+u1x*sg*r;
+    const a0=Math.atan2(p0y-cy,p0x-cx),a1=Math.atan2(b.y+u2y*t-cy,b.x+u2x*t-cx);let da=a1-a0;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;
+    const m=Math.max(2,Math.ceil(Math.abs(da)*r/3));for(let q=0;q<=m;q++){const an=a0+da*q/m;fput({x:cx+r*Math.cos(an),y:cy+r*Math.sin(an),nk:q===(m>>1)?b.nk:null,w:b.w})}}
+   fput({...VV[VV.length-1]});VV.length=0;FV.forEach(q=>VV.push(q));
    const X=[],Y=[],NK=[];
    for(let k=0;k<VV.length-1;k++){const a=VV[k],b=VV[k+1],L=Math.hypot(b.x-a.x,b.y-a.y),m=Math.max(1,Math.ceil(L/STEP));
     for(let t=0;t<m;t++){X.push(a.x+(b.x-a.x)*t/m);Y.push(a.y+(b.y-a.y)*t/m);NK.push(t===0?a.nk||null:null)}}
@@ -2915,7 +2938,15 @@ function buildSchema(spread=1){
      else{ // osie się pokrywają – o stronie decydują dojazd i odjazd linii, a przy remisie numer linii
       const k0=run[0],k1=run[run.length-1],j0=ma[k0],j1=ma[k1];
       const ka0=Math.max(0,k0-PRE),kb0=o>0?Math.max(0,j0-PRE):Math.min(B.n-1,j0+PRE),ka1=Math.min(A.n-1,k1+PRE),kb1=o>0?Math.min(B.n-1,j1+PRE):Math.max(0,j1-PRE);
-      const ext=(B.X[kb0]-A.X[ka0])*A.NX[k0]+(B.Y[kb0]-A.Y[ka0])*A.NY[k0]+(B.X[kb1]-A.X[ka1])*A.NX[k1]+(B.Y[kb1]-A.Y[ka1])*A.NY[k1];
+      const e0=(B.X[kb0]-A.X[ka0])*A.NX[k0]+(B.Y[kb0]-A.Y[ka0])*A.NY[k0],e1=(B.X[kb1]-A.X[ka1])*A.NX[k1]+(B.Y[kb1]-A.Y[ka1])*A.NY[k1],ext=e0+e1;
+      // linie zjeżdżają się z przeciwnych stron i rozjeżdżają też na przeciwne: skrzyżowanie jest nieuniknione – zamiast skręcać jedną linię przez drugą
+      // na rozwidleniu (dziwne figury przy przystanku), każda połowa wspólnego odcinka dostaje stronę ze swojego końca, a linie zamieniają się miejscami w środku
+      if(Math.abs(e0)>4&&Math.abs(e1)>4&&(e0>0)!==(e1>0)&&run.length>=14){
+       // miejsce zamiany: środek najdłuższego odcinka między przystankami w obrębie wspólnego przebiegu (dla wszystkich linii wiązki zwykle ten sam), a przejście łagodne
+       const st=[0];run.forEach((k,i)=>{if(i>0&&i<run.length-1&&A.NK[k])st.push(i)});st.push(run.length-1);let bi=0,bl=-1;for(let i=1;i<st.length;i++)if(st[i]-st[i-1]>bl){bl=st[i]-st[i-1];bi=i}
+       const mid=(st[bi-1]+st[bi])>>1,gp=Math.max(3,Math.min(10,bl>>2));
+       const mk=(rr,dd)=>{let a1=1e9,a2=-1;rr.forEach(k=>{a1=Math.min(a1,ma[k]);a2=Math.max(a2,ma[k])});RUNS.push({P,a,b,run:rr,o,d:dd,fb:false,il:rr[0],ih:rr[rr.length-1],jl:a1,jh:a2,s:0})};
+       mk(run.slice(0,mid-gp),(e0>0?1:-1)*(.5+Math.min(Math.abs(e0),40)/80));mk(run.slice(mid+gp),(e1>0?1:-1)*(.5+Math.min(Math.abs(e1),40)/80));continue}
       if(Math.abs(ext)>2)d=(ext>0?1:-1)*(.5+Math.min(Math.abs(ext),40)/80);else{d=A.g<B.g?1:-o;fb=true}}
      RUNS.push({P,a,b,run,o,d,fb,il:run[0],ih:run[run.length-1],jl,jh,s:0})}})}
   // spójność stron: trzy linie jadące razem nie mogą tworzyć cyklu (A nad B, B nad C, a C nad A) – takie ograniczenia
@@ -3001,14 +3032,15 @@ function buildSchema(spread=1){
   placed.push(best.b);rgAdd(best.b,null);labs.push({n,fs,lh,tl,nb,best,w});});
  if(conf>0&&spread<2.3)return buildSchema(spread*1.18);
  // numery linii wzdłuż krawędzi
- const ens=[];
- E.forEach(e=>{const p=e.pts,k=e.long,q0=p[k],q1=p[k+1],len=Math.hypot(q1.x-q0.x,q1.y-q0.y);if(len<80||p.length<2)return;
+ const ens=[],LBD=Math.max(420,(UI.schStyle==='classic'?92:100)*4.6); // ten sam zestaw numerów najwyżej co ok. 4–5 odstępów między przystankami
+ E.map(e=>{const p=e.pts,k=e.long,q0=p[k],q1=p[k+1];return[e,q0&&q1?Math.hypot(q1.x-q0.x,q1.y-q0.y):0]}).sort((x,y)=>y[1]-x[1]).forEach(([e])=>{const p=e.pts,k=e.long,q0=p[k],q1=p[k+1],len=Math.hypot(q1.x-q0.x,q1.y-q0.y);if(len<80||p.length<2)return;
+  {const key=e.orderI.join(','),mx0=(q0.x+q1.x)/2,my0=(q0.y+q1.y)/2;if(ens.some(o=>o.key===key&&Math.hypot(o.x-mx0,o.y-my0)<LBD))return}
   const dx=(q1.x-q0.x)/len,dy=(q1.y-q0.y)/len;let nx=-dy,ny=dx;if(ny>0||(ny===0&&nx>0)){nx=-nx;ny=-ny}
   const hw=e.order.reduce((t,g)=>t+SLOT(g),0)/2+9,mx=(q0.x+q1.x)/2,my=(q0.y+q1.y)/2,tw=e.orderI.length*11+4;
   for(const sgn of[1,-1]){const x=mx+nx*hw*sgn,y=my+ny*hw*sgn,b={x0:x-tw/2-2,y0:y-tw/2-2,x1:x+tw/2+2,y1:y+tw/2+2};
    if(placed.some(p2=>inter(b,p2,0))||N.some(m=>inter(b,m.r,2)))continue;
    let ang=Math.atan2(dy,dx)*180/Math.PI;if(ang>90)ang-=180;if(ang<=-90)ang+=180;
-   ens.push({x,y,ang,ls:e.orderI});placed.push(b);break}});
+   ens.push({x,y,ang,ls:e.orderI,key:e.orderI.join(',')});placed.push(b);break}});
  // składanie SVG
  // zakres rysunku obejmuje także całe przebiegi linii – geometria odcinków może wystawać poza prostokąt wyznaczony przez przystanki
   let pxa=1e9,pxb=-1e9,pya=1e9,pyb=-1e9;lpath.forEach(P=>{if(P)P.forEach(q=>{if(q.x<pxa)pxa=q.x;if(q.x>pxb)pxb=q.x;if(q.y<pya)pya=q.y;if(q.y>pyb)pyb=q.y})});
@@ -3023,7 +3055,7 @@ function buildSchema(spread=1){
   for(;;){A=ti(ax,ay,z);B=ti(bx,by,z);if((B[0]-A[0]+1)*(B[1]-A[1]+1)<=260||z<=9)break;z--}
   const ts=C/2**z,dk=!!UI.dark;o+=`<g id="mapbg" opacity="${dk?.7:.6}" pointer-events="none">`;
   for(let x=A[0];x<=B[0];x++)for(let y=A[1];y<=B[1];y++){const [u0,v0]=toU(-C/2+x*ts,C/2-y*ts),[u1,v1]=toU(-C/2+(x+1)*ts,C/2-(y+1)*ts);
-   o+=`<image href="https://${'abcd'[(x+y)&3]}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/${z}/${x}/${y}.png?key=${CARTO_KEY}" x="${f2(u0)}" y="${f2(v0)}" width="${f2(u1-u0+.4)}" height="${f2(v1-v0+.4)}" preserveAspectRatio="none"/>`}
+   o+=`<image href="https://${'abcd'[(x+y)&3]}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/${z}/${x}/${y}.png" x="${f2(u0)}" y="${f2(v0)}" width="${f2(u1-u0+.4)}" height="${f2(v1-v0+.4)}" preserveAspectRatio="none"/>`}
   o+=`<text x="${f2(maxx-8)}" y="${f2(maxy-8)}" text-anchor="end" font-size="9" style="fill:var(--ink);opacity:.7">© OpenStreetMap, © CARTO</text></g>`}
  o+='<g id="lines">';
  lines.forEach((l,li)=>{if(!lpath[li])return;const d=dstr(lpath[li]),sw=SWd(li);
@@ -3064,6 +3096,10 @@ const TILEC=new Map();
 async function schTiles(h){const urls=[...new Set([...h.matchAll(/href="(https:\/\/[abcd]\.basemaps\.cartocdn\.com\/[^"]+)"/g)].map(m=>m[1]))];if(!urls.length)return h;
  const get=async u=>{if(TILEC.has(u))return TILEC.get(u);const r=await fetch(u.replace(/&amp;/g,'&'),{mode:'cors',credentials:'omit'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();
   const d=await new Promise((ok,no)=>{const f=new FileReader();f.onload=()=>ok(f.result);f.onerror=no;f.readAsDataURL(b)});if(TILEC.size>1500)TILEC.clear();TILEC.set(u,d);return d};
+ // bez nagłówków CORS kafelków nie da się odczytać – wtedy wczytujemy je jako zwykłe obrazki (z adresem strony), a ramka schematu bierze je z pamięci podręcznej przeglądarki
+ let cors=true;if(!TILEC.has(urls[0]))try{await get(urls[0])}catch(e){cors=false}
+ if(!cors){let i=0,bad=0;const one=u=>new Promise(ok=>{const im=new Image();im.referrerPolicy='strict-origin-when-cross-origin';im.onload=()=>ok(1);im.onerror=()=>{bad++;ok(0)};im.src=u.replace(/&amp;/g,'&')});
+  await Promise.race([Promise.all(Array.from({length:8},async()=>{while(i<urls.length)await one(urls[i++])})),new Promise(r=>setTimeout(r,8000))]);if(bad)dbg(`Schemat – podkład: nie wczytano ${bad} z ${urls.length} kafelków`);return h}
  const M=new Map();let i=0,bad=0;await Promise.all(Array.from({length:6},async()=>{while(i<urls.length){const u=urls[i++];try{M.set(u,await get(u))}catch(e){bad++}}}));
  if(bad)dbg(`Schemat – podkład: nie pobrano ${bad} z ${urls.length} kafelków`);if(!M.size)return h;
  return h.replace(/href="(https:\/\/[abcd]\.basemaps\.cartocdn\.com\/[^"]+)"/g,(m,u)=>M.has(u)?`href="${M.get(u)}"`:m)}
@@ -3074,7 +3110,9 @@ async function openSchema(){
  if(!html){say('Brak widocznych linii z co najmniej dwoma przystankami – nie ma z czego zbudować schematu.');return}
  say('Schemat gotowy.');
  const fr=document.createElement('iframe');fr.setAttribute('sandbox','allow-scripts allow-downloads allow-modals');fr.style.cssText='width:100%;flex:1;min-height:0;border:0;display:block;background:#fff';
- const show=h=>{schemaHTML=h;fr.srcdoc=h;if(/basemaps\.cartocdn\.com/.test(h)){say('Pobieranie podkładu mapy…');schTiles(h).then(h2=>{if(schemaHTML===h&&h2!==h){schemaHTML=h2;fr.srcdoc=h2;say('Schemat gotowy.')}}).catch(()=>{})}};show(html);
+ // styl „Mapa”: schemat pokazywany dopiero z gotowym podkładem (najwyżej po ok. 8 s), żeby kafelki były od razu, a nie dopiero po ponownym wygenerowaniu
+ const show=h=>{schemaHTML=h;if(!/basemaps\.cartocdn\.com/.test(h)){fr.srcdoc=h;return}say('Pobieranie podkładu mapy…');
+  schTiles(h).catch(()=>h).then(h2=>{if(schemaHTML!==h)return;schemaHTML=h2;fr.srcdoc=h2;say('Schemat gotowy.')})};show(html);
  // styl schematu: aktualny albo klasyczny (jak dawne schematy miast w ZbiorkomInfo)
  const wrap=document.createElement('div');wrap.className='schWrap';const bar=document.createElement('div');bar.className='schBar';
  const cur=()=>UI.schStyle==='classic'||UI.schStyle==='map'?UI.schStyle:'cur';
