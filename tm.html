@@ -253,6 +253,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
     <div class="fsep"></div>
     <button class="b" id="fSchema"><i data-ic="network"></i>Schemat…</button>
     <button class="b" id="delAll" style="color:var(--dng,#c62828)"><i data-ic="trash"></i>Usuń wszystkie linie</button>
+    <button class="b" id="clrNums" title="Usuń numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="num"></i>Usuń wszystkie numery przystanków</button>
     <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button><input type="checkbox" id="fAuto" disabled><input type="checkbox" id="fAccAuto"><span id="fAccSt"></span></span>
    </div>
    <div class="small" id="fStat" hidden style="display:none"></div>
@@ -317,7 +318,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
   <div id="lines"></div>
  </div>
  <div class="pane" id="p2">
-  <div class="stTop"><div class="sq"><input id="flt" placeholder="Szukaj przystanku…"><span class="sqi"><i data-ic="search"></i></span></div><button class="b ico" id="load" title="Pobierz z OSM – przystanki bieżącego obszaru, także te usunięte wcześniej ręcznie"><i data-ic="download"></i></button><button class="b ico" id="reloadStops" title="Wczytaj od nowa – usuwa wszystkie przystanki tego miasta i wczytuje je ponownie z OSM"><i data-ic="refresh"></i></button><button class="b ico" id="clrNums" title="Usuń numery słupków 01–12 ze wszystkich przystanków (numery tymczasowe 91–99 zostają)"><i data-ic="num"></i></button></div>
+  <div class="stTop"><div class="sq"><input id="flt" placeholder="Szukaj przystanku…"><span class="sqi"><i data-ic="search"></i></span></div><button class="b ico" id="load" title="Pobierz z OSM – przystanki bieżącego obszaru, także te usunięte wcześniej ręcznie"><i data-ic="download"></i></button><button class="b ico" id="reloadStops" title="Wczytaj od nowa – usuwa wszystkie przystanki tego miasta i wczytuje je ponownie z OSM"><i data-ic="refresh"></i></button></div>
   <div class="small" id="cnt"></div><div id="stops"></div>
  </div>
  <div class="pane" id="p3">
@@ -484,12 +485,18 @@ const stopQuery=B=>{const u=[`node["highway"="bus_stop"](${B})`,`node["railway"=
 // przystanki, których w OSM chwilowo nie ma, choć fizycznie istnieją: tramwaje na Stogi zawieszone na czas przebudowy (od 2025) – przystanki
 // tramwajowe z tego obszaru brane ze stanu mapy sprzed zawieszenia (zapytanie Overpass z datą); dołączane tylko te, których dziś w OSM brak
 const HIST_STOPS=[{city:'gdansk',box:[54.334,18.655,54.378,18.74],date:'2024-12-01T00:00:00Z',tram:true,n:'Stogi'}];
-async function histStops(BX){const out=[];const [s0,w0,n0,e0]=String(BX).split(',').map(Number);
+async function histStops(BX){const out=[],seen=new Set();const [s0,w0,n0,e0]=String(BX).split(',').map(Number);
+ const take=(e,tram)=>{const t={...(e.tags||{})};['railway','public_transport','tram'].forEach(k=>{for(const p of['disused:','was:','abandoned:'])if(t[p+k]&&!t[k])t[k]=t[p+k]});
+  if(tram&&!(t.tram==='yes'||t.railway==='tram_stop'))return;if(!t.name)return;t.tram='yes';const k=e.type+e.id;if(seen.has(k))return;seen.add(k);out.push({...e,tags:t,_hist:1})};
  for(const h of HIST_STOPS){if(h.city!==cityKey())continue;const [s1,w1,n1,e1]=h.box;if(s1>n0||n1<s0||w1>e0||e1<w0)continue;
   const B=[Math.max(s0,s1),Math.max(w0,w1),Math.min(n0,n1),Math.min(e0,e1)].join(',');
-  try{const j=await ov(stopQuery(B).replace('[out:json]','[out:json][date:"'+h.date+'"]'));
-   (j.elements||[]).forEach(e=>{const t=e.tags||{};if(h.tram&&!(t.tram==='yes'||t.railway==='tram_stop'))return;out.push(e)});dbg(`Przystanki sprzed ${h.date.slice(0,10)} (${h.n}): ${out.length} elementów`)}
-  catch(x){dbg(`Przystanki sprzed ${h.date.slice(0,10)} (${h.n}): ${x.message}`)}}
+  // dzisiejsza mapa: przystanki oznaczone jako nieczynne (disused:/was:) …
+  try{const q=[];for(const p of['disused:','was:'])q.push(`node["${p}railway"="tram_stop"](${B})`,`node["${p}public_transport"]["tram"="yes"](${B})`,`node["${p}public_transport"]["${p}tram"="yes"](${B})`,`way["${p}public_transport"="platform"](${B})`);
+   const j=await ov(`[out:json][timeout:60];(${q.join(';')};);out body center;`,60000);(j.elements||[]).forEach(e=>take(e,h.tram))}catch(x){dbg('Nieczynne przystanki ('+h.n+'): '+x.message)}
+  // … i mapa sprzed zawieszenia tramwajów
+  try{const j=await ov(stopQuery(B).replace('[out:json][timeout:90]','[out:json][timeout:180][date:"'+h.date+'"]'),190000);(j.elements||[]).forEach(e=>take(e,h.tram))}
+  catch(x){dbg(`Przystanki sprzed ${h.date.slice(0,10)} (${h.n}): ${x.message}`)}
+  dbg(`Przystanki tramwajowe spoza bieżącej mapy (${h.n}): ${out.length}`)}
  return out}
 const stopClass=e=>{const t=e.tags||{};if(t.public_transport==='stop_position')return 3;
  return e.type==='node'&&(t.highway==='bus_stop'||t.railway==='tram_stop'||(/^(station|halt)$/.test(t.railway||'')&&t.station!=='subway'))?1:2};
@@ -513,7 +520,7 @@ async function loadStops(o){
  const auto=!!(o&&o.auto===true),strip=!!(o&&o.strip),quiet=!!(o&&o.quiet),BX=(o&&o.bbox)||bb();if(auto&&!strip)STOPMSG='';
  if(!quiet)say(auto?'Pobieranie przystanków z OSM dla nowego obszaru…':'Pobieranie przystanków z OSM…');
  try{const j=await ov(stopQuery(BX));
-  {const H=await histStops(BX);if(H.length){const ids=new Set((j.elements||[]).map(e=>e.type+e.id));j.elements=(j.elements||[]).concat(H.filter(e=>!ids.has(e.type+e.id)))}}
+  {const H=await histStops(BX);if(H.length)j.elements=(j.elements||[]).concat(H)}
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
   const md=x=>x.rail?'r':x.tram?'t':'a',pn=(name,st)=>(st&&st.num)||((String(name||'').match(NUMRE)||[])[2])||'',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):'',p:pn(name,st)})};
   // ten sam przystanek opisany drugi raz (peron / pozycja zatrzymania): tylko w obrębie tego samego rodzaju – peron tramwajowy obok
@@ -521,7 +528,7 @@ async function loadStops(o){
   // (two posts of one stop with different numbers – e.g. Warneńska 01 and 02 on both sides of the street – are never one and the same)
   const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st),p0=pn(name,st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
    for(const q of c){const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
-    if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(added.has(q.st.id)){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
+    if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(added.has(q.st.id)||(st&&st._hist&&m0==='t')){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
   // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
   // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
   const NOM=new Map();(j.elements||[]).forEach(e=>{const t=e.tags||{};if(!t.name)return;const ll=e.type==='node'?[e.lat,e.lon]:(e.center?[e.center.lat,e.center.lon]:null);if(!ll)return;
@@ -532,13 +539,14 @@ async function loadStops(o){
   S.stops.forEach(s=>addCov(s.ll,s.name,s));
   const cnt=[0,0,0,0];let skD=0,skM=0,fixAT=0;
   (j.elements||[]).filter(e=>e.tags).map(e=>({e,c:stopClass(e)})).sort((a,b)=>a.c-b.c).forEach(({e,c})=>{
-   const st=stopFromOsm(e,c);if(!st)return;nameFix(st);const old=have.get(st.id);
+   const st=stopFromOsm(e,c);if(!st)return;if(e._hist)st._hist=1;nameFix(st);const old=have.get(st.id);
    if(old){ // już w projekcie: nie nadpisujemy; liczymy te, które użytkownik zmienił (nazwa, położenie, rodzaj)
+    if(e._hist&&st.tram&&!old.tram&&!old.rail){old.tram=true;old.bus=true;fixAT++;return} // (dziś w OSM sam przystanek autobusowy, dawniej także tramwajowy)
     if(o&&o.fixAT&&st.tram&&st.bus&&!old.tram&&!old.rail){old.tram=true;old.bus=true;fixAT++;return} // (A+T wczytane wcześniej jako sam autobus)
     if(old.name!==st.name||mdist(old.ll,st.ll)>1||!!old.tram!==!!st.tram||!!old.rail!==!!st.rail||!!old.bus!==!!st.bus)skM++;return}
    if(gone.has(st.id)){skD++;addCov(st.ll,st.name,st);return}
-   if(c>1&&covered(st.ll,st.name,st))return; // ten sam przystanek opisany także jako peron / pozycja zatrzymania
-   S.stops.push(st);added.add(st.id);addCov(st.ll,st.name,st);cnt[c]++});
+   if((c>1||st._hist)&&covered(st.ll,st.name,st))return; // ten sam przystanek opisany także jako peron / pozycja zatrzymania
+   delete st._hist;S.stops.push(st);added.add(st.id);addCov(st.ll,st.name,st);cnt[c]++});
   const n=cnt[1]+cnt[2]+cnt[3];
   dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}, uzupełnione A+T: ${fixAT}`);
   if(!auto&&S.rmStops&&added.size)S.rmStops=S.rmStops.filter(id=>!added.has(id));
@@ -2005,7 +2013,7 @@ function applyUI(){UI.br=Math.max(10,Math.min(110,+UI.br||100));document.body.cl
  try{localStorage.setItem('gdn-ui',JSON.stringify(UI))}catch(e){}}
 const setDark=v=>{UI.dark=v;applyUI();redraw()};
 $('#uiDark').onchange=e=>setDark(e.target.checked);$('#tdark').onclick=()=>setDark(!UI.dark);
-$('#clrNums').onclick=async()=>{const a=S.stops.filter(isSlup);if(!a.length){say('Żaden przystanek nie ma numeru 01–12.');return}
+$('#clrNums').onclick=async()=>{closeMenus();const a=S.stops.filter(isSlup);if(!a.length){say('Żaden przystanek nie ma numeru 01–12.');return}
  if(!await askConfirm('Usunąć numery (01, 02, 03…) z '+a.length+' przystanków? Numery tymczasowe 91–99 zostaną.',{title:'Usuń numery przystanków',ok:'Usuń',danger:true}))return;
  a.forEach(x=>{const m=x.name.match(/^(.*\S)\s+(0[1-9]|1[0-2])$/);if(m)x.name=m[1];if(/^(0[1-9]|1[0-2])$/.test(x.num||''))x.num=''});
  save();drawStops();renderStops();renderLines();redraw();say('Usunięto numery z '+a.length+' przystanków.')};
@@ -2923,7 +2931,7 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
   if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
-function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&S.stFix3&&!S.stHist1&&cityKey()==='gdansk')setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,bbox:HIST_STOPS[0].box.join(',')})}catch(e){}S.stHist1=1;save()},5000);   // (raz: przystanki tramwajowe na Stogach w istniejących projektach)
+function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&S.stFix3&&!S.stHist2&&cityKey()==='gdansk')setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,bbox:HIST_STOPS[0].box.join(',')})}catch(e){}S.stHist2=1;save();drawStops();renderStops()},5000);   // (raz: przystanki tramwajowe na Stogach w istniejących projektach)
  if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
