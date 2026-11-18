@@ -1828,7 +1828,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795013737;
+const APP_BUILD=1795014593;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -1878,7 +1878,7 @@ function hideRoutes(){const R=IDX.routes;if(Array.isArray(R)){for(let i=R.length
 const IDX_HAS=new Set();let IDX_BUSY={};
 const cityArea=c=>SEP_AREAS.includes(c)?c:'tri';
 const idxHas=a=>IDX_HAS.has('*')||IDX_HAS.has(a);
-function idxJoin(j){const ids=new Set(IDX.routes.map(r=>r.id));(j.routes||[]).forEach(r=>{if(!ids.has(r.id))IDX.routes.push(r)});Object.assign(IDX.stops,j.stops||{});
+function idxJoin(j){NMBN=null;const ids=new Set(IDX.routes.map(r=>r.id));(j.routes||[]).forEach(r=>{if(!ids.has(r.id))IDX.routes.push(r)});Object.assign(IDX.stops,j.stops||{});
   hideRoutes();nightTrams();setByName();setCorridors();if(typeof DEP!=='undefined')DEP.cache={};if(typeof GUIDE!=='undefined')GUIDE._nt=null}
 function idxArea(a){if(!IDX||idxHas(a))return Promise.resolve();
   return IDX_BUSY[a]||(IDX_BUSY[a]=(async()=>{try{const r=a==='nm'?null:await fetch('data/ix/'+a+'.json');if(!r||!r.ok)throw 0;idxJoin(await r.json());IDX_HAS.add(a)}
@@ -7508,7 +7508,9 @@ const nmOn=()=>tmOk();
 function nmRead(){try{return JSON.parse(localStorage.getItem('gdn-zi')||'null')}catch(e){return null}}
 const nmKm=(a,b)=>{const r=Math.PI/180,x=(b[1]-a[1])*r*Math.cos((a[0]+b[0])/2*r),y=(b[0]-a[0])*r;return Math.hypot(x,y)*6371};
 // the real pole for a stop of a direction: of the stops of that name within 300 m, the one on the right of the way it goes
-function nmPole(st,sh){const f=fold(st.n);if(!f)return null;const C=[];for(const [id,S] of Object.entries(IDX.stops)){if(S[4]==='nm'||fold(S[0])!==f)continue;const d=nmKm(st.ll,[S[2],S[3]]);if(d<.3)C.push({id,S,d})}
+// stops by folded name, built once per index (it was a scan of all ~46 000 stops, folding each name, for every stop of every line on every save in NetworkMaker – which froze the page)
+var NMBN=null;function nmByName(){if(NMBN&&NMBN.idx===IDX)return NMBN.m;const m=new Map();for(const id in IDX.stops){const S=IDX.stops[id];if(S[4]==='nm')continue;const f=fold(S[0]);let a=m.get(f);if(!a)m.set(f,a=[]);a.push(id)}NMBN={idx:IDX,m};return m}
+function nmPole(st,sh){const f=fold(st.n);if(!f)return null;const C=[];for(const id of nmByName().get(f)||[]){const S=IDX.stops[id];if(!S||S[4]==='nm')continue;const d=nmKm(st.ll,[S[2],S[3]]);if(d<.3)C.push({id,S,d})}
   if(!C.length)return null;if(C.length===1||!sh||sh.length<2)return C.sort((a,b)=>a.d-b.d)[0];
   let bi=0,bd=1e9;sh.forEach((q,k)=>{const x=nmKm(st.ll,q);if(x<bd){bd=x;bi=k}});const a=sh[Math.max(0,bi-1)],b=sh[Math.min(sh.length-1,bi+1)];
   const M=(P,Q)=>[(Q[1]-P[1])*Math.cos(P[0]*Math.PI/180)*111.32,(Q[0]-P[0])*110.57],v=M(a,b);if(Math.hypot(v[0],v[1])<1e-6)return C.sort((x,y)=>x.d-y.d)[0];
@@ -7536,8 +7538,9 @@ function nmSync(){const on=nmOn(),N=nmRead();NM.data=N;const nmN=N&&N.cityName?N
   const sig=on+'|'+(N?N.t:0);if(sig!==NM.sig){NM.sig=sig;nmInject();if(city==='nm'){if(typeof markCity==='function')markCity();if(location.hash.startsWith('#l')||location.hash.startsWith('#t'))route()}}
   if(!on&&city==='nm'&&ACC.state!=='wait')setCity('gda')}
 const netSync=nmSync;
-addEventListener('storage',e=>{if(e.key==='gdn-zi')nmSync()});
-addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.zi==='nm')nmSync()});
+let nmSyT=0;const nmSyncSoon=()=>{clearTimeout(nmSyT);nmSyT=setTimeout(()=>(window.requestIdleCallback||(f=>setTimeout(f,0)))(nmSync,{timeout:3000}),600)};
+addEventListener('storage',e=>{if(e.key==='gdn-zi')nmSyncSoon()});
+addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.zi==='nm')nmSyncSoon()});
 /* ===== DPB LED core: fonts, pictograms, layout ===== */
 let DPB=null;
 function dpbInit(){if(DPB)return DPB;DPB=(() => {

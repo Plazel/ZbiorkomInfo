@@ -442,7 +442,8 @@ function ziExport(){try{
   const P=FP(),lines=[];
   S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>ttOf(l,dk,a)).filter(Boolean).map(({st,off,sh,dep})=>({st,off,sh,dep}));
     const rt=l.par?S.lines.find(x=>x.id===l.par)||l:l;lines.push({id:l.id,n:String((l.par?l.vnum:l.num)||rt.num||''),color:rt.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
-  const k=cityKey(),out={v:1,t:Date.now(),city:k,cityName:CITIES[k].n.replace(/\s*\(.*\)$/,''),lines};
+  const k=cityKey(),body=JSON.stringify({city:k,lines});if(body===ziExport.last&&localStorage.getItem('gdn-zi'))return;ziExport.last=body; // unchanged lines: nothing written, ZbiorkomInfo does no work
+  const out={v:1,t:Date.now(),city:k,cityName:CITIES[k].n.replace(/\s*\(.*\)$/,''),lines};
   localStorage.setItem('gdn-zi',JSON.stringify(out));try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}
  }catch(e){try{dbg('Eksport do ZbiorkomInfo: '+(e&&e.message||e))}catch(x){}}}
 const save=()=>{if(_svSz>1e6&&!HIST.rest){if(!_svT)_svT=setTimeout(saveNow,350);return}saveNow()};
