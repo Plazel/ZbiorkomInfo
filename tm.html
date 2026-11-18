@@ -481,6 +481,16 @@ const stopQuery=B=>{const u=[`node["highway"="bus_stop"](${B})`,`node["railway"=
  ['bus','trolleybus','tram'].forEach(k=>u.push(`node["public_transport"="platform"]["${k}"="yes"](${B})`,`way["public_transport"="platform"]["${k}"="yes"](${B})`,`way["highway"="platform"]["${k}"="yes"](${B})`));
  ['bus','trolleybus','tram'].forEach(k=>u.push(`node["public_transport"="stop_position"]["${k}"="yes"]["name"](${B})`));
  return `[out:json][timeout:90];(${u.join(';')};);out body center;`};
+// przystanki, których w OSM chwilowo nie ma, choć fizycznie istnieją: tramwaje na Stogi zawieszone na czas przebudowy (od 2025) – przystanki
+// tramwajowe z tego obszaru brane ze stanu mapy sprzed zawieszenia (zapytanie Overpass z datą); dołączane tylko te, których dziś w OSM brak
+const HIST_STOPS=[{city:'gdansk',box:[54.334,18.655,54.378,18.74],date:'2024-12-01T00:00:00Z',tram:true,n:'Stogi'}];
+async function histStops(BX){const out=[];const [s0,w0,n0,e0]=String(BX).split(',').map(Number);
+ for(const h of HIST_STOPS){if(h.city!==cityKey())continue;const [s1,w1,n1,e1]=h.box;if(s1>n0||n1<s0||w1>e0||e1<w0)continue;
+  const B=[Math.max(s0,s1),Math.max(w0,w1),Math.min(n0,n1),Math.min(e0,e1)].join(',');
+  try{const j=await ov(stopQuery(B).replace('[out:json]','[out:json][date:"'+h.date+'"]'));
+   (j.elements||[]).forEach(e=>{const t=e.tags||{};if(h.tram&&!(t.tram==='yes'||t.railway==='tram_stop'))return;out.push(e)});dbg(`Przystanki sprzed ${h.date.slice(0,10)} (${h.n}): ${out.length} elementów`)}
+  catch(x){dbg(`Przystanki sprzed ${h.date.slice(0,10)} (${h.n}): ${x.message}`)}}
+ return out}
 const stopClass=e=>{const t=e.tags||{};if(t.public_transport==='stop_position')return 3;
  return e.type==='node'&&(t.highway==='bus_stop'||t.railway==='tram_stop'||(/^(station|halt)$/.test(t.railway||'')&&t.station!=='subway'))?1:2};
 function stopFromOsm(e,c){
@@ -503,6 +513,7 @@ async function loadStops(o){
  const auto=!!(o&&o.auto===true),strip=!!(o&&o.strip),quiet=!!(o&&o.quiet),BX=(o&&o.bbox)||bb();if(auto&&!strip)STOPMSG='';
  if(!quiet)say(auto?'Pobieranie przystanków z OSM dla nowego obszaru…':'Pobieranie przystanków z OSM…');
  try{const j=await ov(stopQuery(BX));
+  {const H=await histStops(BX);if(H.length){const ids=new Set((j.elements||[]).map(e=>e.type+e.id));j.elements=(j.elements||[]).concat(H.filter(e=>!ids.has(e.type+e.id)))}}
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
   const md=x=>x.rail?'r':x.tram?'t':'a',pn=(name,st)=>(st&&st.num)||((String(name||'').match(NUMRE)||[])[2])||'',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):'',p:pn(name,st)})};
   // ten sam przystanek opisany drugi raz (peron / pozycja zatrzymania): tylko w obrębie tego samego rodzaju – peron tramwajowy obok
@@ -2901,7 +2912,8 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
   if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
-function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
+function bootData(){setTimeout(()=>ziNums(),1800);if(S.stops.length&&S.stFix3&&!S.stHist1&&cityKey()==='gdansk')setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,bbox:HIST_STOPS[0].box.join(',')})}catch(e){}S.stHist1=1;save()},5000);   // (raz: przystanki tramwajowe na Stogach w istniejących projektach)
+ if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
 if(BOOTWAIT){ // projekt zapisany w IndexedDB (był za duży na localStorage) – wczytujemy go przed zapisami i pobieraniem danych z OSM
