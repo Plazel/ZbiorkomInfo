@@ -63,9 +63,16 @@ def prague_page(url, text):
     h = get(url)
     row = lambda k: (lambda m: plain(m.group(1)).replace('\n', ' ').strip() if m else '')(re.search(r'(?is)<th[^>]*>\s*%s\s*</th>\s*<td[^>]*>(.*?)</td>' % k, h))
     kind, why = row('Druh události'), row('Důvod')
-    m = re.search(r'(?is)<h2>\s*Popis události\s*</h2>(.*?)(?:<p>\s*Více informací|<div class="block-side|</article>|<footer)', h)
+    m = re.search(r'(?is)<h2>\s*Popis události\s*</h2>(.*?)(?:<p>\s*Více informací|<div class="block-side|<aside|<nav|</article>|<footer|<h2)', h)
     desc = plain(m.group(1)) if m else ''
-    desc = '\n'.join(x for x in desc.split('\n') if x.strip() and x.strip() not in ('/',) and 'přímo do vašeho e' not in x and not re.match(r'^\*?\*?Více informací', x))
+    # (the description ends where the page's own side panel begins: "Informace", the tabs "Vše / Mimořádnosti / …", the list of other changes)
+    D = []
+    for x in desc.split('\n'):
+        t = x.strip()
+        if t in ('Informace', 'Aktuálně', 'Související') or re.match(r'^\[(Vše|Mimořádnosti|Výluky|Trvalé změny|Připravované změny)\]\(', t): break
+        D.append(x)
+    desc = '\n'.join(x for x in D if x.strip() and x.strip() not in ('/',) and 'přímo do vašeho e' not in x and not re.match(r'^\*?\*?Více informací', x))
+    desc = re.sub(r'\]\((https?://[^)]+)\)\[/\]\(\1\)', '/](\\1)', desc)   # ("mapa.pid.cz" and "/" linked apart: one link)
     head = '\n'.join(x for x in ('**Druh události:** ' + kind if kind else '', '**Důvod:** ' + why if why else '') if x)
     body = desc if desc and desc not in text else text
     return '\n'.join(x for x in (head, body if body != text or not desc else text) if x).strip()[:3000] or text

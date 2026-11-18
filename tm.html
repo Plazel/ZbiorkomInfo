@@ -460,7 +460,7 @@ const LOG=[];const dbg=m=>{LOG.push(new Date().toLocaleTimeString()+' '+m);if(LO
 dbg('start: '+location.protocol+' | '+navigator.userAgent.slice(0,70));
 const map=L.map('map',{preferCanvas:true,renderer:L.canvas({padding:.25}),zoomControl:false,maxZoom:20})   // (the lines drawn a quarter of a screen beyond the view: fewer empty edges while dragging, the redraw still quick)
 .setView([54.352,18.6466],13);
-L.control.zoom({position:'bottomright',zoomInTitle:'Przybliż',zoomOutTitle:'Oddal'}).addTo(map);
+// (bez przycisków przybliżania i oddalania – kółko myszy, gesty)
 // (kafelki do poziomu 18 – dalej powiększane: na poziomach 19–20 podkłady często nie mają kafelków albo ich odmawiają, a mapa robiła się szara)
 const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
 const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© OpenStreetMap contributors'});
