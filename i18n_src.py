@@ -871,6 +871,7 @@ ROWS = [
     ('Funkcja niedostępna w NetworkMaker', 'Not available in NetworkMaker', 'In NetworkMaker nicht verfügbar', 'V NetworkMakeri nedostupné', 'V NetworkMakeru nedostupné'),
 ("Kurs odwołany", "Trip cancelled", "Fahrt fällt aus", "Spoj zrušený", "Spoj zrušen"),
 ("Linia kursuje na trasie objazdowej i pomija ten przystanek", "The line runs on a detour and skips this stop", "Die Linie fährt eine Umleitung und lässt diese Haltestelle aus", "Linka ide po obchádzkovej trase a túto zastávku vynecháva", "Linka jede po objízdné trase a tuto zastávku vynechává"),
+("Funkcja aktualności nie jest obsługiwana w Warszawie", "The news feature is not available in Warsaw", "Die Nachrichtenfunktion ist in Warschau nicht verfügbar", "Funkcia aktualít nie je vo Varšave podporovaná", "Funkce aktualit není ve Varšavě podporována"),
 ]
 
 WEEKDAYS = {
