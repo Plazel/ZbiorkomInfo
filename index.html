@@ -1828,7 +1828,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795038311;
+const APP_BUILD=1795079553;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3196,7 +3196,9 @@ async function loadBase(){
 // its corners fall on, which inside a tile matches to well under a pixel.
 // CARTO's tiles need a (free) API key: CARTO_KEY. Without one the standard OpenStreetMap tiles are used (toned down a little).
 const CARTO_KEY='cb1_4vdw_1_23a15f607749c4261b38e021';
-const TILE_URL=(st,z,x,y)=>CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/${st}/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png?key=${CARTO_KEY}`
+// klucz CARTO jest przypisany do domeny plazel.github.io – na innych adresach (podgląd, localhost) serwer odrzuca kafelki z kluczem (403), więc tam bez klucza
+const CARTO_Q=/(^|\.)plazel\.github\.io$/.test(location.hostname)?'?key='+CARTO_KEY:'';
+const TILE_URL=(st,z,x,y)=>CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/${st}/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png${CARTO_Q}`
   :`https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
 const TILES={c:new Map(),ok:0,bad:0};
 const PJC=Math.cos(54.45*Math.PI/180)*1000;
@@ -7287,7 +7289,7 @@ function mkTap(q){const R=MK.run;if(!R)return;const last=R.ps.length-1,k=R.p>>1,
 // (the line's shape in the data, else straight between the stops), the part behind grey, the next stop marked and how far it is
 const MKM={tiles:new Map(),z:16,ang:null,st:null,raf:0};
 function mkTile(z,x,y,cb,lt){const st=(lt!=null?lt:mkLight())?'rastertiles/voyager':'dark_all',k=st+'/'+z+'/'+x+'/'+y;let t=MKM.tiles.get(k);if(t)return t;const img=new Image();img.crossOrigin='anonymous';t={img,ok:false};MKM.tiles.set(k,t);
-  img.onload=()=>{t.ok=true;cb()};img.onerror=()=>{};img.src=CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/${st}/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png?key=${CARTO_KEY}`:`https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
+  img.onload=()=>{t.ok=true;cb()};img.onerror=()=>{};img.src=CARTO_KEY?`https://${'abcd'[(x+y)%4]}.basemaps.cartocdn.com/${st}/${z}/${x}/${y}${(window.devicePixelRatio||1)>1?'@2x':''}.png${CARTO_Q}`:`https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
   if(MKM.tiles.size>400){const it=MKM.tiles.keys();for(let i=0;i<120;i++)MKM.tiles.delete(it.next().value)}return t}
 const mkWm=(la,lo,z)=>{const n=256*2**z,s=Math.sin(la*Math.PI/180);return [(lo+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]};
 const mkDistM=(a,b)=>{const R=6371000,r=Math.PI/180,dl=(b[0]-a[0])*r,dn=(b[1]-a[1])*r,x=Math.sin(dl/2)**2+Math.cos(a[0]*r)*Math.cos(b[0]*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))};

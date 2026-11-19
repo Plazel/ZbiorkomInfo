@@ -479,7 +479,9 @@ const osmde=L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png',{maxZoom
 const fromFile=location.protocol==='file:';
 // CARTO (Voyager; Dark Matter in the dark theme of ZbiorkomInfo) with ZbiorkomInfo's key, as the alternative to OSM
 const CARTO_KEY='cb1_4vdw_1_23a15f607749c4261b38e021';
-const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png?key=${CARTO_KEY}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
+// klucz CARTO jest przypisany do domeny plazel.github.io – na innych adresach (podgląd, localhost) serwer odrzuca kafelki z kluczem (403), więc tam bez klucza
+const CARTO_Q=/(^|\.)plazel\.github\.io$/.test(location.hostname)?'?key='+CARTO_KEY:'';
+const cartoMake=dk=>L.tileLayer(`https://{s}.basemaps.cartocdn.com/${dk?'dark_all':'rastertiles/voyager'}/{z}/{x}/{y}{r}.png${CARTO_Q}`,{subdomains:'abcd',maxZoom:20,maxNativeZoom:18,keepBuffer:4,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'});
 const BASES={osm,osmde,carto:cartoMake(false)};let curBase=null,cartoDk=false;
 function setBase(k){
  if(k==='maptiler')k='carto';
@@ -2627,16 +2629,40 @@ function buildSchema(spread=1){
     best[i][k]=b+c.d;from[i][k]=f});
    let k=0;best[m-1].forEach((v,i)=>{if(v<best[m-1][k])k=i});const pos=new Array(m);
    for(let i=m-1;i>=0;i--){pos[i]=C[i][k].p;k=from[i][k]}return pos};
- const nodes=new Map(),seqs=[];
+ const nodes=new Map(),seqs=[],OWN=lines.map(()=>new Map());
+ // położenie przystanku TEJ linii w zespole (jej perony), a nie środek całego zespołu – środek zespołu z kilkoma peronami potrafi leżeć za skrzyżowaniem i psuł kolejność węzłów na trasie
+ const sLL=(li,k)=>{const o=OWN[li].get(k);return o?[o[0]/o[2],o[1]/o[2]]:nodes.get(k).ll};
  const getN=u=>{let n=nodes.get(u.key);if(!n){n={key:u.key,name:u.members[0].name.replace(NUMRE,'$1'),ll:u.ll,ls:new Set(),pl:new Set(),tl:new Set(),tm:new Set(),nb:new Set(),term:false,pts:[]};nodes.set(u.key,n)}return n};
  lines.forEach((l,li)=>{const seq=[];
-  l.stops.forEach(id=>{const u=UOF.get(id);if(!u)return;if(!seq.length||seq[seq.length-1]!==u.key){seq.push(u.key);getN(u).ls.add(gid0[li])}});
+  l.stops.forEach(id=>{const u=UOF.get(id);if(!u)return;{const st=stopOf(id);if(st){let o=OWN[li].get(u.key);if(!o)OWN[li].set(u.key,o=[0,0,0]);o[0]+=st.ll[0];o[1]+=st.ll[1];o[2]++}}if(!seq.length||seq[seq.length-1]!==u.key){seq.push(u.key);getN(u).ls.add(gid0[li])}});
   seqs.push(seq.length>1?seq:null);
   if(seq.length>1){let tk=[...new Set(termIds(l).map(id=>(UOF.get(id)||{}).key).filter(k=>k&&seq.includes(k)))];if(!tk.length)tk=[seq[0],seq[seq.length-1]];tk.forEach(k=>{nodes.get(k).term=true;nodes.get(k).tl.add(gid0[li]);if(isMain(li))nodes.get(k).tm.add(gid0[li])})}});
  const realK=seqs.map(q=>q?new Set(q):null); // przystanki, na których linia faktycznie się zatrzymuje
  const LPATH=lines.map(l=>{const p=[];(l.segs||[]).forEach(sg=>(sg.pts||[]).forEach(q=>p.push(q)));return p}),SRV=new Map();
  realK.forEach((K,li)=>K&&K.forEach(k=>{let a=SRV.get(k);if(!a)SRV.set(k,a=[]);a.push(li)}));
  const dPath=(q,P)=>{let d=1e18;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],ax=(a[1]-q[1])*65000,ay=(a[0]-q[0])*111000,dx=(b[1]-a[1])*65000,dy=(b[0]-a[0])*111000,L2=dx*dx+dy*dy;let t=L2?-(ax*dx+ay*dy)/L2:0;t=Math.max(0,Math.min(1,t));const v=Math.hypot(ax+dx*t,ay+dy*t);if(v<d)d=v}return d};
+ // węzły-skrzyżowania (bez przystanku): miejsca, w których linie jadące razem rozjeżdżają się poza przystankiem (np. Havla / Nowa Warszawska –
+ // jedna para linii skręca, druga jedzie prosto). Bez takiego węzła każdy odcinek przystanek–przystanek był prostowany osobno i skrzyżowanie
+ // zamieniało się w trójkąt; z nim linie dochodzą do jednego punktu i przylegają do siebie jak na skrzyżowaniu
+ {const la0=[...nodes.values()].reduce((t,n)=>t+n.ll[0],0)/Math.max(1,nodes.size),KX=Math.cos(la0*Math.PI/180)*111320,KY=110574,ST=10,GC=15;
+  const SP=lines.map((l,li)=>{const p=LPATH[li];if(!seqs[li]||p.length<2)return null;const o=[];
+   for(let i=1;i<p.length;i++){const ax=p[i-1][1]*KX,ay=p[i-1][0]*KY,bx=p[i][1]*KX,by=p[i][0]*KY,d=Math.hypot(bx-ax,by-ay),n=Math.max(1,Math.ceil(d/ST));for(let k=i===1?0:1;k<=n;k++)o.push([ax+(bx-ax)*k/n,ay+(by-ay)*k/n])}
+   const T=o.map((q,k)=>{const a=o[Math.max(0,k-2)],b=o[Math.min(o.length-1,k+2)],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;return[dx/L,dy/L]});return{o,T}});
+  const G=new Map();SP.forEach((P,li)=>P&&P.o.forEach((q,k)=>{const c=Math.floor(q[0]/GC)*1000003+Math.floor(q[1]/GC);let a=G.get(c);if(!a)G.set(c,a=[]);a.push(li,k)}));
+  const NP=[...nodes.values()].map(n=>[n.ll[1]*KX,n.ll[0]*KY]),nearSt=q=>NP.some(v=>Math.hypot(v[0]-q[0],v[1]-q[1])<18); // (skrzyżowanie tuż przy przystanku – np. 30–50 m – zostaje osobnym węzłem: linie rozjeżdżają się przed przystankiem)
+  const pts=[];
+  SP.forEach((P,li)=>{if(!P)return;const g=gid0[li],sh=new Map();
+   P.o.forEach((q,k)=>{const cx=Math.floor(q[0]/GC),cy=Math.floor(q[1]/GC),seen=new Set();
+    for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const a=G.get((cx+i)*1000003+cy+j);if(!a)continue;for(let z=0;z<a.length;z+=2){const lj=a[z];const gj=gid0[lj];if(gj===g||seen.has(gj))continue;const Q=SP[lj],r=Q.o[a[z+1]];
+     if(Math.hypot(r[0]-q[0],r[1]-q[1])<9&&Math.abs(Q.T[a[z+1]][0]*P.T[k][0]+Q.T[a[z+1]][1]*P.T[k][1])>.85){seen.add(gj);let b=sh.get(gj);if(!b)sh.set(gj,b=new Uint8Array(P.o.length));b[k]=1}}}});
+   sh.forEach((b,gj)=>{const n=b.length;let k=0;const runs=[];while(k<n){let e=k;while(e+1<n&&b[e+1]===b[k])e++;runs.push([b[k],k,e]);k=e+1}
+    for(let r=1;r<runs.length;r++){const A=runs[r-1],B=runs[r];if(A[2]-A[1]<6||B[2]-B[1]<6)continue;const kk=A[0]?A[2]:B[1],q=P.o[kk];if(kk<4||kk>n-5||nearSt(q))continue;pts.push({x:q[0],y:q[1],pr:Math.min(g,gj)+'|'+Math.max(g,gj)})}})});
+  const cl=[];pts.forEach(p=>{let c=cl.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<40);if(!c)cl.push(c={x:p.x,y:p.y,n:0,sx:0,sy:0,pr:new Set()});c.sx+=p.x;c.sy+=p.y;c.n++;c.x=c.sx/c.n;c.y=c.sy/c.n;c.pr.add(p.pr)});
+  const NV=[...nodes.values()];
+  cl.forEach((c,i)=>{if(nearSt([c.x,c.y]))return;
+   // wszystkie linie rozjeżdżające się w tym miejscu zatrzymują się na pobliskim przystanku (do 80 m) – rozwidlenie pokazuje sam przystanek, osobny węzeł tylko by go dublował
+   const gs=new Set();c.pr.forEach(x=>x.split('|').forEach(g=>gs.add(+g)));
+   if(NV.some(n=>Math.hypot(n.ll[1]*KX-c.x,n.ll[0]*KY-c.y)<80&&[...gs].every(g=>n.ls.has(g))))return;const key='\u0001J'+i;nodes.set(key,{key,name:'',virt:true,ll:[c.y/KY,c.x/KX],ls:new Set(),pl:new Set(),tl:new Set(),tm:new Set(),nb:new Set(),term:false,pts:[]})})}
  // przystanki, które linia mija bez zatrzymania (wg rzeczywistej geometrii trasy) – tylko dla spójnej topologii/pasów, bez ich obsługiwania
  const NL=[...nodes.values()];
  // siatka węzłów (komórka ok. 120 m): dla każdej linii sprawdzamy tylko węzły leżące w pobliżu jej przebiegu, a nie wszystkie węzły sieci (wynik ten sam – dalsze węzły i tak odpadały na progu odległości)
@@ -2649,25 +2675,28 @@ function buildSchema(spread=1){
  lines.forEach((l,li)=>{const seq=seqs[li];if(!seq)return;
   const path=[];(l.segs||[]).forEach(sg=>(sg.pts||[]).forEach(p=>path.push(p)));if(path.length<2)return;
   const r0=path[0],kx=Math.cos(r0[0]*Math.PI/180)*111320,m=p=>[(p[1]-r0[1])*kx,(p[0]-r0[0])*110574],M=path.map(m);
-  const PP=prep(M),pos=alignSeq(PP,seq.map(k=>m(nodes.get(k).ll)));
+  const PP=prep(M),pos=alignSeq(PP,seq.map(k=>m(sLL(li,k))));
   const inSeq=new Set(seq),ins=[];
   for(const n of nearNodes(path)){if(inSeq.has(n.key))continue;const q=m(n.ll);let bc=null;
-   for(const c of cands(PP,q,4)){if(c.d>(UI.dt?75:40))continue;let k=-1;for(let i=0;i<seq.length-1;i++)if(pos[i]<=c.p&&c.p<=pos[i+1]){k=i;break}
+   for(const c of cands(PP,q,4)){if(c.d>(n.virt?25:(UI.dt?75:40)))continue;let k=-1;for(let i=0;i<seq.length-1;i++)if(pos[i]<=c.p&&c.p<=pos[i+1]){k=i;break}
     if(k>=0&&(!bc||c.d<bc.d))bc={k,p:c.p,d:c.d}}
    if(bc){ // węzeł leżący praktycznie w tym samym miejscu co przystanek tej linii (< 45 m wzdłuż trasy) – wstawienie dałoby zygzak, więc pomijamy
     const sOf=x=>{const j=Math.min(Math.floor(x),PP.n-2);return PP.cum[j]+(x-j)*(PP.cum[j+1]-PP.cum[j])},sb=sOf(bc.p);
-    if(pos.some(x=>Math.abs(sOf(x)-sb)<45))continue;
+    if(pos.some(x=>Math.abs(sOf(x)-sb)<(n.virt?12:45)))continue;
     // mijany przystanek wstawiamy tylko wtedy, gdy linia przejeżdża przez niego RAZEM z linią, która się na nim zatrzymuje (wspólny przebieg ok. 60 m przed i za nim).
     // Linia, która dopiero w tym miejscu dołącza do innych albo od nich odbija (skrzyżowanie przy przystanku), nie jest przez niego prowadzona – inaczej schemat
     // pokazywał ją tak, jakby się tam zatrzymywała
     const atS=sv=>{let j=0;while(j<PP.n-2&&PP.cum[j+1]<sv)j++;const L=PP.cum[j+1]-PP.cum[j],t=L?Math.max(0,Math.min(1,(sv-PP.cum[j])/L)):0;return[path[j][0]+(path[j+1][0]-path[j][0])*t,path[j][1]+(path[j+1][1]-path[j][1])*t]};
     const qb=atS(Math.max(0,sb-60)),qa=atS(Math.min(PP.cum[PP.n-1],sb+60));
-    if(!(SRV.get(n.key)||[]).some(lj=>lj!==li&&LPATH[lj].length>1&&dPath(qb,LPATH[lj])<25&&dPath(qa,LPATH[lj])<25))continue;
+    if(!n.virt&&!(SRV.get(n.key)||[]).some(lj=>lj!==li&&LPATH[lj].length>1&&dPath(qb,LPATH[lj])<25&&dPath(qa,LPATH[lj])<25))continue;
     ins.push({k:bc.k,p:bc.p,key:n.key})}}
   if(!ins.length)return;
   ins.sort((a,b)=>a.p-b.p);const out=[];
   seq.forEach((key,i)=>{out.push(key);ins.filter(x=>x.k===i).forEach(x=>{out.push(x.key);nodes.get(x.key).pl.add(gid0[li])})});
   seqs[li]=out});
+ // węzeł-skrzyżowanie, przez który ostatecznie przechodzi mniej niż dwie linie, jest zbędny
+ {const use=new Map();seqs.forEach((q,li)=>q&&new Set(q).forEach(k=>{if(nodes.get(k).virt)use.set(k,(use.get(k)||new Set()).add(gid0[li]))}));
+  nodes.forEach((n,k)=>{if(n.virt&&!((use.get(k)||{size:0}).size>=2)){nodes.delete(k);seqs.forEach((q,li)=>{if(q&&q.includes(k))seqs[li]=q.filter(x=>x!==k)})}})}
  // pętle: ostatni przystanek łączy się z najbliższym wcześniejszym przystankiem przy miejscu domknięcia
  lines.forEach((l,li)=>{const seq=seqs[li];if(!seq||!l.loop||!l.segs.length)return;
   const sg=l.segs[l.segs.length-1],q=sg.pts[sg.pts.length-1],last=seq[seq.length-1];let bk=null,bd=250;
@@ -2681,7 +2710,7 @@ function buildSchema(spread=1){
   const path=[];(l.segs||[]).forEach(sg=>(sg.pts||[]).forEach(p=>path.push(p)));if(path.length<2)return;
   const r0=path[0],kx0=Math.cos(r0[0]*Math.PI/180)*111320,m=p=>[(p[1]-r0[1])*kx0,(p[0]-r0[0])*110574],M=path.map(m);
   const at=f=>{const j=Math.min(Math.floor(f),path.length-2),t=f-j;return[path[j][0]+(path[j+1][0]-path[j][0])*t,path[j][1]+(path[j+1][1]-path[j][1])*t]};
-  const pos=alignSeq(prep(M),seq.map(k=>m(nodes.get(k).ll)));
+  const pos=alignSeq(prep(M),seq.map(k=>m(sLL(li,k))));
   // ten sam (scalony) węzeł odwiedzony w dwóch odległych miejscach trasy (> 100 m, np. dwa perony po obu stronach pętli): odcinki dochodzące do tych odwiedzin
   // kończą się w rzeczywistym miejscu postoju, a nie w środku węzła – inaczej linia musiałaby dojechać do środka i zawrócić
   const aS=new Set();{const vv=new Map();seq.forEach((k,i)=>{let a=vv.get(k);if(!a)vv.set(k,a=[]);a.push(i)});
@@ -3006,7 +3035,7 @@ function buildSchema(spread=1){
  const f2=v=>Math.round(v*10)/10;
  const dstr=P=>{let d='',px=null,py=null;P.forEach((q,i)=>{if(px!==null&&Math.abs(q.x-px)<.05&&Math.abs(q.y-py)<.05)return;d+=(d?'L':'M')+f2(q.x)+' '+f2(q.y);px=q.x;py=q.y});return d};
  // prostokąty przystanków
- N.forEach(n=>{if(!n.pts.length)n.pts.push({x:n.x,y:n.y});const xs=n.pts.map(p=>p.x),ys=n.pts.map(p=>p.y),pad=(n.mw||8)/2+1.5;n.r={x0:Math.min(...xs)-pad,y0:Math.min(...ys)-pad,x1:Math.max(...xs)+pad,y1:Math.max(...ys)+pad};n.major=n.term||n.nb.size>=3||n.ls.size>=3});
+ N.forEach(n=>{if(n.virt){n.r={x0:n.x,y0:n.y,x1:n.x,y1:n.y};n.major=false;return}if(!n.pts.length)n.pts.push({x:n.x,y:n.y});const xs=n.pts.map(p=>p.x),ys=n.pts.map(p=>p.y),pad=(n.mw||8)/2+1.5;n.r={x0:Math.min(...xs)-pad,y0:Math.min(...ys)-pad,x1:Math.max(...xs)+pad,y1:Math.max(...ys)+pad};n.major=n.term||n.nb.size>=3||n.ls.size>=3});
  // siatka kolizji
  const hash=new Map(),cell=30,addPt=(x,y,r)=>{const k=Math.floor(x/cell)+','+Math.floor(y/cell);let a=hash.get(k);if(!a)hash.set(k,a=[]);a.push([x,y,r])};
  lpath.forEach((P,li)=>{if(!P)return;const rr=SWd(li)/2+1;for(let k=0;k<P.length-1;k++){const p=P[k],q=P[k+1],l=Math.hypot(q.x-p.x,q.y-p.y),m=Math.max(1,Math.ceil(l/4));for(let s=0;s<=m;s++)addPt(p.x+(q.x-p.x)*s/m,p.y+(q.y-p.y)*s/m,rr)}});
@@ -3016,10 +3045,10 @@ function buildSchema(spread=1){
  const placed=[],labs=[];let conf=0;
  // siatka prostokątów (prostokąty przystanków i już rozmieszczonych etykiet) – kolizje sprawdzamy tylko w sąsiedztwie, nie ze wszystkimi
  const RC=60,RG=new Map(),RI=[],rgAdd=(r,node)=>{const id=RI.length;RI.push({r,node});for(let cx=Math.floor(r.x0/RC);cx<=Math.floor(r.x1/RC);cx++)for(let cy=Math.floor(r.y0/RC);cy<=Math.floor(r.y1/RC);cy++){const k=cx+','+cy;let a=RG.get(k);if(!a)RG.set(k,a=[]);a.push(id)}};
- N.forEach(m=>rgAdd(m.r,m));
+ N.forEach(m=>{if(!m.virt)rgAdd(m.r,m)});
  const rgHits=(b,n)=>{let c=0;const seen=new Set();for(let cx=Math.floor((b.x0-2)/RC);cx<=Math.floor((b.x1+2)/RC);cx++)for(let cy=Math.floor((b.y0-2)/RC);cy<=Math.floor((b.y1+2)/RC);cy++){const a=RG.get(cx+','+cy);if(!a)continue;
    for(const id of a){if(seen.has(id))continue;seen.add(id);const it=RI[id];if(it.node===n)continue;if(inter(b,it.r,2))c++}}return c};
- const order=[...N].sort((a,b)=>(b.major-a.major)||(b.ls.size-a.ls.size));
+ const order=N.filter(n=>!n.virt).sort((a,b)=>(b.major-a.major)||(b.ls.size-a.ls.size));
  order.forEach(n=>{const fs=n.term?18:15,lh=fs*1.2,tl=wrap(n.term?n.name.toUpperCase():n.name),tw=Math.max(...tl.map(t=>t.length))*fs*(n.term?.66:.54),nb=n.tl.size,bw=nb*29,w=Math.max(tw,bw),h=tl.length*lh+(nb?29:0);
   const r=n.r,cx=(r.x0+r.x1)/2,cy=(r.y0+r.y1)/2,C=[
    {a:'start',x0:r.x1+7,y0:cy-h/2},{a:'end',x0:r.x0-7-w,y0:cy-h/2},{a:'middle',x0:cx-w/2,y0:r.y0-5-h},{a:'middle',x0:cx-w/2,y0:r.y1+5},
@@ -3061,7 +3090,7 @@ function buildSchema(spread=1){
  lines.forEach((l,li)=>{if(!lpath[li])return;const d=dstr(lpath[li]),sw=SWd(li);
   o+=`<g class="ln" data-l="${lines[gid0[li]].id}" data-i="${li}"><title>Linia ${esc(l.num)}: ${esc(routeText(l))}</title><path class="cs" d="${d}" fill="none" style="stroke:var(--bg)" stroke-width="${f2(sw+2.6)}" stroke-linejoin="round" stroke-linecap="round"/><path class="lc" d="${d}" fill="none" stroke="${l.color}" stroke-width="${f2(sw)}" stroke-linejoin="round" stroke-linecap="round"/><path class="hit" d="${d}" fill="none" stroke-width="${f2(Math.max(14,sw+6))}" stroke-linejoin="round" stroke-linecap="round" style="cursor:pointer;stroke:none;pointer-events:stroke"/></g>`});
  o+='</g><g id="stops">';
- N.forEach(n=>{const r=n.r,w=r.x1-r.x0,h=r.y1-r.y0;o+=`<g class="sp" data-ls="${[...n.ls,...n.pl].map(i=>lines[i].id).join(' ')}"><title>${esc(n.name)}</title><rect x="${f2(r.x0)}" y="${f2(r.y0)}" width="${f2(w)}" height="${f2(h)}" rx="${f2(Math.min(w,h)/2)}" style="fill:var(--bg);stroke:var(--ink)" stroke-width="2"/></g>`});
+ N.forEach(n=>{if(n.virt)return;const r=n.r,w=r.x1-r.x0,h=r.y1-r.y0;o+=`<g class="sp" data-ls="${[...n.ls,...n.pl].map(i=>lines[i].id).join(' ')}"><title>${esc(n.name)}</title><rect x="${f2(r.x0)}" y="${f2(r.y0)}" width="${f2(w)}" height="${f2(h)}" rx="${f2(Math.min(w,h)/2)}" style="fill:var(--bg);stroke:var(--ink)" stroke-width="2"/></g>`});
  o+='</g><g id="labels">';
  labs.forEach(({n,fs,lh,tl,nb,best,w})=>{const b=best.b,x=best.a==='start'?b.x0:best.a==='end'?b.x1:(b.x0+b.x1)/2;
   o+=`<g class="lb" data-ls="${[...n.ls].map(i=>lines[i].id).join(' ')}"><text x="${f2(x)}" y="${f2(b.y0+fs)}" text-anchor="${best.a}" font-size="${fs}" font-weight="${n.term?700:400}" style="fill:var(--ink);paint-order:stroke;stroke:var(--bg);stroke-width:3.5px;stroke-linejoin:round">`+tl.map((t,i)=>`<tspan x="${f2(x)}" dy="${i?lh:0}">${esc(t)}</tspan>`).join('')+'</text>';
