@@ -680,7 +680,7 @@ header.top .themebar{max-width:none;margin:0 0 0 auto;padding:0;flex-wrap:nowrap
 .cityMenu,.langMenu{max-height:calc(100vh - var(--top-h) - 20px);max-height:calc(100dvh - var(--top-h) - 20px);overflow-y:auto;overscroll-behavior:contain}
 @media (max-width:760px){.cityMenu,.langMenu{max-height:calc(100vh - var(--top-h) - 80px - env(safe-area-inset-bottom,0px));max-height:calc(100dvh - var(--top-h) - 80px - env(safe-area-inset-bottom,0px))}}
 .cmg{display:flex;flex-direction:column;padding:4px 0}
-.cmg+.cmg{border-top:1px solid var(--line)}
+.cmg:not([hidden])~.cmg:not([hidden]){border-top:1px solid var(--line)}
 .cmg span{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 10px 2px}
 .cmg button,.cmg a[data-city]{border:0;background:none;color:var(--fg);text-align:left;font:inherit;font-size:.95rem;padding:7px 10px;border-radius:6px;cursor:pointer}.cmg a[data-city]{display:block;text-decoration:none}.cmg a[data-city][hidden]{display:none}
 .cmg button:hover,.cmg a[data-city]:hover{background:var(--panel)}
@@ -1495,15 +1495,14 @@ html.tmFsOn nav.rail{display:none!important}html.tmFsOn .toolsDr{left:0!importan
 
 <header class="top"><button type="button" class="plus gdBackTop" id="gdBackTop" hidden title="Wstecz" aria-label="Wstecz"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><a class="logo" href="#" aria-label="ZbiorkomInfo – strona główna"><span>Zbiorkom<i>Info</i></span></a><div class="cityPick"><button type="button" id="cityBtn" aria-haspopup="true" aria-expanded="false" aria-controls="cityMenu"><svg class="cityIco" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 21h18M5 21V10l5-3v14M10 21V4l9 4v13M13 9h3M13 12.5h3M13 16h3M7 13h1M7 16h1"/></svg><span id="cityName"></span><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
  <div class="cityMenu" id="cityMenu" hidden role="menu" aria-label="Wybierz miasto">
-  <div class="cmg cmNm" hidden><span>NetworkMaker</span><a role="menuitem" data-city="nm" href="?miasto=nm">NetworkMaker</a></div>
-  <div class="cmg"><span>Pomorskie</span><div class="cmTri"><a role="menuitem" data-city="all" href="?miasto=all">Trójmiasto</a><button type="button" class="cmExp" id="cmExp" aria-expanded="false" aria-controls="cmSub" title="Pokaż miasta">▾</button></div><div class="cmSub" id="cmSub" hidden><a role="menuitem" data-city="gda" href="?miasto=gda">Gdańsk</a><a role="menuitem" data-city="sop" href="?miasto=sop">Sopot</a><a role="menuitem" data-city="gdy" href="?miasto=gdy">Gdynia</a><a role="menuitem" data-city="wej" href="?miasto=wej">Wejherowo</a></div></div>
-  <div class="cmg"><span>Kujawsko-pomorskie</span><a role="menuitem" data-city="byd" href="?miasto=byd">Bydgoszcz</a></div>
+  <div class="cmg" data-reg="pom"><span>Pomorskie</span><div class="cmTri"><a role="menuitem" data-city="all" href="?miasto=all">Trójmiasto</a><button type="button" class="cmExp" id="cmExp" aria-expanded="false" aria-controls="cmSub" title="Pokaż miasta">▾</button></div><div class="cmSub" id="cmSub" hidden><a role="menuitem" data-city="gda" href="?miasto=gda">Gdańsk</a><a role="menuitem" data-city="sop" href="?miasto=sop">Sopot</a><a role="menuitem" data-city="gdy" href="?miasto=gdy">Gdynia</a><a role="menuitem" data-city="wej" href="?miasto=wej">Wejherowo</a></div><a role="menuitem" data-city="nm" id="cmNmA" href="?miasto=nm" hidden>NetworkMaker</a></div>
+  <div class="cmg" data-reg="kp"><span>Kujawsko-pomorskie</span><a role="menuitem" data-city="byd" href="?miasto=byd">Bydgoszcz</a></div>
   <div class="cmg"><span>Wielkopolskie</span><a role="menuitem" data-city="poz" href="?miasto=poz">Poznań</a></div>
   <div class="cmg"><span>Łódzkie</span><a role="menuitem" data-city="ldz" href="?miasto=ldz">Łódź</a></div>
   <div class="cmg"><span>Dolnośląskie</span><a role="menuitem" data-city="wro" href="?miasto=wro">Wrocław</a></div>
   <div class="cmg"><span>Lubelskie</span><a role="menuitem" data-city="lub" href="?miasto=lub">Lublin</a></div>
   <div class="cmg"><span>Mazowieckie</span><a role="menuitem" data-city="waw" href="?miasto=waw">Warszawa</a></div>
-  <div class="cmg"><span>Małopolskie</span><a role="menuitem" data-city="krk" href="?miasto=krk">Kraków</a><a role="menuitem" data-city="ns" href="?miasto=ns">Nowy Sącz</a><a role="menuitem" data-city="km" href="?miasto=km">Krynica-Zdrój i Muszyna</a></div>
+  <div class="cmg" data-reg="mp"><span>Małopolskie</span><a role="menuitem" data-city="krk" href="?miasto=krk">Kraków</a><a role="menuitem" data-city="ns" href="?miasto=ns">Nowy Sącz</a><a role="menuitem" data-city="km" href="?miasto=km">Krynica-Zdrój i Muszyna</a></div>
   <div class="cmg"><span>Śląskie</span><a role="menuitem" data-city="gzm" href="?miasto=gzm">Metropolia GZM</a></div>
   <div class="cmg"><span>Czechy</span><a role="menuitem" data-city="prg" href="?miasto=prg">Praga</a></div>
   <div class="cmg"><span>Słowacja</span><a role="menuitem" data-city="bts" href="?miasto=bts">Bratysława</a></div>
@@ -1837,7 +1836,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795359165;
+const APP_BUILD=1795359445;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7702,7 +7701,9 @@ function nmMapOf(R){if(!MAP.data)return;const sn={};R.dirs.forEach(d=>d.stops.fo
   MAP.data.routes[R.id]={lt:[],g:R.dirs.map(d=>(d.shape||d.stops.map(s=>{const S=IDX.stops[s[0]];return [S[2],S[3]]})).map(q=>proj(q[0],q[1]))),v:[],d:R.dirs.map(d=>d.stops.map(s=>s[0])),ve:[],vs:[],sn,vr:[]}}
 // the account or its mode changed, or the network in NetworkMaker: the city shown or hidden, its lines drawn anew
 function nmSync(){const on=nmOn(),N=nmRead();NM.data=N;const nmN=N&&N.cityName?N.cityName+' (NM)':'NetworkMaker';CITIES.nm=[nmN,'w sieci '+nmN];
-  document.querySelectorAll('.cmNm').forEach(g=>{g.hidden=!on||!N;const a=g.querySelector('[data-city=nm]');if(a)a.textContent=nmN});
+  // (miasto z NetworkMakera: w grupie swojego województwa, z dopiskiem (NM) – tylko gdy ma linie)
+  {const a=document.getElementById('cmNmA');if(a){const reg={gdansk:'pom',gdynia:'pom',sopot:'pom',trojmiasto:'pom',bydgoszcz:'kp',krynica:'mp'}[N&&N.city]||'pom',g=document.querySelector('#cityMenu .cmg[data-reg="'+reg+'"]');
+    if(g&&a.parentElement!==g)g.append(a);a.textContent=nmN;a.hidden=!(on&&N&&Array.isArray(N.lines)&&N.lines.length);if(g&&!a.hidden)g.hidden=false}}
   const sig=on+'|'+(N?N.t:0);if(sig!==NM.sig){NM.sig=sig;nmInject();if(city==='nm'){if(typeof markCity==='function')markCity();if(location.hash.startsWith('#l')||location.hash.startsWith('#t'))route()}}
   if(!on&&city==='nm'&&ACC.state!=='wait')setCity('gda')}
 const netSync=nmSync;
