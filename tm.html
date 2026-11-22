@@ -795,16 +795,16 @@ async function clickAt(ll){
  if(mode==='infra'){if(infraEditId||FH.swallow)return;draft.push(snapInfra(ll,$('#infraKind').value,null,draft.length===0));drawDraft();return}
  if(mode!=='draw')return;
  const l=selLine();if(!l){say('Najpierw dodaj i zaznacz linię.');return}l.hidden=false;l.auto=false;
- if(busy)return;const am=curAm(),mm=am==='auto'?'tramfirst':am;
+ if(busy){if(Date.now()-(window._busyT||0)<30000){say('Trwa wyznaczanie poprzedniego odcinka…');return}busy=false}const am=curAm(),mm=am==='auto'?'tramfirst':am;   // (zawieszone wyznaczanie – np. serwer tras nie odpowiada – nie blokuje rysowania na zawsze)
  if(l.segs.length&&l.wp.length!==l.segs.length+1)l.wp=[l.segs[0].pts[0],...l.segs.map(sg=>sg.pts[sg.pts.length-1])];
  if(!l.wp.length){let p=ll;const g=mm==='rail'?RG:(mm==='tram'||mm==='tramfirst')?G:null;
   if(g){let bn=null;for(const [n,d] of bestPerComp(ll,g).values())if(!bn||d<bn[1])bn=[n,d];
    if(bn&&bn[1]<(mm==='tramfirst'?40:120))p=g.pos.get(bn[0]);
    else if(mm==='tram'||mm==='rail'){say('W pobliżu nie ma '+(mm==='rail'?'torów kolejowych':'torów tramwajowych')+' – zmień rodzaj linii na liście „Trasa” albo kliknij bliżej toru.');return}}
   l.wp.push(p);redraw();return}
- busy=true;CLNOTE='';say('Wyznaczanie trasy…');
+ busy=true;window._busyT=Date.now();CLNOTE='';say('Wyznaczanie trasy…');
  try{const A={id:'m'+Date.now()+'a',name:'punkt',ll:l.wp[l.wp.length-1],tram:false},B={id:'m'+Date.now()+'b',name:'punkt',ll,tram:false};
-  const r=await segRoute(A,B,mm);
+  const r=await Promise.race([segRoute(A,B,mm),new Promise((_,rj)=>setTimeout(()=>rj(new Error('wyznaczanie trasy trwa zbyt długo – serwer tras lub dane torów/dróg nie odpowiadają (Diagnostyka na dole panelu)')),45000))]);
   if(r.bad&&mm!=='free'){say('Brak trasy po '+(mm==='rail'?'torach kolejowych':mm==='street'?'drogach':'torach tramwajowych')+' ('+r.err+') – w trybie przyciągania nie rysuję linii prostej. Kliknij bliżej '+(mm==='street'?'drogi':'toru')+' albo przełącz na rysowanie swobodne.');busy=false;return}
   l.segs.push({mode:r.mode,pts:r.pts});l.wp.push(r.pts[r.pts.length-1]);l.stops=routeStops(l);
   say((r.bad?'Brak trasy dla tego odcinka ('+r.err+') – narysowano linię prostą.':'Dodano odcinek ('+({tram:'torowisko',rail:'tory kolejowe',street:'ulice',free:'swobodnie'}[r.mode]||r.mode)+').')+(CLNOTE?' Uwaga: '+CLNOTE:''));CLNOTE=''}
