@@ -1829,7 +1829,8 @@ def rdp(pts, eps=0.05):
         i0, i1 = stack.pop(); a, b = pts[i0], pts[i1]; dx, dy = b[0] - a[0], b[1] - a[1]; n = math.hypot(dx, dy) or 1e-12
         dmax, idx = 0, None
         for i in range(i0 + 1, i1):
-            d = abs(dy * (pts[i][0] - a[0]) - dx * (pts[i][1] - a[1])) / n
+            # (pętla: oba końce w tym samym miejscu – odległość od punktu, nie od odcinka zerowej długości, który zjadał całą trasę)
+            d = abs(dy * (pts[i][0] - a[0]) - dx * (pts[i][1] - a[1])) / n if n > 1e-9 else math.hypot(pts[i][0] - a[0], pts[i][1] - a[1])
             if d > dmax: dmax, idx = d, i
         if idx is not None and dmax > eps: keep[idx] = True; stack += [(i0, idx), (idx, i1)]
     return [p for p, k in zip(pts, keep) if k]
