@@ -805,7 +805,7 @@ async function clickAt(ll){
  busy=true;window._busyT=Date.now();CLNOTE='';say('Wyznaczanie trasy…');
  try{const A={id:'m'+Date.now()+'a',name:'punkt',ll:l.wp[l.wp.length-1],tram:false},B={id:'m'+Date.now()+'b',name:'punkt',ll,tram:false};
   const r=await Promise.race([segRoute(A,B,mm),new Promise((_,rj)=>setTimeout(()=>rj(new Error('wyznaczanie trasy trwa zbyt długo – serwer tras lub dane torów/dróg nie odpowiadają (Diagnostyka na dole panelu)')),45000))]);
-  if(r.bad&&mm!=='free'){say('Brak trasy po '+(mm==='rail'?'torach kolejowych':mm==='street'?'drogach':'torach tramwajowych')+' ('+r.err+') – w trybie przyciągania nie rysuję linii prostej. Kliknij bliżej '+(mm==='street'?'drogi':'toru')+' albo przełącz na rysowanie swobodne.');busy=false;return}
+  if(r.bad&&mm!=='free'){say('Brak trasy po '+(mm==='rail'?'torach kolejowych':mm==='street'?'drogach':'torach tramwajowych')+' ('+String(r.err).replace(/^przystanek/,'kliknięty punkt')+') – w trybie przyciągania nie rysuję linii prostej. Kliknij bliżej '+(mm==='street'?'drogi':'toru')+' albo przełącz na rysowanie swobodne.');busy=false;return}
   l.segs.push({mode:r.mode,pts:r.pts});l.wp.push(r.pts[r.pts.length-1]);l.stops=routeStops(l);
   say((r.bad?'Brak trasy dla tego odcinka ('+r.err+') – narysowano linię prostą.':'Dodano odcinek ('+({tram:'torowisko',rail:'tory kolejowe',street:'ulice',free:'swobodnie'}[r.mode]||r.mode)+').')+(CLNOTE?' Uwaga: '+CLNOTE:''));CLNOTE=''}
  catch(err){say('Błąd: '+err.message)}
@@ -1865,10 +1865,11 @@ async function segRoute(A,B,am){
  if(wantTram){try{pts=await route(A.ll,B.ll,'tram',undefined,drw);m='tram'}catch(e){errs.push(e.message)}}
  const strictT=UI.strict&&(wantTram||wantRail);
  if(!pts&&am!=='tram'&&am!=='rail'&&!strictT){try{pts=await route(A.ll,B.ll,'street');m='street';fb=pts._fb||null;nf=pts._nf||null}catch(e){errs.push('ulice: '+e.message)}}
- if(!pts&&wantTram&&G){try{pts=await route(A.ll,B.ll,'tram',600);m='tram'}catch(e){}}
- if(!pts&&wantRail&&RG){try{pts=await route(A.ll,B.ll,'rail',600);m='rail'}catch(e){}}
- if(!pts&&strictT&&wantTram&&G){try{pts=await route(A.ll,B.ll,'tram',1500);m='tram'}catch(e){}}
- if(!pts&&strictT&&wantRail&&RG){try{pts=await route(A.ll,B.ll,'rail',1500);m='rail'}catch(e){}}
+ // (ołówek: bez awaryjnego szukania toru w promieniu 600 m – dokładało ono prosty odcinek od toru do klikniętego punktu)
+ if(!pts&&wantTram&&G&&!drw){try{pts=await route(A.ll,B.ll,'tram',600);m='tram'}catch(e){}}
+ if(!pts&&wantRail&&RG&&!drw){try{pts=await route(A.ll,B.ll,'rail',600);m='rail'}catch(e){}}
+ if(!pts&&strictT&&wantTram&&G&&!drw){try{pts=await route(A.ll,B.ll,'tram',1500);m='tram'}catch(e){}}
+ if(!pts&&strictT&&wantRail&&RG&&!drw){try{pts=await route(A.ll,B.ll,'rail',1500);m='rail'}catch(e){}}
  if(pts&&m==='street'&&pts.length>1){if(!pts._loc){try{pts=await fixEnd(pts,B.ll,true);pts=await fixEnd(pts,A.ll,false)}catch(e){dbg('fixEnd: '+e.message)}}
   // ciągłość linii: jeśli trasa nie zaczyna/kończy się w punkcie przystanku (np. brak dojazdu drogą dla transportu publicznego), dołączamy krótki prosty łącznik zamiast przerwy
   if(mdist(pts[0],A.ll)>3&&mdist(pts[0],A.ll)<250)pts=[A.ll,...pts];
