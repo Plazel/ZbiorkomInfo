@@ -18,6 +18,7 @@ AREAS = {   # area -> [(feed key used by the page, static GTFS: folder in the bu
     'ber': [('B', 'ber')],
     'lub': [('U', 'lub')],
     'wro': [('R', 'wro')],
+    'gzm': [('Z', 'gzm_rt/*')],   # (GZM: każdy plik dzienny i wersja tymczasowa osobno, wspólny klucz – gzm_gtfs.py, rt_dir)
 }
 
 
@@ -56,7 +57,13 @@ def build(scr, out, names_of_area=None, log=print):
     for area, feeds in AREAS.items():
         res = {'days': dates, 'f': {}}
         names = (names_of_area or {}).get(area)
+        exp = []
         for key, src in feeds:
+            if src.endswith('/*'):
+                base = os.path.join(scr, src[:-2])
+                exp += [(key, os.path.join(base, x)) for x in sorted(os.listdir(base))] if os.path.isdir(base) else []
+            else: exp.append((key, src))
+        for key, src in exp:
             folder = src if os.path.isabs(src) else os.path.join(scr, src)
             try:
                 if src.startswith('http'):
@@ -68,12 +75,13 @@ def build(scr, out, names_of_area=None, log=print):
                             if n in zf.namelist(): zf.extract(n, folder)
                     os.remove(z)
                 svc = active(folder, set(dates))
-                short = {r['route_id']: r['route_short_name'] or r['route_id'] for r in rd(folder + '/routes.txt')}
+                # (wersja tymczasowa GZM: bez route_short_name – numer linii w route_desc, np. „T99”, „704”)
+                short = {r['route_id']: r['route_short_name'] or r.get('route_desc') or r.get('route_long_name') or r['route_id'] for r in rd(folder + '/routes.txt')}
                 trips = {}
                 for r in rd(folder + '/trips.txt'):
                     if r['service_id'] not in svc: continue
                     n = short.get(r['route_id'], '')
-                    if names is not None and n not in names: continue
+                    if names is not None and area != 'gzm' and n not in names: continue
                     trips[r['trip_id']] = n
                 first = {}
                 for r in rd(folder + '/stop_times.txt'):
@@ -81,8 +89,8 @@ def build(scr, out, names_of_area=None, log=print):
                     if t not in trips: continue
                     q = int(r['stop_sequence']); f = first.get(t)
                     if f is None or q < f[0]: first[t] = (q, r['departure_time'] or r['arrival_time'])
-                res['f'][key] = {t: [trips[t], round(tmin(f[1])), f[0]] for t, f in first.items()}
-                log('Indeks kursów na żywo %s/%s: %d kursów' % (area, key, len(res['f'][key])))
+                res['f'].setdefault(key, {}).update({t: [trips[t], round(tmin(f[1])), f[0]] for t, f in first.items()})
+                log('Indeks kursów na żywo %s/%s: %d kursów (%s)' % (area, key, len(first), os.path.basename(folder)))
             except Exception as e:
                 log('Indeks kursów na żywo %s/%s: pominięty (%s)' % (area, key, e))
         if res['f']:

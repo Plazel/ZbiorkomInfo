@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795372481;
+const APP_BUILD=1795372677;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4166,7 +4166,8 @@ const GD_CITY_LANG={prg:'cs',bts:'sk',fl:'de',ber:'de',ham:'de'};
 const GD_LOC={pl:'pl-PL',de:'de-DE',en:'en-GB',cs:'cs-CZ',sk:'sk-SK'};
 const VP_FEEDS={poz:[['P','https://www.ztm.poznan.pl/pl/dla-deweloperow/getGtfsRtFile?file=vehicle_positions.pb']],
   krk:[['KA','https://gtfs.ztp.krakow.pl/VehiclePositions_A.pb'],['KT','https://gtfs.ztp.krakow.pl/VehiclePositions_T.pb']],
-  prg:[['G','https://api.golemio.cz/v2/vehiclepositions/gtfsrt/vehicle_positions.pb']]};
+  prg:[['G','https://api.golemio.cz/v2/vehiclepositions/gtfsrt/vehicle_positions.pb']],
+  gzm:[['Z','https://gtfsrt.transportgzm.pl:5443/gtfsrt/gzm/vehiclePositions']]};   // (ZTM GZM, otwartedane.metropoliagzm.pl – oficjalny GTFS-RT)
 function a11ySet(on){store.set('ztm.a11y',!!on);const sw=document.getElementById('a11ySw');if(sw)sw.checked=!!on;document.querySelectorAll('nav.rail .railA11y').forEach(b=>b.hidden=!on||!!window.ACC_DRV);if(!on&&GUIDE.open)closeGuide()}
 function gdLang(){const o=window.MK_OVR,l=o&&o.lang&&o.lang!=='auto'?o.lang:o&&o.lang==='auto'?gdNameLang():LANG;return GD_TXT[l]?l:'en'}
 const gdNameLang=()=>GD_CITY_LANG[city]||'pl';
@@ -5299,7 +5300,7 @@ async function rtFetch(id){const order=RT_WAY!==null?[RT_WAY,...RT_WAYS.keys()].
 const stTown=st=>st.sc||(['gda','sop','gdy'].includes(st.c)?st.c:null);
 const ztmIds=st=>Object.entries(IDX.stops).filter(([sid,S])=>/^\d+$/.test(sid)&&S[0]===st.n&&['gda','sop','gdy','oth'].includes(S[4])&&(!stTown(st)||S[4]===stTown(st)||S[4]==='oth')&&(!st.poles||!st.poles.length||st.poles.includes(S[1]||''))).map(([sid,S])=>[sid,S[1]||'']);
 // Poznań, Kraków, Warszawa, Łódź and Praga: GTFS-Realtime, read by serwer.py on this computer (their servers send no CORS header)
-const RT_GTFS={poz:'poz',krk:'krk',waw:'waw',ldz:'ldz',prg:'prg',ber:'ber',lub:'lub',wro:'wro'};
+const RT_GTFS={poz:'poz',krk:'krk',waw:'waw',ldz:'ldz',prg:'prg',ber:'ber',lub:'lub',wro:'wro',gzm:'gzm'};
 async function depLiveRT(st){const a=RT_GTFS[st.c];if(!a||!RT_LOCAL)return null;
   const ids=Object.entries(IDX.stops).filter(([sid,S])=>S[0]===st.n&&(S[4]===st.c||(st.sc&&S[4]===st.sc)||(st.c==='all'&&!st.sc&&['gda','sop','gdy'].includes(S[4])))&&(!st.poles||!st.poles.length||st.poles.includes(S[1]||''))).map(([sid])=>sid);
   if(!ids.length)return null;
@@ -5317,6 +5318,7 @@ const RT_FEEDS={waw:[['W','https://api.zbiorkom.live/api6-open/warsaw/gtfsRealti
   poz:[['P','https://www.ztm.poznan.pl/pl/dla-deweloperow/getGtfsRtFile?file=trip_updates.pb']],
   krk:[['KA','https://gtfs.ztp.krakow.pl/TripUpdates_A.pb'],['KT','https://gtfs.ztp.krakow.pl/TripUpdates_T.pb']],
   prg:[['G','https://api.golemio.cz/v2/vehiclepositions/gtfsrt/trip_updates.pb']],
+  gzm:[['Z','https://gtfsrt.transportgzm.pl:5443/gtfsrt/gzm/tripUpdates']],
   ber:[['B','https://production.gtfsrt.vbb.de/data']]};   // (VBB: delays only, no vehicle positions; at most 7 requests a minute)
 // protobuf: varints (64-bit negatives through BigInt) and length-delimited fields
 function pbV(b,i){let v=0,m=1,x,n=0;const s0=i;do{x=b[i++];v+=(x&127)*m;m*=128;n++}while(x&128&&i<b.length);
@@ -6150,7 +6152,7 @@ function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('di
 // ---- every departure board on the page (the board, the stop's board, the map's stop popup, the guide's changes) gives a time
 // the same way: a live run as the minutes to go (under an hour), a timetable run as its clock time; where a city has no
 // live data at all, its timetable runs as the minutes to go under an hour, then the clock time
-const LIVE_CITIES=['gda','sop','gdy','all','byd','poz','krk','waw','ldz','prg'];
+const LIVE_CITIES=['gda','sop','gdy','all','byd','poz','krk','waw','ldz','prg','gzm'];
 function brdTime(d,nowM,c){const left=d.t-nowM,mins=d.live||!LIVE_CITIES.includes(c||city);
   if(mins&&left<1)return '<span class="dArr" aria-label="odjeżdża"><i>&gt;</i><i>&gt;</i><i>&gt;</i></span>';if(mins&&left<60)return Math.floor(left)+' min';
   const t=Math.floor(d.t+1e-6)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}

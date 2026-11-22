@@ -9,6 +9,9 @@ trafia do routes.txt jako dodatkowa kolumna route_type_1.
 import csv, io, json, os, urllib.request, zipfile, datetime
 
 PKG = 'https://otwartedane.metropoliagzm.pl/api/3/action/package_show?id=317435cc-0075-4d10-b8ef-6e9b0010e90a'
+# wersja tymczasowa (jeden plik, publikowana dla Google'a) – do indeksu kursów GTFS-RT, gdyby dane na żywo odnosiły się do niej
+PKG_TMP = 'https://otwartedane.metropoliagzm.pl/api/3/action/package_show?id=5d8d7145-1be1-4ed2-9c18-5535e056a56d'
+RT_FILES = ('routes.txt', 'trips.txt', 'stop_times.txt', 'calendar.txt', 'calendar_dates.txt')
 UA = {'User-Agent': 'ZbiorkomInfo (rozklady; github.com/Plazel/ZbiorkomInfo)'}
 
 
@@ -45,8 +48,10 @@ def _days(z):
     return out
 
 
-def build(dest, cache_dir=None, log=print):
-    """pobiera, wybiera i łączy pliki; zwraca True, gdy w dest jest gotowy katalog GTFS"""
+def build(dest, cache_dir=None, log=print, rt_dir=None):
+    """pobiera, wybiera i łączy pliki; zwraca True, gdy w dest jest gotowy katalog GTFS. rt_dir: katalog na pliki do indeksu kursów
+    na żywo (rtindex.py) – każdy plik obejmujący wczoraj, dziś lub jutro osobno i bez zmian identyfikatorów (GTFS-RT podaje oryginalne
+    trip_id), oraz wersja tymczasowa"""
     urls = resources()
     if not urls: raise RuntimeError('brak plików ZIP w zbiorze GZM')
     zips = []
@@ -62,6 +67,24 @@ def build(dest, cache_dir=None, log=print):
                 if not any(p[0] == u for p in pick): pick.append((u, z, ds))
                 break
     if not pick: pick = zips
+    if rt_dir:
+        today = datetime.date.today(); want = {today + datetime.timedelta(days=i) for i in (-1, 0, 1)}
+        n = 0
+        for i, (u, z, ds) in enumerate(zips):
+            if not (ds & want): continue
+            d = os.path.join(rt_dir, 'e%d' % i); os.makedirs(d, exist_ok=True)
+            for nm in RT_FILES:
+                if nm in z.namelist(): z.extract(nm, d)
+            n += 1
+        try:
+            j = json.loads(_get(PKG_TMP, 60)); rs = [r['url'] for r in j['result']['resources'] if (r.get('format') or '').upper() == 'ZIP' and r.get('url')]
+            if rs:
+                zt = zipfile.ZipFile(io.BytesIO(_get(rs[0]))); d = os.path.join(rt_dir, 'tmp'); os.makedirs(d, exist_ok=True)
+                for nm in RT_FILES:
+                    if nm in zt.namelist(): zt.extract(nm, d)
+                n += 1
+        except Exception as e: log('GZM: wersja tymczasowa do GTFS-RT pominięta (%s)' % e)
+        log('GZM: %d plików do indeksu kursów na żywo' % n)
     log('GZM: %d z %d plików (%s)' % (len(pick), len(zips), ', '.join(min(p[2]).strftime('%d.%m') + '–' + max(p[2]).strftime('%d.%m') for p in pick if p[2])))
     os.makedirs(dest, exist_ok=True)
     W = {}

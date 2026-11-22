@@ -123,7 +123,7 @@ try:
     import gzm_gtfs
     _gk = os.path.join(SRC_CACHE, 'gzm.zip')
     try:
-        gzm_gtfs.build(os.path.join(SCR, 'gzm'))
+        gzm_gtfs.build(os.path.join(SCR, 'gzm'), rt_dir=os.path.join(SCR, 'gzm_rt'))
         os.makedirs(SRC_CACHE, exist_ok=True)
         with zipfile.ZipFile(_gk, 'w', zipfile.ZIP_DEFLATED) as _z:
             for _f in os.listdir(os.path.join(SCR, 'gzm')): _z.write(os.path.join(SCR, 'gzm', _f), _f)
