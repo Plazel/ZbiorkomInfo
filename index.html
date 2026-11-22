@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795378969;
+const APP_BUILD=1795381362;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7317,13 +7317,28 @@ function navOrder(){const nav=document.querySelector('nav.rail'),o=ACC.user&&Arr
   document.addEventListener('pointermove',e=>{if(!drag||vert())return;const M=document.getElementById('navMore'),r=nav.getBoundingClientRect();if(M&&M.hidden&&e.clientY<r.top-30)navMoreOpen()});
   {const M=document.getElementById('navMore');let h2=0,dr=null,s0=null;
     const end=e=>{clearTimeout(h2);h2=0;if(!dr)return;const x=dr;dr=null;x.classList.remove('navDrag');x.style.transform='';x._eat=true;setTimeout(()=>x._eat=false,350);
-      const r=nav.getBoundingClientRect();if(e&&e.clientY>=r.top&&e.clientY<=r.bottom){const b=x._nav,list=[...nav.querySelectorAll('[data-nav]')].filter(y=>!y.hidden&&y.offsetParent&&y.dataset.nav!=='more'&&y!==b);
+      const r=nav.getBoundingClientRect(),inM=e&&(()=>{const q=M.getBoundingClientRect();return e.clientX>=q.left&&e.clientX<=q.right&&e.clientY>=q.top&&e.clientY<=q.bottom})();
+      // (upuszczona w „Więcej”: nowa kolejność w panelu – te same miejsca na liście ikon paska, przestawione jak w panelu)
+      if(inM){const bs=[...M.querySelectorAll('button')].map(y=>y._nav).filter(Boolean),all=[...nav.querySelectorAll('[data-nav]')],slots=bs.map(b=>all.indexOf(b)).sort((a,b)=>a-b);
+        slots.forEach((k,i)=>{all[k]=bs[i]});all.forEach(b=>nav.append(b));{const m=nav.querySelector('[data-nav=more]');if(m)nav.append(m)}
+        ACC.data.nav=[...nav.querySelectorAll('[data-nav]')].map(y=>y.dataset.nav);accSave();return}
+      if(e&&e.clientY>=r.top&&e.clientY<=r.bottom&&e.clientX>=r.left&&e.clientX<=r.right){const b=x._nav,list=[...nav.querySelectorAll('[data-nav]')].filter(y=>!y.hidden&&y.offsetParent&&y.dataset.nav!=='more'&&y!==b);
         const at=list.find(y=>{const q=y.getBoundingClientRect();return e.clientX<q.left+q.width/2});const bs=list.filter(y=>y!==b),r0=new Map(bs.map(y=>[y,y.getBoundingClientRect()]));if(at)nav.insertBefore(b,at);else{const last=list[list.length-1];if(last)last.after(b)}bs.forEach(y=>{const a0=r0.get(y),b2=y.getBoundingClientRect(),dx=a0.left-b2.left;if(!dx)return;y.style.transition='none';y.style.transform=`translateX(${dx}px)`;y.getBoundingClientRect();y.style.transition='transform .18s ease';y.style.transform='';setTimeout(()=>{y.style.transition=''},220)})
         const c=persCfg();delete c.place[b.dataset.nav];b.classList.remove('navOff','navOver');{const m=nav.querySelector('[data-nav=more]');if(m)nav.append(m)}
         ACC.data.nav=[...nav.querySelectorAll('[data-nav]')].map(y=>y.dataset.nav);accSave();M.hidden=true;navApply()}};
-    M.addEventListener('pointerdown',e=>{const x=e.target.closest('button');if(!x||!x._nav||!ACC.user||e.button>0)return;s0={x:e.clientX,y:e.clientY};
+    M.addEventListener('pointerdown',e=>{const x=e.target.closest('button');if(!x||!x._nav||!ACC.user||e.button>0)return;s0={x:e.clientX,y:e.clientY};if(e.pointerType==='mouse')e.preventDefault();
       h2=setTimeout(()=>{h2=0;dr=x;x.classList.add('navDrag');try{x.setPointerCapture(e.pointerId)}catch(z){}if(navigator.vibrate)try{navigator.vibrate(15)}catch(z){}},450)});
-    M.addEventListener('pointermove',e=>{if(h2&&s0&&Math.hypot(e.clientX-s0.x,e.clientY-s0.y)>8){clearTimeout(h2);h2=0}if(!dr)return;e.preventDefault();dr.style.transform=`translate(${e.clientX-s0.x}px,${e.clientY-s0.y}px)`});
+    // (w panelu: przeciągana ikona zajmuje miejsce tej, nad którą jest – pozostałe przesuwają się; poza panelem leci za palcem / kursorem)
+    M.addEventListener('pointermove',e=>{if(h2&&s0&&Math.hypot(e.clientX-s0.x,e.clientY-s0.y)>8){clearTimeout(h2);if(e.pointerType==='mouse'){const x=e.target.closest('button');if(x&&x._nav&&ACC.user){dr=x;x.classList.add('navDrag');try{x.setPointerCapture(e.pointerId)}catch(z){}}}h2=0}if(!dr)return;e.preventDefault();
+      const q=M.getBoundingClientRect(),inside=e.clientX>=q.left&&e.clientX<=q.right&&e.clientY>=q.top&&e.clientY<=q.bottom;
+      if(!inside){dr.style.transform=`translate(${e.clientX-s0.x}px,${e.clientY-s0.y}px)`;return}
+      dr.style.transform='';const bs=[...M.querySelectorAll('button')].filter(y=>y!==dr);
+      const at=bs.find(y=>{const b=y.getBoundingClientRect();return e.clientX>=b.left&&e.clientX<=b.right&&e.clientY>=b.top&&e.clientY<=b.bottom});if(!at)return;
+      const b=at.getBoundingClientRect(),horiz=getComputedStyle(M).display==='grid'||b.width>b.height*1.6?e.clientX<b.left+b.width/2:e.clientY<b.top+b.height/2;
+      const tgt=horiz?at:at.nextElementSibling;if(tgt===dr||dr.nextElementSibling===tgt&&horiz)return;
+      const r0=new Map(bs.map(y=>[y,y.getBoundingClientRect()]));if(tgt)M.insertBefore(dr,tgt);else M.append(dr);
+      bs.forEach(y=>{const a0=r0.get(y),b2=y.getBoundingClientRect(),dx=a0.left-b2.left,dy=a0.top-b2.top;if(!dx&&!dy)return;y.style.transition='none';y.style.transform=`translate(${dx}px,${dy}px)`;y.getBoundingClientRect();y.style.transition='transform .18s ease';y.style.transform='';setTimeout(()=>{y.style.transition=''},220)});
+      s0={x:e.clientX,y:e.clientY}});
     M.addEventListener('pointerup',end);M.addEventListener('pointercancel',()=>end(null));M.addEventListener('touchmove',e=>{if(dr)e.preventDefault()},{passive:false})}
   // (while a button is dragged the bar does not scroll, and the press is no click)
   document.addEventListener('touchmove',e=>{if(drag)e.preventDefault()},{passive:false});
