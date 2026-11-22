@@ -1,8 +1,7 @@
 {
- "sprawdzono": "2026-11-22 16:40",
+ "sprawdzono": "2026-11-22 17:40",
  "zrodla": {
   "ztm": "ValueError: pobrany plik nie jest archiwum ZIP (272 B)",
-  "ztrips": "URLError: <urlopen error [Errno 110] Connection timed out>",
-  "gzm": "URLError: <urlopen error timed out>"
+  "ztrips": "URLError: <urlopen error [Errno 110] Connection timed out>"
  }
 }
