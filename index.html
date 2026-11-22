@@ -1830,7 +1830,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795355765;
+const APP_BUILD=1795355827;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6034,7 +6034,7 @@ function newsRender(){const A=document.getElementById('tdNews');if(!A||TD.view!=
   const none=(t,d)=>`<div class="bgNone newsNone"><svg class="bgWarn" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h12.5v14a2 2 0 0 0 2 2H6.5A2.5 2.5 0 0 1 4 18V8.5h1"/><path d="M17.5 8.5H20v10a2 2 0 0 1-4 0"/><path d="M8 8.5h6M8 12h6M8 15.5h4"/></svg><h2>${esc(trS(t))}</h2>${d?`<p>${esc(trS(d))}</p>`:''}</div>`;
   // (Warszawa: wiadomości WTP niedostępne do pobrania – strona chroniona przed automatami; komunikat jak przy braku rozkładów brygadowych)
   if(g==='waw'){A.innerHTML=naBox(null,null,'newsNone');return}
-  A.innerHTML=ks.length?`<h2 class="newsH">${esc(trS('Aktualności'))}</h2><div class="alertBox newsBox">${ks.map((k,o)=>alertItem(L,k,was.length===ks.length?was[o]:true,pg)).join('')}</div>`
+  A.innerHTML=ks.length?`<h2 class="newsH">${esc(trS('Aktualności'))}</h2><div class="alertBox newsBox">${ks.map((k,o)=>alertItem(L,k,was.length===ks.length?was[o]:false,pg)).join('')}</div>`
     :!g?naBox(null,null,'newsNone'):ALERT_BY[g]?none('Brak aktualności','Przewoźnik nie opublikował teraz żadnych aktualności.'):none('Wczytywanie…','');
   A.querySelectorAll('a.aStop').forEach(a=>a.onclick=e=>{e.preventDefault();closeTool();location.hash=a.getAttribute('href')});
   A.querySelector('.newsBox')&&A.querySelector('.newsBox').addEventListener('click',e=>{const b=e.target.closest('.alTr');if(!b)return;e.preventDefault();e.stopPropagation();const a=alertsOf(g)[+b.dataset.k];if(!a)return;a.mt=!a.mt;a.mtBusy=true;newsRender();mtAlerts(g,true).finally(()=>{a.mtBusy=false;newsRender()})})}
