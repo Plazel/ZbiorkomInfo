@@ -692,7 +692,15 @@ async function loadStops(o){
   clearInterval(_rt);clearInterval(_ot);stProg(88,'Dodawanie przystanków…');
   {const t0=Date.now(),it=setInterval(()=>{if(!STPROG){clearInterval(it);return}stProg(88+11*(1-Math.exp(-(Date.now()-t0)/3000)))},300)}
   if(ZO)j={elements:(j.elements||[]).filter(e=>/^(station|halt)$/.test((e.tags||{}).railway||''))};
-  {const H=await histStops(BX);if(H.length)j.elements=(j.elements||[]).concat(H)}
+  {let H=await histStops(BX);
+   // (przystanki z otwartych danych: dawny przystanek tramwajowy (np. Stogi – tramwaje zawieszone) dopisuje rodzaj tramwajowy przystankowi
+   // o tej samej nazwie i numerze słupka w promieniu 60 m – zamiast dodawać drugi przystanek obok)
+   if(ZO&&H.length){const bn=x=>norm(String(x||'').replace(NUMRE,'$1')),nm=x=>{const m=String(x||'').match(NUMRE);return m?m[2]:''};let mk=0;
+    H=H.filter(e=>{const t=e.tags||{},ll=e.type==='node'?[e.lat,e.lon]:e.center?[e.center.lat,e.center.lon]:null;if(!ll||!t.name)return true;const n0=bn(t.name),u0=t.local_ref||t.ref||nm(t.name);
+     const c=S.stops.filter(s=>!s.rail&&bn(s.name)===n0&&(!u0||!s.num||s.num===String(u0).padStart(2,'0'))&&mdist(s.ll,ll)<60).sort((a,b)=>mdist(a.ll,ll)-mdist(b.ll,ll))[0];
+     if(!c)return true;if(!c.tram){c.tram=true;c.bus=true;mk++}return false});
+    if(mk)dbg('Dawne przystanki tramwajowe: rodzaj tramwajowy dopisany '+mk+' przystankom')}
+   if(H.length)j.elements=(j.elements||[]).concat(H)}
   let zMig=0;if(ZO&&!S.ziSrc&&S.stops.length)zMig=ziMigrate(ZO);else if(ZO&&!S.stops.length)S.ziSrc=1;
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
   const md=x=>x.rail?'r':x.tram?'t':'a',pn=(name,st)=>(st&&st.num)||((String(name||'').match(NUMRE)||[])[2])||'',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):'',p:pn(name,st)})};
@@ -3935,7 +3943,7 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
 // (S.stFix4) – usunięcie dodanych wtedy duplikatów: nieużywanych peronów i pozycji zatrzymania, które poprawny import uznaje za drugi opis przystanku)
 // (wersja poprawek importu przystanków: każda nowa poprawka podnosi STOPFIX_V, a zapisane projekty są wtedy raz uzupełniane z OSM;
 // gdy OSM nie odpowiada – kolejne próby co 2 minuty, znacznik zapisywany dopiero po udanym pobraniu)
-const STOPFIX_V=8;let _sfT=0,_sfRun=false;
+const STOPFIX_V=9;let _sfT=0,_sfRun=false;
 function stopFix5(d){clearTimeout(_sfT);if(!S.stops.length||(S.stopFixV||0)>=STOPFIX_V)return;_sfT=setTimeout(async()=>{if(_sfRun||(S.stopFixV||0)>=STOPFIX_V)return;_sfRun=true;let ok=false;
   try{ok=await loadStops({auto:true,quiet:true,fixBus:true,prune:!!S.stFix4&&!S.stFix5})}catch(e){dbg('Uzupełnianie przystanków: '+e.message)}finally{_sfRun=false}
   if(ok){S.stopFixV=STOPFIX_V;S.stFix4=S.stFix5=1;S.numZI2=0;await ziNums();save();drawStops();renderStops();renderLines();redraw();say(S.ziSrc?'Przystanki zaktualizowane z otwartych danych przewoźników (stacje kolejowe z OSM).':'Przystanki zaktualizowane z OpenStreetMap (brakujące perony, numery słupków z danych ZbiorkomInfo).')}else stopFix5(120000)},d==null?6000:d)}
