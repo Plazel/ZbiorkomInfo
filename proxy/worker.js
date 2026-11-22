@@ -17,7 +17,10 @@
 //
 // 5. Accounts (only for people given one): /konto … with the header "Authorization: Bearer <token>". Each account has a long
 //    random token instead of a password; the page keeps it on the device. Only the token's SHA-256 is stored, so the
-//    store holds nothing that lets anyone in. Kept in a KV namespace bound as KONTA:
+//    store holds nothing that lets anyone in. Logging in (POST /konto/login with the code) gives a session id; the page keeps only the
+//    session, never the code (POST /konto/logout ends it; a new code or a deleted account ends all its sessions). Every administrator
+//    sees and manages only the accounts they made themselves (own) – also the main administrator (ADMIN_TOKEN) only theirs and the
+//    accounts made before this split. Kept in a KV namespace bound as KONTA:
 //      t:<sha256 of token> → account id     u:<id> → {id, name, role, created}     d:<id> → the account's data (JSON)
 //    GET /konto → {id, name, role, emp, grant, mk}; GET /konto/tm, PUT /konto/tm – the TransitMaker project (at most 20 MB); GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
@@ -142,10 +145,20 @@ const TOK_ABC = 'abcdefghjkmnpqrstuvwxyz23456789';
 function newTok(n = 12) { let t = ''; while (t.length < n) for (const b of crypto.getRandomValues(new Uint8Array(n * 2))) { if (b < 248 && t.length < n) t += TOK_ABC[b % 31]; } return t; }
 async function sha(t) { return [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map(b => b.toString(16).padStart(2, '0')).join(''); }
 function same(a, b) { if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false; let x = 0; for (let i = 0; i < a.length; i++) x |= a.charCodeAt(i) ^ b.charCodeAt(i); return x === 0; }
-async function who(req, env) {
+// sesja: po zalogowaniu kodem strona dostaje losowy identyfikator sesji i trzyma tylko jego – kodu logowania w przeglądarce nie ma.
+// W KV tylko skrót sesji: s:<sha256> → {id, at}; ss:<id> → lista skrótów sesji konta (nowy kod lub usunięcie konta kończą wszystkie)
+const SESS_TTL = 180 * 86400;
+const ADMIN0 = { id: 'admin', name: 'Administrator', role: 'admin' };
+async function sessNew(env, id) { const sid = newTok(40), sh = await sha(sid);
+  await env.KONTA.put('s:' + sh, JSON.stringify({ id, at: new Date().toISOString() }), { expirationTtl: SESS_TTL });
+  const L = ((await env.KONTA.get('ss:' + id, 'json')) || []).filter(Boolean); L.unshift(sh); for (const x of L.splice(30)) await env.KONTA.delete('s:' + x);
+  await env.KONTA.put('ss:' + id, JSON.stringify(L)); return sid; }
+async function sessEndAll(env, id) { const L = (await env.KONTA.get('ss:' + id, 'json')) || []; await Promise.all([...L.map(x => env.KONTA.delete('s:' + x)), env.KONTA.delete('ss:' + id)]); }
+async function who(req, env, viaCode) {
   const m = (req.headers.get('Authorization') || '').match(/^Bearer\s+([A-Za-z0-9_\-+/=]{8,200})$/);
   if (!m) return null;
-  if (env.ADMIN_TOKEN && same(m[1], env.ADMIN_TOKEN)) return { id: 'admin', name: 'Administrator', role: 'admin' };
+  {const se = await env.KONTA.get('s:' + await sha(m[1]), 'json'); if (se && se.id) { if (viaCode) return null; if (se.id === 'admin') return env.ADMIN_TOKEN ? ADMIN0 : null; const a = await env.KONTA.get('u:' + se.id, 'json'); if (a) a._sid = m[1]; return a; }}
+  if (env.ADMIN_TOKEN && same(m[1], env.ADMIN_TOKEN)) return ADMIN0;
   const id = await env.KONTA.get('t:' + await sha(m[1]));
   if (!id) return null;
   return await env.KONTA.get('u:' + id, 'json');
@@ -156,11 +169,18 @@ async function tokKey(env) { const raw = await crypto.subtle.digest('SHA-256', n
 const b64 = a => btoa(String.fromCharCode(...new Uint8Array(a))), unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 async function tokSeal(env, t) { if (!env.ADMIN_TOKEN) return null; const iv = crypto.getRandomValues(new Uint8Array(12)); return b64(iv) + '.' + b64(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, await tokKey(env), new TextEncoder().encode(t))); }
 async function tokOpen(env, x) { if (!env.ADMIN_TOKEN || !x) return null; try { const [iv, c] = x.split('.'); return new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(iv) }, await tokKey(env), unb64(c))); } catch (e) { return null; } }
+// właściciel konta: administrator, który je utworzył (konta sprzed tego podziału – główny administrator)
+const ownerOf = a => (a && a.own) || 'admin';
+async function ownIds(env, oid) { const out = new Set(); let cur; do { const l = await env.KONTA.list({ prefix: 'u:', cursor: cur }); for (const k of l.keys) { const md = k.metadata || {}; let o = md.own; if (o === undefined) { const a = await env.KONTA.get(k.name, 'json'); o = ownerOf(a); } if ((o || 'admin') === oid) out.add(k.name.slice(2)); } cur = l.list_complete ? null : l.cursor; } while (cur); return out; }
 async function konta(req, env, cors) {
   const h = new Headers(cors); h.set('Content-Type', 'application/json; charset=utf-8'); h.set('Cache-Control', 'no-store');
   const J = (o, st) => new Response(JSON.stringify(o), { status: st || 200, headers: h });
   if (!env.KONTA) return J({ error: 'accounts not set up' }, 503);
-  const p = new URL(req.url).pathname.replace(/\/+$/, ''), u = await who(req, env);
+  const p = new URL(req.url).pathname.replace(/\/+$/, '');
+  // logowanie kodem: wymiana na sesję (kod nie jest potem przechowywany w przeglądarce); wylogowanie kończy sesję
+  if (p === '/konto/login' && req.method === 'POST') { const a = await who(req, env, true); if (!a) return J({ error: 'unauthorized' }, 401); return J({ session: await sessNew(env, a.id) }); }
+  const u = await who(req, env);
+  if (p === '/konto/logout' && req.method === 'POST') { const m2 = (req.headers.get('Authorization') || '').match(/^Bearer\s+(\S+)$/); if (m2) { const sh = await sha(m2[1]); if (await env.KONTA.get('s:' + sh)) { await env.KONTA.delete('s:' + sh); if (u) { const L = ((await env.KONTA.get('ss:' + u.id, 'json')) || []).filter(x => x !== sh); await env.KONTA.put('ss:' + u.id, JSON.stringify(L)); } } } return J({ ok: true }); }
   // the settings every visitor's page needs, logged in or not: which sections and options each role gets (comp), and the
   // proposals the administrator approved (ok: e.g. the transfer to replacement lines shown in a line's timetable)
   if (p === '/konto/konfig' && req.method === 'GET') { const c = (await env.KONTA.get('cfg:mk', 'json')) || {}; return J({ comp: c.comp || null, ok: c.ok || [] }); }
@@ -168,10 +188,10 @@ async function konta(req, env, cors) {
   // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
   // the account: its service number, and the sections or options given to it alone (ucomp; the whole list only for an administrator)
   if (p === '/konto' && req.method === 'GET') { const mk = (await env.KONTA.get('cfg:mk', 'json')) || null, grant = mk && mk.ucomp && Array.isArray(mk.ucomp[u.id]) ? mk.ucomp[u.id] : [];
-    if (mk && u.role !== 'admin') delete mk.ucomp; return J({ id: u.id, name: u.name, role: u.role, emp: u.emp || null, grant, mk }); }
+    if (mk && u.role !== 'admin') delete mk.ucomp; else if (mk && mk.ucomp) { const own = await ownIds(env, u.id); for (const k of Object.keys(mk.ucomp)) if (!own.has(k)) delete mk.ucomp[k]; } return J({ id: u.id, name: u.name, role: u.role, emp: u.emp || null, grant, mk }); }
   // the administrator's messages: those for this account, newest first; fetching marks them delivered, opening read
   // ("every driver": the administrators too, who can use the drivers' mode)
-  const forMe = x => x.to === '*' ? u.role === 'driver' || u.role === 'admin' : Array.isArray(x.to) && x.to.includes(u.id);
+  const forMe = x => x.to === '*' ? (u.role === 'driver' || u.role === 'admin') && (ownerOf(u) === (x.fid || 'admin') || u.id === (x.fid || 'admin')) : Array.isArray(x.to) && x.to.includes(u.id);
   const mine = x => { const s = (x.st || {})[u.id] || {}; return { id: x.id, t: x.t, text: x.text, from: x.from, ack: !!x.ack, r: s.r || null, c: s.c || null }; };
   if (p === '/konto/komunikaty' && req.method === 'GET') {
     const L = (await env.KONTA.get('msg:list', 'json')) || [], now = new Date().toISOString(); let ch = false;
@@ -215,6 +235,7 @@ async function konta(req, env, cors) {
   }
   if (p.startsWith('/admin/')) {
     if (u.role !== 'admin') return J({ error: 'forbidden' }, 403);
+    const mine_ = a => a && ownerOf(a) === u.id;
     if (p === '/admin/ustawienia' && req.method === 'PUT') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       // fields left out of the body keep their stored values
@@ -235,52 +256,55 @@ async function konta(req, env, cors) {
       if ('ok' in b) c.ok = (Array.isArray(b.ok) ? b.ok : []).filter(x => x && typeof x === 'object' && typeof x.id === 'string' && x.id.length <= 80).slice(0, 300)
         .map(x => ({ id: x.id, at: typeof x.at === 'string' ? x.at.slice(0, 30) : new Date().toISOString(), d: x.d && typeof x.d === 'object' && JSON.stringify(x.d).length <= 4000 ? x.d : null }));
       // sections or options given to single accounts, whatever their group: {account id: [keys]}
-      if ('ucomp' in b) { const o = {}; if (b.ucomp && typeof b.ucomp === 'object') for (const [id, L] of Object.entries(b.ucomp).slice(0, 300)) { if (!/^[A-Za-z0-9_-]{4,40}$/.test(id) || !Array.isArray(L)) continue; const k = L.map(String).filter(x => /^[a-zA-Z.]{2,24}$/.test(x)).slice(0, 60); if (k.length) o[id] = k; } c.ucomp = o; }
+      if ('ucomp' in b) { const own = await ownIds(env, u.id), o = {}; for (const [k, v] of Object.entries(c.ucomp || {})) if (!own.has(k)) o[k] = v; if (b.ucomp && typeof b.ucomp === 'object') for (const [id, L] of Object.entries(b.ucomp).slice(0, 300)) { if (!/^[A-Za-z0-9_-]{4,40}$/.test(id) || !Array.isArray(L) || !own.has(id)) continue; const k = L.map(String).filter(x => /^[a-zA-Z.]{2,24}$/.test(x)).slice(0, 60); if (k.length) o[id] = k; } c.ucomp = o; }
       if ('no' in b) c.no = (Array.isArray(b.no) ? b.no : []).map(String).filter(x => x.length <= 80).slice(0, 500);
-      await env.KONTA.put('cfg:mk', JSON.stringify(c)); return J(c);
+      await env.KONTA.put('cfg:mk', JSON.stringify(c)); { const own = await ownIds(env, u.id), out = Object.assign({}, c); out.ucomp = Object.fromEntries(Object.entries(c.ucomp || {}).filter(([k]) => own.has(k))); return J(out); }
     }
-    if (p === '/admin/komunikaty' && req.method === 'GET') return J((await env.KONTA.get('msg:list', 'json')) || []);
+    const myMsg = x => (x.fid || 'admin') === u.id;
+    if (p === '/admin/komunikaty' && req.method === 'GET') return J(((await env.KONTA.get('msg:list', 'json')) || []).filter(myMsg));
     if (p === '/admin/komunikat' && req.method === 'POST') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       const text = String(b.text || '').trim().slice(0, 500); if (!text) return J({ error: 'text' }, 400);
       const to = b.to === '*' ? '*' : Array.isArray(b.to) ? [...new Set(b.to.filter(x => typeof x === 'string' && /^[a-z0-9]{3,32}$/.test(x)))].slice(0, 200) : null;
       if (!to || (Array.isArray(to) && !to.length)) return J({ error: 'to' }, 400);
-      const L = (await env.KONTA.get('msg:list', 'json')) || []; L.unshift({ id: newTok(8), t: new Date().toISOString(), text, from: u.name, to, ack: !!b.ack, st: {} }); L.splice(100);
-      await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L);
+      if (Array.isArray(to)) { const own = await ownIds(env, u.id); if (to.some(x => !own.has(x))) return J({ error: 'to' }, 403); }
+      const L = (await env.KONTA.get('msg:list', 'json')) || []; L.unshift({ id: newTok(8), t: new Date().toISOString(), text, from: u.name, fid: u.id, to, ack: !!b.ack, st: {} }); L.splice(300);
+      await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L.filter(myMsg));
     }
     {const mm = p.match(/^\/admin\/komunikat(?:\/([a-z0-9]{6,16}))?$/);
-    if (mm && req.method === 'DELETE') { const L = mm[1] ? ((await env.KONTA.get('msg:list', 'json')) || []).filter(x => x.id !== mm[1]) : []; await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L); }}
+    if (mm && req.method === 'DELETE') { const L = ((await env.KONTA.get('msg:list', 'json')) || []).filter(x => !(myMsg(x) && (!mm[1] || x.id === mm[1]))); await env.KONTA.put('msg:list', JSON.stringify(L)); return J(L.filter(myMsg)); }}
     if (p === '/admin/statusy' && req.method === 'GET') {
       const keys = []; let cur;
       do { const l = await env.KONTA.list({ prefix: 'st:', cursor: cur }); keys.push(...l.keys); cur = l.list_complete ? null : l.cursor; } while (cur);
-      const out = {}; await Promise.all(keys.map(async k => { const v = await env.KONTA.get(k.name, 'json'); if (v) out[k.name.slice(3)] = v; })); return J(out);
+      const own = await ownIds(env, u.id); own.add(u.id);
+      const out = {}; await Promise.all(keys.filter(k => own.has(k.name.slice(3))).map(async k => { const v = await env.KONTA.get(k.name, 'json'); if (v) out[k.name.slice(3)] = v; })); return J(out);
     }
     const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
     // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
-    const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: (a.fn || '').slice(0, 60), ln: (a.ln || '').slice(0, 60) } });
+    const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: (a.fn || '').slice(0, 60), ln: (a.ln || '').slice(0, 60), own: ownerOf(a) } });
     const nextEmp = async () => { const n = (+(await env.KONTA.get('cnt:emp')) || 1000) + 1; await env.KONTA.put('cnt:emp', String(n)); return n; };
     const PROF = ['fn', 'ln', 'phone', 'email', 'note'];
     const pub = a => ({ id: a.id, name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: a.fn || '', ln: a.ln || '', phone: a.phone || '', email: a.email || '', note: a.note || '' });
     const newToken = async a => { const t = newTok(), th = await sha(t), old = a.th; a.th = th; a.tk = await tokSeal(env, t);
-      await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old ? env.KONTA.delete('t:' + old) : null]); return t; };
+      await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old ? env.KONTA.delete('t:' + old) : null, sessEndAll(env, a.id)]); return t; };
     if (!m[1] && req.method === 'GET') {
       const keys = []; let cur;
       do { const l = await env.KONTA.list({ prefix: 'u:', cursor: cur }); keys.push(...l.keys); cur = l.list_complete ? null : l.cursor; } while (cur);
       // (the whole record for each account: the profile's fields; accounts from before the numbers get theirs now, in the order made)
       const all = (await Promise.all(keys.map(k => env.KONTA.get(k.name, 'json')))).filter(Boolean).sort((a, b) => (a.created || '').localeCompare(b.created || ''));
       for (const a of all) if (!a.emp) { a.emp = await nextEmp(); await putU(a); }
-      return J(all.map(pub));
+      return J(all.filter(mine_).map(pub));
     }
     if (!m[1] && req.method === 'POST') {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       const name = String(b.name || '').trim().slice(0, 60), role = ROLES.includes(b.role) ? b.role : 'user';
       if (!name) return J({ error: 'name' }, 400);
-      const id = newTok(10), a = { id, name, role, created: new Date().toISOString(), emp: await nextEmp() };
+      const id = newTok(10), a = { id, name, role, created: new Date().toISOString(), emp: await nextEmp(), own: u.id };
       for (const k of PROF) if (b[k]) a[k] = String(b[k]).trim().slice(0, k === 'note' ? 500 : 80);
       const token = await newToken(a);
       return J(Object.assign(pub(a), { token }));
     }
-    const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a) return J({ error: 'not found' }, 404);
+    const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a || !mine_(a)) return J({ error: 'not found' }, 404);   // (konto innego administratora: jakby go nie było)
     // a new token: drawn, or the administrator's own code ({token}: 8–40 letters and digits, not in use by another account);
     // the profile and the data stay
     if (m[2] && req.method === 'POST') {
@@ -289,7 +313,7 @@ async function konta(req, env, cors) {
         const t = String(b.token).trim(); if (!/^[A-Za-z0-9]{8,40}$/.test(t)) return J({ error: 'format' }, 400);
         const th = await sha(t), other = await env.KONTA.get('t:' + th); if (other && other !== a.id) return J({ error: 'taken' }, 409);
         if (env.ADMIN_TOKEN && same(t, env.ADMIN_TOKEN)) return J({ error: 'taken' }, 409);
-        const old = a.th; a.th = th; a.tk = await tokSeal(env, t); await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old && old !== th ? env.KONTA.delete('t:' + old) : null]);
+        const old = a.th; a.th = th; a.tk = await tokSeal(env, t); await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old && old !== th ? env.KONTA.delete('t:' + old) : null, sessEndAll(env, a.id)]);
         return J({ id: a.id, token: t });
       }
       return J({ id: a.id, token: await newToken(a) });
@@ -304,7 +328,10 @@ async function konta(req, env, cors) {
     }
     // the token now in use, for the administrator (null: made before tokens were kept – a new one is needed)
     if (m[2] && req.method === 'GET') return J({ id: a.id, token: await tokOpen(env, a.tk) });
-    if (!m[2] && req.method === 'DELETE') { await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
+    if (!m[2] && req.method === 'DELETE') {
+      // (administrator z własnymi kontami: najpierw trzeba je usunąć – inaczej zostałyby bez opiekuna albo przeszły do kogoś innego)
+      if (a.role === 'admin' && (await ownIds(env, a.id)).size) return J({ error: 'has accounts' }, 409);
+      await sessEndAll(env, a.id); await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
   }
   return J({ error: 'not found' }, 404);
 }

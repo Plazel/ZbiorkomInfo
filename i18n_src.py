@@ -890,6 +890,7 @@ ROWS = [
     ('Generuj tablice z NetworkMakera', 'Generate boards from NetworkMaker', 'Anzeigen aus NetworkMaker erzeugen', 'Vytvoriť tabule z NetworkMakera', 'Vytvořit tabule z NetworkMakeru'),
     ('Dodano tablice:', 'Boards added:', 'Anzeigen hinzugefügt:', 'Pridané tabule:', 'Přidané tabule:'),
     ('Wszystkie tablice z NetworkMakera są już zapisane.', 'All boards from NetworkMaker are already saved.', 'Alle Anzeigen aus NetworkMaker sind bereits gespeichert.', 'Všetky tabule z NetworkMakera sú už uložené.', 'Všechny tabule z NetworkMakeru jsou již uložené.'),
+    ('Ten administrator ma własne konta użytkowników – najpierw trzeba je usunąć z jego panelu.', 'This administrator has their own user accounts – they have to be deleted in their panel first.', 'Dieser Administrator hat eigene Benutzerkonten – sie müssen zuerst in seinem Bereich gelöscht werden.', 'Tento administrátor má vlastné používateľské účty – najprv ich treba odstrániť v jeho paneli.', 'Tento administrátor má vlastní uživatelské účty – nejprve je třeba je smazat v jeho panelu.'),
 ]
 
 WEEKDAYS = {
