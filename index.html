@@ -242,7 +242,7 @@ span.chip{cursor:inherit}
 .slist li:nth-child(odd) button{background:var(--stripe)}
 .slist button:hover{background:var(--line)}
 .slist button:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
-.slist li::before{content:"";position:absolute;left:19px;top:0;bottom:0;border-left:2px solid var(--lc,var(--chip-grey));opacity:.6}
+.slist li::before{content:"";position:absolute;left:19px;top:0;bottom:0;border-left:2px solid var(--lc,var(--chip-grey))}
 .slist li:first-child::before{top:50%}.slist li:last-child::before{bottom:50%}
 .slist li::after{content:"";position:absolute;left:14px;top:50%;width:8px;height:8px;margin-top:-6px;border-radius:50%;border:2px solid var(--lc,var(--chip-grey));background:var(--bg)}
 .slist li.end::after{background:var(--lc,var(--chip-grey));width:10px;height:10px;margin-top:-7px;left:13px}
@@ -250,7 +250,7 @@ span.chip{cursor:inherit}
 .slist li.var .nm{color:var(--muted);font-style:italic}
 .slist li.var button{padding-left:68px}
 .slist li.var::after{left:40px}
-.slist li.var button::before{content:"";position:absolute;left:21px;top:50%;width:19px;margin-top:-1px;border-top:2px solid var(--lc,var(--chip-grey));opacity:.6}
+.slist li.var button::before{content:"";position:absolute;left:21px;top:50%;width:19px;margin-top:-1px;border-top:2px solid var(--lc,var(--chip-grey))}
 .slist .tag{font-size:.75rem;color:var(--muted);margin-left:auto;white-space:nowrap}
 .hand{width:15px;height:15px;flex:none;vertical-align:-2px;color:var(--hand)}
 .slist .hand{margin-left:-6px}
@@ -451,7 +451,7 @@ span.chip{cursor:inherit}
 .vdesc{flex-basis:100%;font-size:.85rem;color:var(--muted)}
 .vdesc b.k{color:var(--accent);margin-right:4px}
 .mapVar[hidden]{display:none}
-#mapDT polyline{pointer-events:none}#mapDT .dtOff{stroke:#9aa0a6;stroke-width:7}#mapDT .dtCase{stroke:#ffc400;stroke-width:12}#mapDT .dtPath{stroke-width:5}#mapDT .dtX{stroke:#d32f2f;stroke-width:4}
+#mapDT polyline{pointer-events:none}#mapDT .dtOff{stroke:#9aa0a6;stroke-width:7}#mapDT .dtCase{stroke:var(--alert);stroke-width:12}#mapDT .dtPath{stroke-width:5}#mapDT .dtX{stroke:var(--alert);stroke-width:4}
 #mapHL polyline{stroke-width:6;opacity:1;pointer-events:none;stroke-linejoin:round;stroke-linecap:round}#mapHL polyline.runPast{stroke:#a3a9b0;stroke-width:4}
 #mapSvg polyline.on{opacity:1;stroke-width:6}
 #mapSvg .mstop circle{fill:var(--bg);stroke-width:2.5}
@@ -967,15 +967,15 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 .slist li.zastLi{color:var(--fg);font-weight:500}
 /* (a stop not served: grey, struck through from its name to its pole's number) */
 .slist li.dtSkip .nm,.slist li.dtSkip .num,.side tr.dtSkip .n,.side tr.dtSkip .p,.rpList li.dtSkip .n{color:var(--muted)}
-.slist li.dtSkip button{position:relative}.slist li.dtSkip::before{z-index:1}.slist li.dtSkip .hand,.side tr.dtSkip .hand,.rpList li.dtSkip .hand{color:var(--muted)}
-.dtBadge{display:inline-flex;align-items:center;gap:5px;margin-left:10px;padding:2px 8px 2px 5px;font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none;background:#ffe9a8;color:#3a2f00;vertical-align:.12em;line-height:1.4;white-space:nowrap}.dtBadge svg{width:15px;height:15px;flex:none}
-:root[data-theme=dark] .dtBadge{background:#5a4810;color:#fff4cc}.slist li.dtSkip button::after,.side tr.dtSkip .sb::after,.rpList li.dtSkip::after{content:"";position:absolute;top:50%;border-top:2px solid var(--muted);pointer-events:none}
+.slist li.dtSkip button{position:relative}.slist li.dtSkip .hand,.side tr.dtSkip .hand,.rpList li.dtSkip .hand{color:var(--muted)}
+.dtBadge{display:inline-flex;align-items:center;gap:5px;margin-left:10px;padding:2px 8px 2px 5px;font-size:.78rem;font-weight:700;letter-spacing:0;text-transform:none;background:var(--alert);color:#fff;vertical-align:.12em;line-height:1.4;white-space:nowrap}.dtBadge svg{width:15px;height:15px;flex:none}
+:root[data-theme=dark] .dtBadge{background:var(--alert);color:#1a0000}.slist li.dtSkip button::after,.side tr.dtSkip .sb::after,.rpList li.dtSkip::after{content:"";position:absolute;top:50%;border-top:2px solid var(--alert);pointer-events:none}
 .slist li.dtSkip button::after{left:40px;right:12px}.side tr.dtSkip .sb::after{left:var(--dtl,64px);right:6px}.rpList li.dtSkip{position:relative}.rpList li.dtSkip::after{left:108px;right:12px}
-.slist li.dtAdd button,.slist li.dtAdd:nth-child(odd) button,.side tr.r.dtAdd td,.side tr.r.dtAdd:nth-child(even) td{background:#ffe9a8;color:#1a1a1a;cursor:default}.slist li.dtAdd .num,.side tr.dtAdd .p{color:#5a4a10}
-:root[data-theme=dark] .slist li.dtAdd button,:root[data-theme=dark] .side tr.r.dtAdd td{background:#5a4810;color:#fff}:root[data-theme=dark] .slist li.dtAdd .num,:root[data-theme=dark] .side tr.dtAdd .p{color:#e8d9a0}
+.slist li.dtAdd button,.slist li.dtAdd:nth-child(odd) button,.side tr.r.dtAdd td,.side tr.r.dtAdd:nth-child(even) td{background:color-mix(in srgb,var(--alert) 13%,var(--bg));color:var(--alert);font-weight:500;cursor:default}.slist li.dtAdd .num,.side tr.dtAdd .p{color:var(--alert)}
+
 .slist li.dtPass .nm,.side tr.dtPass .n{font-style:italic}
-.rpList li.dtAdd{background:#ffe9a8;color:#1a1a1a}:root[data-theme=dark] .rpList li.dtAdd{background:#5a4810;color:#fff}.rpList li.dtAdd .rl i{border-style:dashed}.rpList li.dtSkip .rl i{border-color:#d32f2f}
-.dtLeg{display:flex;gap:14px;flex-wrap:wrap;font-size:.85em;margin-top:2px}.dtLeg i{font-style:normal;background:#ffe9a8;color:#1a1a1a;padding:0 5px;border-radius:2px}
+.rpList li.dtAdd{background:color-mix(in srgb,var(--alert) 13%,var(--bg));color:var(--alert)}.rpList li.dtAdd .rl i{border-style:dashed}.rpList li.dtSkip .rl i{border-color:var(--alert)}
+.dtLeg{display:flex;gap:14px;flex-wrap:wrap;font-size:.85em;margin-top:2px}.dtLeg i{font-style:normal;background:color-mix(in srgb,var(--alert) 13%,var(--bg));color:var(--alert);padding:0 5px;border-radius:2px}
 .dtCov{position:relative;min-height:320px}.dtCover{position:absolute;left:0;right:0;bottom:0;z-index:3;background:var(--bg);text-align:center}.dtCoverIn{padding:56px 20px 40px;display:flex;flex-direction:column;align-items:center}.dtCover h2{margin:0;max-width:32ch;font-size:1.25rem;line-height:1.35}@media print{.dtCover{background:#fff}}
 .dtBeta{font-size:.6em;font-weight:700;letter-spacing:.04em;color:var(--muted);vertical-align:super;line-height:0;margin-left:3px}
 .dtNote .lwTx{display:block}.dir .dtNote{margin:4px 0 10px}.slist li.zastLi a.zastL{text-decoration:none}.propList{list-style:none;padding:0;margin:8px 0 16px;display:grid;gap:10px;max-width:760px}.propI{border:1px solid var(--line);padding:10px 12px}.propI p{margin:0 0 8px;line-height:1.75}.propI .admRow input{flex:1;min-width:0}
@@ -1830,7 +1830,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795353772;
+const APP_BUILD=1795355765;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
