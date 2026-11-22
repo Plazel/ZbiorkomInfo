@@ -205,6 +205,7 @@ def plans_of(trips_out):
 STOPS = {}           # sid -> [name, num, lat, lon, city]
 TSHAPE = {}; SHAPE_OF = {}   # trip -> shape id; (route, stop ids of a pattern) -> shape id
 ROUTES_OUT = []
+NM_MODES = {}   # (NetworkMaker: rodzaje linii zatrzymujących się na przystanku – T tramwaj, Y trolejbus, B autobus; bez kolei)
 
 TOWNS_OTHER = ('Pruszcz', 'Kowale', 'Banino', 'Borkowo', 'Czaple', 'Jankowo', 'Otomin', 'Straszyn', 'Rotmanka',
                'Juszkowo', 'Rusocin', 'Lędowo', 'Bąkowo', 'Cieplewo', 'Żukowo', 'Kolbudy', 'Rumia', 'Reda', 'Wejherowo',
@@ -499,6 +500,8 @@ def build_routes(groups, meta_of):
         main_stops = [dd['stops'][i][0] for dd in out_dirs for i in dd['pats'][0]]
         city_stops = [s[0] for dd in out_dirs for s in dd['stops']]
         cities = sorted({STOPS[s][4] for s in city_stops} - {'oth'})
+        if m['t'] != 'rail':
+            for s_ in city_stops: NM_MODES.setdefault(s_, set()).add({'tram': 'T', 'trol': 'Y'}.get(m['t'], 'B'))
         ROUTES_OUT.append({'id': rid, 'n': m['n'], 't': m['t'], 'op': m['op'], 'f': cov24 >= 480 or (bool(peak_all) and min(peak_all) <= 15), 'pk': round(min(peak_all), 1) if peak_all and min(peak_all) < 999 else None,
                            'fh': round(cov24 / 60, 1), 'avg': round(660 / deps) if deps else None, 'c': cities,
                            'ends': [out_dirs[0]['from'], out_dirs[0]['head']],
@@ -1572,6 +1575,19 @@ json.dump({'valid': TODAY.strftime('%d.%m.%Y'), 'until': fmt(end), 'generated': 
            'stops': {k: v for k, v in STOPS.items() if k in used}, 'routes': ROUTES_OUT},
           open(OUT + '/index.json', 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
 print('Gotowe:', len(ROUTES_OUT), 'linii zapisanych w', OUT)
+# NetworkMaker: przystanki z otwartych danych przewoźników (GTFS) dla jego miast – źródło przystanków autobusowych i tramwajowych
+# zamiast OSM (stacje kolejowe nadal z OSM). [id, nazwa, numer słupka, szer., dług., rodzaje linii]
+try:
+    import osm_nm
+    os.makedirs(OUT + '/nm', exist_ok=True)
+    for key, B in osm_nm.BOX.items():
+        s0, w0, n0, e0 = map(float, B.split(','))
+        L = [[k, v[0], v[1], v[2], v[3], ''.join(sorted(NM_MODES[k]))] for k, v in STOPS.items() if k in NM_MODES and s0 <= v[2] <= n0 and w0 <= v[3] <= e0]
+        if len(L) < 20: continue   # (miasto bez otwartych danych przystanków – np. Krynica: tylko OSM)
+        json.dump({'t': int(time.time()), 'bb': B, 'stops': L}, open(OUT + '/nm/zi_%s.json' % key, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+        print('NetworkMaker: przystanki z otwartych danych', key, len(L))
+except Exception as e:
+    print('NetworkMaker: przystanki z otwartych danych – błąd (%s)' % e)
 
 # ---------------- second pass: ZTM-style variant notes ----------------
 # "Kurs do: Y", "przez: Z" where Z is the busiest variant-only stop (the origin is not described)
