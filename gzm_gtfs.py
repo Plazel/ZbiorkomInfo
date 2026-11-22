@@ -15,10 +15,17 @@ RT_FILES = ('routes.txt', 'trips.txt', 'stop_times.txt', 'calendar.txt', 'calend
 UA = {'User-Agent': 'ZbiorkomInfo (rozklady; github.com/Plazel/ZbiorkomInfo)'}
 
 
-def _get(url, timeout=180):
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read()
+def _get(url, timeout=180, tries=3):
+    # (portal GZM czasem nie odpowiada – kilka prób z przerwą)
+    import time
+    for k in range(tries):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception:
+            if k == tries - 1: raise
+            time.sleep(20 * (k + 1))
 
 
 def resources():

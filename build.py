@@ -127,10 +127,18 @@ try:
         os.makedirs(SRC_CACHE, exist_ok=True)
         with zipfile.ZipFile(_gk, 'w', zipfile.ZIP_DEFLATED) as _z:
             for _f in os.listdir(os.path.join(SCR, 'gzm')): _z.write(os.path.join(SCR, 'gzm', _f), _f)
+        # (pliki do indeksu kursów na żywo – też zachowane, gdy portal następnym razem nie odpowie)
+        _gr = os.path.join(SCR, 'gzm_rt')
+        if os.path.isdir(_gr):
+            with zipfile.ZipFile(os.path.join(SRC_CACHE, 'gzm_rt.zip'), 'w', zipfile.ZIP_DEFLATED) as _z:
+                for _d, _, _fs in os.walk(_gr):
+                    for _f in _fs: _z.write(os.path.join(_d, _f), os.path.relpath(os.path.join(_d, _f), _gr))
     except Exception as e:
         MISSING['gzm'] = '%s: %s' % (type(e).__name__, str(e)[:300])
         if os.path.exists(_gk) and zipfile.is_zipfile(_gk):
             print('UWAGA: gzm niedostępne (%s) – użyta ostatnia pobrana kopia' % MISSING['gzm']); zipfile.ZipFile(_gk).extractall(os.path.join(SCR, 'gzm'))
+            _grz = os.path.join(SRC_CACHE, 'gzm_rt.zip')
+            if os.path.exists(_grz) and zipfile.is_zipfile(_grz): zipfile.ZipFile(_grz).extractall(os.path.join(SCR, 'gzm_rt'))
         else: print('gzm: pominięty (%s)' % e)
 except Exception as e: print('gzm: pominięty (%s)' % e)
 if _lost:
