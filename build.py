@@ -73,6 +73,8 @@ def fetch_src(key, dest):
     for url in [u for u in [SOURCES[key]] + ([SOURCES_ALT[key]] if key in SOURCES_ALT else []) if u]:
         try:
             fetch(url, dest)
+            # a page of an error or a half-downloaded file instead of the feed: not kept, the next source (or the copy kept) is used
+            if dest.endswith('.zip') and not zipfile.is_zipfile(dest): raise ValueError('pobrany plik nie jest archiwum ZIP (%d B)' % os.path.getsize(dest))
             os.makedirs(SRC_CACHE, exist_ok=True); shutil.copyfile(dest, kept)
             if SOURCES[key] and url != SOURCES[key]: print('UWAGA: %s z kopii Mobility Database (%s)' % (key, url)); MISSING[key] = 'pobrane z Mobility Database'
             return True
@@ -81,7 +83,7 @@ def fetch_src(key, dest):
     if True:
         e = err
         MISSING[key] = '%s: %s' % (type(e).__name__, str(e)[:300])
-        if not os.path.exists(kept): return False
+        if not os.path.exists(kept) or (dest.endswith('.zip') and not zipfile.is_zipfile(kept)): return False
         print('UWAGA: %s niedostępne (%s) – użyta ostatnia pobrana kopia z %s' % (key, MISSING[key],
               time.strftime('%d.%m.%Y %H:%M', time.localtime(os.path.getmtime(kept)))))
         shutil.copyfile(kept, dest)
