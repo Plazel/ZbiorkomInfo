@@ -873,6 +873,23 @@ ROWS = [
 ("Przystanek nieobsługiwany w związku z objazdem", "Stop not served due to a detour", "Haltestelle wegen einer Umleitung nicht bedient", "Zastávka neobsluhovaná z dôvodu obchádzky", "Zastávka neobsluhovaná kvůli objížďce"),
 ("Funkcja aktualności nie jest obsługiwana w Warszawie", "The news feature is not available in Warsaw", "Die Nachrichtenfunktion ist in Warschau nicht verfügbar", "Funkcia aktualít nie je vo Varšave podporovaná", "Funkce aktualit není ve Varšavě podporována"),
     ('nieprzeczytane', 'unread', 'ungelesen', 'neprečítané', 'nepřečtené'),
+    ('Ta funkcja nie jest obsługiwana w wybranym mieście', 'This feature is not supported in the selected city', 'Diese Funktion wird in der gewählten Stadt nicht unterstützt', 'Táto funkcia nie je vo vybranom meste podporovaná', 'Tato funkce není ve vybraném městě podporována'),
+    ('Klapkowy', 'Split-flap', 'Fallblatt', 'Preklápací', 'Překlápěcí'),
+    ('Wyświetlacz', 'Display', 'Anzeige', 'Displej', 'Displej'),
+    ('Standardowy', 'Standard', 'Standard', 'Štandardný', 'Standardní'),
+    ('Rozmiar wiersza dolnego', 'Size of the bottom row', 'Größe der unteren Zeile', 'Veľkosť dolného riadku', 'Velikost dolního řádku'),
+    ('Mały', 'Small', 'Klein', 'Malý', 'Malý'),
+    ('Wyrównanie kierunku', 'Alignment of the destination', 'Ausrichtung des Ziels', 'Zarovnanie smeru', 'Zarovnání směru'),
+    ('Wyrównaj do lewej', 'Align left', 'Linksbündig', 'Zarovnať doľava', 'Zarovnat doleva'),
+    ('Wyśrodkuj', 'Centre', 'Zentrieren', 'Vycentrovať', 'Vystředit'),
+    ('Najpierw wpisz górny wiersz', 'Enter the top row first', 'Zuerst die obere Zeile eingeben', 'Najprv zadajte horný riadok', 'Nejprve zadejte horní řádek'),
+    ('Przenieś do folderu', 'Move to a folder', 'In einen Ordner verschieben', 'Presunúť do priečinka', 'Přesunout do složky'),
+    ('Bez folderu', 'No folder', 'Ohne Ordner', 'Bez priečinka', 'Bez složky'),
+    ('Nowy folder', 'New folder', 'Neuer Ordner', 'Nový priečinok', 'Nová složka'),
+    ('Kliknij ponownie, aby usunąć', 'Click again to delete', 'Zum Löschen erneut klicken', 'Kliknite znova na odstránenie', 'Klikněte znovu pro smazání'),
+    ('Generuj tablice z NetworkMakera', 'Generate boards from NetworkMaker', 'Anzeigen aus NetworkMaker erzeugen', 'Vytvoriť tabule z NetworkMakera', 'Vytvořit tabule z NetworkMakeru'),
+    ('Dodano tablice:', 'Boards added:', 'Anzeigen hinzugefügt:', 'Pridané tabule:', 'Přidané tabule:'),
+    ('Wszystkie tablice z NetworkMakera są już zapisane.', 'All boards from NetworkMaker are already saved.', 'Alle Anzeigen aus NetworkMaker sind bereits gespeichert.', 'Všetky tabule z NetworkMakera sú už uložené.', 'Všechny tabule z NetworkMakeru jsou již uložené.'),
 ]
 
 WEEKDAYS = {
