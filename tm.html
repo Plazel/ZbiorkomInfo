@@ -938,6 +938,18 @@ function buildPaths(vis,CB){
  let gx0=Infinity,gy0=Infinity,gy1=-Infinity;paths.forEach(p=>p.m.forEach(q=>{const x=Math.floor(q[0]/C),y=Math.floor(q[1]/C);if(x<gx0)gx0=x;if(y<gy0)gy0=y;if(y>gy1)gy1=y}));
  const GH=(gy1-gy0)+3,GK=(x,y)=>(x-gx0+1)*GH+(y-gy0+1),mpp=156543.03*Math.cos(((paths[0]&&paths[0].pts[0][0])||54)*Math.PI/180)/Math.pow(2,map.getZoom());
  paths.forEach((p,pi)=>p.m.forEach((q,vi)=>{const k=GK(Math.floor(q[0]/C),Math.floor(q[1]/C));let a=grid.get(k);if(!a)grid.set(k,a=[]);a.push(pi,vi)}));
+ // strona, po której biegnie inna linia na wspólnym odcinku: ustalana dla całego odcinka z jego końców (skąd linia przychodzi i dokąd odchodzi),
+ // a nie punkt po punkcie – inaczej przy oddaleniu linie z sąsiednich torów ustawiały się wg numeru i przecinały się na początku lub końcu wspólnego odcinka
+ const SIDE=paths.map(()=>new Map());{
+  const nearG=(pi,vi,R2)=>{const p=paths[pi],q=p.m[vi],cx=Math.floor(q[0]/C),cy=Math.floor(q[1]/C),rr=Math.ceil(Math.sqrt(R2)/C),out=new Map();
+   for(let i=-rr;i<=rr;i++)for(let j=-rr;j<=rr;j++){const a=grid.get(GK(cx+i,cy+j));if(!a)continue;for(let k=0;k<a.length;k+=2){const o=paths[a[k]];if(o.gi===p.gi)continue;const vj=a[k+1],d=(o.m[vj][0]-q[0])**2+(o.m[vj][1]-q[1])**2;if(d>R2)continue;
+     if(R2===T2&&Math.abs(o.tx[vj]*p.tx[vi]+o.ty[vj]*p.ty[vi])<.8)continue;const c=out.get(o.gi);if(!c||d<c[0])out.set(o.gi,[d,a[k],vj])}}return out};
+  const FAR=Math.max(T2*16,60*60),K=Math.max(2,Math.round(40/ST));
+  paths.forEach((p,pi)=>{const n=p.m.length,runs=new Map(),cur=new Map();
+   for(let vi=0;vi<=n;vi++){const g=vi<n?nearG(pi,vi,T2):new Map();g.forEach((v,k)=>{if(!cur.has(k))cur.set(k,vi)});[...cur.keys()].forEach(k=>{if(!g.has(k)){(runs.get(k)||runs.set(k,[]).get(k)).push([cur.get(k),vi-1]);cur.delete(k)}})}
+   const sideAt=(vi,g)=>{if(vi<0||vi>=n)return 0;const e=nearG(pi,vi,FAR).get(g);if(!e)return 0;const Q=paths[e[1]].m[e[2]],P=p.m[vi],v=(Q[0]-P[0])*p.ty[vi]-(Q[1]-P[1])*p.tx[vi];return Math.abs(v)<.5?0:Math.sign(v)};
+   runs.forEach((rs,g)=>rs.forEach(([a,b])=>{let s0=0,s1=0;for(let t=K;t<=3*K&&!s0;t+=K)s0=sideAt(a-t,g);for(let t=K;t<=3*K&&!s1;t+=K)s1=sideAt(b+t,g);
+    const sd=s0&&s1?(s0===s1?s0:0):(s0||s1);if(!sd)return;let arr=SIDE[pi].get(g);if(!arr)SIDE[pi].set(g,arr=new Int8Array(n));for(let i=a;i<=b;i++)arr[i]=sd}))})}
  paths.forEach((p,pi)=>{
   for(let vi=0;vi<p.m.length;vi++){const q=p.m[vi],cx=Math.floor(q[0]/C),cy=Math.floor(q[1]/C);let near=null,rc=null,pm=null,dupf=0,cvl=null; // mapy tworzone dopiero przy pierwszym sąsiedzie (większość punktów leży na pojedynczej linii)
    // kandydaci do ramki odniesienia: najniższy indeks ścieżki w grupie – wspólny dla wszystkich ścieżek grupy (także wariantu „powrót”
@@ -964,7 +976,13 @@ function buildPaths(vis,CB){
      if(MC){let t=0,c=0;pm.forEach((v,pj)=>{const q2=paths[pj];if(q2.gi===g){const Q=q2.m[v[1]];t+=(Q[0]-ox)*rx+(Q[1]-oy)*ry;c++}});if(c>1)s=t/c} // grupa kolorów: średnie położenie boczne wszystkich jej linii
      return{g,s}}).sort((a,b)=>a.g-b.g),pos=[],ww=g=>lw(vis[g]),spc=(a,b)=>(ww(a)+ww(b))/2*mpp;
     // kolejność stabilna wzdłuż trasy: wg numeru linii; zamiana tylko gdy linie realnie leżą po przeciwnych stronach (>1 szerokość)
-    for(let i=1;i<it.length;i++)for(let j=i;j>0&&it[j-1].s-it[j].s>spc(it[j-1].g,it[j].g)*1.5;j--){const t=it[j];it[j]=it[j-1];it[j-1]=t}
+    // (próg zamiany: 1,5 szerokości linii, ale najwyżej 30 m na ziemi – przy oddaleniu szerokość w metrach rośnie i linie z sąsiednich ulic/torów ustawiały się wg numeru, więc przecinały się na wjeździe do wspólnego odcinka)
+    const thr=(a,b)=>Math.min(spc(a,b)*1.5,30);
+    // (strona ustalona dla całego wspólnego odcinka ma pierwszeństwo przed kolejnością numerów; każda para oceniana zawsze z punktu widzenia linii o niższym
+    // indeksie grupy – wszystkie linie wspólnego odcinka liczą tę samą kolejność, więc nie nachodzą na siebie)
+    const want=(x,y)=>{if(x.s-y.s>thr(x.g,y.g))return true;if(y.s-x.s>thr(x.g,y.g))return false;const lo=x.g<y.g?x:y,hi=lo===x?y:x,e=rc.get(lo.g);if(!e)return false;
+     const pa=paths[e[0]],A=SIDE[e[0]].get(hi.g);if(!A)return false;const sd=A[e[1]]*((rp.tx[rv]*pa.tx[e[1]]+rp.ty[rv]*pa.ty[e[1]])<0?-1:1);if(!sd)return false;return x===lo?sd<0:sd>0};
+    for(let i=1;i<it.length;i++)for(let j=i;j>0&&want(it[j-1],it[j]);j--){const t=it[j];it[j]=it[j-1];it[j-1]=t}
     it.forEach((x,k)=>pos.push(k?Math.max(x.s,pos[k-1]+spc(it[k-1].g,x.g)):x.s));
     const shift=pos.reduce((a,b)=>a+b,0)/n-it.reduce((a,x)=>a+x.s,0)/n,k=it.findIndex(x=>x.g===p.gi);
     p.off[vi]=(pos[k]-(MC?(q[0]-ox)*rx+(q[1]-oy)*ry:it[k].s)-shift)/mpp}
