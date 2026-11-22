@@ -100,7 +100,7 @@ input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .ntList{display:flex;flex-direction:column}.ntR{display:flex;align-items:flex-start;gap:8px}.ntR textarea{flex:1;border:0;background:transparent;color:var(--fg);font:inherit;font-size:14.5px;line-height:1.5;resize:none;padding:2px 0;outline:none;overflow:hidden;min-height:24px}
 .ntM{flex:none;min-width:18px;text-align:right;line-height:1.5;padding-top:2px;font-size:14.5px;color:var(--mut);font-variant-numeric:tabular-nums}.ntR.ol .ntM{min-width:24px}.ntR.ul,.ntR.ol,.ntR.todo{padding-left:6px}
 .ntC{flex:none;margin:6px 0 0;width:16px;height:16px;accent-color:var(--acc,#2456d6)}.ntR.done textarea{text-decoration:line-through;color:var(--mut)}
-.ttModal{width:min(1240px,100%)!important;height:88vh}.ttModal .mb{overflow:hidden;padding:0;flex:1;min-height:0}
+.ttModal{width:min(1680px,100%)!important;height:94vh}.ttModal .mb{overflow:hidden;padding:0;flex:1;min-height:0}
 .ttHub{display:grid;grid-template-columns:260px minmax(0,1fr);height:100%;min-height:0}.ttSide{border-right:1px solid var(--bd);overflow:auto;display:flex;flex-direction:column}.ttMain{overflow:auto;padding:16px 18px;min-height:0}
 .ttLn{display:flex;align-items:center;gap:10px;border:0;border-bottom:1px solid var(--bd2);background:transparent;color:var(--fg);font:inherit;text-align:left;padding:8px 12px;cursor:pointer}.ttLn:hover{background:var(--bd2)}.ttLn.on{background:var(--bd2);box-shadow:inset 3px 0 0 var(--acc,#2456d6)}
 .ttLnN{flex:none;min-width:38px;height:26px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}.ttLnT{display:flex;flex-direction:column;min-width:0}.ttLnT b{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -125,6 +125,16 @@ input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .ttRail i{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--panel);border:2.5px solid var(--lc);box-sizing:border-box}
 .ttSn{display:flex;align-items:center;gap:6px}.ttSn .pnumI{font-size:12px;color:var(--mut)}.ttDiff{font-size:11.5px;color:var(--mut);text-align:right;font-variant-numeric:tabular-nums}
 .ttNote{color:var(--mut);margin:8px 0 0;line-height:1.4}
+.ttCoI{flex:none;width:38px;height:28px;display:inline-flex;align-items:center;justify-content:center;color:var(--fg)}.ttCoI.big{width:40px;height:40px;border:1px solid var(--bd)}.ttLn.ttCo{border-bottom:2px solid var(--bd)}
+.coEd .ttHead{align-items:flex-start}.coEd .ttHead .ttTools{margin-left:auto}.coEd .ttHT small{white-space:normal;line-height:1.4;max-width:760px}
+.coList{display:flex;flex-direction:column;gap:10px}.coCard{border:1px solid var(--bd);padding:12px;display:flex;flex-direction:column;gap:10px}
+.coTop{display:flex;align-items:center;gap:10px;justify-content:space-between}.coSec{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13.5px}.coSec small{color:var(--mut)}.coSec svg{color:var(--mut)}
+.coItems,.coPick,.coSecs{display:flex;flex-wrap:wrap;gap:6px}.coIt{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);padding:4px 8px 4px 6px;cursor:pointer;font-size:13px;background:var(--panel)}.coIt.anc{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}.coIt input{margin:0}
+.coChip{display:inline-flex;align-items:center;gap:6px}.coChip .badge{transform:scale(.85);transform-origin:left center;margin-right:-4px}.coChip>span:last-child{display:inline-flex;align-items:center;gap:2px}
+.coOpt{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.coMax{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--mut)}.coMax input{width:56px;height:30px;padding:0 6px;text-align:right}
+.coRes{display:flex;flex-direction:column;gap:3px;font-size:13px;border-top:1px solid var(--bd2);padding-top:8px}.coRes>div{display:grid;grid-template-columns:150px auto 16px auto;align-items:center;gap:8px;justify-content:start}.coRes .coB{color:var(--mut)}.coRes .coA{font-weight:600}.coRes small{color:var(--mut)}
+.coEmpty{display:flex;align-items:center;gap:12px;border:1px dashed var(--bd);padding:14px;color:var(--mut)}.coEmpty p{margin:0}
+.coH{margin:8px 0 0}.coSug{display:flex;flex-direction:column;border-top:1px solid var(--bd2)}.coSugR{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd2)}.coSugR .coSec{flex:1;color:var(--mut)}
 .ttEmpty{display:flex;align-items:center;gap:12px;border:1px dashed var(--bd);padding:12px 14px;margin-bottom:12px}.ttEmpty>svg{flex:none;color:var(--mut)}.ttEmpty>div{flex:1;display:flex;flex-direction:column;gap:2px;font-size:13px}.ttEmpty span{color:var(--mut);line-height:1.4}.ttEmpty .b{flex:none}
 .ttTools .b.ico.on{background:var(--fg);color:var(--panel)}
 .ttBar{display:flex;flex-wrap:wrap;gap:10px}.ttSeg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--bd)}
@@ -2496,13 +2506,13 @@ function notesDlg(){if(!Array.isArray(S.notes))S.notes=[{k:'p',t:''}];if(!S.note
  const focusNow=()=>{const t=box.querySelector(`textarea[data-i="${foc}"]`);if(!t)return;t.focus();const c=caret==null?t.value.length:caret;t.setSelectionRange(c,c)};
  modal({title:'Notatki',body:box,cls:'ntModal',cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}],init:()=>draw(),onClose:()=>{S.notes=S.notes.filter((x,i)=>x.t||i===0);save()}})}
 function ttStat(l,P){const a=ziAuto(l,P||FP());if(!a)return['none','brak trasy'];if(l.tt&&Object.keys(l.tt).length)return['own','edytowany ręcznie'];return['auto','wyliczony z częstotliwości']}
-function ttEdit(l0){const P=FP(),roots=orderedLines().filter(x=>!x.par);if(!roots.length){say('Brak linii.');return}
- let cur=l0&&roots.includes(l0)?l0:(roots.find(x=>ttStat(x,P)[0]!=='none')||roots[0]);
+function ttEdit(l0,coordFirst){const P=FP(),roots=orderedLines().filter(x=>!x.par);if(!roots.length){say('Brak linii.');return}
+ let cur=coordFirst?'coord':l0&&roots.includes(l0)?l0:(roots.find(x=>ttStat(x,P)[0]!=='none')||roots[0]);
  const box=document.createElement('div');box.className='ttHub';box.innerHTML='<aside class="ttSide" aria-label="Linie"></aside><div class="ttMain"></div>';
  const side=box.querySelector('.ttSide'),main=box.querySelector('.ttMain');
- const drawSide=()=>{side.innerHTML=roots.map(x=>{const [k,t]=ttStat(x,P);return `<button type="button" class="ttLn${x===cur?' on':''}" data-l="${x.id}">${badgeOf(x)}<span class="ttLnT"><b>${x.stops.length?esc(routeText(x)):'Brak przystanków'}</b><small class="ttSt ${k}">${t}</small></span></button>`}).join('');
-  side.querySelectorAll('[data-l]').forEach(bt=>bt.onclick=()=>{cur=S.lines.find(x=>x.id===bt.dataset.l)||cur;show()})};
- const show=()=>{drawSide();const h=box.closest('.mbox');if(h)h.querySelector('.mh b').textContent='Rozkłady jazdy – linia '+(cur.num||'');main.replaceChildren(ttBody(cur,P,()=>drawSide()))};
+ const drawSide=()=>{const nc=(S.coord||[]).length;side.innerHTML=`<button type="button" class="ttLn ttCo${cur==='coord'?' on':''}" data-l="__coord"><span class="ttCoI">${ic('network',20)}</span><span class="ttLnT"><b>Koordynacja linii</b><small class="ttSt">${nc?nc+' '+(nc===1?'odcinek':nc<5?'odcinki':'odcinków')+' wspólnych':'równe odstępy na wspólnych odcinkach'}</small></span></button>`+roots.map(x=>{const [k,t]=ttStat(x,P);return `<button type="button" class="ttLn${x===cur?' on':''}" data-l="${x.id}">${badgeOf(x)}<span class="ttLnT"><b>${x.stops.length?esc(routeText(x)):'Brak przystanków'}</b><small class="ttSt ${k}">${t}</small></span></button>`}).join('');
+  side.querySelectorAll('[data-l]').forEach(bt=>bt.onclick=()=>{cur=bt.dataset.l==='__coord'?'coord':S.lines.find(x=>x.id===bt.dataset.l)||cur;show()})};
+ const show=()=>{drawSide();const h=box.closest('.mbox');if(h)h.querySelector('.mh b').textContent=cur==='coord'?'Rozkłady jazdy – koordynacja linii':'Rozkłady jazdy – linia '+(cur.num||'');main.replaceChildren(cur==='coord'?coordBody(P,()=>drawSide()):ttBody(cur,P,()=>drawSide()))};
  modal({title:'Rozkłady jazdy',body:box,cls:'ttModal',cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}],init:()=>show()})}
 function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElement('div');d.className='ttNone';d.innerHTML=`${ic('clock',28)}<p>Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.</p>`;return d}
  const st={dk:'A',dy:'w',gen:false},b=document.createElement('div');b.className='ttEd';
@@ -2539,9 +2549,8 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
       <div class="ttBands">${st.bands.map((x,i)=>`<div class="ttBand"><span class="ttBl">${ic('clock',14)}</span><input data-ba="${i}" value="${hm(x.a)}" inputmode="numeric" aria-label="Od godziny"><span class="ttDash">–</span><input data-bb="${i}" value="${hm(x.b%1440)}" inputmode="numeric" aria-label="Do godziny"><span class="ttCo">co</span><input data-bh="${i}" type="number" min="1" max="240" step="any" value="${x.h}" aria-label="Co ile minut"><span class="ttCo">min</span><button type="button" class="b ico flat" data-bx="${i}" data-tl="Usuń przedział" data-td="Usuwa ten przedział godzin z taktów." aria-label="Usuń przedział"${st.bands.length>1?'':' disabled'}>${ic('trash',15)}</button></div>`).join('')}</div>
       <div class="ttPre"><span>Wszędzie co:</span>${pres.map(h=>`<button type="button" class="b flat" data-pre="${h}">${String(h).replace('.',',')}</button>`).join('')}<span class="grow"></span><button type="button" class="b flat" data-t="badd">${ic('plus',14)}Przedział</button></div>
       <div class="ttGenF"><span class="small">Kółko myszy nad godziną zmienia ją o 5 min (z Shiftem o 1 min). ${dep.length?'Zastąpi obecne odjazdy tego dnia.':''}</span><button type="button" class="b" data-t="gcancel">Anuluj</button><button type="button" class="b pri" data-t="gok">${ic('check',14)}Zastosuj</button></div></div>`:''}
-     ${!dep.length&&!st.gen?`<div class="ttEmpty">${ic('clock',22)}<div><b>Brak odjazdów (${TT_DN[st.dy].toLowerCase()})</b><span>Wygeneruj je z taktów – np. co 10 min w szczycie i co 20 poza nim – albo wpisz minuty przy godzinach poniżej.</span></div><button type="button" class="b pri" data-t="gen2">${ic('wand',15)}Wygeneruj z taktów</button></div>`:''}
      <div class="ttGrid${isOwn?'':' isAuto'}">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" placeholder="" aria-label="Minuty odjazdów o godzinie ${h}"></label>`).join('')}</div>
-     <div class="ttFoot"><span class="small">${sum}</span><span class="small ttHint">Wpisz minuty oddzielone spacją, np. „05 25 45”.</span><label class="ttAdd" data-tl="Dodaj odjazd" data-td="Wpisz godzinę (np. 14:35) i naciśnij Enter."><span>${ic('plus',14)}</span><input data-t="add" placeholder="gg:mm" inputmode="numeric" aria-label="Dodaj odjazd (gg:mm)"></label></div>
+     <div class="ttFoot"><span class="small">${sum}</span><span class="small ttHint">Wpisz minuty oddzielone spacją, np. „05 25 45”.</span></div>
     </section>
     <section class="ttOff"><div class="ttTH"><h4>Czasy przejazdu</h4><div class="ttTools">${tb('oauto','reset','Przywróć wyliczone','Wraca do czasów przejazdu wyliczonych z długości trasy.',!T.ownOff)}</div></div>
      <div class="ttStops" style="--lc:${l.color}">${T.st.map((q,i)=>`<label class="ttS${i===0?' first':''}${i===T.st.length-1?' last':''}"><span class="ttRail"><i></i></span><span class="ttSn">${esc(q.n)}${q.num?`<span class="pnumI">${POLE_SVG}${esc(q.num)}</span>`:''}</span><span class="ttDiff">${i?'+'+Math.max(0,T.off[i]-T.off[i-1]):''}</span><input type="number" min="0" max="600" data-o="${i}" value="${T.off[i]}"${i===0?' disabled':''} class="${T.ownOff?'':'auto'}" aria-label="Minuta przejazdu: ${esc(q.n)}"><small>min</small></label>`).join('')}</div>
@@ -2552,7 +2561,7 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
    x.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();x.blur()}}});
   b.querySelectorAll('[data-o]').forEach(x=>x.onchange=()=>{const v=[...b.querySelectorAll('[data-o]')].map(y=>Math.max(0,Math.round(+y.value||0)));v[0]=0;for(let i=1;i<v.length;i++)if(v[i]<v[i-1])v[i]=v[i-1];setOff(v);draw()});
   const t=k=>b.querySelector(`[data-t="${k}"]`);
-  t('gen').onclick=()=>{st.gen=!st.gen;draw()};if(t('gen2'))t('gen2').onclick=()=>{st.gen=true;draw()};
+  t('gen').onclick=()=>{st.gen=!st.gen;draw()};
   t('gen').classList.toggle('on',!!st.gen);
   t('auto').onclick=()=>{setDep(null);draw();say('Przywrócono rozkład wyliczany z częstotliwości ('+TT_DN[st.dy].toLowerCase()+').')};
   t('oauto').onclick=()=>{setOff(null);draw()};
@@ -2560,7 +2569,6 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
   t('copy').onclick=()=>{const v=cur().dep[st.dy];l.tt=l.tt||{};const D=l.tt[st.dk]=l.tt[st.dk]||{};TT_D.forEach(k=>D[k]=v.slice());save();renderLines();if(onCh)onCh();draw();say('Skopiowano odjazdy ('+TT_DN[st.dy].toLowerCase()+') do pozostałych dni.')};
   t('shift').onclick=async()=>{const v=await modal({title:'Przesuń odjazdy',body:'<label class="row" style="gap:8px">O ile minut (np. 5 lub -3): <input id="ttSh" type="number" value="0" style="width:80px" autofocus></label>',cancelV:null,btns:[{t:'Anuluj',v:null},{t:'Przesuń',c:'pri',v:()=>+document.getElementById('ttSh').value||0}]});
    if(!v)return;setDep(cur().dep[st.dy].map(m=>(m+v+1440)%1440));draw()};
-  {const ad=t('add');ad.onkeydown=e=>{if(e.key!=='Enter')return;e.preventDefault();const m=t2m(ad.value.trim());if(m==null||m>=1440){say('Wpisz godzinę w formacie gg:mm, np. 14:35.');return}setDep([...cur().dep[st.dy],m]);draw();const n=b.querySelector('[data-t="add"]');if(n)n.focus();say('Dodano odjazd '+hm(m)+'.')}}
   if(st.gen){const wheel=(inp,f)=>inp.addEventListener('wheel',e=>{e.preventDefault();f(e.deltaY<0?1:-1,e.shiftKey)},{passive:false});
    const pvU=()=>{const p=cnt(st.bands),e=b.querySelector('.ttPv');if(e)e.textContent=p.length+' odjazdów'+(p.length?' · '+hm(p[0])+'–'+hm(p[p.length-1]):'')};
    b.querySelectorAll('[data-ba],[data-bb],[data-bh]').forEach(x=>{const i=+(x.dataset.ba||x.dataset.bb||x.dataset.bh),B=st.bands[i];
@@ -2575,6 +2583,97 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
    t('badd').onclick=()=>{const L=st.bands[st.bands.length-1];st.bands.push({a:L?L.b%1440:360,b:Math.min(1440,(L?L.b:360)+120),h:L?L.h:20});draw()};
    t('gcancel').onclick=()=>{st.gen=false;draw()};
    t('gok').onclick=()=>{const out=cnt(st.bands);setDep(out);st.gen=false;draw();say('Wygenerowano '+out.length+' odjazdów ('+TT_DN[st.dy].toLowerCase()+').')}}};
+ draw();return b}
+// ---- koordynacja linii: kilka linii (w danym kierunku) na wspólnym odcinku trasy dostaje odjazdy rozłożone możliwie równomiernie
+// – stały takt na wspólnym odcinku. S.coord: [{id, items:[{l, dk}], sec:[nazwy przystanków odcinka], days:[w,s,h], anchor, max}].
+// Każda linia przesuwana jest w danym kierunku i dniu o jedną stałą liczbę minut (cały rozkład tego dnia; w granicach ±max),
+// wspólnie dla wszystkich odcinków, na których jest koordynowana. Kryterium: suma kwadratów odstępów między kolejnymi kursami
+// wszystkich linii na początku każdego odcinka (najmniejsza przy równych odstępach) – liczona łącznie dla wszystkich powiązanych
+// odcinków, więc linia skoordynowana na kilku odcinkach z różnymi liniami dostaje przesunięcie najlepsze dla całej sieci.
+// Szukanie: zejście po współrzędnych (każda linia po kolei: wszystkie przesunięcia w zakresie) z kilkoma losowymi startami.
+const coordDn=(l,dk,P)=>{const a=ziAuto(l,P);if(!a||!a[dk])return null;const T=ttOf(l,dk,a);return T};
+const coordNames=(l,dk,P)=>{const T=coordDn(l,dk,P);return T?T.st.map(q=>q.n):null};
+// wspólne, nieprzerwane ciągi przystanków (w tej samej kolejności) we wszystkich trasach; najdłuższe, nie krótsze niż 2 przystanki
+function coordCommon(lists){if(!lists.length||lists.some(x=>!x||x.length<2))return [];const A=lists[0],out=[];
+ const has=(L,seq)=>{for(let i=0;i+seq.length<=L.length;i++){let ok=true;for(let k=0;k<seq.length;k++)if(L[i+k]!==seq[k]){ok=false;break}if(ok)return true}return false};
+ for(let i=0;i<A.length;i++)for(let j=A.length;j>=i+2;j--){const seq=A.slice(i,j);if(lists.every(L=>has(L,seq))){if(!out.some(o=>o.join('|').includes(seq.join('|'))))out.push(seq);break}}
+ return out.sort((x,y)=>y.length-x.length)}
+// propozycje: pary linii-kierunków z co najmniej 3 wspólnymi przystankami pod rząd, zgrupowane po tym samym odcinku
+function coordSuggest(P){const items=[];S.lines.filter(l=>!l.par).forEach(l=>['A','B'].forEach(dk=>{const n=coordNames(l,dk,P);if(n)items.push({l:l.id,dk,n})}));
+ const G=new Map();for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){if(items[i].l===items[j].l)continue;const c=coordCommon([items[i].n,items[j].n])[0];if(!c||c.length<3)continue;
+  const k=c.join('|');let g=G.get(k);if(!g){g={sec:c,items:[]};G.set(k,g)}[items[i],items[j]].forEach(x=>{if(!g.items.some(y=>y.l===x.l&&y.dk===x.dk))g.items.push({l:x.l,dk:x.dk})})}
+ const have=new Set((S.coord||[]).map(c=>c.sec.join('|')+'#'+c.items.map(x=>x.l+x.dk).sort().join(',')));
+ return [...G.values()].filter(g=>!have.has(g.sec.join('|')+'#'+g.items.map(x=>x.l+x.dk).sort().join(','))).sort((a,b)=>b.items.length-a.items.length||b.sec.length-a.sec.length).slice(0,12)}
+// czasy przejazdu przez początek odcinka: odjazd z pierwszego przystanku + czas do przystanku, od którego zaczyna się odcinek
+function coordTimes(c,it,dy,P){const l=S.lines.find(x=>x.id===it.l);if(!l)return null;const T=coordDn(l,it.dk,P);if(!T)return null;const n=T.st.map(q=>q.n);
+ let k=-1;for(let i=0;i+c.sec.length<=n.length;i++){if(c.sec.every((x,q)=>n[i+q]===x)){k=i;break}}if(k<0)return null;return {l,T,k,t:(T.dep[dy]||[]).map(m=>m+T.off[k])}}
+const coordCost=arr=>{const a=arr.slice().sort((x,y)=>x-y);let c=0;for(let i=1;i<a.length;i++){const g=a[i]-a[i-1];c+=g*g}return c};
+const coordStats=arr=>{const a=arr.slice().sort((x,y)=>x-y),g=[];for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];if(d<=90)g.push(d)}if(!g.length)return null;
+ const m=g.reduce((x,y)=>x+y,0)/g.length,sd=Math.sqrt(g.reduce((x,y)=>x+(y-m)**2,0)/g.length);return {min:Math.min(...g),max:Math.max(...g),sd,n:a.length}};
+// optymalizacja wszystkich powiązanych odcinków dla jednego dnia: zmienne – przesunięcie każdej pary (linia, kierunek)
+function coordSolve(groups,dy,P){const V=new Map(),terms=[];
+ groups.forEach(c=>{if(!(c.days||TT_D).includes(dy))return;const rows=[];c.items.forEach(it=>{const r=coordTimes(c,it,dy,P);if(!r||!r.t.length)return;const key=it.l+'|'+it.dk;
+   if(!V.has(key))V.set(key,{key,l:it.l,dk:it.dk,max:Math.max(0,Math.round(c.max!=null?c.max:15)),fix:c.anchor===it.l+'|'+it.dk,d:0});else{const v=V.get(key);v.max=Math.min(v.max,Math.max(0,Math.round(c.max!=null?c.max:15)));if(c.anchor===key)v.fix=true}
+   rows.push({key,t:r.t})});if(rows.length>=2)terms.push(rows)});
+ const vars=[...V.values()];if(!vars.length||!terms.length)return null;
+ if(!vars.some(v=>v.fix))vars[0].fix=true;   // (jedna linia zostaje na miejscu – przesuwanie wszystkich o tyle samo niczego nie zmienia)
+ const cost=()=>terms.reduce((acc,rows)=>acc+coordCost(rows.flatMap(r=>{const d=V.get(r.key).d;return r.t.map(x=>x+d)})),0);
+ const before=terms.map(rows=>coordStats(rows.flatMap(r=>r.t)));
+ const free=vars.filter(v=>!v.fix);let best=null,bestD=null;
+ for(let rs=0;rs<6;rs++){free.forEach(v=>v.d=rs?Math.round((Math.random()*2-1)*v.max):0);let c0=cost();
+  for(let it=0;it<12;it++){let imp=false;free.forEach(v=>{let bd=v.d,bc=c0;for(let d=-v.max;d<=v.max;d++){v.d=d;const c=cost();if(c<bc-1e-9||(Math.abs(c-bc)<1e-9&&Math.abs(d)<Math.abs(bd))){bc=c;bd=d}}if(bd!==v.d||bc<c0)imp=imp||bc<c0-1e-9;v.d=bd;c0=bc});if(!imp)break}
+  if(best==null||c0<best-1e-9){best=c0;bestD=new Map(vars.map(v=>[v.key,v.d]))}}
+ vars.forEach(v=>v.d=bestD.get(v.key));
+ const after=terms.map(rows=>coordStats(rows.flatMap(r=>{const d=V.get(r.key).d;return r.t.map(x=>x+d)})));
+ return {vars,before,after}}
+// powiązane odcinki: wszystkie, które dzielą choć jedną parę (linia, kierunek) z danym – przeliczane razem
+function coordComp(c){const all=S.coord||[],inC=new Set([c]);let ch=true;while(ch){ch=false;all.forEach(x=>{if(inC.has(x))return;if(x.items.some(it=>[...inC].some(y=>y.items.some(j=>j.l===it.l&&j.dk===it.dk)))){inC.add(x);ch=true}})}return [...inC]}
+function coordRun(groups,P){const res={},moved=[];TT_D.forEach(dy=>{const r=coordSolve(groups,dy,P);if(!r)return;res[dy]=r;
+  r.vars.forEach(v=>{if(!v.d)return;const l=S.lines.find(x=>x.id===v.l);const T=coordDn(l,v.dk,P);if(!T)return;l.tt=l.tt||{};const D=l.tt[v.dk]=l.tt[v.dk]||{};
+   D[dy]=[...new Set((T.dep[dy]||[]).map(m=>((m+v.d)%1440+1440)%1440))].sort((x,y)=>x-y);moved.push([l,v.dk,dy,v.d])})});
+ groups.forEach((c,gi)=>{c.res=c.res||{};TT_D.forEach(dy=>{const r=res[dy];if(!r)return;const terms=groups.filter(x=>(x.days||TT_D).includes(dy));const ti=terms.indexOf(c);
+   if(ti>=0&&r.before[ti]!==undefined)c.res[dy]={b:r.before[ti],a:r.after[ti],t:Date.now()}})});
+ save();renderLines();return moved}
+function coordBody(P,onCh){S.coord=S.coord||[];const b=document.createElement('div');b.className='ttEd coEd';let add=null;
+ const lineOf=id=>S.lines.find(x=>x.id===id),dirN=(l,dk)=>{const n=coordNames(l,dk,P);return n?n[n.length-1]:'?'};
+ const chip=it=>{const l=lineOf(it.l);return l?`<span class="coChip">${badgeOf(l)}<span>${ic('right',12)}${esc(dirN(l,it.dk))}</span></span>`:''};
+ const st2=x=>x?`${x.min}–${x.max} min <small>(±${x.sd.toFixed(1).replace('.',',')})</small>`:'–';
+ const draw=()=>{const sug=coordSuggest(P);
+  b.innerHTML=`<div class="ttHead"><span class="ttCoI big">${ic('network',24)}</span><div class="ttHT"><b>Koordynacja linii na wspólnych odcinkach</b><small class="ttSt auto">Linie jadące wspólnym odcinkiem dostają odjazdy przesunięte tak, by kursy na tym odcinku jechały możliwie równo co kilka minut. Linia może być koordynowana na kilku odcinkach – przeliczane są one razem.</small></div>
+    <div class="ttTools">${[['addc','plus','Dodaj odcinek','Wybierz linie i ich wspólny odcinek do skoordynowania.'],['runall','wand','Koordynuj wszystkie','Przelicza wszystkie odcinki naraz i przesuwa odjazdy linii (dni robocze, soboty, niedziele).',!S.coord.length]].map(([k,i,tl,td,dis])=>`<button type="button" class="b ico" data-t="${k}" data-tl="${esc(tl)}" data-td="${esc(td)}" aria-label="${esc(tl)}"${dis?' disabled':''}>${ic(i)}</button>`).join('')}</div></div>
+   ${add?addHtml():''}
+   <div class="coList">${S.coord.length?S.coord.map((c,ci)=>{const items=c.items.filter(it=>lineOf(it.l));return `<div class="coCard" data-ci="${ci}">
+     <div class="coTop"><div class="coSec">${ic('route',16)}<b>${esc(c.sec[0])}</b>${ic('right',14)}<b>${esc(c.sec[c.sec.length-1])}</b><small>${c.sec.length} przyst.</small></div>
+      <div class="ttTools"><button type="button" class="b ico" data-run="${ci}" data-tl="Koordynuj" data-td="Przelicza ten odcinek (razem z odcinkami, które mają wspólne linie) i przesuwa odjazdy." aria-label="Koordynuj">${ic('wand')}</button><button type="button" class="b ico" data-del="${ci}" data-tl="Usuń odcinek" data-td="Usuwa koordynację tego odcinka; rozkłady linii zostają, jakie są." aria-label="Usuń odcinek">${ic('trash')}</button></div></div>
+     <div class="coItems">${items.map(it=>`<label class="coIt${c.anchor===it.l+'|'+it.dk?' anc':''}" data-tl="Linia wzorcowa" data-td="Linia wzorcowa zostaje na miejscu, pozostałe dopasowują się do niej. Kliknij, aby ją wybrać."><input type="radio" name="anc${ci}" data-anc="${ci}" value="${it.l}|${it.dk}"${c.anchor===it.l+'|'+it.dk?' checked':''}>${chip(it)}</label>`).join('')}</div>
+     <div class="coOpt"><span class="ttSeg" role="group" aria-label="Dni">${TT_D.map(k=>`<button type="button" data-cday="${ci}" data-k="${k}" class="${(c.days||TT_D).includes(k)?'on':''}">${TT_DN[k]}</button>`).join('')}</span>
+      <label class="coMax" data-tl="Największe przesunięcie" data-td="O ile minut najwyżej można przesunąć odjazdy linii (w obie strony).">${ic('shift',14)}<span>±</span><input type="number" min="0" max="60" data-cmax="${ci}" value="${c.max!=null?c.max:15}"><span>min</span></label></div>
+     ${c.res&&Object.keys(c.res).length?`<div class="coRes">${TT_D.filter(k=>c.res[k]).map(k=>`<div><span>${TT_DN[k]}</span><span class="coB">${st2(c.res[k].b)}</span>${ic('right',12)}<span class="coA">${st2(c.res[k].a)}</span></div>`).join('')}<small>Odstępy między kolejnymi kursami na początku odcinka (najkrótszy–najdłuższy, w nawiasie średnie odchylenie).</small></div>`:''}
+    </div>`}).join(''):`<div class="coEmpty">${ic('network',26)}<p>Nie ma jeszcze koordynowanych odcinków. Dodaj odcinek ręcznie albo wybierz jedną z propozycji poniżej.</p></div>`}</div>
+   ${sug.length?`<h4 class="coH">Propozycje – linie ze wspólnymi odcinkami</h4><div class="coSug">${sug.map((g,i)=>`<div class="coSugR">${g.items.map(chip).join('')}<span class="coSec small">${esc(g.sec[0])} ${ic('right',12)} ${esc(g.sec[g.sec.length-1])} · ${g.sec.length} przyst.</span><button type="button" class="b" data-sug="${i}">${ic('plus',14)}Dodaj</button></div>`).join('')}</div>`:''}`;
+  const t=k=>b.querySelector(`[data-t="${k}"]`);
+  t('addc').onclick=()=>{add=add?null:{sel:[],sec:0};draw()};
+  t('runall').onclick=()=>{const m=coordRun(S.coord,P);if(onCh)onCh();draw();say(m.length?'Skoordynowano: przesunięto '+m.length+' rozkładów ('+[...new Set(m.map(x=>x[0].num))].join(', ')+').':'Rozkłady są już rozłożone najlepiej, jak się da – bez zmian.')};
+  b.querySelectorAll('[data-run]').forEach(x=>x.onclick=()=>{const c=S.coord[+x.dataset.run],m=coordRun(coordComp(c),P);if(onCh)onCh();draw();say(m.length?'Skoordynowano: '+m.map(([l,dk,dy,d])=>l.num+' '+TT_DN[dy].toLowerCase()+' '+(d>0?'+':'')+d+' min').join(', ')+'.':'Bez zmian – odjazdy są już rozłożone najlepiej, jak się da.')});
+  b.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{S.coord.splice(+x.dataset.del,1);save();if(onCh)onCh();draw()});
+  b.querySelectorAll('[data-anc]').forEach(x=>x.onchange=()=>{S.coord[+x.dataset.anc].anchor=x.value;save();draw()});
+  b.querySelectorAll('[data-cday]').forEach(x=>x.onclick=()=>{const c=S.coord[+x.dataset.cday],D=new Set(c.days||TT_D);D.has(x.dataset.k)?D.delete(x.dataset.k):D.add(x.dataset.k);c.days=TT_D.filter(k=>D.has(k));save();draw()});
+  b.querySelectorAll('[data-cmax]').forEach(x=>x.onchange=()=>{S.coord[+x.dataset.cmax].max=Math.max(0,Math.min(60,Math.round(+x.value||0)));save()});
+  b.querySelectorAll('[data-sug]').forEach(x=>x.onclick=()=>{const g=sug[+x.dataset.sug];S.coord.push({id:'c'+Date.now(),items:g.items,sec:g.sec,days:TT_D.slice(),max:15,anchor:g.items[0].l+'|'+g.items[0].dk});save();if(onCh)onCh();draw()});
+  if(add)addWire()};
+ // dodawanie odcinka: wybór linii (z kierunkiem), potem jeden z ich wspólnych odcinków
+ const opts=()=>{const o=[];S.lines.filter(l=>!l.par).forEach(l=>['A','B'].forEach(dk=>{if(coordNames(l,dk,P))o.push({l:l.id,dk})}));return o};
+ const addHtml=()=>{const O=opts(),lists=add.sel.map(it=>coordNames(lineOf(it.l),it.dk,P)),cs=add.sel.length>=2?coordCommon(lists):[];add.cs=cs;
+  return `<div class="ttGenP coAdd"><div class="ttGenH">${ic('plus',16)}<b>Nowy odcinek koordynacji</b><span class="ttPv">${add.sel.length} wybrane</span></div>
+   <div class="small" style="color:var(--mut)">1. Zaznacz linie (każdą w kierunku, który jedzie wspólnym odcinkiem):</div>
+   <div class="coPick">${O.map(it=>`<label class="coIt${add.sel.some(x=>x.l===it.l&&x.dk===it.dk)?' anc':''}"><input type="checkbox" data-pk="${it.l}|${it.dk}"${add.sel.some(x=>x.l===it.l&&x.dk===it.dk)?' checked':''}>${chip(it)}</label>`).join('')}</div>
+   <div class="small" style="color:var(--mut)">2. Wspólny odcinek:</div>
+   <div class="coSecs">${add.sel.length<2?'<span class="small" style="color:var(--mut)">Zaznacz co najmniej dwie linie.</span>':cs.length?cs.map((q,i)=>`<label class="coIt${add.sec===i?' anc':''}"><input type="radio" name="coSec" data-sec="${i}"${add.sec===i?' checked':''}>${esc(q[0])} ${ic('right',12)} ${esc(q[q.length-1])} <small>(${q.length} przyst.)</small></label>`).join(''):'<span class="small" style="color:#c62828">Te linie nie mają wspólnego odcinka (co najmniej dwóch kolejnych przystanków w tej samej kolejności).</span>'}</div>
+   <div class="ttGenF"><span class="small"></span><button type="button" class="b" data-t="acancel">Anuluj</button><button type="button" class="b pri" data-t="aok"${cs.length?'':' disabled'}>${ic('check',14)}Dodaj odcinek</button></div></div>`};
+ const addWire=()=>{b.querySelectorAll('[data-pk]').forEach(x=>x.onchange=()=>{const [l,dk]=x.dataset.pk.split('|');add.sel=add.sel.filter(y=>!(y.l===l&&y.dk===dk));if(x.checked)add.sel.push({l,dk});add.sec=0;draw()});
+  b.querySelectorAll('[data-sec]').forEach(x=>x.onchange=()=>{add.sec=+x.dataset.sec;draw()});
+  b.querySelector('[data-t="acancel"]').onclick=()=>{add=null;draw()};
+  b.querySelector('[data-t="aok"]').onclick=()=>{const q=add.cs[add.sec];if(!q)return;S.coord.push({id:'c'+Date.now(),items:add.sel.slice(),sec:q,days:TT_D.slice(),max:15,anchor:add.sel[0].l+'|'+add.sel[0].dk});add=null;save();if(onCh)onCh();draw()}};
  draw();return b}
 function askPrompt(msg,def,o={}){
  const w=document.createElement('div'),inp=document.createElement('input');inp.value=def||'';inp.setAttribute('autofocus','');inp.style.width='100%';
