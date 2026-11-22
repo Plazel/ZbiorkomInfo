@@ -185,6 +185,9 @@ async function konta(req, env, cors) {
   // proposals the administrator approved (ok: e.g. the transfer to replacement lines shown in a line's timetable)
   if (p === '/konto/konfig' && req.method === 'GET') { const c = (await env.KONTA.get('cfg:mk', 'json')) || {}; return J({ comp: c.comp || null, ok: c.ok || [] }); }
   if (!u) return J({ error: 'unauthorized' }, 401);
+  // konto zawieszone przez swojego administratora: odpowiada tylko /konto (z susp: true – strona pokazuje komunikat), reszta odmawia
+  if (u.susp && !(p === '/konto' && req.method === 'GET')) return J({ error: 'suspended' }, 423);
+  if (u.susp) return J({ id: u.id, name: u.name, role: u.role, susp: true });
   // (with the administrator's settings for mKomputer: voice, language, gong – or null, the driver's own choice)
   // the account: its service number, and the sections or options given to it alone (ucomp; the whole list only for an administrator)
   if (p === '/konto' && req.method === 'GET') { const mk = (await env.KONTA.get('cfg:mk', 'json')) || null, grant = mk && mk.ucomp && Array.isArray(mk.ucomp[u.id]) ? mk.ucomp[u.id] : [];
@@ -279,12 +282,31 @@ async function konta(req, env, cors) {
       const own = await ownIds(env, u.id); own.add(u.id);
       const out = {}; await Promise.all(keys.filter(k => own.has(k.name.slice(3))).map(async k => { const v = await env.KONTA.get(k.name, 'json'); if (v) out[k.name.slice(3)] = v; })); return J(out);
     }
-    const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token)?)?$/); if (!m) return J({ error: 'not found' }, 404);
+    // import kont wyeksportowanych wcześniej (np. przy usuwaniu administratora): wracają pod tego administratora
+    if (p === '/admin/import' && req.method === 'POST') {
+      const t = await req.text(); if (t.length > 25000000) return J({ error: 'too large' }, 413);
+      let X; try { X = JSON.parse(t); } catch (e) { return J({ error: 'bad json' }, 400); }
+      if (!X || X.app !== 'zbiorkominfo-konta' || !Array.isArray(X.accounts)) return J({ error: 'format' }, 400);
+      const ids = new Set(X.accounts.map(a => a && a.id)), done = [], skip = [];
+      for (const a of X.accounts) {
+        if (!a || !/^[a-z0-9]{8,32}$/.test(a.id || '') || !ROLES.includes(a.role)) continue;
+        if (await env.KONTA.get('u:' + a.id)) { skip.push(a.id); continue; }
+        if (!ids.has(a.own) || a.id === X.root) a.own = u.id;   // (najwyższe konto eksportu – i każde bez opiekuna w pliku – trafia do importującego)
+        if (a.th && await env.KONTA.get('t:' + a.th)) { delete a.th; delete a.tk; }   // (kod zajęty przez inne konto: trzeba nadać nowy)
+        await env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: (a.fn || '').slice(0, 60), ln: (a.ln || '').slice(0, 60), own: a.own } });
+        if (a.th) await env.KONTA.put('t:' + a.th, a.id);
+        const D = (X.data || {})[a.id] || {}; if (typeof D.d === 'string') await env.KONTA.put('d:' + a.id, D.d); if (typeof D.tm === 'string') await env.KONTA.put('tm:' + a.id, D.tm);
+        done.push(a.id);
+      }
+      if (Array.isArray(X.msgs) && X.msgs.length) { const L = (await env.KONTA.get('msg:list', 'json')) || [], have = new Set(L.map(x => x.id)); for (const x of X.msgs) if (x && x.id && !have.has(x.id) && done.includes(x.fid)) L.push(x); L.sort((a, b) => (b.t || '').localeCompare(a.t || '')); L.splice(300); await env.KONTA.put('msg:list', JSON.stringify(L)); }
+      return J({ ok: true, imported: done.length, skipped: skip });
+    }
+    const m = p.match(/^\/admin\/konta(?:\/([a-z0-9]{8,32})(\/token|\/eksport|\/przenies)?)?$/); if (!m) return J({ error: 'not found' }, 404);
     // (the account's list entry carries its name, role and date as the key's metadata: the list needs no read per account)
     const putU = a => env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: (a.fn || '').slice(0, 60), ln: (a.ln || '').slice(0, 60), own: ownerOf(a) } });
     const nextEmp = async () => { const n = (+(await env.KONTA.get('cnt:emp')) || 1000) + 1; await env.KONTA.put('cnt:emp', String(n)); return n; };
     const PROF = ['fn', 'ln', 'phone', 'email', 'note'];
-    const pub = a => ({ id: a.id, name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: a.fn || '', ln: a.ln || '', phone: a.phone || '', email: a.email || '', note: a.note || '' });
+    const pub = a => ({ id: a.id, name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: a.fn || '', ln: a.ln || '', phone: a.phone || '', email: a.email || '', note: a.note || '', susp: !!a.susp });
     const newToken = async a => { const t = newTok(), th = await sha(t), old = a.th; a.th = th; a.tk = await tokSeal(env, t);
       await Promise.all([env.KONTA.put('t:' + th, a.id), putU(a), old ? env.KONTA.delete('t:' + old) : null, sessEndAll(env, a.id)]); return t; };
     if (!m[1] && req.method === 'GET') {
@@ -305,6 +327,28 @@ async function konta(req, env, cors) {
       return J(Object.assign(pub(a), { token }));
     }
     const a = m[1] && await env.KONTA.get('u:' + m[1], 'json'); if (!a || !mine_(a)) return J({ error: 'not found' }, 404);   // (konto innego administratora: jakby go nie było)
+    // wszystkie konta pod administratorem: jego własne i – rekurencyjnie – konta jego administratorów
+    const tree = async root => { const out = [], seen = new Set([root]); const q = [root]; while (q.length) { const o = q.shift(); for (const id of await ownIds(env, o)) { if (seen.has(id)) continue; seen.add(id); const x = await env.KONTA.get('u:' + id, 'json'); if (!x) continue; out.push(x); if (x.role === 'admin') q.push(id); } } return out; };
+    // eksport administratora z jego kontami i ich danymi (do ponownego wczytania przez POST /admin/import)
+    if (m[2] === '/eksport' && req.method === 'GET') {
+      const accs = [a, ...await tree(a.id)], data = {};
+      for (const x of accs) { const [d, tm] = await Promise.all([env.KONTA.get('d:' + x.id), env.KONTA.get('tm:' + x.id)]); if (d || tm) data[x.id] = Object.assign({}, d ? { d } : {}, tm ? { tm } : {}); }
+      const fids = new Set(accs.map(x => x.id)), msgs = ((await env.KONTA.get('msg:list', 'json')) || []).filter(x => fids.has(x.fid));
+      return J({ app: 'zbiorkominfo-konta', v: 1, at: new Date().toISOString(), root: a.id, accounts: accs, data, msgs });
+    }
+    // konta i dane administratora przekazane innemu administratorowi (sobie albo administratorowi, którego się utworzyło)
+    if (m[2] === '/przenies' && req.method === 'POST') {
+      if (a.role !== 'admin') return J({ error: 'not admin' }, 400);
+      let b = {}; try { b = await req.json(); } catch (e) {}
+      const to = String(b.to || ''); if (!to || to === a.id) return J({ error: 'to' }, 400);
+      if (to !== u.id) { const t = await env.KONTA.get('u:' + to, 'json'); if (!t || !mine_(t) || t.role !== 'admin') return J({ error: 'to' }, 403); }
+      const own = await ownIds(env, a.id); let n = 0;
+      for (const id of own) { const x = await env.KONTA.get('u:' + id, 'json'); if (!x) continue; x.own = to; await putU(x); n++; }
+      const L = (await env.KONTA.get('msg:list', 'json')) || []; let ch = false; for (const x of L) if (x.fid === a.id) { x.fid = to; ch = true; } if (ch) await env.KONTA.put('msg:list', JSON.stringify(L));
+      // (projekt NetworkMakera i dane konta przenoszonego administratora – tylko jeśli docelowy nie ma własnych)
+      for (const k of ['tm:', 'd:']) { const v = await env.KONTA.get(k + a.id); if (v && !(await env.KONTA.get(k + to))) await env.KONTA.put(k + to, v); }
+      return J({ ok: true, moved: n });
+    }
     // a new token: drawn, or the administrator's own code ({token}: 8–40 letters and digits, not in use by another account);
     // the profile and the data stay
     if (m[2] && req.method === 'POST') {
@@ -323,6 +367,7 @@ async function konta(req, env, cors) {
       let b; try { b = await req.json(); } catch (e) { return J({ error: 'bad json' }, 400); }
       if ('name' in b) { const n = String(b.name || '').trim().slice(0, 60); if (n) a.name = n; }
       if ('role' in b && ROLES.includes(b.role)) a.role = b.role;
+      if ('susp' in b) { if (b.susp) a.susp = true; else delete a.susp; }
       for (const k of PROF) if (k in b) a[k] = String(b[k] || '').trim().slice(0, k === 'note' ? 500 : 80);
       await putU(a); return J(pub(a));
     }
@@ -330,8 +375,13 @@ async function konta(req, env, cors) {
     if (m[2] && req.method === 'GET') return J({ id: a.id, token: await tokOpen(env, a.tk) });
     if (!m[2] && req.method === 'DELETE') {
       // (administrator z własnymi kontami: najpierw trzeba je usunąć – inaczej zostałyby bez opiekuna albo przeszły do kogoś innego)
-      if (a.role === 'admin' && (await ownIds(env, a.id)).size) return J({ error: 'has accounts' }, 409);
-      await sessEndAll(env, a.id); await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
+      // (?wszystko=1: razem ze wszystkimi kontami pod nim i ich danymi; bez tego administrator z kontami nie jest usuwany)
+      if (a.role === 'admin' && (await ownIds(env, a.id)).size) {
+        if (new URL(req.url).searchParams.get('wszystko') !== '1') return J({ error: 'has accounts' }, 409);
+        for (const x of await tree(a.id)) { await sessEndAll(env, x.id); await Promise.all([x.th ? env.KONTA.delete('t:' + x.th) : null, env.KONTA.delete('u:' + x.id), env.KONTA.delete('d:' + x.id), env.KONTA.delete('tm:' + x.id), env.KONTA.delete('st:' + x.id)]); }
+        const L = (await env.KONTA.get('msg:list', 'json')) || []; await env.KONTA.put('msg:list', JSON.stringify(L.filter(x => x.fid !== a.id)));
+      }
+      await sessEndAll(env, a.id); await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), env.KONTA.delete('tm:' + a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
   }
   return J({ error: 'not found' }, 404);
 }
