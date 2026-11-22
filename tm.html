@@ -282,6 +282,8 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
     <div class="fsep"></div>
     <button class="b" id="fSchema"><i data-ic="network"></i>Schemat</button>
     <button class="b" id="retryTram" title="Pobierz ponownie tory tramwajowe i kolejowe z OSM (szczegóły w sekcji Diagnostyka)"><i data-ic="refresh"></i>Odśwież dane</button>
+    <div class="fsep"></div>
+    <button class="b" id="fDelCity" style="color:var(--dng,#c62828)"><i data-ic="trash"></i>Usuń miasto</button>
     <span hidden style="display:none"><button id="fSaveAs"></button><button id="fSaveNow"></button><button id="fOpen"></button><button id="fAccLoad"></button><button id="exp"></button><button id="imp"></button><input type="checkbox" id="fAuto" disabled><input type="checkbox" id="fAccAuto"><span id="fAccSt"></span></span>
    </div>
    <div class="small" id="fStat" hidden style="display:none"></div>
@@ -467,7 +469,8 @@ function ziExport(){try{
   const P=FP(),lines=[];
   S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>ttOf(l,dk,a)).filter(Boolean).map(({st,off,sh,dep})=>({st,off,sh,dep}));
     const rt=l.par?S.lines.find(x=>x.id===l.par)||l:l;lines.push({id:l.id,n:String((l.par?l.vnum:l.num)||rt.num||''),color:rt.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
-  const k=cityKey(),body=JSON.stringify({city:k,lines});if(body===ziExport.last&&localStorage.getItem('gdn-zi'))return;ziExport.last=body; // unchanged lines: nothing written, ZbiorkomInfo does no work
+  const k=cityKey(),body=JSON.stringify({city:k,lines});if(body===ziExport.last&&localStorage.getItem('gdn-zi'))return;ziExport.last=body;
+  if(!lines.length){if(localStorage.getItem('gdn-zi')){localStorage.removeItem('gdn-zi');try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}}return}   // (projekt bez linii: miasta nie ma w menu ZbiorkomInfo) // unchanged lines: nothing written, ZbiorkomInfo does no work
   const out={v:1,t:Date.now(),city:k,cityName:CITIES[k].n.replace(/\s*\(.*\)$/,''),lines};
   localStorage.setItem('gdn-zi',JSON.stringify(out));try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}
  }catch(e){try{dbg('Eksport do ZbiorkomInfo: '+(e&&e.message||e))}catch(x){}}}
@@ -2091,6 +2094,19 @@ function setCity(k,go=true){
 $('#citySel').onchange=async()=>{const k=$('#citySel').value;
  if(S.lines.length||S.stops.length){if(!await askConfirm(`Zmiana obszaru na: ${CITIES[k].n}. Pobrane zostaną przystanki, torowiska i tory kolejowe tego obszaru. Dotychczasowe linie i przystanki pozostaną w projekcie, a przystanki usunięte lub zmienione przez Ciebie nie zostaną przywrócone ani nadpisane.`,{title:'Zmień miasto',ok:'Zmień miasto'})){$('#citySel').value=curCity;return}}
  setCity(k);save()};
+// usunięcie miasta: cały projekt (linie, przystanki, trasy, własne tory i drogi) – w przeglądarce, na koncie i w połączonym pliku – oraz
+// wpis miasta w menu ZbiorkomInfo; zostaje pusty projekt tego samego obszaru
+$('#fDelCity').onclick=async()=>{const nm=CITIES[cityKey()].n.replace(/\s*\(.*\)$/,'');
+ if(!await askConfirm(`Usunąć miasto „${nm}”?\nZostaną usunięte wszystkie linie (${S.lines.length}), przystanki (${S.stops.length}), trasy i własne tory/drogi – w przeglądarce, na koncie i w połączonym pliku – oraz wpis „${nm} (NM)” w menu miast ZbiorkomInfo.`,{title:'Usuń miasto',ok:'Dalej…',danger:true}))return;
+ if(!await askConfirm('Czy na pewno? Tej operacji nie można cofnąć. Jeśli chcesz zachować kopię, najpierw zapisz projekt do pliku (Plik → Zapisz).',{title:'Ostateczne potwierdzenie',ok:'Tak, usuń miasto',cancel:'Nie, wróć',danger:true}))return;
+ const k=cityKey();S={lines:[],stops:[],sel:null,city:k,custom:[],cats:[],collapsed:{},infraRound:{on:true,r:100},stopFixV:STOPFIX_V,stFix4:1,stFix5:1,numZI:1,numZI2:1,stFix3:1,stHist2:1,pf1:1};
+ try{localStorage.removeItem('gdn-zi');ziExport.last=null}catch(e){}
+ try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}
+ HIST.h=[JSON.stringify(S)];HIST.i=0;histUI();saveNow();
+ // (wpis w ZbiorkomInfo znika dopiero, gdy nie ma linii: eksport z pustego projektu nic nie zapisuje)
+ try{localStorage.removeItem('gdn-zi')}catch(e){}
+ try{const tok=accTok();if(tok)await fetch(ACCP.url,{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),net:S})})}catch(e){}
+ renderLines();renderStops();renderInfra();drawInfra();drawStops();redraw();say('Usunięto miasto „'+nm+'”: projekt jest pusty, wpis w ZbiorkomInfo zniknął.')};
 $('#retryTram').onclick=()=>{try{localStorage.removeItem('gdn-tw5-'+cityKey());localStorage.removeItem('gdn-rw5-'+cityKey())}catch(e){}tramTry=railTry=0;tramReady=loadTram();railReady=tramReady.then(loadRail);
  // (przystanki też: nowe z OSM, poprawki A+T, numery słupków z danych ZbiorkomInfo)
  setTimeout(async()=>{const ok=await loadStops({auto:true,live:true,fixBus:true});if(ok){S.numZI2=0;await ziNums();say('Dane odświeżone: przystanki z OSM i numery słupków zaktualizowane.')}},300)};
