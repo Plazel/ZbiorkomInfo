@@ -933,6 +933,17 @@ ROWS = [
     ('Linie szkolne', 'School lines', 'Schullinien', 'Školské linky', 'Školní linky'),
     ('Metropolia GZM', 'GZM Metropolis', 'Metropole GZM', 'Metropola GZM', 'Metropole GZM'),
     ('Śląskie', 'Silesia', 'Schlesien', 'Sliezsko', 'Slezsko'),
+    ('Wybierz kierowców', 'Choose drivers', 'Fahrer auswählen', 'Vybrať vodičov', 'Vybrat řidiče'),
+    ('Wybrani kierowcy:', 'Chosen drivers:', 'Ausgewählte Fahrer:', 'Vybraní vodiči:', 'Vybraní řidiči:'),
+    ('Nie wybrano odbiorców.', 'No recipients chosen.', 'Keine Empfänger ausgewählt.', 'Nie sú vybraní príjemcovia.', 'Nejsou vybráni příjemci.'),
+    ('Wybór', 'Selection', 'Auswahl', 'Výber', 'Výběr'),
+    ('Aktywność', 'Activity', 'Aktivität', 'Aktivita', 'Aktivita'),
+    ('Szukaj: nazwa, imię, nazwisko, numer', 'Search: name, first name, surname, number', 'Suchen: Name, Vorname, Nachname, Nummer', 'Hľadať: názov, meno, priezvisko, číslo', 'Hledat: název, jméno, příjmení, číslo'),
+    ('Zaznacz widocznych', 'Select visible', 'Sichtbare auswählen', 'Označiť zobrazených', 'Označit zobrazené'),
+    ('Odznacz widocznych', 'Deselect visible', 'Sichtbare abwählen', 'Odznačiť zobrazených', 'Odznačit zobrazené'),
+    ('Zaznaczeni:', 'Selected:', 'Ausgewählt:', 'Označení:', 'Označeno:'),
+    ('Brak kierowców pasujących do wyszukiwania.', 'No drivers match the search.', 'Keine Fahrer entsprechen der Suche.', 'Vyhľadávaniu nezodpovedajú žiadni vodiči.', 'Hledání neodpovídají žádní řidiči.'),
+    ('Brak kont kierowców.', 'No driver accounts.', 'Keine Fahrerkonten.', 'Žiadne účty vodičov.', 'Žádné účty řidičů.'),
 ]
 
 WEEKDAYS = {
