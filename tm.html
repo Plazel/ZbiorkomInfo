@@ -863,15 +863,29 @@ function nearOn(pts,ll){let best=null,bd=1e9;const px=ll[1]*RX,py=ll[0]*R0;
  return{p:best,d:bd}}
 function dblMate(sn,kind){for(const c of S.custom){if(c.kind!==kind||!c.dbl||c.pts.length<2)continue;const ws=cways(c);if(ws.length<2)continue;
   const a=nearOn(ws[0],sn),b=nearOn(ws[1],sn);if(Math.min(a.d,b.d)<2)return(a.d<b.d?b:a).p}return null}
+// przystanek autobusowy po drugiej stronie jezdni: punkt odbity względem osi najbliższej jezdni (własna droga dwujezdniowa – na drugiej
+// jezdni; szkielet ulic, jeśli wczytany; inaczej OSRM nearest). Dwie jezdnie obok siebie (6–40 m, po przeciwnych stronach kliknięcia) –
+// przystanek na drugiej jezdni, w tej samej odległości od niej. null – kliknięto na osi jezdni albo nie ma drogi w pobliżu
+async function roadMate(ll){
+ const M=(p,q)=>[(q[1]-p[1])*RX,(q[0]-p[0])*R0],far=(p,dk)=>{const v=M(p,ll),l=Math.hypot(v[0],v[1]);return l<3?null:[p[0]-v[1]/R0*(dk/l),p[1]-v[0]/RX*(dk/l)]};
+ const mirror=(p,q)=>{const v=M(p,ll),dk=Math.hypot(v[0],v[1]);if(dk<3)return null;
+  if(q){const w=M(p,q),dq=Math.hypot(w[0],w[1]);if(dq>=6&&dq<=40&&v[0]*w[0]+v[1]*w[1]<0)return[q[0]+(q[0]-p[0])*(dk/dq),q[1]+(q[1]-p[1])*(dk/dq)]}
+  return[2*p[0]-ll[0],2*p[1]-ll[1]]};
+ for(const c of S.custom){if(c.kind!=='street'||c.pts.length<2)continue;const ws=cways(c);const ns=ws.map(w=>nearOn(w,ll)).sort((a,b)=>a.d-b.d);if(!ns.length||ns[0].d>25)continue;return mirror(ns[0].p,ns[1]&&ns[1].p)}
+ const lines=sCache.all||sCache.main;if(lines){const ns=[];lines.forEach(w=>{const n=nearOn(w,ll);if(n.d<45)ns.push(n)});ns.sort((a,b)=>a.d-b.d);if(ns.length&&ns[0].d<25)return mirror(ns[0].p,ns.slice(1).map(n=>n.p).find(q=>{const w=M(ns[0].p,q),v=M(ns[0].p,ll);return v[0]*w[0]+v[1]*w[1]<0}))}
+ try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),8000);let j;try{const r=await fetch('https://router.project-osrm.org/nearest/v1/driving/'+ll[1]+','+ll[0]+'?number=4',{signal:ac.signal});j=await r.json()}finally{clearTimeout(to)}
+  const W=(j.waypoints||[]).map(w=>[w.location[1],w.location[0]]);if(!W.length||mdist(W[0],ll)>25)return null;
+  return mirror(W[0],W.slice(1).find(q=>{const w=M(W[0],q),v=M(W[0],ll);return mdist(q,W[0])>=6&&v[0]*w[0]+v[1]*w[1]<0}))}catch(e){dbg('Przystanek po drugiej stronie jezdni: '+e.message);return null}}
 async function clickAt(ll){
  if((mode==='edit'||mode==='draw')&&lkSay(selLine()))return;
  if(mode==='edit'){editAdd(ll);return}
  if(mode==='nav'){if(S.sel){S.sel=null;ins=null;renderLines();redraw()}return}
  if(mode==='stop'){{const k=$('#stopKind').value,sn=k==='bus'?null:snapToTrack(ll,k==='rail'?'rail':'tram'),id='u'+Date.now();
   const mk=(i,pt,pair)=>({id:i,name:'Nowy przystanek',num:'',ll:pt,tram:k==='tram'||k==='both',...(k==='both'?{bus:true}:{}),...(k==='rail'?{rail:true}:{}),...(pair?{pair}:{})});
-  const mate=sn&&k!=='bus'&&$('#stopDbl').checked?dblMate(sn,k==='rail'?'rail':'tram'):null,ids=[id];
+  const mate=!$('#stopDbl').checked?null:k==='bus'?await roadMate(ll):sn?dblMate(sn,k==='rail'?'rail':'tram'):null,ids=[id];
   if(mate){S.stops.push(mk(id,sn,id),mk(id+'b',mate,id));ids.push(id+'b')}else S.stops.push(mk(id,sn||ll));
   if(k!=='bus')say(mate?'Dodano dwa przystanki – po jednym na każdy kierunek.':sn?'Przystanek osadzony na torze.':'Przystanek dodany (w pobliżu nie ma toru – nie osadzono).');
+  else if($('#stopDbl').checked)say(mate?'Dodano dwa przystanki – po obu stronach jezdni.':'Dodano jeden przystanek – nie udało się ustalić drugiej strony jezdni (kliknij obok jezdni, nie na jej osi).');
   const l=selLine();if(l&&!l.auto&&l.segs.length){const rs=routeStops(l);ids.forEach(id=>{const ix=rs.indexOf(id);if(ix>=0&&!l.stops.includes(id)){let at=0;for(let j=ix-1;j>=0;j--){const p=l.stops.indexOf(rs[j]);if(p>=0){at=p+1;break}}l.stops.splice(at,0,id)}})}}save();drawStops();renderStops();renderLines();
   const ls_=S.stops[S.stops.length-1],nss=ls_?(ls_.pair?S.stops.filter(x=>x.pair===ls_.pair):[ls_]):[],nv=await askPrompt('Nazwa przystanku:','',{title:nss.length>1?'Nowe przystanki (po jednym na kierunek)':'Nowy przystanek',ok:'Zapisz'});
   if(nv&&nv.trim()&&nss.length){nss.forEach(ns=>{ns.name=nv.trim();syncNum(ns)});save();drawStops();renderStops();renderLines()}return}
@@ -2240,7 +2254,7 @@ function commitInfra(){if(draft.length<2){say('Potrzebne są co najmniej 2 punkt
   if(mdist(a,d0)<1){ct=c;atEnd=false;break}if(mdist(b,d0)<1){ct=c;atEnd=true;break}}
  if(ct){const add=draft.slice(1);ct.pts=atEnd?ct.pts.concat(add):add.reverse().concat(ct.pts);draft=[];drawDraft();infraChanged();say('Przedłużono istniejące '+(kd==='street'?'drogę':'torowisko')+'.');return}
  S.custom.push({id:'c'+Date.now(),kind:kd,name:(kd==='tram'?'Tor ':kd==='rail'?'Tor kolejowy ':'Droga ')+nn,pts:draft.slice(),...(kd!=='street'&&$('#infraDbl').checked?{dbl:true}:S.infraOw?{ow:true}:{})});draft=[];drawDraft();infraChanged();say('Dodano własną infrastrukturę. Teraz możesz wytyczyć po niej linię.')}
-{const sd=$('#stopDbl'),sk=$('#stopKind'),upd=()=>{sd.checked=S.stopDbl!==false;{const pb=document.getElementById('stopPairB');if(pb){pb.disabled=sk.value==='bus';pb.classList.toggle('on',sd.checked)}}};sd.onchange=()=>{S.stopDbl=sd.checked;save()};sk.addEventListener('change',upd);upd();window.stopDblUI=upd}
+{const sd=$('#stopDbl'),sk=$('#stopKind'),upd=()=>{sd.checked=S.stopDbl!==false;{const pb=document.getElementById('stopPairB');if(pb){pb.disabled=false;pb.classList.toggle('on',sd.checked)}}};sd.onchange=()=>{S.stopDbl=sd.checked;save()};sk.addEventListener('change',upd);upd();window.stopDblUI=upd}
 $('#infraDbl').onchange=e=>{S.infraDbl=e.target.checked;save();drawDraft()};
 $('#infraRound').onchange=e=>{S.infraRound.on=e.target.checked;drawDraft();infraChanged()};
 $('#infraR').onchange=e=>{S.infraRound.r=Math.max(0,+e.target.value||0);drawDraft();infraChanged()};
@@ -3539,7 +3553,7 @@ function pickOk(st){const k=pickKind();return k==='rail'?!!st.rail:k==='tram'?!!
  document.addEventListener('click',()=>{fly.hidden=true});
  const D={nav:['Wybór','Umożliwia przeglądanie mapy oraz wyświetlanie informacji o przystankach po najechaniu na nie.'],draw:['Rysowanie','Umożliwia wytyczenie trasy linii poprzez wyznaczanie punktów, które aplikacja ze sobą łączy w jedną linię.'],edit:['Edytuj linię','Umożliwia korektę przebiegu linii poprzez przeciąganie wyświetlonych na niej punktów.'],
   pick:['Wybieraj przystanki','Umożliwia wytyczenie trasy linii poprzez zaznaczanie przystanków, które linia ma obsługiwać.'],stop:['Dodaj przystanek','Umożliwia dodanie dodatkowego przystanku na mapie.'],move:['Przenieś przystanek','Umożliwia zmianę lokalizacji przystanku bez utraty połączenia z obsługującymi go liniami.'],infra:['Dorysuj tor lub drogę','Dorysowanie toru lub drogi, których nie ma na mapie.'],
-  loopBtn:['Pętla uliczna','W przypadku tras zakończonych pętlą uliczną umożliwia automatyczne połączenie ostatniego przystanku z resztą linii.'],amBtn:['Typ linii','Tramwajowa, autobusowa, trolejbusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],stopPairB:['Dwa przystanki','Na torze dwunitkowym dodaje dwa przystanki – po jednym na każdy kierunek.'],dblTr:['Jednotor','Umożliwia przełączenie między rysowaniem jednego oraz dwóch torów.'],infraEdit:['Korekta przebiegu ścieżki','Umożliwia łatwą korektę przebiegu utworzonej już drogi lub torów.'],infraDone:['Zakończ rysowanie','Zapisuje rysowany tor lub drogę (także Enter lub prawy przycisk myszy).'],infraCancel:['Anuluj rysowanie','Porzuca rysowany odcinek (także Esc).'],
+  loopBtn:['Pętla uliczna','W przypadku tras zakończonych pętlą uliczną umożliwia automatyczne połączenie ostatniego przystanku z resztą linii.'],amBtn:['Typ linii','Tramwajowa, autobusowa, trolejbusowa lub kolejowa – decyduje, po czym prowadzona jest trasa.'],stopPairB:['Dwa przystanki','Dodaje dwa przystanki – po jednym na każdy kierunek: na torze dwunitkowym oraz po obu stronach jezdni (przystanek autobusowy – kliknij obok jezdni, po stronie pierwszego przystanku).'],dblTr:['Jednotor','Umożliwia przełączenie między rysowaniem jednego oraz dwóch torów.'],infraEdit:['Korekta przebiegu ścieżki','Umożliwia łatwą korektę przebiegu utworzonej już drogi lub torów.'],infraDone:['Zakończ rysowanie','Zapisuje rysowany tor lub drogę (także Enter lub prawy przycisk myszy).'],infraCancel:['Anuluj rysowanie','Porzuca rysowany odcinek (także Esc).'],
   owInf:['Jednokierunkowy odcinek','Umożliwia utworzenie jednokierunkowego odcinka drogi lub torów. Kierunek determinuje kierunek, w którym linia jest prowadzona.'],strictTr:['Przyciąganie','Tworzone linie automatycznie dopasowywane są do torów i dróg.'],owTr:['Ignorowanie obostrzeń','Umożliwia wytyczanie linii na odcinkach jednokierunkowych „pod prąd” i po zamkniętych odcinkach dróg i torów.'],closedTr:['Ignorowanie obostrzeń','Umożliwia wytyczanie linii na odcinkach jednokierunkowych „pod prąd” i po zamkniętych odcinkach dróg i torów.']};
  amShow();
  T.querySelectorAll('.b').forEach(b=>{const k=b.dataset.m||b.id,d=D[k];const txt=[...b.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join('').trim();
