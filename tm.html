@@ -119,7 +119,10 @@ input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .ttGenH{display:flex;align-items:center;gap:8px}.ttGenH b{font-size:13.5px}.ttPv{margin-left:auto;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
 .ttBand{gap:6px}.ttBl{display:inline-flex;color:var(--mut)}.ttDash,.ttCo{color:var(--mut);font-size:13px}.ttBand input{background:var(--panel)}
 .ttPre{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:12.5px}.ttPre>span:first-child{color:var(--mut);margin-right:4px}.ttPre .b.flat{height:28px;min-width:34px;padding:0 8px;justify-content:center;background:var(--panel);border:1px solid var(--bd)}
-.ttGenF{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.ttGenF .small{flex:1;color:var(--mut);margin:0}
+.ttGenF{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.ttGenF .small{flex:1;color:var(--mut);margin:0}.ttApT{font-size:12.5px;color:var(--mut)}.ttApD button{padding:5px 10px;font-size:12.5px;background:var(--panel)}.ttApD button.on{background:var(--fg)}
+.ttTpl{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:12.5px}.ttTpl>span:first-child{color:var(--mut);margin-right:4px}.ttTpl .b.flat{height:28px;padding:0 8px;background:var(--panel);border:1px solid var(--bd);font-size:12.5px;gap:5px}
+.ttTp{display:inline-flex}.ttTp .b.ico{width:24px;border-left:0!important;padding:0;justify-content:center}
+.ttBand.off input:not(.ttBon){opacity:.4}.ttBand.off .ttDash,.ttBand.off .ttCo{opacity:.4}.ttBand input.ttBon{margin:0 4px 0 0;width:16px!important;height:16px!important;min-width:0!important;padding:0!important;flex:none;accent-color:var(--fg)}
 .ttS{grid-template-columns:18px minmax(0,1fr) 30px 64px 28px!important;padding:0!important;min-height:36px}.ttStops{border-top:0!important}
 .ttRail{position:relative;align-self:stretch;display:block}.ttRail::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:4px;margin-left:-2px;background:var(--lc)}.ttS.first .ttRail::before{top:50%}.ttS.last .ttRail::before{bottom:50%}
 .ttRail i{position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--panel);border:2.5px solid var(--lc);box-sizing:border-box}
@@ -2466,6 +2469,7 @@ const askConfirm=(msg,o={})=>modal({title:o.title||'Potwierdzenie',body:`<p styl
 // row, its minutes), and the minutes from the first stop to each stop. Left as worked out (from the headways and the line's
 // hours, from the length and speed) until changed; "Przywróć wyliczone" goes back. ZbiorkomInfo's NM city shows it at once.
 Object.assign(ICON,{wand:'<path d="M15 4V2M15 16v-2M8 9h2M20 9h2M17.8 11.8 19 13M17.8 6.2 19 5M3 21l9-9M12.2 6.2 11 5"/>',shift:'<path d="m18 8 4 4-4 4M6 8l-4 4 4 4M2 12h20"/>',eraser:'<path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7M5 11l9 9"/>',minus:'<path d="M5 12h14"/>',swatches:'<rect x="3.5" y="3.5" width="7" height="7"/><rect x="13.5" y="3.5" width="7" height="7"/><rect x="3.5" y="13.5" width="7" height="7"/><rect x="13.5" y="13.5" width="7" height="7"/>',pole:'<rect x="7.5" y="2" width="9" height="7.5" rx="2"/><path d="M12 9.5V21.5M9.5 21.5h5"/>',stoppair:'<rect x="2.5" y="3" width="7" height="6" rx="1.6"/><path d="M6 9v11.5M4 20.5h4"/><rect x="14.5" y="3" width="7" height="6" rx="1.6"/><path d="M18 9v11.5M16 20.5h4"/>',sgltrack:'<path d="M12 2v20M8 6h8M8 12h8M8 18h8"/>',dbltrack:'<path d="M6 2v20M18 2v20M3.5 6h5M3.5 12h5M3.5 18h5M15.5 6h5M15.5 12h5M15.5 18h5"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',trolley:'<rect x="4" y="9" width="16" height="10" rx="2"/><path d="M4 14h16M9 9 12 3M13 9l3-6M7 19v2M17 19v2"/>'});
+const TT_BANDS=[[240,300],[300,360],[360,540],[540,780],[780,1080],[1080,1200],[1200,1320],[1320,1410]];
 const TT_DN={w:'Dni robocze',s:'Soboty',h:'Niedziele i święta'},hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 // okno rozkładów: po lewej lista linii ze stanem rozkładu, po prawej edytor rozkładu wybranej linii
 // ---- notatki projektu: akapity, listy punktowane i numerowane, zadania z polem wyboru; zapisywane w pliku (S.notes)
@@ -2518,22 +2522,24 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
  const st={dk:'A',dy:'w',gen:false},b=document.createElement('div');b.className='ttEd';
  const pkIv=ivOf(S.peak||DEFPEAK),win=ivOf(winSrc(l).ws),o0=l.op||{};
  // the bands for generating: the line's hours split at the peaks, each with its headway (peak / off-peak, days off one band)
- const bandsDef=dy=>{const out=[],cuts=new Set();win.forEach(([x,y])=>{cuts.add(x);cuts.add(y)});if(dy==='w')pkIv.forEach(([x,y])=>{cuts.add(x);cuts.add(y)});
-   const cs=[...cuts].sort((x,y)=>x-y);for(let i=0;i<cs.length-1;i++){const x=cs[i],y=cs[i+1];if(!win.some(([p,q])=>x>=p&&y<=q))continue;
-     const pk=dy==='w'&&pkIv.some(([p,q])=>x>=p&&y<=q),h=dy==='w'?numOr(((pk?o0.pk:o0.ot)||{}).h,0):numOr((o0.we||{}).h,0);out.push({a:x,b:y,h:h||(pk?10:20)})}
-   return out.length?out:[{a:300,b:1380,h:20}]};
+ // domyślne przedziały taktów (te same dla wszystkich dni i linii); częstotliwość z ustawień kursowania linii: szczyt w dni robocze
+ // 6–9 i 13–18, poza szczytem pozostałe, wczesny ranek i późny wieczór rzadziej (półtora odstępu); w soboty i niedziele odstęp weekendowy
+ const bandsDef=dy=>{const r5=x=>Math.max(1,Math.round(x/5)*5)||x,pk=numOr((o0.pk||{}).h,0)||10,ot=numOr((o0.ot||{}).h,0)||20,we=numOr((o0.we||{}).h,0)||Math.max(ot,20);
+   return TT_BANDS.map(([x,y])=>{const edge=x<300||x>=1320,peak=dy==='w'&&((x>=360&&y<=540)||(x>=780&&y<=1080)),base=dy==='w'?(peak?pk:ot):we;return {a:x,b:y,h:edge?r5(base*1.5):base}})};
  const own=()=>((l.tt||{})[st.dk]||{})[st.dy],cur=()=>ttOf(l,st.dk,a);
+ const setDepDay=(dy,v)=>{const o=st.dy;st.dy=dy;setDep(v);st.dy=o};
  const setDep=v=>{l.tt=l.tt||{};const D=l.tt[st.dk]=l.tt[st.dk]||{};if(v==null)delete D[st.dy];else D[st.dy]=[...new Set(v)].filter(x=>x>=0&&x<1440).sort((x,y)=>x-y);if(!Object.keys(D).length)delete l.tt[st.dk];if(!Object.keys(l.tt).length)delete l.tt;save();renderLines();if(onCh)onCh()};
  const setOff=v=>{l.tto=l.tto||{};if(v==null)delete l.tto[st.dk];else l.tto[st.dk]=v;if(!Object.keys(l.tto).length)delete l.tto;save();renderLines()};
  const t2m=v=>{const m=String(v||'').match(/^(\d{1,2})[:.]?(\d{2})$/);return m?Math.min(1440,+m[1]*60+ +m[2]):null};
  // ---- widok: nagłówek linii (prawdziwy symbol linii), kierunek i dni, pasek narzędzi z ikonami (podpowiedzi jak w całym NetworkMakerze),
  // generator taktów wbudowany w okno (podgląd liczby odjazdów na bieżąco), siatka godzin, czasy przejazdu na schemacie trasy
- const pres=[5,7.5,10,12,15,20,30,60],cnt=(L)=>{const o=[];L.forEach(({a:x,b:y,h})=>{for(let m=x;m<y&&o.length<1500;m+=h)o.push(Math.round(m)%1440)});return [...new Set(o)].sort((p,q)=>p-q)};
+ const pres=[5,7.5,10,12,15,20,30,60],cnt=(L)=>{const o=[];L.forEach(({a:x,b:y,h,off})=>{if(off)return;for(let m=x;m<y&&o.length<1500;m+=h)o.push(Math.round(m)%1440)});return [...new Set(o)].sort((p,q)=>p-q)};
  const tb=(k,i,tl,td,dis)=>`<button type="button" class="b ico" data-t="${k}" data-tl="${esc(tl)}" data-td="${esc(td)}" aria-label="${esc(tl)}"${dis?' disabled':''}>${ic(i)}</button>`;
  const draw=()=>{const T=cur(),dep=T.dep[st.dy],isOwn=!!own(),hrs=[...Array(24)].map((_,i)=>(i+3)%24);
   const byH=h=>dep.filter(m=>Math.floor(m/60)===h).map(m=>String(m%60).padStart(2,'0')).join(' ');
   const dn=x=>x.st.length?x.st[x.st.length-1].n:'',nDay=k=>(ttOf(l,st.dk,a).dep[k]||[]).length;
-  if(!st.bands||st.bandsFor!==st.dk+st.dy){st.bands=bandsDef(st.dy);st.bandsFor=st.dk+st.dy}
+  if(!st.bands||st.bandsFor!==st.dk+st.dy){st.bands=bandsDef(st.dy);st.bandsFor=st.dk+st.dy;st.gd=[st.dy]}
+  const TPL=Array.isArray(S.ttTpl)?S.ttTpl:[];
   const pv=cnt(st.bands),sum=dep.length?`${dep.length} odjazdów · pierwszy ${hm(dep[0])} · ostatni ${hm(dep[dep.length-1])}`:'Brak odjazdów';
   b.innerHTML=`<div class="ttHead">${badgeOf(l)}<div class="ttHT"><b>${esc(routeText(l))}</b><small class="ttSt ${isOwn?'own':'auto'}">${isOwn?'Rozkład własny (wpisany lub wygenerowany)':'Rozkład wyliczany z częstotliwości linii'}</small></div></div>
    <div class="ttBar"><div class="ttSeg" role="group" aria-label="Kierunek">${['A','B'].filter(k=>a[k]).map(k=>`<button type="button" data-dk="${k}" class="${st.dk===k?'on':''}">${ic('right',14)}${esc(dn(a[k]))}</button>`).join('')}</div>
@@ -2546,9 +2552,10 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
       ${tb('clear','eraser','Wyczyść','Usuwa wszystkie odjazdy tego dnia – możesz wpisać rozkład od zera.',!dep.length)}
       ${tb('auto','reset','Przywróć wyliczony','Wraca do rozkładu wyliczanego automatycznie z częstotliwości linii.',!isOwn)}</div></div>
      ${st.gen?`<div class="ttGenP"><div class="ttGenH">${ic('wand',16)}<b>Takty – ${TT_DN[st.dy].toLowerCase()}</b><span class="ttPv">${pv.length} odjazdów${pv.length?` · ${hm(pv[0])}–${hm(pv[pv.length-1])}`:''}</span></div>
-      <div class="ttBands">${st.bands.map((x,i)=>`<div class="ttBand"><span class="ttBl">${ic('clock',14)}</span><input data-ba="${i}" value="${hm(x.a)}" inputmode="numeric" aria-label="Od godziny"><span class="ttDash">–</span><input data-bb="${i}" value="${hm(x.b%1440)}" inputmode="numeric" aria-label="Do godziny"><span class="ttCo">co</span><input data-bh="${i}" type="number" min="1" max="240" step="any" value="${x.h}" aria-label="Co ile minut"><span class="ttCo">min</span><button type="button" class="b ico flat" data-bx="${i}" data-tl="Usuń przedział" data-td="Usuwa ten przedział godzin z taktów." aria-label="Usuń przedział"${st.bands.length>1?'':' disabled'}>${ic('trash',15)}</button></div>`).join('')}</div>
+      <div class="ttTpl"><span>Szablon:</span><button type="button" class="b flat" data-t="tdef" data-tl="Domyślne przedziały" data-td="4–5, 5–6, 6–9, 9–13, 13–18, 18–20, 20–22, 22–23:30 z częstotliwością z ustawień kursowania linii.">${ic('reset',14)}Domyślny</button>${TPL.map((q,i)=>`<span class="ttTp"><button type="button" class="b flat" data-tpl="${i}" data-tl="${esc(q.n)}" data-td="${esc(q.b.filter(x=>!x.off).map(x=>hm(x.a)+'–'+hm(x.b%1440)+' co '+String(x.h).replace('.',',')).join(', '))}">${esc(q.n)}</button><button type="button" class="b ico flat" data-tplx="${i}" aria-label="Usuń szablon ${esc(q.n)}" data-tl="Usuń szablon" data-td="Usuwa zapisany szablon „${esc(q.n)}”.">${ic('x',13)}</button></span>`).join('')}<span class="grow"></span><button type="button" class="b flat" data-t="tsave" data-tl="Zapisz jako szablon" data-td="Zapisuje te przedziały i częstotliwości w pliku projektu – do użycia przy kolejnych liniach.">${ic('save',14)}Zapisz jako szablon</button></div>
+      <div class="ttBands">${st.bands.map((x,i)=>`<div class="ttBand${x.off?' off':''}"><input type="checkbox" class="ttBon" data-bon="${i}"${x.off?'':' checked'} aria-label="Przedział włączony" title="Włącz lub wyłącz ten przedział"><input data-ba="${i}" value="${hm(x.a)}" inputmode="numeric" aria-label="Od godziny"><span class="ttDash">–</span><input data-bb="${i}" value="${hm(x.b%1440)}" inputmode="numeric" aria-label="Do godziny"><span class="ttCo">co</span><input data-bh="${i}" type="number" min="1" max="240" step="any" value="${x.h}" aria-label="Co ile minut"><span class="ttCo">min</span><button type="button" class="b ico flat" data-bx="${i}" data-tl="Usuń przedział" data-td="Usuwa ten przedział godzin z taktów." aria-label="Usuń przedział"${st.bands.length>1?'':' disabled'}>${ic('trash',15)}</button></div>`).join('')}</div>
       <div class="ttPre"><span>Wszędzie co:</span>${pres.map(h=>`<button type="button" class="b flat" data-pre="${h}">${String(h).replace('.',',')}</button>`).join('')}<span class="grow"></span><button type="button" class="b flat" data-t="badd">${ic('plus',14)}Przedział</button></div>
-      <div class="ttGenF"><span class="small">Kółko myszy nad godziną zmienia ją o 5 min (z Shiftem o 1 min). ${dep.length?'Zastąpi obecne odjazdy tego dnia.':''}</span><button type="button" class="b" data-t="gcancel">Anuluj</button><button type="button" class="b pri" data-t="gok">${ic('check',14)}Zastosuj</button></div></div>`:''}
+      <div class="ttGenF"><span class="ttApT">Zastosuj do:</span><span class="ttSeg ttApD" role="group" aria-label="Dni, do których zastosować">${TT_D.map(k=>`<button type="button" data-gd="${k}" class="${st.gd.includes(k)?'on':''}">${TT_DN[k]}</button>`).join('')}</span><span class="small">Kółko myszy nad godziną zmienia ją o 5 min (z Shiftem o 1 min).${dep.length?' Zastąpi obecne odjazdy.':''}</span><button type="button" class="b" data-t="gcancel">Anuluj</button><button type="button" class="b pri" data-t="gok">${ic('check',14)}Zastosuj</button></div></div>`:''}
      <div class="ttGrid${isOwn?'':' isAuto'}">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" placeholder="" aria-label="Minuty odjazdów o godzinie ${h}"></label>`).join('')}</div>
      <div class="ttFoot"><span class="small">${sum}</span><span class="small ttHint">Wpisz minuty oddzielone spacją, np. „05 25 45”.</span></div>
     </section>
@@ -2582,7 +2589,14 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
    b.querySelectorAll('[data-pre]').forEach(x=>x.onclick=()=>{const h=+x.dataset.pre;st.bands.forEach(B=>B.h=h);draw()});
    t('badd').onclick=()=>{const L=st.bands[st.bands.length-1];st.bands.push({a:L?L.b%1440:360,b:Math.min(1440,(L?L.b:360)+120),h:L?L.h:20});draw()};
    t('gcancel').onclick=()=>{st.gen=false;draw()};
-   t('gok').onclick=()=>{const out=cnt(st.bands);setDep(out);st.gen=false;draw();say('Wygenerowano '+out.length+' odjazdów ('+TT_DN[st.dy].toLowerCase()+').')}}};
+   b.querySelectorAll('[data-bon]').forEach(x=>x.onchange=()=>{st.bands[+x.dataset.bon].off=!x.checked;draw()});
+   b.querySelectorAll('[data-gd]').forEach(x=>x.onclick=()=>{const k=x.dataset.gd,G=new Set(st.gd);G.has(k)?G.delete(k):G.add(k);if(!G.size)G.add(st.dy);st.gd=TT_D.filter(q=>G.has(q));draw()});
+   t('tdef').onclick=()=>{st.bands=bandsDef(st.dy);draw()};
+   b.querySelectorAll('[data-tpl]').forEach(x=>x.onclick=()=>{const q=TPL[+x.dataset.tpl];if(!q)return;st.bands=q.b.map(y=>({...y}));draw();say('Wczytano szablon „'+q.n+'”.')});
+   b.querySelectorAll('[data-tplx]').forEach(x=>x.onclick=async()=>{const q=TPL[+x.dataset.tplx];if(!q||!await askConfirm('Usunąć szablon „'+q.n+'”?',{title:'Usuń szablon',ok:'Usuń',danger:true}))return;S.ttTpl=TPL.filter(y=>y!==q);save();draw()});
+   t('tsave').onclick=async()=>{const n=await askPrompt('Nazwa szablonu (np. „Linia dzienna – dni robocze”):',TT_DN[st.dy]+' – '+(TPL.length+1),{title:'Zapisz szablon taktów',ok:'Zapisz'});if(!n||!n.trim())return;
+    const L=TPL.filter(q=>q.n!==n.trim());L.push({n:n.trim(),b:st.bands.map(y=>({a:y.a,b:y.b,h:y.h,...(y.off?{off:true}:{})}))});S.ttTpl=L;save();draw();say('Zapisano szablon „'+n.trim()+'” – dostępny przy każdej linii tego projektu.')};
+   t('gok').onclick=()=>{const out=cnt(st.bands);st.gd.forEach(dy=>setDepDay(dy,out));st.gen=false;draw();say('Wygenerowano '+out.length+' odjazdów ('+st.gd.map(k=>TT_DN[k].toLowerCase()).join(', ')+').')}}};
  draw();return b}
 // ---- koordynacja linii: kilka linii (w danym kierunku) na wspólnym odcinku trasy dostaje odjazdy rozłożone możliwie równomiernie
 // – stały takt na wspólnym odcinku. S.coord: [{id, items:[{l, dk}], sec:[nazwy przystanków odcinka], days:[w,s,h], anchor, max}].
