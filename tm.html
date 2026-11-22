@@ -606,10 +606,10 @@ async function loadStops(o){
    :`Dodano ${n} przystanków z OSM (łącznie ${S.stops.length}).`+alt;
   if(strip){if(n){const ms=`Obszar miasta rozszerzono na wschód (m.in. Wyspa Sobieszewska): dodano ${n} przystanków z OSM (łącznie ${S.stops.length}).`+alt;say(ms);
     // komunikat o torowiskach (ładowanych równolegle) nie może go zagłuszyć
-    Promise.resolve(typeof tramReady!=='undefined'?tramReady:null).catch(()=>0).then(()=>{const t=$('#status').textContent;say(/^Torowiska wczytane/.test(t)?ms+' '+t:ms)})}return}
-  if(quiet){if(fixed)say('Uzupełniono nazwy '+fixed+' przystanków (nazwy z peronów w OSM).');return}
+    Promise.resolve(typeof tramReady!=='undefined'?tramReady:null).catch(()=>0).then(()=>{const t=$('#status').textContent;say(/^Torowiska wczytane/.test(t)?ms+' '+t:ms)})}return true}
+  if(quiet){if(fixed)say('Uzupełniono nazwy '+fixed+' przystanków (nazwy z peronów w OSM).');return true}
   if(auto)STOPMSG=msg;say(msg)
- }catch(e){if(quiet){dbg('Przystanki z rozszerzonego obszaru: '+e.message+' – ponowię przy następnym uruchomieniu');return}say('Błąd pobierania przystanków: '+e.message+(auto?' Spróbuj ponownie przyciskiem „Pobierz z OSM” w zakładce Przystanki.':''))}}
+ return true}catch(e){if(quiet){dbg('Przystanki z rozszerzonego obszaru: '+e.message+' – ponowię przy następnym uruchomieniu');return false}say('Błąd pobierania przystanków: '+e.message+(auto?' Spróbuj ponownie przyciskiem „Pobierz z OSM” w zakładce Przystanki.':''));return false}}
 let OSMW=null,GS=null,CID=1e12,OSMR=null,RG=null,railReady=null;
 function buildGraph(ways){
  const pos=new Map(),adj=new Map(),add=(a,b,d)=>{if(!adj.has(a))adj.set(a,[]);adj.get(a).push([b,d])};
@@ -3367,7 +3367,7 @@ function histFlush(){if(_svT)saveNow();clearTimeout(HIST.t);const j=HIST.pend;HI
   HIST.i=HIST.h.length-1}
  histUI()}
 function histUI(){const u=$('#hUndo'),r=$('#hRedo');if(!u)return;u.disabled=HIST.i<=0&&HIST.pend==null;r.disabled=HIST.i>=HIST.h.length-1}
-function restoreState(j){HIST.rest=true;try{S=JSON.parse(j);if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound={on:true,r:100};S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});if(!S.lines.some(l=>l.id===S.sel))S.sel=null;save();rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();drawStops();if(window.stopDblUI)stopDblUI()}finally{HIST.rest=false}}
+function restoreState(j){HIST.rest=true;try{S=JSON.parse(j);setTimeout(()=>stopFix5(),0);if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound={on:true,r:100};S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});if(!S.lines.some(l=>l.id===S.sel))S.sel=null;save();rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();drawStops();if(window.stopDblUI)stopDblUI()}finally{HIST.rest=false}}
 function histGo(d){flushLater();histFlush();const k=HIST.i+d;if(k<0||k>=HIST.h.length){say(d<0?'Nie ma czego cofnąć.':'Nie ma czego ponowić.');return}
  HIST.i=k;restoreState(HIST.h[k]);histUI();say(d<0?'Cofnięto ostatnią zmianę.':'Ponowiono zmianę.')}
 $('#hUndo').onclick=()=>histGo(-1);$('#hRedo').onclick=()=>histGo(1);
@@ -3484,7 +3484,12 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
 // (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu obok, błędne A+T; projekty otwarte w wadliwej wersji z 22.11
 // (S.stFix4) – usunięcie dodanych wtedy duplikatów: nieużywanych peronów i pozycji zatrzymania, które poprawny import uznaje za drugi opis przystanku)
-function stopFix5(){if(S.stops.length&&!S.stFix5)setTimeout(async()=>{if(S.stFix5)return;try{await loadStops({auto:true,quiet:true,fixBus:true,prune:!!S.stFix4})}catch(e){dbg('stFix5: '+e.message)}S.stFix4=S.stFix5=1;save();drawStops();renderStops();redraw()},6000)}
+// (wersja poprawek importu przystanków: każda nowa poprawka podnosi STOPFIX_V, a zapisane projekty są wtedy raz uzupełniane z OSM;
+// gdy OSM nie odpowiada – kolejne próby co 2 minuty, znacznik zapisywany dopiero po udanym pobraniu)
+const STOPFIX_V=6;let _sfT=0,_sfRun=false;
+function stopFix5(d){clearTimeout(_sfT);if(!S.stops.length||(S.stopFixV||0)>=STOPFIX_V)return;_sfT=setTimeout(async()=>{if(_sfRun||(S.stopFixV||0)>=STOPFIX_V)return;_sfRun=true;let ok=false;
+  try{ok=await loadStops({auto:true,quiet:true,fixBus:true,prune:!!S.stFix4&&!S.stFix5})}catch(e){dbg('Uzupełnianie przystanków: '+e.message)}finally{_sfRun=false}
+  if(ok){S.stopFixV=STOPFIX_V;S.stFix4=S.stFix5=1;S.numZI2=0;await ziNums();save();drawStops();renderStops();renderLines();redraw();say('Przystanki zaktualizowane z OpenStreetMap (brakujące perony, numery słupków z danych ZbiorkomInfo).')}else stopFix5(120000)},d==null?6000:d)}
 function bootData(){setTimeout(()=>ziNums(),1800);if(!S.pf1&&S.lines.some(l=>l.auto&&l.segs.length))setTimeout(async()=>{let n=0;for(const l of S.lines.filter(l=>l.auto&&l.segs.length)){try{if(platFix(l)){n++;l._pf=1;try{await rebuild(l,false,true)}finally{delete l._pf}}}catch(e){}}S.pf1=1;save();if(n){redraw();renderLines();say('Poprawiono perony (po prawej stronie jazdy) w liniach: '+n+'.')}},6500);   // (raz: perony po złej stronie w liniach zapisanych wcześniej)
  if(S.stops.length&&S.stFix3&&!S.stHist2&&cityKey()==='gdansk')setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,bbox:HIST_STOPS[0].box.join(',')})}catch(e){}S.stHist2=1;save();drawStops();renderStops()},5000);   // (raz: przystanki tramwajowe na Stogach w istniejących projektach)
 // (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu o tej samej nazwie obok; najpierw usunięcie duplikatów
