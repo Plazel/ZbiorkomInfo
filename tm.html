@@ -2177,7 +2177,11 @@ async function gapFix(l,k){
  const st=l.stops.map(id=>stopOf(id));if(st.some(x=>!x))return;
  const ch=chainArcs(l.segs,st);if(!ch)return;const a0=ch.a[k-1],a1=ch.a[k];if(!(a1>a0))return;
  const A=st[k-1],B=st[k],r=await segRoute(A,B,am);if(!r||r.bad||!r.pts||r.pts.length<2)return;
- const rl=segsLen([{pts:r.pts}]),dl=a1-a0;if(dl<=rl*1.15+60)return;
+ const rl=segsLen([{pts:r.pts}]),dl=a1-a0;
+ // (trasa po usuniętym przystanku: wyraźnie dłuższa niż najkrótsza – albo tylko trochę dłuższa, ale biegnąca tą samą drogą z małym
+ // odbiciem, np. łącznikiem do przystanku obok toru; wtedy też poprowadzona na nowo – inaczej odnoga do usuniętego przystanku zostawała)
+ if(dl<=rl*1.15+60){if(dl<=rl+8)return;const cur=sliceSegs(l.segs,a0,a1).flatMap(x=>x.pts);if(cur.length<2)return;
+  const near=q=>nearOn(cur,q).d;if(!r.pts.every(q=>near(q)<=25))return}
  const T=segsLen(l.segs),before=sliceSegs(l.segs,0,a0),after=sliceSegs(l.segs,a1,T+1);
  l.segs=[...before,{mode:r.mode,pts:r.pts},...after].filter(x=>x.pts&&x.pts.length>1&&segsLen([x])>.5);
  l.wp=[l.segs[0].pts[0],...l.segs.map(x=>x.pts[x.pts.length-1])];
