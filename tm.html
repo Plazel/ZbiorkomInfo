@@ -567,9 +567,11 @@ async function loadStops(o){
   // ten sam przystanek opisany drugi raz (peron / pozycja zatrzymania): tylko w obrębie tego samego rodzaju – peron tramwajowy obok
   // przystanku autobusowego o tej samej nazwie (np. Sikorskiego) to osobny przystanek; tuż obok (< 25 m) – wspólny przystanek A+T
   // (two posts of one stop with different numbers – e.g. Warneńska 01 and 02 on both sides of the street – are never one and the same)
+  // (dwa osobne perony-obszary – np. dwa nienazwane perony tramwajowe Migowo po obu stronach torów, 7 m od siebie – to dwa perony, nie jeden)
   const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st),p0=pn(name,st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
-   for(const q of c){const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(st&&q.st&&st.id[0]==='w'&&q.st.id[0]==='w'&&d>8)continue;   // (dwa osobne perony-obszary o tej samej nazwie – np. Migowo 01 bez numeru w OSM obok Migowo 02 – to dwa perony, nie jeden)if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
-    if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(added.has(q.st.id)||(st&&st._hist&&m0==='t')){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
+   for(const q of c){if(st&&q.st&&q.st.id===st.id)continue;const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(st&&q.st&&st.id[0]==='w'&&q.st.id[0]==='w'&&d>2)continue;if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
+    // (wspólny przystanek A+T: tylko słupek/peron tuż obok peronu drugiego rodzaju – pozycja zatrzymania autobusu na jezdni obok peronu tramwajowego, np. Migowo, nie robi z peronu przystanku A+T)
+    if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(st&&st._cls===3)return true;if(added.has(q.st.id)||(st&&st._hist&&m0==='t')){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
   // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
   // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
   const NOM=new Map();(j.elements||[]).forEach(e=>{const t=e.tags||{};if(!t.name)return;const ll=e.type==='node'?[e.lat,e.lon]:(e.center?[e.center.lat,e.center.lon]:null);if(!ll)return;
@@ -577,19 +579,23 @@ async function loadStops(o){
   const nameNear=(ll,tram)=>{const a=Math.floor(ll[0]*1800),b=Math.floor(ll[1]*1800);let best=null,bd=1e9;for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++)for(const q of NOM.get((a+i)+','+(b+k))||[]){const d=mdist(q.ll,ll)-(tram&&q.tram?15:0);if(d<bd&&mdist(q.ll,ll)<60){bd=d;best=q}}return best};
   const nameFix=st=>{if(st.name!=='(bez nazwy)')return false;const q=nameNear(st.ll,st.tram);if(!q)return false;st.name=q.name;const mm=q.name.match(NUMRE);st.num=mm?mm[2]:(q.ref||st.num||'');if(st.num&&!mm&&q.ref)st.name=q.name+' '+q.ref;return true};
   let fixed=0;S.stops.forEach(s=>{if(nameFix(s))fixed++});if(fixed)dbg('Uzupełniono nazwy przystanków bez nazwy: '+fixed);
-  S.stops.forEach(s=>addCov(s.ll,s.name,s));
-  const cnt=[0,0,0,0];let skD=0,skM=0,fixAT=0;
+  const cnt=[0,0,0,0];let skD=0,skM=0,fixAT=0,pruned=0;const PRU=!!(o&&o.prune),PRU_USED=new Set(PRU?S.lines.flatMap(l=>l.stops):[]);
+  // (porządkowanie: przystanki z OSM wchodzą do pokrycia w kolejności klas – duplikat sprawdzany tylko wobec już zachowanych)
+  const OSMID=new Set(PRU?(j.elements||[]).map(e=>(e.type==='way'?'w':'n')+e.id):[]);
+  S.stops.forEach(s=>{if(!PRU||!OSMID.has(s.id)||PRU_USED.has(s.id))addCov(s.ll,s.name,s)});
   (j.elements||[]).filter(e=>e.tags).map(e=>({e,c:stopClass(e)})).sort((a,b)=>a.c-b.c).forEach(({e,c})=>{
-   const st=stopFromOsm(e,c);if(!st)return;if(e._hist)st._hist=1;nameFix(st);const old=have.get(st.id);
+   const st=stopFromOsm(e,c);if(!st)return;if(e._hist)st._hist=1;st._cls=c;nameFix(st);const old=have.get(st.id);
    if(old){ // już w projekcie: nie nadpisujemy; liczymy te, które użytkownik zmienił (nazwa, położenie, rodzaj)
+    if(PRU&&!PRU_USED.has(old.id)){if(c>1&&covered(old.ll,old.name,old)){const k=S.stops.indexOf(old);if(k>=0){S.stops.splice(k,1);pruned++}return}addCov(old.ll,old.name,old)}else if(PRU)addCov(old.ll,old.name,old);
     if(e._hist&&st.tram&&!old.tram&&!old.rail){old.tram=true;old.bus=true;fixAT++;return} // (dziś w OSM sam przystanek autobusowy, dawniej także tramwajowy)
     if(o&&o.fixAT&&st.tram&&st.bus&&!old.tram&&!old.rail){old.tram=true;old.bus=true;fixAT++;return} // (A+T wczytane wcześniej jako sam autobus)
+    if(o&&o.fixBus&&old.id[0]==='w'&&st.tram&&!st.bus&&old.tram&&old.bus){delete old.bus;fixAT++;return} // (peron tramwajowy oznaczony wcześniej błędnie jako A+T przez pobliską pozycję zatrzymania autobusu)
     if(old.name!==st.name||mdist(old.ll,st.ll)>1||!!old.tram!==!!st.tram||!!old.rail!==!!st.rail||!!old.bus!==!!st.bus)skM++;return}
    if(gone.has(st.id)){skD++;addCov(st.ll,st.name,st);return}
    if((c>1||st._hist)&&covered(st.ll,st.name,st))return; // ten sam przystanek opisany także jako peron / pozycja zatrzymania
-   delete st._hist;S.stops.push(st);added.add(st.id);addCov(st.ll,st.name,st);cnt[c]++});
+   delete st._hist;delete st._cls;S.stops.push(st);added.add(st.id);addCov(st.ll,st.name,st);cnt[c]++});
   const n=cnt[1]+cnt[2]+cnt[3];
-  dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}, uzupełnione A+T: ${fixAT}`);
+  dbg(`Przystanki z OSM: ${(j.elements||[]).length} elementów; nowe: ${cnt[1]} (bus_stop/tram_stop/stacje), ${cnt[2]} (perony), ${cnt[3]} (pozycje zatrzymania); pominięte usunięte: ${skD}, zmodyfikowane: ${skM}, poprawione A+T: ${fixAT}, usunięte duplikaty: ${pruned}`);
   if(!auto&&S.rmStops&&added.size)S.rmStops=S.rmStops.filter(id=>!added.has(id));
   if(added.size)setTimeout(()=>ziNums(added),0);
   S.stopBB=bb();
@@ -2538,7 +2544,7 @@ function dlFile(name,text,type){const a=document.createElement('a');a.href=URL.c
 function applyProject(o){
  const p=o&&o.project?o.project:o;
  if(!p||!Array.isArray(p.lines)||!Array.isArray(p.stops))throw new Error('To nie jest plik projektu sieci.');
- NOSAVE=false;S=p;if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound={on:true,r:100};S.stops.forEach(x=>{if(!x.num)syncNum(x)});S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});
+ NOSAVE=false;S=p;setTimeout(stopFix5,0);if(cityKey()!==curCity)setCity(cityKey());S.custom=S.custom||[];S.infraRound={on:true,r:100};S.stops.forEach(x=>{if(!x.num)syncNum(x)});S.lines.forEach(l=>{l.stops=l.stops||[];l.segs=l.segs||[];l.wp=l.wp||[]});
  if(!S.lines.some(l=>l.id===S.sel))S.sel=null;
  save();rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();stopsTopUp();
  const all=S.lines.flatMap(l=>l.segs.flatMap(s=>s.pts));if(all.length)map.fitBounds(L.latLngBounds(all),{padding:[30,30]})}
@@ -3463,10 +3469,14 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
   if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
+// (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu obok, błędne A+T; projekty otwarte w wadliwej wersji z 22.11
+// (S.stFix4) – usunięcie dodanych wtedy duplikatów: nieużywanych peronów i pozycji zatrzymania, które poprawny import uznaje za drugi opis przystanku)
+function stopFix5(){if(S.stops.length&&!S.stFix5)setTimeout(async()=>{if(S.stFix5)return;try{await loadStops({auto:true,quiet:true,fixBus:true,prune:!!S.stFix4})}catch(e){dbg('stFix5: '+e.message)}S.stFix4=S.stFix5=1;save();drawStops();renderStops();redraw()},6000)}
 function bootData(){setTimeout(()=>ziNums(),1800);if(!S.pf1&&S.lines.some(l=>l.auto&&l.segs.length))setTimeout(async()=>{let n=0;for(const l of S.lines.filter(l=>l.auto&&l.segs.length)){try{if(platFix(l)){n++;l._pf=1;try{await rebuild(l,false,true)}finally{delete l._pf}}}catch(e){}}S.pf1=1;save();if(n){redraw();renderLines();say('Poprawiono perony (po prawej stronie jazdy) w liniach: '+n+'.')}},6500);   // (raz: perony po złej stronie w liniach zapisanych wcześniej)
  if(S.stops.length&&S.stFix3&&!S.stHist2&&cityKey()==='gdansk')setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,bbox:HIST_STOPS[0].box.join(',')})}catch(e){}S.stHist2=1;save();drawStops();renderStops()},5000);   // (raz: przystanki tramwajowe na Stogach w istniejących projektach)
-// (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu o tej samej nazwie obok)
- if(S.stops.length&&S.stFix3&&!S.stFix4)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true})}catch(e){}S.stFix4=1;save();drawStops();renderStops()},6000);
+// (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu o tej samej nazwie obok; najpierw usunięcie duplikatów
+// dodanych przez wadliwą wersję importu z 22.11 – nieużywane przez linie przystanki tego samego rodzaju i nazwy tuż obok wcześniejszego)
+ stopFix5();
  if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
