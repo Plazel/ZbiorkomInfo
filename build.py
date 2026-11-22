@@ -1474,6 +1474,17 @@ for area, A in NEW_AREAS.items():
                 for rr in runs: groups[rk].append((k, False, tmeta[tid][0], rr))
                 if tid in TSHAPE: SHAPE_OF.setdefault((rk, tuple(x[0] for x in rows)), TSHAPE[tid])
         del st
+        # runs to or from a depot (Łódź: "Nowe Sady-zajezdnia", "zajezdnia Chocianowice"…): a run that begins or ends at a stop named
+        # after a depot which is not one of the line's usual terminals – the page can hide those runs ("Ukryj trasy kursów z/do zajezdni")
+        DEPOT_NM = re.compile(r'zajezdni|(?<!\w)baza(?!\w)|Betriebshof|vozovn|vozovň|(?<!\w)depo(?!\w)', re.I)
+        for rk, G in groups.items():
+            ends = collections.Counter()
+            for e in G: ends[e[3][0][0]] += 1; ends[e[3][-1][0]] += 1
+            top = {sid for sid, c in ends.items() if c >= max(2, .25 * len(G))}
+            for i, (k, dep, dd_, rr) in enumerate(G):
+                if dep: continue
+                f0, f1 = rr[0][0], rr[-1][0]
+                if any(DEPOT_NM.search(STOPS.get(x, [''])[0]) and x not in top for x in (f0, f1)): G[i] = (k, True, dd_, rr)
         # feeds without direction_id (Flensburg from gtfs.de): each trip oriented against the line's most common pattern, as for ZKM –
         # otherwise every trip falls into one direction and the line looks one-way with half of its timetable
         for rk in groups:

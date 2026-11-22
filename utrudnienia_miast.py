@@ -9,6 +9,8 @@ Sources (all open, no key, nothing behind a check):
   byd – ZDMiKP Bydgoszcz, RSS of "Aktualności komunikacyjne", the last two weeks'
   ns  – MPK Nowy Sącz, the notices its home page shows in its bar of notices (each read from its page)
   wej – MZK Wejherowo, "Wiadomości i komunikaty": the notices (komunikaty) of the last month
+  ldz – MPK Łódź, "Utrudnienia w ruchu" (mpk.lodz.pl/rozklady/utrudnienia.jsp): each row's lines, the disruption and the change
+        of the service (objazd) as the operator writes them – the GTFS-RT copy kept elsewhere (zbiorkom.live) comes without lines
   wro – MPK Wrocław, "Zmiany w komunikacji" (mpk.wroc.pl): each notice's lines and period as the list gives them, its text from its page;
         those in force now or within three days (the GTFS-RT alerts of Wrocław come empty)
 A source that does not answer leaves its old file. Usage: python3 utrudnienia_miast.py [data folder]"""
@@ -208,7 +210,40 @@ def wroclaw(data):
     return base, res
 
 
+def lodz_lines(t):
+    """MPK Łódź writes the variants of a line together: "87AB", "87A/B", "88ABC" – written out as separate lines, so that the page
+    shows each as its own sign: 87A oraz 87B, 88A, 88B oraz 88C"""
+    def ex(m):
+        n, vs = m.group(1), re.sub(r'[/,]', '', m.group(2))
+        L = [n + v for v in vs]
+        return L[0] if len(L) == 1 else ', '.join(L[:-1]) + ' oraz ' + L[-1]
+    return re.sub(r'(?<![\w/])(N?\d{1,3})((?:[A-D](?:\s*/\s*|,)?){2,4})(?![\w/])', lambda m: ex(m) if len(re.sub(r'[^A-D]', '', m.group(2))) >= 2 else m.group(0), t)
+
+
+def lodz(data):
+    import zoneinfo
+    WAW = zoneinfo.ZoneInfo('Europe/Warsaw'); u = 'https://www.mpk.lodz.pl/rozklady/utrudnienia.jsp'
+    raw = urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=40).read()
+    m = re.search(rb'charset=([\w-]+)', raw); page = raw.decode((m.group(1).decode() if m else 'iso-8859-2'), 'replace')
+    t = page[page.find('id="tJams"'):]; t = t[:t.find('</table>')]
+    res = []
+    rows = re.split(r'(?i)<tr\b', t)
+    for i, r in enumerate(rows):
+        lc = re.search(r'(?is)<td class="lines"[^>]*>(.*?)</td>', r)
+        if not lc: continue
+        lines = [x.strip() for x in re.findall(r'>\s*([0-9A-Z]{1,4})\s*<', '>' + lc.group(1) + '<')]
+        info = [plain(x) for x in re.findall(r'(?is)<td class="info"[^>]*>(.*?)(?=<td|$)', r)]
+        dates = re.findall(r'(\d{4})-(\d{2})-(\d{2})&nbsp;o godzinie&nbsp;(\d{1,2}):(\d{2})', rows[i + 1] if i + 1 < len(rows) else '')
+        st = datetime.datetime(*map(int, dates[0]), tzinfo=WAW) if dates else None
+        txt = lodz_lines('\n'.join(x for x in info if x))
+        if not lines or not txt: continue
+        title = ('Utrudnienia w ruchu: linia ' if len(lines) == 1 else 'Utrudnienia w ruchu: linie ') + ', '.join(lines)
+        res.append({'id': 'ldz-' + '-'.join(lines) + '-' + (iso(st) or str(i)), 'lines': lines, 'title': title[:200], 'text': txt, 'start': iso(st), 'end': None, 'url': u})
+    return u, res
+
+
 SOURCES = {
+    'ldz': lodz,
     'prg': prague,
     'poz': lambda d: recent_rss('https://www.ztm.poznan.pl/feed/?post_type=komunikaty', 'https://www.ztm.poznan.pl/pl/komunikaty/'),
     'byd': lambda d: recent_rss('https://zdmikp.bydgoszcz.pl/pl/transport/aktualnosci-komunikacyjne?format=feed&type=rss',

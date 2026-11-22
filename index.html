@@ -1829,7 +1829,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795334935;
+const APP_BUILD=1795336619;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4284,6 +4284,13 @@ function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{
   if(nl==='de')n=n.replace(/\bBhf\b\.?/g,'Bahnhof');   // ("S+U Friedrichstr. Bhf": "S- und U-Bahnhof Friedrichstraße Bahnhof", every word said)   // ("S Westkreuz Bhf": the station said once)
   // (Łódź: "Bratysławska-Wróblewskiego" written without spaces, said as two names; not a double name such as Skłodowskiej-Curie)
   if(city==='ldz')n=n.replace(/(\p{Ll})-(\p{Lu})(?!urie)/gu,'$1 - $2');
+  // (pozostała sama liczba – „Telefoniczna 27”, „Osiedle 1000-lecia” już zamienione wyżej –: liczebnik główny słowami, „dwadzieścia siedem”;
+  // syntezator mowy sam czytał ją jako porządkowy, „dwudziesta siódma”)
+  if(nl==='pl'){const J=['zero','jeden','dwa','trzy','cztery','pięć','sześć','siedem','osiem','dziewięć','dziesięć','jedenaście','dwanaście','trzynaście','czternaście','piętnaście','szesnaście','siedemnaście','osiemnaście','dziewiętnaście'],
+    D=['','','dwadzieścia','trzydzieści','czterdzieści','pięćdziesiąt','sześćdziesiąt','siedemdziesiąt','osiemdziesiąt','dziewięćdziesiąt'],
+    H=['','sto','dwieście','trzysta','czterysta','pięćset','sześćset','siedemset','osiemset','dziewięćset'],
+    card=v=>{if(v<20)return J[v];const h=Math.floor(v/100),r=v%100,w=[];if(h)w.push(H[h]);if(r){if(r<20)w.push(J[r]);else{w.push(D[Math.floor(r/10)]);if(r%10)w.push(J[r%10])}}return w.join(' ')};
+    n=n.replace(/(^|\s)3\s+Krzyży/gu,'$1Trzech Krzyży').replace(/(^|[\s,(])(\d{1,3})(?=$|[\s,).])/g,(m,a,d)=>a+card(+d))}
   n=n.replace(/\s+[-–]\s+/g,', ');   // ("Kraszewskiego - Szpital", "Brzechwy - Szafirowa": a pause between)
   return /[.!?]$/.test(n)?n:n+'.'}
 // a Czech or German stop's name in Polish, where it says what the place is ("Hlavní nádraží" – Dworzec Główny, "ZOB" –
@@ -5493,7 +5500,7 @@ const ALERT_IC='<svg viewBox="0 0 24 24" width="26" height="26" fill="currentCol
 // where each city's notices come from: ZTM Gdańsk's bar on its site (the proxy), else the operators' GTFS-Realtime service
 // alerts (Warszawa and Łódź through zbiorkom.live's open API, Kraków from ZTP)
 const ALERT_SRC={tri:[['ztm']],waw:[['rt','https://api.zbiorkom.live/api6-open/warsaw/gtfsRealtime/default/serviceAlerts']],
-  ldz:[['rt','https://api.zbiorkom.live/api6-open/lodz/gtfsRealtime/default/serviceAlerts']],
+  ldz:[['json','data/alerts_ldz.json']],   // (MPK Łódź, „Utrudnienia w ruchu” z jego strony – z numerami linii; nieoficjalna kopia GTFS-RT przychodziła bez linii)
   lub:[['rt','https://api.zbiorkom.live/api6-open/lublin/gtfsRealtime/default/serviceAlerts']],wro:[['rt','https://api.zbiorkom.live/api6-open/wroclaw/gtfsRealtime/default/serviceAlerts'],['json','data/alerts_wro.json']],   // (Wrocław: also MPK's own "Zmiany w komunikacji" – its GTFS-RT alerts come empty)
   
   krk:[['rt','https://gtfs.ztp.krakow.pl/ServiceAlerts_A.pb',1],['rt','https://gtfs.ztp.krakow.pl/ServiceAlerts_T.pb',1]],
@@ -5680,7 +5687,7 @@ const dtDist=(a,b)=>{const r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]);co
 // the notice cut into its parts per line ("Linia 6: …", "Linie 2 i 8: …"; the opening, which often names the closed street,
 // kept with each); a notice without such parts: the whole of it for each line it is about
 function dtSplit(text,lines){const parts={},t=String(text||'');
-  const re=/(?:^|\n)\s*Lini[ae]\s+([0-9A-ZŻ]{1,4}(?:\s*(?:,|i|oraz)\s*[0-9A-ZŻ]{1,4})*)\s*[:\n]/g;let m;const idx=[];
+  const re=/(?:^|\n)\s*Lini[ae]\s+([0-9A-ZŻ]{1,4}(?:\s*(?:,|i|oraz)\s*[0-9A-ZŻ]{1,4})*)\s*(?:\([^)\n]*\))?\s*[:\n]/g;let m;const idx=[];
   while((m=re.exec(t)))idx.push([m.index,m[0].length,m[1].split(/\s*(?:,|i|oraz)\s*/)]);
   if(!idx.length){lines.forEach(l=>parts[l]=t);return parts}
   idx.forEach(([i,len,ls],k)=>{const body=t.slice(i+len,k+1<idx.length?idx[k+1][0]:t.length);ls.forEach(l=>parts[l]=(parts[l]?parts[l]+'\n':'')+body)});
@@ -5693,21 +5700,29 @@ function dtParse(txt){
   {const SN='[A-ZŁŚŻŹĆ0-9][\\p{L}\\d-]*(?:\\s+(?:z|i|w|na|im|de)?\\s*[A-ZŁŚŻŹĆ][\\p{L}\\d-]*)*';
     const re=new RegExp('(?:zablokowan|zamknięci|wstrzymani|utrudnie|remont|awari)[\\p{L}]*[^.]*?\\bna\\s+(?:(?:ul|al|Al|pl|Pl|ulicy|alei|ulicach)\\s+)?('+SN+')','gu');
     while((m=re.exec(t)))ev.blocked.push(m[1])}
-  if((m=t.match(/w kierunku\s+([A-ZŁŚŻŹĆ„"][^,.;]+?)(?=[,.;]|\s+(?:od|do)\s|$)/u)))ev.toward=m[1].replace(/[„”"]/gu,'');
+  if((m=t.match(/w kierunku\s+(?:krańca\s+|pętli\s+|przystanku\s+)?([A-ZŁŚŻŹĆ„"][^,.;]+?)(?=[,.;]|\s+(?:od|do)\s|$)/u)))ev.toward=m[1].replace(/[„”"]/gu,'');
   if((m=t.match(/kursuj[\p{L}\d]*\s+(?:w obu kierunkach\s+)?(?:na odcinku\s+|między\s+|pomiędzy\s+)(?:przystankami\s+)?[„"]?(.+?)[”"]?\s+(?:i|a|–|-)\s+[„"]?(.+?)[”"]?\s+(?:(bez zatrzyma[nń]|z obsługą wszystkich przystanków|z obsługą przystanków)\s+)?(?:przez|ulicami|objazdem)\s+(.+?)(?:\.|$)/u))){
     ev.from=m[1];ev.to=m[2];if(m[3])ev.serveAll=!/^bez/.test(m[3]);ev.via=dtList(m[4].replace(/(?<!\p{L})(?:ul|al|Al|ulicę|ulicami|ulicą)\s+/gu,''))}
   else if((m=t.match(/Od\s+(?:pętli|krańca|przystanku|placu)?\s*[„"]?([^,]+?)[”"]?\s+(?:autobusy|tramwaje|trolejbusy|pojazdy)\s+kursuj[\p{L}\d]*\s+(.+?)\s+do\s+(?:ul|al|Al|ulicy|alei|przystanku|pętli)?\s*[„"]?([^,.]+?)[”"]?\s+i\s+dalej\s+(?:po\s+)?stał[\p{L}\d]*\s+tras[\p{L}\d]*/u))){
     ev.from=m[1];ev.via=dtList(m[2].replace(/(?<!\p{L})(?:ul|al|Al)\s+/gu,''));ev.rejoin=m[3]}
+  // (ZTM Gdańsk: „Autobusy jadące w kierunku krańca X od przystanku „Oliwa PKP” 05 pojadą ul.: Krzywoustego – Droszyńskiego – … – dalej po stałej trasie”)
+  else if((m=t.match(/od\s+(?:przystanku|pętli|krańca)\s+(?:•\s*)?[„"]?([^„”"•]+?)[”"]?\s*(\d{2})?\s+(?:pojad[\p{L}]*|kursuj[\p{L}]*|skierowan[\p{L}]*)\s+(?:objazdem\s+)?(?:ul|ulicami|al|Al|przez)?\s*:?\s*(.+?)\s*[–—-]\s*dalej\s+(?:po\s+)?stał[\p{L}]*\s+tras[\p{L}]*/u))){
+    ev.from=m[1]+(m[2]?' '+m[2]:'');ev.via=m[3].replace(/\([^)]*\)/g,' ').split(/\s*[–—]\s*|\s+-\s+/).map(x=>x.replace(/(?<!\p{L})(?:ul|al|Al|pl|Pl)\s+/gu,'').trim()).filter(Boolean);ev.rejoin=ev.via[ev.via.length-1];ev.noAdd=true}
+  // (MPK Łódź: „Linia 77 skierowana objazdem od skrzyżowania Sienkiewicza/Wigury przez Sienkiewicza, Piłsudskiego, Kilińskiego na swoją trasę”)
+  else if((m=t.match(/(?:skierowan[\p{L}]*|kursuj[\p{L}]*)\s+(?:objazdem|na objazd)\s+od\s+(?:przystanku|skrzyżowania|pętli|ul|al|ulicy)?\s*[„"]?(.+?)[”"]?\s+(?:ulicami\s+|przez\s+)(?:ul\s+|ulice\s+)?(.+?)\s+(?:na\s+(?:swoj|stał)[\p{L}]*\s+tras[\p{L}]*|do\s+(?:przystanku\s+)?[„"]?(.+?)[”"]?)(?=[.,;]|\s+i\s+dalej|$)/u))){
+    {const x=m[1].split(/\s*\/\s*/);if(x.length===2)ev.fromX=x}ev.from=m[1].replace(/\s*\/\s*/g,' ');ev.via=dtList(m[2].replace(/(?<!\p{L})(?:ul|al|Al)\s+/gu,''));if(m[3])ev.to=m[3];else ev.rejoin=ev.via[ev.via.length-1]}
   else if((m=t.match(/od przystanku\s+[„"]?(.+?)[”"]?\s+do przystanku\s+[„"]?(.+?)[”"]?\s+.*?(?:przez|ulicami)\s+(.+?)(?:\.|$)/u))){ev.from=m[1];ev.to=m[2];ev.via=dtList(m[3].replace(/(?<!\p{L})(?:ul|al|Al)\s+/gu,''))}
   if((m=t.match(/nie\s+kursuj[\p{L}]*\s+(?:w obu kierunkach\s+)?(?:na odcinku|między|pomiędzy)\s+(?:przystankami\s+)?[„"]?(.+?)[”"]?\s+(?:–|-|—|a|i)\s+[„"]?(.+?)[”"]?(?=[,.;]|\s+(?:w kierunku|z powodu|ze względu)|$)/u)))ev.cut=[m[1],m[2]];
   if((m=t.match(/(?:skróconą trasą|na skróconej trasie|na trasie skróconej|kursuj[\p{L}]* na trasie(?: skróconej)?)\s*:?\s*[„"]?([^,.;–—-]+?)[”"]?\s+(?:–|—|-)\s+[„"]?([^,.;]+?)[”"]?(?=[,.;]|$)/u)))ev.short=[m[1],m[2]];
-  for(const re of [/Nieobsługiwan[\p{L}\d]*\s+(?:są|będą|jest|będzie)?\s*przystan[\p{L}\d]*\s*:?\s*(.+?)(?:\.|$)/gu,/(?:nie\s+(?:są|będą)\s+obsługiwane|nie\s+(?:jest|będzie)\s+obsługiwany)\s+przystan[\p{L}\d]*\s*:?\s*(.+?)(?:\.|$)/gu,/przystan[\p{L}]*\s+([^.]+?)\s+(?:nie (?:są|będą|jest|będzie) obsługiwan[\p{L}]*|zostan[\p{L}]* zawieszon[\p{L}]*|(?:jest|są|będą)\s+nieczynn[\p{L}]*)/giu])
+  // (ZTM Warszawa: „l. 194 > PKP Gołąbki: …Kadłubka – Leszczyńskiego – Przejazdowa… z pominięciem przystanków Przemysława II 02, Bolesława Śmiałego 02 i Bolesława Krzywoustego 02”)
+  if(!ev.toward&&(m=t.match(/(?:^|\s)(?:l\.?|lini[ai])\s*[0-9A-Z]{1,4}\s*>\s*([^:]+?)\s*:/u)))ev.toward=m[1].trim();
+  for(const re of [/z\s+pominięciem\s+przystank[\p{L}]*\s*:?\s*(.+?)(?:\.(?:\s|$)|$)/gu,/(?:Zawieszon[\p{L}]*|Wstrzyman[\p{L}]*)\s+(?:zostanie|będzie|jest)?\s*obsług[\p{L}]*\s+(?:komunikacyjn[\p{L}]*\s+)?przystank[\p{L}]*\s*:?\s*(.+?)(?:\.(?:\s|$)|$)/gu,/Nieobsługiwan[\p{L}\d]*\s+(?:są|będą|jest|będzie)?\s*przystan[\p{L}\d]*\s*:?\s*(.+?)(?:\.|$)/gu,/(?:nie\s+(?:są|będą)\s+obsługiwane|nie\s+(?:jest|będzie)\s+obsługiwany)\s+przystan[\p{L}\d]*\s*:?\s*(.+?)(?:\.|$)/gu,/przystan[\p{L}]*\s+([^.]+?)\s+(?:nie (?:są|będą|jest|będzie) obsługiwan[\p{L}]*|zostan[\p{L}]* zawieszon[\p{L}]*|(?:jest|są|będą)\s+nieczynn[\p{L}]*)/giu])
     while((m=re.exec(t)))ev.skip.push(...dtList(m[1]));
-  for(const re of [/(?:Na trasie objazdu|Na trasie objazdowej|Na objeździe)\s+(?:obowiązuj[\p{L}\d]*|obsługiwan[\p{L}\d]*\s+(?:jest|są))\s+przystan[\p{L}\d]*\s*:?\s*(.+?)(?:\.|$)/gu,/(?<![\p{L}])obsługiwan[\p{L}]*\s+(?:będzie|jest|są|będą)\s+(?:dodatkowo\s+)?przystan[\p{L}]*\s*:?\s*(.+?)(?:\.|$)/gu])
+  for(const re of [/(?:Na trasie objazdu|Na trasie objazdowej|Na objeździe)\s+(?:obowiązuj[\p{L}\d]*|obsługiwan[\p{L}\d]*\s+(?:jest|są))\s+przystan[\p{L}\d]*\s*:?\s*(.+?)(?:\.|$)/gu,/(?<![\p{L}])obsługiwan[\p{L}]*\s+(?:będzie|jest|są|będą)\s+(?:dodatkowo\s+)?przystan[\p{L}]*\s*:?\s*(.+?)(?:\.|$)/gu,/(?:będą|będzie|są|jest)\s+(?:dodatkowo\s+|zastępczo\s+)?obsługiwan[\p{L}]*\s+(?:dodatkowo\s+)?przystan[\p{L}]*\s*:?\s*(.+?)(?:\.(?:\s|$)|$)/gu])
     while((m=re.exec(t)))ev.use.push(...dtList(m[1]));
   if(/obsługiwane\s+(?:są|będą)\s+wszystkie\s+przystanki\s+(?:na\s+)?(?:trasie\s+)?objazd/iu.test(t))ev.serveAll=true;
   if(/bez\s+zatrzyma[nń]|bez\s+obsługi\s+przystank/iu.test(t))ev.serveAll=false;
-  ev.skip=ev.skip.map(x=>x.replace(/^przystanek\s+/iu,''));ev.use=ev.use.map(x=>x.replace(/^przystanek\s+/iu,''));return ev}
+  const cl=x=>x.replace(/^przystanek\s+/iu,'').replace(/\(n\/ż\)/gu,'').replace(/[„”"]/gu,'').replace(/\s+/g,' ').trim();ev.skip=[...new Set(ev.skip.map(cl))].filter(Boolean);ev.use=[...new Set(ev.use.map(cl))].filter(Boolean);return ev}
 // Berlin (BVG, in German): "Bus M27: Umleitung … Richtung S+U Pankow von U Turmstraße bis Stendaler Straße via Lübecker Str., Birkenstr.",
 // "• Bus 123 beide Richtungen [Umleitung] zwischen A ↔ B", "Kein Halt" at a stop; the stretch BVG gives with the notice ("A ↔ B") when the text names none
 function dtSplitDe(text,n){const esc=n.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),re=new RegExp('(?<![\\w+])'+esc+'(?![\\w])');const L=String(text).split('\n'),mine=L.filter(l=>re.test(l));
@@ -5756,15 +5771,20 @@ function dtPath(G,a,b,avoid,via,ST){const S=IDX.stops,vs=id=>S[id]&&via.some(v=>
 function dtRead(al,r,L,G,ST){const S=IDX.stops,out=[];
   const txt=al.g==='ber'?dtSplitDe(al.text||'',r.n):al.g==='prg'?(al.title?al.title+'.\n':'')+(al.text||''):dtSplit((al.title?al.title+'.\n':'')+(al.text||''),[r.n])[r.n];if(!txt)return out;
   const ev=al.g==='ber'?dtParseDe(txt,al):al.g==='prg'?dtParseCs(txt):dtParse(txt);if(!ev.from&&!ev.skip.length&&!ev.cut&&!ev.short&&!(ev.blocked.length&&ST))return out;
-  L.dirs.forEach((d,di)=>{const ids=d.stops.map(x=>x[0]);
-    if(ev.toward&&!dtWords(ev.toward).some(w=>dtWords(d.head).some(x=>dtSame(x,w))))return;
+  // (przystanki głównego przebiegu kierunku – lista kierunku zawiera też przystanki wariantów, przez które linia nie jedzie po kolei; numery z powrotem jako indeksy listy kierunku)
+  L.dirs.forEach((d,di)=>{const P=d.pats&&d.pats[0]&&d.pats[0].length>1?d.pats[0]:d.stops.map((_,i)=>i),ids=P.map(i=>d.stops[i][0]);
+    // (kierunek z komunikatu, który nie pasuje do żadnego kierunku linii – np. nazwa krańca w innej formie: bez zawężania)
+    const twd=h=>dtWords(ev.toward).some(w=>dtWords(h).some(x=>dtSame(x,w)));if(ev.toward&&L.dirs.some(x=>twd(x.head))&&!twd(d.head))return;
     const res={di,notes:[],conf:1},skip=new Set();
     ev.skip.forEach(ph=>{const i=dtFind(ph,ids);if(i>=0)skip.add(i);else res.notes.push('?'+ph)});
     if(ev.cut){let a=dtFind(ev.cut[0],ids),b=dtFind(ev.cut[1],ids);if(a>b)[a,b]=[b,a];if(a>=0&&b>a)for(let i=a+1;i<b;i++)skip.add(i);else res.conf=Math.min(res.conf,.5)}
     if(ev.short){let a=dtFind(ev.short[0],ids),b=dtFind(ev.short[1],ids);if(a>b)[a,b]=[b,a];if(a>=0&&b>a){for(let i=0;i<ids.length;i++)if(i<a||i>b)skip.add(i)}else res.conf=Math.min(res.conf,.5)}
     let fi=ev.from?dtFind(ev.from,ids):-1,ti=-1;if(ev.to)ti=dtFind(ev.to,ids,{after:fi});
+    // (od skrzyżowania „Sienkiewicza/Wigury”: ostatni przystanek przed skrętem – nazwa z jedną ulicą, następny z drugą; nazwy przystanków „Ulica-Przecznica”)
+    if(ev.from&&fi<0&&ev.fromX){const [xa,xb]=ev.fromX,has=(id,v)=>{const W=dtWords(v);const N=dtWords((S[id]||[])[0]);return W.length&&W.every(w=>N.some(x=>dtSame(x,w)))};
+      for(let i=0;i<ids.length-1;i++){if(has(ids[i],xa)&&has(ids[i],xb)){fi=Math.max(0,i-1);break}if(has(ids[i],xa)&&has(ids[i+1],xb)){fi=i;break}}}
     if(ev.from&&fi<0)res.conf=0;
-    if(fi>=0&&ti<0&&ev.rejoin){let nm=dtFind(ev.rejoin,ids,{after:fi,first:true});if(nm<0&&ST)nm=ids.findIndex((id,i)=>i>fi&&dtOnSt(id,ST,ev.rejoin));const ls=Math.max(fi,...skip);ti=nm>fi?nm:ls+1<ids.length?ls+1:-1}
+    if(fi>=0&&ti<0&&ev.rejoin){let nm=dtFind(ev.rejoin,ids,{after:fi,first:true});if(nm<0){const W=dtWords(ev.rejoin);nm=ids.findIndex((id,i)=>i>fi&&W.length&&W.every(w=>dtWords((S[id]||[])[0]).some(x=>dtSame(x,w))))}if(nm<0&&ST)nm=ids.findIndex((id,i)=>i>fi&&dtOnSt(id,ST,ev.rejoin));const ls=Math.max(fi,...skip);ti=nm>fi?nm:ls+1<ids.length?ls+1:-1;if(ev.skip.length&&skip.size&&ls>fi&&ls+1<ids.length&&ti>ls+1)ti=ls+1}
     // ("między X i Y": the other direction meets Y first)
     if(ev.to&&!ev.rejoin&&ti<0){const f2=dtFind(ev.to,ids),t2=f2>=0?dtFind(ev.from,ids,{after:f2}):-1;if(t2>f2){fi=f2;ti=t2}}
     if(ev.to&&ti<0)res.conf=0;
@@ -5778,12 +5798,14 @@ function dtRead(al,r,L,G,ST){const S=IDX.stops,out=[];
       let mid=[];
       if(ev.serveAll!==null||!useIds.length){const p=G?dtPath(G,ids[fi],ids[ti],avoid,ev.via.concat(ev.use),ST):null;if(p)mid=p.slice(1,-1);else res.conf=Math.min(res.conf,.7)}
       if(useIds.length){const set=new Set(mid);useIds.forEach(id=>{if(!set.has(id))mid.push(id)});if(ev.serveAll==null)mid=mid.filter(id=>useIds.includes(id))}
+      if(ev.noAdd&&!useIds.length)mid=[];   // (same ulice objazdu, bez wymienionych przystanków zastępczych: żadnych zgadywanych przystanków po drodze)
       if(ev.serveAll==null)mid.sort((x,y)=>dtDist(A0,[S[x][2],S[x][3]])-dtDist(A0,[S[y][2],S[y][3]]));
       add=mid.filter(id=>!ids.includes(id)).map(id=>({id,st:ev.serveAll===false?'pass':'add'}));
       skip.forEach(i=>{if(mid.includes(ids[i]))skip.delete(i)});afterSi=Math.max(fi,ti-1);res.from=fi;res.to=ti;res.path=[ids[fi],...mid,ids[ti]]}
     if(!skip.size&&!add.length)return;
-    res.rows=[];ids.forEach((id,i)=>{res.rows.push({id,si:i,st:skip.has(i)?'skip':'ok'});if(i===afterSi)res.rows.push(...add)});
-    res.skip=skip;res.add=add;res.afterSi=afterSi;out.push(res)});
+    res.rows=[];ids.forEach((id,i)=>{res.rows.push({id,si:P[i],st:skip.has(i)?'skip':'ok'});if(i===afterSi)res.rows.push(...add)});
+    if(res.from!=null){res.from=P[res.from];res.to=P[res.to]}
+    res.skip=new Set([...skip].map(i=>P[i]));res.add=add;res.afterSi=afterSi>=0?P[afterSi]:-1;out.push(res)});
   return out}
 const dtKind=r=>{const t=r.t||'bus';return t==='tram'?'tram':t==='rail'?'rail':'bus'};
 async function dtNet(g){if(!(g in DT.net))DT.net[g]=fetch('data/net_'+g+'.json').then(x=>x.ok?x.json():null).catch(()=>null);return DT.net[g]}
