@@ -1495,7 +1495,8 @@ html.tmFsOn nav.rail{display:none!important}html.tmFsOn .toolsDr{left:0!importan
 
 <header class="top"><button type="button" class="plus gdBackTop" id="gdBackTop" hidden title="Wstecz" aria-label="Wstecz"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><a class="logo" href="#" aria-label="ZbiorkomInfo – strona główna"><span>Zbiorkom<i>Info</i></span></a><div class="cityPick"><button type="button" id="cityBtn" aria-haspopup="true" aria-expanded="false" aria-controls="cityMenu"><svg class="cityIco" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3 21h18M5 21V10l5-3v14M10 21V4l9 4v13M13 9h3M13 12.5h3M13 16h3M7 13h1M7 16h1"/></svg><span id="cityName"></span><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4.5l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
  <div class="cityMenu" id="cityMenu" hidden role="menu" aria-label="Wybierz miasto">
-  <div class="cmg" data-reg="pom"><span>Pomorskie</span><div class="cmTri"><a role="menuitem" data-city="all" href="?miasto=all">Trójmiasto</a><button type="button" class="cmExp" id="cmExp" aria-expanded="false" aria-controls="cmSub" title="Pokaż miasta">▾</button></div><div class="cmSub" id="cmSub" hidden><a role="menuitem" data-city="gda" href="?miasto=gda">Gdańsk</a><a role="menuitem" data-city="sop" href="?miasto=sop">Sopot</a><a role="menuitem" data-city="gdy" href="?miasto=gdy">Gdynia</a><a role="menuitem" data-city="wej" href="?miasto=wej">Wejherowo</a></div><a role="menuitem" data-city="nm" id="cmNmA" href="?miasto=nm" hidden>NetworkMaker</a></div>
+  <div class="cmg" data-reg="nm" hidden><span>NetworkMaker</span><a role="menuitem" data-city="nm" id="cmNmA" href="?miasto=nm" hidden>NetworkMaker</a></div>
+  <div class="cmg" data-reg="pom"><span>Pomorskie</span><div class="cmTri"><a role="menuitem" data-city="all" href="?miasto=all">Trójmiasto</a><button type="button" class="cmExp" id="cmExp" aria-expanded="false" aria-controls="cmSub" title="Pokaż miasta">▾</button></div><div class="cmSub" id="cmSub" hidden><a role="menuitem" data-city="gda" href="?miasto=gda">Gdańsk</a><a role="menuitem" data-city="sop" href="?miasto=sop">Sopot</a><a role="menuitem" data-city="gdy" href="?miasto=gdy">Gdynia</a><a role="menuitem" data-city="wej" href="?miasto=wej">Wejherowo</a></div></div>
   <div class="cmg" data-reg="kp"><span>Kujawsko-pomorskie</span><a role="menuitem" data-city="byd" href="?miasto=byd">Bydgoszcz</a></div>
   <div class="cmg"><span>Wielkopolskie</span><a role="menuitem" data-city="poz" href="?miasto=poz">Poznań</a></div>
   <div class="cmg"><span>Łódzkie</span><a role="menuitem" data-city="ldz" href="?miasto=ldz">Łódź</a></div>
@@ -1836,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795359869;
+const APP_BUILD=1795370842;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7701,9 +7702,8 @@ function nmMapOf(R){if(!MAP.data)return;const sn={};R.dirs.forEach(d=>d.stops.fo
   MAP.data.routes[R.id]={lt:[],g:R.dirs.map(d=>(d.shape||d.stops.map(s=>{const S=IDX.stops[s[0]];return [S[2],S[3]]})).map(q=>proj(q[0],q[1]))),v:[],d:R.dirs.map(d=>d.stops.map(s=>s[0])),ve:[],vs:[],sn,vr:[]}}
 // the account or its mode changed, or the network in NetworkMaker: the city shown or hidden, its lines drawn anew
 function nmSync(){const on=nmOn(),N=nmRead();NM.data=N;const nmN=N&&N.cityName?N.cityName+' (NM)':'NetworkMaker';CITIES.nm=[nmN,'w sieci '+nmN];
-  // (miasto z NetworkMakera: w grupie swojego województwa, z dopiskiem (NM) – tylko gdy ma linie)
-  {const a=document.getElementById('cmNmA');if(a){const reg={gdansk:'pom',gdynia:'pom',sopot:'pom',trojmiasto:'pom',bydgoszcz:'kp',krynica:'mp'}[N&&N.city]||'pom',g=document.querySelector('#cityMenu .cmg[data-reg="'+reg+'"]');
-    if(g&&a.parentElement!==g)g.append(a);a.textContent=nmN;a.hidden=!(on&&N&&Array.isArray(N.lines)&&N.lines.length);if(g&&!a.hidden)g.hidden=false}}
+  // (miasto z NetworkMakera: w osobnej, górnej grupie NetworkMaker, z dopiskiem (NM) – tylko gdy ma linie; bez linii grupy nie ma)
+  {const a=document.getElementById('cmNmA');if(a){a.textContent=nmN;a.hidden=!(on&&N&&Array.isArray(N.lines)&&N.lines.length);a.parentElement.hidden=a.hidden}}
   const sig=on+'|'+(N?N.t:0);if(sig!==NM.sig){NM.sig=sig;nmInject();if(city==='nm'){if(typeof markCity==='function')markCity();if(location.hash.startsWith('#l')||location.hash.startsWith('#t'))route()}}
   if(!on&&city==='nm'&&ACC.state!=='wait')setCity('gda')}
 const netSync=nmSync;
