@@ -521,6 +521,7 @@ let STOPMSG=''; // podsumowanie ostatniego importu po zmianie obszaru (wyświetl
 const stopQuery=B=>{const u=[`node["highway"="bus_stop"](${B})`,`node["railway"="tram_stop"](${B})`,`node["railway"~"^(station|halt)$"]["station"!="subway"](${B})`,`way["railway"~"^(station|halt)$"]["station"!="subway"](${B})`];
  ['bus','trolleybus','tram'].forEach(k=>u.push(`node["public_transport"="platform"]["${k}"="yes"](${B})`,`way["public_transport"="platform"]["${k}"="yes"](${B})`,`way["highway"="platform"]["${k}"="yes"](${B})`));
  ['bus','trolleybus','tram'].forEach(k=>u.push(`node["public_transport"="stop_position"]["${k}"="yes"]["name"](${B})`));
+ u.push(`node["railway"="platform"]["tram"="yes"](${B})`,`way["railway"="platform"]["tram"="yes"](${B})`);   // (peron tramwajowy opisany tylko jako railway=platform, bez public_transport)
  return `[out:json][timeout:90];(${u.join(';')};);out body center;`};
 // przystanki, których w OSM chwilowo nie ma, choć fizycznie istnieją: tramwaje na Stogi zawieszone na czas przebudowy (od 2025) – przystanki
 // tramwajowe z tego obszaru brane ze stanu mapy sprzed zawieszenia (zapytanie Overpass z datą); dołączane tylko te, których dziś w OSM brak
@@ -567,7 +568,7 @@ async function loadStops(o){
   // przystanku autobusowego o tej samej nazwie (np. Sikorskiego) to osobny przystanek; tuż obok (< 25 m) – wspólny przystanek A+T
   // (two posts of one stop with different numbers – e.g. Warneńska 01 and 02 on both sides of the street – are never one and the same)
   const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st),p0=pn(name,st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
-   for(const q of c){const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
+   for(const q of c){const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(st&&q.st&&st.id[0]==='w'&&q.st.id[0]==='w'&&d>8)continue;   // (dwa osobne perony-obszary o tej samej nazwie – np. Migowo 01 bez numeru w OSM obok Migowo 02 – to dwa perony, nie jeden)if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
     if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(added.has(q.st.id)||(st&&st._hist&&m0==='t')){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
   // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
   // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
@@ -3464,6 +3465,8 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
 function bootData(){setTimeout(()=>ziNums(),1800);if(!S.pf1&&S.lines.some(l=>l.auto&&l.segs.length))setTimeout(async()=>{let n=0;for(const l of S.lines.filter(l=>l.auto&&l.segs.length)){try{if(platFix(l)){n++;l._pf=1;try{await rebuild(l,false,true)}finally{delete l._pf}}}catch(e){}}S.pf1=1;save();if(n){redraw();renderLines();say('Poprawiono perony (po prawej stronie jazdy) w liniach: '+n+'.')}},6500);   // (raz: perony po złej stronie w liniach zapisanych wcześniej)
  if(S.stops.length&&S.stFix3&&!S.stHist2&&cityKey()==='gdansk')setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,bbox:HIST_STOPS[0].box.join(',')})}catch(e){}S.stHist2=1;save();drawStops();renderStops()},5000);   // (raz: przystanki tramwajowe na Stogach w istniejących projektach)
+// (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu o tej samej nazwie obok)
+ if(S.stops.length&&S.stFix3&&!S.stFix4)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true})}catch(e){}S.stFix4=1;save();drawStops();renderStops()},6000);
  if(S.stops.length&&!S.stFix3)setTimeout(async()=>{try{await loadStops({auto:true,quiet:true,fixAT:true})}catch(e){}S.stFix3=1;save();drawStops();renderStops()},4000);setTimeout(accAutoOpen,400);rebuildGraphs();drawInfra();renderInfra();renderLines();renderStops();redraw();HIST.h=[JSON.stringify(S)];HIST.i=0;HIST.pend=null;clearTimeout(HIST.t);histUI();curCity=cityKey();$('#citySel').value=curCity;if(curCity!=='gdansk')map.setView(CITIES[curCity].c,CITIES[curCity].z);document.title='NetworkMaker – '+CITIES[curCity].n.replace(/ \(.*/,'');
  tramReady=loadTram();railReady=tramReady.then(loadRail);ptReady=railReady.then(loadPT);
  if(!S.stops.length)loadStops();else stopsTopUp()}
