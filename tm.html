@@ -2596,8 +2596,11 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
    if(!v)return;setDep(cur().dep[st.dy].map(m=>(m+v+1440)%1440));draw()};
   if(st.gen){const wheel=(inp,f)=>inp.addEventListener('wheel',e=>{e.preventDefault();f(e.deltaY<0?1:-1,e.shiftKey)},{passive:false});
    const pvU=()=>{const p=cnt(st.bands),e=b.querySelector('.ttPv');if(e)e.textContent=p.length+' odjazdów'+(p.length?' · '+hm(p[0])+'–'+hm(p[p.length-1]):'')};
+   // (kliknięcie pola godziny lub częstotliwości zaznacza jego treść – pisanie od razu ją zastępuje)
+   b.querySelectorAll('[data-ba],[data-bb],[data-bh]').forEach(x=>{let fresh=false;x.addEventListener('focus',()=>{fresh=true;x.select()});x.addEventListener('mouseup',e=>{if(fresh){e.preventDefault();x.select()}fresh=false})});
    b.querySelectorAll('[data-ba],[data-bb],[data-bh]').forEach(x=>{const i=+(x.dataset.ba||x.dataset.bb||x.dataset.bh),B=st.bands[i];
-    x.onchange=()=>{if(x.dataset.ba!=null){const m=t2m(x.value);if(m!=null)B.a=m}else if(x.dataset.bb!=null){let m=t2m(x.value);if(m!=null){if(m<=B.a)m+=1440;B.b=Math.min(m,1440+180)}}else B.h=Math.max(1,Math.min(240,+String(x.value).replace(',','.')||1));draw()};
+    // (bez przebudowy okna – przejście kliknięciem do kolejnego pola nie gubi go; tylko poprawiona wartość i podgląd)
+    x.onchange=()=>{if(x.dataset.ba!=null){const m=t2m(x.value);if(m!=null)B.a=m;x.value=hm(B.a)}else if(x.dataset.bb!=null){let m=t2m(x.value);if(m!=null){if(m<=B.a)m+=1440;B.b=Math.min(m,1440+180)}x.value=hm(B.b%1440)}else{B.h=Math.max(1,Math.min(240,+String(x.value).replace(',','.')||1));x.value=B.h}pvU()};
     x.oninput=()=>{if(x.dataset.bh!=null){const v=+String(x.value).replace(',','.');if(v>=1)B.h=v;pvU()}};
     wheel(x,(d,sh)=>{if(x.dataset.bh!=null){B.h=Math.max(1,Math.min(240,Math.round(B.h)+d));x.value=B.h;pvU();return}
      const k=x.dataset.ba!=null?'a':'b',step=sh?1:5;let m=(k==='a'?B.a:B.b)+d*step;m=Math.round(m/step)*step;
