@@ -571,7 +571,8 @@ async function loadStops(o){
   const covered=(ll,name,st)=>{const[a,b]=ck(ll).split(',').map(Number),n0=nn(name),m0=md(st),p0=pn(name,st);for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++){const c=cov.get((a+i)+','+(b+k));if(!c)continue;
    for(const q of c){if(st&&q.st&&q.st.id===st.id)continue;const d=mdist(q.ll,ll);if(p0&&q.p&&p0!==q.p)continue;if(st&&q.st&&st.id[0]==='w'&&q.st.id[0]==='w'&&d>2)continue;if(q.m===m0||!q.st){if(d<25||(d<60&&n0&&q.n===n0))return true;continue}
     // (wspólny przystanek A+T: tylko słupek/peron tuż obok peronu drugiego rodzaju – pozycja zatrzymania autobusu na jezdni obok peronu tramwajowego, np. Migowo, nie robi z peronu przystanku A+T)
-    if(d<25&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(st&&st._cls===3)return true;if(added.has(q.st.id)||(st&&st._hist&&m0==='t')){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
+    // (peron-obszar i słupek drugiego rodzaju: wspólny przystanek tylko tuż obok – 12 m; peron tramwajowy Budapesztańska 01 i słupek autobusowy 03 po drugiej stronie, 23 m dalej, to dwa przystanki)
+    if(d<((st&&st.id[0]==='w')||(q.st&&q.st.id[0]==='w')?12:25)&&(m0==='t'&&q.m==='a'||m0==='a'&&q.m==='t')&&(!n0||!q.n||q.n===n0)){if(st&&st._cls===3)return true;if(added.has(q.st.id)||(st&&st._hist&&m0==='t')){if(m0==='t'){q.st.tram=true;q.st.bus=true}else q.st.bus=true}return true}}}return false};
   // W OSM węzeł railway=tram_stop (na torze) często nie ma nazwy – nosi ją peron lub pozycja zatrzymania obok. Przystanek bez
   // nazwy dostaje nazwę (i numer słupka) najbliższego nazwanego elementu w promieniu 60 m; tak samo naprawiamy przystanki już w projekcie.
   const NOM=new Map();(j.elements||[]).forEach(e=>{const t=e.tags||{};if(!t.name)return;const ll=e.type==='node'?[e.lat,e.lon]:(e.center?[e.center.lat,e.center.lon]:null);if(!ll)return;
@@ -3455,13 +3456,25 @@ pShow()}
 // the numbers of the posts missing in OSM (e.g. Królewskie Wzgórze, Łabędzia): taken from ZbiorkomInfo's own stops (data/index.json,
 // the Tricity's operators) – the nearest post of the same name within 40 m; once per project, then for the stops loaded later
 let ZIST=null;
-async function ziNums(ids){if(!ids&&S.numZI)return;try{
+async function ziNums(ids){if(!ids&&S.numZI&&S.numZI2)return;try{
   if(!ZIST){const r=await fetch('data/index.json',{cache:'force-cache'});if(!r.ok)return;const j=await r.json(),g=new Map();
    Object.values(j.stops||{}).forEach(v=>{if(!v||!/^(gda|gdy|sop|tri)/.test(v[4]||'')||!/^\d{2}$/.test(v[1]||''))return;const k=Math.floor(v[2]*900)+','+Math.floor(v[3]*900);(g.get(k)||g.set(k,[]).get(k)).push({n:norm(v[0]),num:v[1],ll:[v[2],v[3]]})});ZIST=g}
-  let n=0;S.stops.forEach(st=>{if(ids&&!ids.has(st.id))return;if(st.num||NUMRE.test(st.name)||st.name==='(bez nazwy)')return;const a=Math.floor(st.ll[0]*900),b=Math.floor(st.ll[1]*900),bn=norm(st.name);let best=null,bd=40;
-   for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++)for(const q of ZIST.get((a+i)+','+(b+k))||[]){if(q.n!==bn)continue;const d=mdist(q.ll,st.ll);if(d<bd){bd=d;best=q}}
-   if(best){st.num=best.num;n++}});
-  if(!ids)S.numZI=1;if(n||!ids){save();drawStops();renderStops();renderLines();redraw()}if(n)dbg('Numery słupków uzupełnione z danych ZbiorkomInfo: '+n)}catch(e){dbg('Numery słupków z ZbiorkomInfo: '+(e&&e.message||e))}}
+  // (numery dobierane parami „przystanek–słupek ZbiorkomInfo” od najbliższych, każdy słupek najwyżej raz – dwa perony obok siebie,
+  // np. Migowo 01 i 02, nie dostają już tego samego numeru najbliższego słupka; w grupie z brakiem lub powtórzonym numerem numery
+  // nadane wcześniej z ZbiorkomInfo są dobierane od nowa, numery z nazw w OSM zostają)
+  const bnOf=st=>norm(String(st.name).replace(NUMRE,'$1')),near=(st,R)=>{const a=Math.floor(st.ll[0]*900),b=Math.floor(st.ll[1]*900),bn=bnOf(st),out=[];
+    for(let i=-1;i<=1;i++)for(let k=-1;k<=1;k++)for(const q of ZIST.get((a+i)+','+(b+k))||[]){if(q.n!==bn)continue;const d=mdist(q.ll,st.ll);if(d<R)out.push([d,q])}return out};
+  const fromName=st=>NUMRE.test(st.name)&&!st.zn,groups=new Map();
+  {const byN=new Map();S.stops.forEach(st=>{if(st.name==='(bez nazwy)'||!/^[nw]\d/.test(st.id))return;const bn=bnOf(st);(byN.get(bn)||byN.set(bn,[]).get(bn)).push(st)});
+   // (grupa: przystanki tej samej nazwy połączone odstępami do 150 m)
+   let gi=0;byN.forEach(L=>{const g=new Map();L.forEach(st=>{if(g.has(st))return;const q=[st];g.set(st,++gi);while(q.length){const x=q.pop();L.forEach(y=>{if(!g.has(y)&&mdist(x.ll,y.ll)<150){g.set(y,gi);q.push(y)}})}});g.forEach((v,st)=>{(groups.get(v)||groups.set(v,[]).get(v)).push(st)})})}
+  let n=0;groups.forEach(G=>{if(ids&&!G.some(st=>ids.has(st.id)))return;
+   const nums=G.map(st=>st.num).filter(Boolean),dup=nums.length!==new Set(nums).size,miss=G.some(st=>!st.num);if(!dup&&!miss)return;
+   const fixed=G.filter(st=>st.num&&(fromName(st)||(!st.zn&&!dup&&S.numZI2))),taken=new Set(fixed.map(st=>st.num)),free=G.filter(st=>!fixed.includes(st));
+   const pairs=[];free.forEach(st=>near(st,40).forEach(([d,q])=>{if(!taken.has(q.num))pairs.push([d,st,q])}));pairs.sort((a,b)=>a[0]-b[0]);
+   const done=new Set(),used=new Set();pairs.forEach(([d,st,q])=>{if(done.has(st)||used.has(q))return;done.add(st);used.add(q);if(st.num!==q.num){st.num=q.num;n++}st.zn=1});
+   free.forEach(st=>{if(!done.has(st)&&st.zn){delete st.num;delete st.zn}})});
+  if(!ids){S.numZI=1;S.numZI2=1}if(n||!ids){save();drawStops();renderStops();renderLines();redraw()}if(n)dbg('Numery słupków uzupełnione z danych ZbiorkomInfo: '+n)}catch(e){dbg('Numery słupków z ZbiorkomInfo: '+(e&&e.message||e))}}
 // the project saved on the account opened by itself at the start (when there is one, and it is not older than the changes made here)
 async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await fetch(ACCP.url,{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)return;const d=await r.json();if(!d||!d.net)return;
   if(JSON.stringify(d.net)===JSON.stringify(S)){if(!SV.loc)svLoc('acc');return}
