@@ -22,7 +22,7 @@
 //    sees and manages only the accounts they made themselves (own) – also the main administrator (ADMIN_TOKEN) only theirs and the
 //    accounts made before this split. Kept in a KV namespace bound as KONTA:
 //      t:<sha256 of token> → account id     u:<id> → {id, name, role, created}     d:<id> → the account's data (JSON)
-//    GET /konto → {id, name, role, emp, grant, mk}; GET /konto/tm, PUT /konto/tm – the TransitMaker project (at most 20 MB); GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
+//    GET /konto → {id, name, role, emp, grant, mk}; GET /konto/tm/pliki – pliki NetworkMakera; GET/PUT/DELETE /konto/tm?f=<plik> – jeden plik (najwyżej 20 MB, do 50 plików); GET /konto/dane → its data; PUT /konto/dane (JSON, at most 200 kB) saves it.
 //    Administration with ADMIN_TOKEN (a secret; it also logs in as the administrator):
 //      GET /admin/konta → the accounts; POST /admin/konta {name, role: "user"|"driver"|"admin"} → {id, token} (the token shown once);
 //      POST /admin/konta/<id>/token → a new token (the old one stops working); GET /admin/konta/<id>/token → the token in use
@@ -149,6 +149,17 @@ function same(a, b) { if (typeof a !== 'string' || typeof b !== 'string' || a.le
 // W KV tylko skrót sesji: s:<sha256> → {id, at}; ss:<id> → lista skrótów sesji konta (nowy kod lub usunięcie konta kończą wszystkie)
 const SESS_TTL = 180 * 86400;
 const ADMIN0 = { id: 'admin', name: 'Administrator', role: 'admin' };
+// pliki NetworkMakera konta: klucz pliku i spis (dla kont sprzed spisu – sam dawny projekt jako plik „0”)
+const tmKey = (id, f) => (!f || f === '0') ? 'tm:' + id : 'tm:' + id + ':' + f;
+async function tmList(env, id) {
+  const L = await env.KONTA.get('tmf:' + id, 'json'); if (Array.isArray(L)) return L;
+  const v = await env.KONTA.get('tm:' + id); if (!v) return [];
+  let t = 0; try { t = JSON.parse(v).t || 0; } catch (e) {}
+  return [{ f: '0', name: 'Projekt', t, size: v.length }];
+}
+// wszystkie pliki konta {f: zawartość} (eksport, przeniesienie) i ich usunięcie
+async function tmAll(env, id) { const o = {}; for (const x of await tmList(env, id)) { const v = await env.KONTA.get(tmKey(id, x.f)); if (v) o[x.f] = v; } return o; }
+async function tmDelAll(env, id) { for (const x of await tmList(env, id)) await env.KONTA.delete(tmKey(id, x.f)); await Promise.all([env.KONTA.delete('tm:' + id), env.KONTA.delete('tmf:' + id)]); }
 async function sessNew(env, id) { const sid = newTok(40), sh = await sha(sid);
   await env.KONTA.put('s:' + sh, JSON.stringify({ id, at: new Date().toISOString() }), { expirationTtl: SESS_TTL });
   const L = ((await env.KONTA.get('ss:' + id, 'json')) || []).filter(Boolean); L.unshift(sh); for (const x of L.splice(30)) await env.KONTA.delete('s:' + x);
@@ -219,13 +230,25 @@ async function konta(req, env, cors) {
     b.at = new Date().toISOString(); b.s = b.s === 'run' ? 'run' : 'break';
     await env.KONTA.put('st:' + u.id, JSON.stringify(b), { expirationTtl: 6 * 3600 }); return J({ ok: true });
   }
-  // TransitMaker: the account's project (the whole network, saved from its File menu), apart from the small account data
+  // NetworkMaker: pliki projektów konta (cała sieć, zapisywana z menu Plik). Spis w tmf:<id> ([{f, name, t, size}]); plik „0” to
+  // dawny jedyny projekt (tm:<id>), pozostałe w tm:<id>:<f>. Bez ?f= – plik „0” (zgodność ze starszymi wersjami strony).
+  if (p === '/konto/tm/pliki' && req.method === 'GET') return J({ files: await tmList(env, u.id) });
   if (p === '/konto/tm') {
-    if (req.method === 'GET') return new Response((await env.KONTA.get('tm:' + u.id)) || '{}', { headers: h });
+    const f = new URL(req.url).searchParams.get('f') || '0'; if (!/^[a-z0-9]{1,16}$/.test(f)) return J({ error: 'bad file' }, 400);
+    if (req.method === 'GET') return new Response((await env.KONTA.get(tmKey(u.id, f))) || '{}', { headers: h });
     if (req.method === 'PUT') {
       const t = await req.text(); if (t.length > 20000000) return J({ error: 'too large' }, 413);
-      try { const o = JSON.parse(t); if (!o || typeof o !== 'object' || !o.net || typeof o.net !== 'object') throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
-      await env.KONTA.put('tm:' + u.id, t); return J({ ok: true });
+      let o; try { o = JSON.parse(t); if (!o || typeof o !== 'object' || !o.net || typeof o.net !== 'object') throw 0; } catch (e) { return J({ error: 'bad json' }, 400); }
+      const L = await tmList(env, u.id), e = L.find(x => x.f === f);
+      if (!e && L.length >= 50) return J({ error: 'too many files' }, 409);
+      await env.KONTA.put(tmKey(u.id, f), t);
+      const name = String(o.name || (e && e.name) || 'Projekt').slice(0, 80), ent = { f, name, t: +o.t || Date.now(), size: t.length };
+      if (e) Object.assign(e, ent); else L.push(ent);
+      await env.KONTA.put('tmf:' + u.id, JSON.stringify(L)); return J({ ok: true, f });
+    }
+    if (req.method === 'DELETE') {
+      const L = (await tmList(env, u.id)).filter(x => x.f !== f);
+      await env.KONTA.delete(tmKey(u.id, f)); await env.KONTA.put('tmf:' + u.id, JSON.stringify(L)); return J({ ok: true });
     }
   }
   if (p === '/konto/dane') {
@@ -296,6 +319,7 @@ async function konta(req, env, cors) {
         await env.KONTA.put('u:' + a.id, JSON.stringify(a), { metadata: { name: a.name, role: a.role, created: a.created, emp: a.emp || null, fn: (a.fn || '').slice(0, 60), ln: (a.ln || '').slice(0, 60), own: a.own } });
         if (a.th) await env.KONTA.put('t:' + a.th, a.id);
         const D = (X.data || {})[a.id] || {}; if (typeof D.d === 'string') await env.KONTA.put('d:' + a.id, D.d); if (typeof D.tm === 'string') await env.KONTA.put('tm:' + a.id, D.tm);
+        if (D.tmx && typeof D.tmx === 'object' && Array.isArray(D.tmf)) { for (const [f, v] of Object.entries(D.tmx)) if (/^[a-z0-9]{1,16}$/.test(f) && typeof v === 'string') await env.KONTA.put(tmKey(a.id, f), v); await env.KONTA.put('tmf:' + a.id, JSON.stringify(D.tmf)); }
         done.push(a.id);
       }
       if (Array.isArray(X.msgs) && X.msgs.length) { const L = (await env.KONTA.get('msg:list', 'json')) || [], have = new Set(L.map(x => x.id)); for (const x of X.msgs) if (x && x.id && !have.has(x.id) && done.includes(x.fid)) L.push(x); L.sort((a, b) => (b.t || '').localeCompare(a.t || '')); L.splice(300); await env.KONTA.put('msg:list', JSON.stringify(L)); }
@@ -332,7 +356,7 @@ async function konta(req, env, cors) {
     // eksport administratora z jego kontami i ich danymi (do ponownego wczytania przez POST /admin/import)
     if (m[2] === '/eksport' && req.method === 'GET') {
       const accs = [a, ...await tree(a.id)], data = {};
-      for (const x of accs) { const [d, tm] = await Promise.all([env.KONTA.get('d:' + x.id), env.KONTA.get('tm:' + x.id)]); if (d || tm) data[x.id] = Object.assign({}, d ? { d } : {}, tm ? { tm } : {}); }
+      for (const x of accs) { const [d, tmf, tmx] = await Promise.all([env.KONTA.get('d:' + x.id), tmList(env, x.id), tmAll(env, x.id)]); if (d || tmf.length) data[x.id] = Object.assign({}, d ? { d } : {}, tmf.length ? { tmf, tmx } : {}); }
       const fids = new Set(accs.map(x => x.id)), msgs = ((await env.KONTA.get('msg:list', 'json')) || []).filter(x => fids.has(x.fid));
       return J({ app: 'zbiorkominfo-konta', v: 1, at: new Date().toISOString(), root: a.id, accounts: accs, data, msgs });
     }
@@ -346,7 +370,12 @@ async function konta(req, env, cors) {
       for (const id of own) { const x = await env.KONTA.get('u:' + id, 'json'); if (!x) continue; x.own = to; await putU(x); n++; }
       const L = (await env.KONTA.get('msg:list', 'json')) || []; let ch = false; for (const x of L) if (x.fid === a.id) { x.fid = to; ch = true; } if (ch) await env.KONTA.put('msg:list', JSON.stringify(L));
       // (projekt NetworkMakera i dane konta przenoszonego administratora – tylko jeśli docelowy nie ma własnych)
-      for (const k of ['tm:', 'd:']) { const v = await env.KONTA.get(k + a.id); if (v && !(await env.KONTA.get(k + to))) await env.KONTA.put(k + to, v); }
+      { const v = await env.KONTA.get('d:' + a.id); if (v && !(await env.KONTA.get('d:' + to))) await env.KONTA.put('d:' + to, v); }
+      // (pliki NetworkMakera dopisywane do plików docelowego administratora pod nowymi identyfikatorami)
+      { const src = await tmList(env, a.id), dst = await tmList(env, to);
+        for (const x of src) { const v = await env.KONTA.get(tmKey(a.id, x.f)); if (!v || dst.length >= 50) continue; let f; do f = Math.random().toString(36).slice(2, 10); while (dst.some(y => y.f === f));
+          await env.KONTA.put(tmKey(to, f), v); dst.push(Object.assign({}, x, { f, name: x.name + ' (' + (a.name || a.id) + ')' })); }
+        if (src.length) await env.KONTA.put('tmf:' + to, JSON.stringify(dst)); }
       return J({ ok: true, moved: n });
     }
     // a new token: drawn, or the administrator's own code ({token}: 8–40 letters and digits, not in use by another account);
@@ -378,10 +407,10 @@ async function konta(req, env, cors) {
       // (?wszystko=1: razem ze wszystkimi kontami pod nim i ich danymi; bez tego administrator z kontami nie jest usuwany)
       if (a.role === 'admin' && (await ownIds(env, a.id)).size) {
         if (new URL(req.url).searchParams.get('wszystko') !== '1') return J({ error: 'has accounts' }, 409);
-        for (const x of await tree(a.id)) { await sessEndAll(env, x.id); await Promise.all([x.th ? env.KONTA.delete('t:' + x.th) : null, env.KONTA.delete('u:' + x.id), env.KONTA.delete('d:' + x.id), env.KONTA.delete('tm:' + x.id), env.KONTA.delete('st:' + x.id)]); }
+        for (const x of await tree(a.id)) { await sessEndAll(env, x.id); await Promise.all([x.th ? env.KONTA.delete('t:' + x.th) : null, env.KONTA.delete('u:' + x.id), env.KONTA.delete('d:' + x.id), tmDelAll(env, x.id), env.KONTA.delete('st:' + x.id)]); }
         const L = (await env.KONTA.get('msg:list', 'json')) || []; await env.KONTA.put('msg:list', JSON.stringify(L.filter(x => x.fid !== a.id)));
       }
-      await sessEndAll(env, a.id); await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), env.KONTA.delete('tm:' + a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
+      await sessEndAll(env, a.id); await Promise.all([a.th ? env.KONTA.delete('t:' + a.th) : null, env.KONTA.delete('u:' + a.id), env.KONTA.delete('d:' + a.id), tmDelAll(env, a.id), env.KONTA.delete('st:' + a.id)]); return J({ ok: true }); }
   }
   return J({ error: 'not found' }, 404);
 }

@@ -130,6 +130,9 @@ input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .mf{display:flex;justify-content:flex-end;gap:8px;padding:10px 14px;border-top:1px solid var(--bd2);flex-wrap:wrap}
 .b.dng{background:#c62828;border-color:#c62828;color:#fff}.b.dng:hover{filter:brightness(1.08);color:#fff}
 #fChip{font-size:12px;color:var(--mut)}
+.opnCh{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}.opnCh .b{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;height:auto;text-align:left;white-space:normal}.opnCh .b .small{color:var(--mut);line-height:1.35}
+.accFl{display:grid;gap:0;max-height:60vh;overflow:auto;width:100%}.accF{display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--bd2)}.accF:last-child{border-bottom:0}.accF.cur .accFn b::after{content:'';display:inline-block;width:6px;height:6px;margin-left:6px;background:var(--acc);vertical-align:middle}
+.accFn{flex:1;min-width:0;display:grid;gap:2px}.accFn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.accFn .small{color:var(--mut)}
 .fmenu{display:flex;flex-direction:column;gap:2px}.fmenu .b{justify-content:flex-start;border-color:transparent;background:transparent;width:100%;text-align:left}.fmenu .b:hover{background:var(--tab)}
 .mbox:has(.help){width:min(680px,100%)}.help h4{justify-content:flex-start;display:flex;align-items:center;gap:8px;margin:16px 0 6px;font-size:14px}.help h4:first-child{margin-top:0}.help p,.help li{font-size:13px;line-height:1.55}.help ol,.help ul{padding-left:20px;margin:6px 0}.hcmd{display:flex;align-items:center;gap:8px;margin:6px 0;background:var(--tab);border:1px solid var(--bd2);border-radius:0;padding:4px 4px 4px 10px}.hcmd code{flex:1;font:13px ui-monospace,Menlo,Consolas,monospace;overflow-x:auto;white-space:nowrap}
 .stl{position:absolute;top:0;transform:translateY(-50%);white-space:nowrap;pointer-events:none;font:500 var(--stfs,11px)/1.2 Roboto,Arial,sans-serif;color:#1c1f24;text-shadow:-1px 0 #fff,1px 0 #fff,0 -1px #fff,0 1px #fff,0 0 3px #fff}
@@ -275,6 +278,7 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
  <div class="dd"><button class="b" id="bFile"><i data-ic="file"></i>Plik</button>
   <div class="pop" id="pFile">
    <div class="fmenu">
+    <button class="b" id="fNew"><i data-ic="file"></i>Nowy plik…</button>
     <button class="b" id="fOpenM"><i data-ic="folder"></i>Otwórz…</button>
     <button class="b" id="fSaveL"><i data-ic="save"></i>Zapisz (lokalnie)</button>
     <button class="b" id="fAccSave"><i data-ic="upload"></i>Zapisz na koncie</button>
@@ -417,12 +421,17 @@ async function svToggle(){if(SV.on){SV.on=false;svApply();say('Autozapis wyłąc
  if(accTok())return accOn();
  if(FS.ok){svApply();await $('#fSaveAs').onclick();if(!FS.h){SV.on=false;svApply()}return}
  SV.on=false;svApply();say('Autozapis wymaga zapisania projektu w pliku (Chrome lub Edge) albo zalogowania się w ZbiorkomInfo.')}
-const ACCP={url:'https://divine-limit-0a3b.latka1500.workers.dev/konto/tm',t:null,auto:false};try{ACCP.auto=localStorage.getItem('gdn-acc-auto')==='1'}catch(e){}
+const ACCP={url:'https://divine-limit-0a3b.latka1500.workers.dev/konto/tm',t:null,auto:false,f:'0',name:''};try{ACCP.auto=localStorage.getItem('gdn-acc-auto')==='1'}catch(e){}
+// (bieżący plik na koncie: identyfikator i nazwa; „0” – dawny jedyny projekt konta)
+try{const o=JSON.parse(localStorage.getItem('gdn-acc-file')||'null');if(o&&/^[a-z0-9]{1,16}$/.test(o.f||'')){ACCP.f=o.f;ACCP.name=o.name||''}}catch(e){}
+const accUrl=f=>ACCP.url+'?f='+encodeURIComponent(f==null?ACCP.f:f);
+function accFileSet(f,name){ACCP.f=f;ACCP.name=name||'';try{localStorage.setItem('gdn-acc-file',JSON.stringify({f,name:ACCP.name}))}catch(e){}accStat()}
+const accNewId=()=>Math.random().toString(36).slice(2,10);
 function accTok(){try{return JSON.parse(localStorage.getItem('ztm.token')||'""')||''}catch(e){return''}}
 function accStat(t){try{svApply()}catch(x){}const e=document.getElementById('fAccSt');if(!e)return;const on=!!accTok();['fAccSave','fAccLoad','fAccAuto'].forEach(id=>{const b=document.getElementById(id);if(b)b.disabled=!on});
  const a=document.getElementById('fAccAuto');if(a)a.checked=on&&ACCP.auto;e.textContent=t!=null?t:on?(ACCP.last?'Ostatni zapis na koncie: '+new Date(ACCP.last).toLocaleTimeString():''):'Zaloguj się w ZbiorkomInfo, aby zapisywać projekt na koncie.'}
 async function accSaveNet(quiet){clearTimeout(ACCP.t);ACCP.t=null;const tok=accTok();if(!tok||BOOTWAIT||NOSAVE){accStat();return false}
- try{const r=await fetch(ACCP.url,{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),net:S})});
+ try{const r=await fetch(accUrl(),{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),name:ACCP.name||undefined,net:S})});
   if(!r.ok)throw new Error(r.status===404||r.status===405?'serwer nie obsługuje zapisu projektu – wdróż najnowszy worker.js':r.status===401?'sesja wygasła – zaloguj się ponownie w ZbiorkomInfo':r.status===413?'projekt jest za duży (limit 20 MB)':'HTTP '+r.status);
   ACCP.last=Date.now();accStat();if(!quiet)say('Projekt zapisano na koncie.');return true}
  catch(e){const m='Nie udało się zapisać projektu na koncie: '+e.message+'.';accStat(m);if(!quiet||Date.now()-(ACCP.warn||0)>60000){ACCP.warn=Date.now();say(m)}return false}}
@@ -2105,7 +2114,7 @@ $('#fDelCity').onclick=async()=>{const nm=CITIES[cityKey()].n.replace(/\s*\(.*\)
  HIST.h=[JSON.stringify(S)];HIST.i=0;histUI();saveNow();
  // (wpis w ZbiorkomInfo znika dopiero, gdy nie ma linii: eksport z pustego projektu nic nie zapisuje)
  try{localStorage.removeItem('gdn-zi')}catch(e){}
- try{const tok=accTok();if(tok)await fetch(ACCP.url,{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),net:S})})}catch(e){}
+ try{const tok=accTok();if(tok)await fetch(accUrl(),{method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:JSON.stringify({t:Date.now(),name:ACCP.name||undefined,net:S})})}catch(e){}
  renderLines();renderStops();renderInfra();drawInfra();drawStops();redraw();say('Usunięto miasto „'+nm+'”: projekt jest pusty, wpis w ZbiorkomInfo zniknął.')};
 $('#retryTram').onclick=()=>{try{localStorage.removeItem('gdn-tw5-'+cityKey());localStorage.removeItem('gdn-rw5-'+cityKey())}catch(e){}tramTry=railTry=0;tramReady=loadTram();railReady=tramReady.then(loadRail);
  // (przystanki też: nowe z OSM, poprawki A+T, numery słupków z danych ZbiorkomInfo)
@@ -2609,7 +2618,7 @@ $('#fOpen').onclick=async()=>{closeMenus();
   const o=JSON.parse(await (await h.getFile()).text());
   if(!(o&&(o.project||o.lines)))throw new Error('To nie jest plik projektu sieci.');
   if(!await confirmReplace())return;
-  applyProject(o);
+  applyProject(o);accFileSet(accNewId(),'');   // (projekt z dysku: osobny plik na koncie, nazwa przy pierwszym zapisie)
   let p='denied';try{p=await h.requestPermission({mode:'readwrite'})}catch(e){}
   if(p==='granted'){FS.h=h;FS.pend=null;await idbSet('h',h);svLoc('file');fsStat();say(`Wczytano projekt z pliku „${h.name}”.`+(SV.on?' Zmiany będą zapisywane w tym pliku automatycznie.':''))}
   else{FS.h=null;fsStat();say(`Wczytano projekt z pliku „${h.name}” (bez zgody na zapis – autozapis wyłączony).`)}}
@@ -2620,26 +2629,65 @@ $('#fReconnect').onclick=async()=>{closeMenus();const h=FS.pend;if(!h)return;
   if(p!=='granted'){say('Brak zgody na zapis do pliku.');return}
   FS.h=h;FS.pend=null;SV.on=true;svLoc('file');if(await writeFile())say(`Autozapis wznowiony: „${h.name}”.`)}catch(e){say('Nie udało się połączyć z plikiem: '+(e.message||e))}};
 $('#fAuto').onchange=async e=>{FS.auto=e.target.checked;if(FS.auto)await writeFile();fsStat()};
-$('#fAccSave').onclick=async()=>{closeMenus();if(await accSaveNet(false))svLoc('acc')};
+$('#fAccSave').onclick=async()=>{closeMenus();if(!accTok())return;
+ // (plik bez nazwy – pierwszy zapis na koncie: najpierw nazwa)
+ if(!ACCP.name){let L=[];try{L=await accFiles()}catch(e){}const ex=L.find(x=>x.f===ACCP.f);
+  if(ex)accFileSet(ACCP.f,ex.name);else{const n=await askName('Zapisz na koncie',CITIES[cityKey()].n.replace(/\s*\(.*\)$/,''),'Zapisz');if(n==null)return;accFileSet(ACCP.f,n)}}
+ if(await accSaveNet(true)){svLoc('acc');say('Projekt zapisano na koncie jako „'+ACCP.name+'”.')}};
 $('#fAccAuto').onchange=e=>{ACCP.auto=e.target.checked;try{localStorage.setItem('gdn-acc-auto',ACCP.auto?'1':'0')}catch(x){}if(ACCP.auto)accSaveNet(true);accStat()};
-$('#fAccLoad').onclick=async()=>{closeMenus();const tok=accTok();if(!tok)return;let d;
- try{const r=await fetch(ACCP.url,{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)throw new Error(r.status===404||r.status===405?'serwer nie obsługuje zapisu projektu – wdróż najnowszy worker.js':'HTTP '+r.status);d=await r.json()}
- catch(e){say('Nie udało się wczytać projektu z konta: '+e.message+'.');return}
- if(!d||!d.net){say('Na koncie nie ma jeszcze zapisanego projektu.');return}
- if(!await askConfirm('Wczytać projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'? Zastąpi on bieżący projekt (można to cofnąć przyciskiem Cofnij).',{title:'Wczytaj z konta',ok:'Wczytaj'}))return;
- NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Wczytano projekt z konta.')};
+// pliki zapisane na koncie: lista (nazwa, data, rozmiar) – otwarcie albo usunięcie pliku
+const kB=n=>n>=1048576?(n/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(n/1024))+' kB';
+async function accFiles(){const tok=accTok();if(!tok)throw new Error('nie zalogowano');const r=await fetch(ACCP.url+'/pliki',{headers:{Authorization:'Bearer '+tok},cache:'no-store'});
+ if(!r.ok)throw new Error(r.status===404||r.status===405?'serwer nie obsługuje plików na koncie – wdróż najnowszy worker.js':'HTTP '+r.status);return (await r.json()).files||[]}
+async function accOpenFile(f,name){const tok=accTok();let d;
+ try{const r=await fetch(accUrl(f),{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);d=await r.json()}
+ catch(e){say('Nie udało się wczytać pliku z konta: '+e.message+'.');return false}
+ if(!d||!d.net){say('Ten plik na koncie jest pusty.');return false}
+ if(!await confirmReplace())return false;
+ NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();
+ FS.h=null;FS.pend=null;fsStat();accFileSet(f,d.name||name);svLoc('acc');say('Otwarto plik „'+(d.name||name||'Projekt')+'” z konta.');return true}
+$('#fAccLoad').onclick=async()=>{closeMenus();if(!accTok())return;let L;
+ try{L=await accFiles()}catch(e){say('Nie udało się pobrać listy plików z konta: '+e.message+'.');return}
+ const bd=document.createElement('div');
+ const draw=()=>{L.sort((a,b)=>(b.t||0)-(a.t||0));
+  bd.innerHTML=L.length?`<div class="accFl">${L.map(x=>`<div class="accF${x.f===ACCP.f?' cur':''}" data-f="${esc(x.f)}"><span class="accFn"><b>${esc(x.name||'Projekt')}</b><span class="small">${x.t?new Date(x.t).toLocaleString('pl-PL',{dateStyle:'short',timeStyle:'short'}):'–'} · ${kB(x.size||0)}${x.f===ACCP.f?' · bieżący':''}</span></span><button class="b ico flat" data-del title="Usuń plik z konta">${ic('trash')}</button><button class="b" data-open>${ic('folder')}Otwórz</button></div>`).join('')}</div>`
+   :'<p style="margin:0;line-height:1.5">Na koncie nie ma jeszcze zapisanych plików. Zapisz projekt przyciskiem Plik → Zapisz na koncie.</p>'};
+ draw();
+ await modal({title:'Pliki na koncie',body:bd,btns:[{t:'Zamknij',v:false}],init:(bx,close)=>{bd.onclick=async e=>{const row=e.target.closest('.accF');if(!row)return;const x=L.find(y=>y.f===row.dataset.f);if(!x)return;
+  if(e.target.closest('[data-open]')){close(true);await accOpenFile(x.f,x.name);return}
+  if(e.target.closest('[data-del]')){if(!await askConfirm('Usunąć plik „'+(x.name||'Projekt')+'” z konta? Tej operacji nie można cofnąć.',{title:'Usuń plik',ok:'Usuń',danger:true}))return;
+   try{const r=await fetch(accUrl(x.f),{method:'DELETE',headers:{Authorization:'Bearer '+accTok()}});if(!r.ok)throw new Error('HTTP '+r.status);L=L.filter(y=>y!==x);
+    if(x.f===ACCP.f){accFileSet(accNewId(),ACCP.name);if(SV.loc==='acc'){SV.on=false;svApply()}}draw();say('Usunięto plik „'+(x.name||'Projekt')+'” z konta.')}
+   catch(e){say('Nie udało się usunąć pliku: '+e.message+'.')}}}}})};
+// nazwa pliku (nowego albo zapisywanego pierwszy raz na koncie)
+function askName(title,def,ok){const bd=`<label style="display:grid;gap:6px"><span>Nazwa pliku</span><input id="nmName" value="${esc(def||'')}" maxlength="80" autofocus style="width:100%"></label>`;
+ return modal({title,body:bd,cancelV:null,btns:[{t:'Anuluj',v:null},{t:ok||'OK',c:'pri',fn:close=>{const v=document.getElementById('nmName').value.trim();close(v||def||'Projekt')}}],
+  init:(bx,close)=>{const i=bx.querySelector('#nmName');i.select();i.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();close(i.value.trim()||def||'Projekt')}}}})}
 accStat();addEventListener('storage',e=>{if(e.key==='ztm.token')accStat()});
 // Zapisz (lokalnie): to the file the project is joined to; none yet – a file chosen (then saved there after each change), or – where
 // the browser cannot write files – the project downloaded (JSON either way)
 $('#fSaveL').onclick=()=>{closeMenus();if(FS.h)$('#fSaveNow').click();else $('#fSaveAs').click()};
 // Otwórz: a file (JSON); signed in to ZbiorkomInfo – or the project kept on the account
-$('#fOpenM').onclick=async()=>{closeMenus();if(!accTok()){$('#fOpen').click();return}
- const v=await modal({title:'Otwórz projekt',body:'<p style="margin:0;line-height:1.5">Skąd otworzyć projekt?</p>',cancelV:false,btns:[{t:'Anuluj',v:false},{t:'Z konta ZbiorkomInfo',v:'acc'},{t:'Z pliku…',v:'file',c:'pri'}]});
+// Otwórz: z dysku (plik JSON) albo z konta ZbiorkomInfo (lista zapisanych tam plików)
+$('#fOpenM').onclick=async()=>{closeMenus();const on=!!accTok();
+ const v=await modal({title:'Otwórz projekt',body:`<div class="opnCh"><button class="b" data-v="file">${ic('folder',22)}<b>Z dysku</b><span class="small">Plik projektu (JSON) zapisany na tym urządzeniu</span></button><button class="b" data-v="acc"${on?'':' disabled'}>${ic('upload',22)}<b>Z konta</b><span class="small">${on?'Pliki zapisane na koncie ZbiorkomInfo':'Zaloguj się w ZbiorkomInfo, aby otwierać pliki z konta'}</span></button></div>`,cancelV:false,btns:[{t:'Anuluj',v:false}],
+  init:(bx,close)=>{bx.querySelectorAll('.opnCh [data-v]').forEach(b=>b.onclick=()=>close(b.dataset.v));const f=bx.querySelector('.opnCh [data-v]');if(f)f.focus()}});
  if(v==='file')$('#fOpen').click();else if(v==='acc')$('#fAccLoad').click()};
+// Nowy plik: pusty projekt bieżącego miasta, odłączony od dotychczasowego pliku na dysku i na koncie (zalogowany – od razu zapisany na koncie)
+$('#fNew').onclick=async()=>{closeMenus();
+ if((S.lines.length||S.stops.length||S.custom.length)&&!await askConfirm('Utworzyć nowy, pusty plik? Bieżący projekt zostanie zamknięty – jeśli nie jest zapisany w pliku ani na koncie, najpierw go zapisz.',{title:'Nowy plik',ok:'Dalej'}))return;
+ const n=await askName('Nowy plik',CITIES[cityKey()].n.replace(/\s*\(.*\)$/,'')+' – nowa sieć','Utwórz');if(n==null)return;
+ const k=cityKey();S={lines:[],stops:[],sel:null,city:k,custom:[],cats:[],collapsed:{},infraRound:{on:true,r:100},stopFixV:STOPFIX_V,stFix4:1,stFix5:1,numZI:1,numZI2:1,stFix3:1,stHist2:1,pf1:1};
+ FS.h=null;FS.pend=null;try{await idbSet('h',null)}catch(e){}fsStat();
+ HIST.h=[JSON.stringify(S)];HIST.i=0;histUI();saveNow();
+ accFileSet(accNewId(),n);
+ renderLines();renderStops();renderInfra();drawInfra();drawStops();redraw();
+ if(accTok()){if(await accSaveNet(true)){svLoc('acc');say('Utworzono plik „'+n+'” na koncie. Przystanki pobierzesz przyciskiem w panelu Przystanki.')}}
+ else{SV.loc=null;svApply();say('Utworzono nowy plik „'+n+'”. Zapisz go na dysku (Plik → Zapisz) albo zaloguj się, aby zapisać go na koncie.')}};
 $('#exp').onclick=()=>{closeMenus();dlFile('siec-gdansk.json',projectJSON());say('Pobrano kopię projektu (JSON).')};
 $('#imp').onclick=()=>{closeMenus();$('#file').click()};
 $('#file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
- try{const o=JSON.parse(await f.text());if(!(o&&(o.project||o.lines)))throw new Error('To nie jest plik projektu sieci.');if(!await confirmReplace())return;applyProject(o);say(`Wczytano projekt z pliku „${f.name}”.`)}
+ try{const o=JSON.parse(await f.text());if(!(o&&(o.project||o.lines)))throw new Error('To nie jest plik projektu sieci.');if(!await confirmReplace())return;applyProject(o);accFileSet(accNewId(),'');say(`Wczytano projekt z pliku „${f.name}”.`)}
  catch(err){say('Nie udało się wczytać pliku: '+(err.message||err))}};
 if(FS.ok)idbGet('h').then(h=>{if(h&&h.name){FS.pend=h;fsStat()}}).catch(()=>{});
 $('#bFile').addEventListener('click',()=>fsStat());
@@ -3501,10 +3549,10 @@ async function ziNums(ids){if(!ids&&S.numZI&&S.numZI2)return;try{
    free.forEach(st=>{if(!done.has(st)&&st.zn){delete st.num;delete st.zn}})});
   if(!ids){S.numZI=1;S.numZI2=1}if(n||!ids){save();drawStops();renderStops();renderLines();redraw()}if(n)dbg('Numery słupków uzupełnione z danych ZbiorkomInfo: '+n)}catch(e){dbg('Numery słupków z ZbiorkomInfo: '+(e&&e.message||e))}}
 // the project saved on the account opened by itself at the start (when there is one, and it is not older than the changes made here)
-async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await fetch(ACCP.url,{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)return;const d=await r.json();if(!d||!d.net)return;
+async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await fetch(accUrl(),{headers:{Authorization:'Bearer '+tok},cache:'no-store'});if(!r.ok)return;const d=await r.json();if(!d||!d.net)return;
   if(JSON.stringify(d.net)===JSON.stringify(S)){if(!SV.loc)svLoc('acc');return}
   let mt=0;try{mt=+localStorage.getItem('gdn-mt')||0}catch(e){}
-  if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta wczytasz z menu Plik).');return}
+  if(d.t&&mt>d.t+2000){say('Projekt w przeglądarce jest nowszy niż zapisany na koncie – zostawiono bieżący (wersję z konta otworzysz z menu Plik → Otwórz → Z konta).');return}
   NOSAVE=false;restoreState(JSON.stringify(d.net));if(_svT)saveNow();svLoc('acc');say('Otwarto projekt zapisany na koncie'+(d.t?' ('+new Date(d.t).toLocaleString()+')':'')+'.')}
  catch(e){dbg('Projekt z konta: '+(e&&e.message||e))}finally{ACCO.done=true}}
 // (jednorazowo: perony pominięte wcześniej jako rzekome duplikaty peronu obok, błędne A+T; projekty otwarte w wadliwej wersji z 22.11
