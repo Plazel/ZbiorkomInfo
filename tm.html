@@ -601,6 +601,9 @@ const HIST_STOPS=[{city:'gdansk',box:[54.334,18.655,54.378,18.74],date:'2024-12-
 async function histStops(BX){const out=[],seen=new Set();const [s0,w0,n0,e0]=String(BX).split(',').map(Number);
  const take=(e,tram)=>{const t={...(e.tags||{})};['railway','public_transport','tram'].forEach(k=>{for(const p of['disused:','was:','abandoned:'])if(t[p+k]&&!t[k])t[k]=t[p+k]});
   if(tram&&!(t.tram==='yes'||t.railway==='tram_stop'))return;if(!t.name)return;t.tram='yes';const k=e.type+e.id;if(seen.has(k))return;seen.add(k);out.push({...e,tags:t,_hist:1})};
+ // (kopia z budowania rozkładów – data/nm/hist_<miasto>.json, osm_nm.py – zamiast zawodnych zapytań Overpass o dawny stan mapy)
+ try{const r=await fetch('data/nm/hist_'+nmSnapKey()+'.json',{cache:'no-cache'});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.elements)&&j.elements.length){
+   j.elements.forEach(e=>{const ll=e.type==='node'?[e.lat,e.lon]:e.center?[e.center.lat,e.center.lon]:null;if(ll&&ll[0]>=s0&&ll[0]<=n0&&ll[1]>=w0&&ll[1]<=e0)take(e,true)});dbg('Przystanki tramwajowe spoza bieżącej mapy (kopia): '+out.length);return out}}}catch(x){}
  for(const h of HIST_STOPS){if(h.city!==cityKey())continue;const [s1,w1,n1,e1]=h.box;if(s1>n0||n1<s0||w1>e0||e1<w0)continue;
   const B=[Math.max(s0,s1),Math.max(w0,w1),Math.min(n0,n1),Math.min(e0,e1)].join(',');
   // dzisiejsza mapa: przystanki oznaczone jako nieczynne (disused:/was:) …
@@ -646,7 +649,9 @@ function ziMigrate(ZO){const nn=x=>norm(String(x||'').replace(NUMRE,'$1')),cell=
  const rm=new Set(old.filter(st=>!M.has(st.id)&&!used.has(st.id)).map(st=>st.id));
  const js=JSON.stringify(S).replace(/"([nw]\d+)"/g,(m,id)=>M.has(id)?'"'+M.get(id).id+'"':m);S=JSON.parse(js);
  const seen=new Set(),zi=new Map(ZO.map(z=>[z.id,z]));
- S.stops=S.stops.filter(st=>{if(rm.has(st.id)||seen.has(st.id))return false;seen.add(st.id);const z=zi.get(st.id);if(z){st.name=z.name;st.num=z.num;st.ll=z.ll.slice();st.tram=z.tram;st.rail=false;if(z.bus)st.bus=true;else delete st.bus;delete st.zn}return true});
+ S.stops=S.stops.filter(st=>{if(rm.has(st.id)||seen.has(st.id))return false;seen.add(st.id);const z=zi.get(st.id);if(z){const wasT=!!st.tram,wasB=!!st.bus||!st.tram;st.name=z.name;st.num=z.num;st.ll=z.ll.slice();st.rail=false;
+   // (rodzaj: suma dotychczasowego i z otwartych danych – np. Stogi: tramwaje zawieszone, w rozkładach tylko autobusy, a przystanek jest też tramwajowy)
+   const T=z.tram||wasT,B=!z.tram||z.bus||(wasT&&wasB);st.tram=T;if(T&&B)st.bus=true;else delete st.bus;delete st.zn}return true});
  S.ziSrc=1;dbg('Przystanki z otwartych danych: zastąpiono '+M.size+' przystanków z OSM, usunięto '+rm.size+' nieużywanych bez odpowiednika');return M.size}
 const stopClass=e=>{const t=e.tags||{};if(t.public_transport==='stop_position')return 3;
  return e.type==='node'&&(t.highway==='bus_stop'||t.railway==='tram_stop'||(/^(station|halt)$/.test(t.railway||'')&&t.station!=='subway'))?1:2};
@@ -3928,7 +3933,7 @@ async function accAutoOpen(){try{const tok=accTok();if(!tok)return;const r=await
 // (S.stFix4) – usunięcie dodanych wtedy duplikatów: nieużywanych peronów i pozycji zatrzymania, które poprawny import uznaje za drugi opis przystanku)
 // (wersja poprawek importu przystanków: każda nowa poprawka podnosi STOPFIX_V, a zapisane projekty są wtedy raz uzupełniane z OSM;
 // gdy OSM nie odpowiada – kolejne próby co 2 minuty, znacznik zapisywany dopiero po udanym pobraniu)
-const STOPFIX_V=7;let _sfT=0,_sfRun=false;
+const STOPFIX_V=8;let _sfT=0,_sfRun=false;
 function stopFix5(d){clearTimeout(_sfT);if(!S.stops.length||(S.stopFixV||0)>=STOPFIX_V)return;_sfT=setTimeout(async()=>{if(_sfRun||(S.stopFixV||0)>=STOPFIX_V)return;_sfRun=true;let ok=false;
   try{ok=await loadStops({auto:true,quiet:true,fixBus:true,prune:!!S.stFix4&&!S.stFix5})}catch(e){dbg('Uzupełnianie przystanków: '+e.message)}finally{_sfRun=false}
   if(ok){S.stopFixV=STOPFIX_V;S.stFix4=S.stFix5=1;S.numZI2=0;await ziNums();save();drawStops();renderStops();renderLines();redraw();say(S.ziSrc?'Przystanki zaktualizowane z otwartych danych przewoźników (stacje kolejowe z OSM).':'Przystanki zaktualizowane z OpenStreetMap (brakujące perony, numery słupków z danych ZbiorkomInfo).')}else stopFix5(120000)},d==null?6000:d)}

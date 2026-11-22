@@ -37,8 +37,37 @@ def ov(q):
     raise last
 
 
+# przystanki tramwajowe spoza bieżącej mapy (jak HIST_STOPS w tm.html): Stogi – tramwaje zawieszone, przystanki oznaczone jako nieczynne
+# albo usunięte z mapy; zapytanie o nieczynne oraz o stan mapy sprzed zawieszenia
+HIST = {'trojmiasto': [('54.334,18.655,54.378,18.74', '2024-12-01T00:00:00Z')]}
+
+
+def hist_query(B, date=None):
+    if date: return stop_query(B).replace('[out:json][timeout:180]', '[out:json][timeout:180][date:"%s"]' % date)
+    q = []
+    for p in ('disused:', 'was:'):
+        q += ['node["%srailway"="tram_stop"](%s)' % (p, B), 'node["%spublic_transport"]["tram"="yes"](%s)' % (p, B),
+              'node["%spublic_transport"]["%stram"="yes"](%s)' % (p, p, B), 'way["%spublic_transport"="platform"](%s)' % (p, B)]
+    return '[out:json][timeout:120];(%s;);out body center;' % ';'.join(q)
+
+
 def build(out, log=print):
     d = os.path.join(out, 'nm'); os.makedirs(d, exist_ok=True)
+    for key, boxes in HIST.items():
+        els, ok = {}, False
+        for B, date in boxes:
+            for q in (hist_query(B), hist_query(B, date)):
+                try:
+                    for e in ov(q).get('elements', []):
+                        t = e.get('tags') or {}
+                        if not t.get('name'): continue
+                        if not any(('tram' in k or k.endswith('railway')) and ('tram' in str(v) or v == 'yes') for k, v in t.items()) and t.get('railway') != 'tram_stop': continue
+                        els[e['type'] + str(e['id'])] = e
+                    ok = True
+                except Exception as e: log('NetworkMaker OSM hist %s: %s' % (key, e))
+        if ok and els:
+            json.dump({'t': int(time.time()), 'elements': list(els.values())}, open(os.path.join(d, 'hist_%s.json' % key), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+            log('NetworkMaker OSM hist %s: %d przystanków' % (key, len(els)))
     for key, B in BOX.items():
         for kind, q in (('stops', stop_query(B)), ('tram', tram_query(B))):
             f = os.path.join(d, '%s_%s.json' % (kind, key))
