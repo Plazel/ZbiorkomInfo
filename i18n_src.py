@@ -872,6 +872,7 @@ ROWS = [
 ("Kurs odwołany", "Trip cancelled", "Fahrt fällt aus", "Spoj zrušený", "Spoj zrušen"),
 ("Przystanek nieobsługiwany w związku z objazdem", "Stop not served due to a detour", "Haltestelle wegen einer Umleitung nicht bedient", "Zastávka neobsluhovaná z dôvodu obchádzky", "Zastávka neobsluhovaná kvůli objížďce"),
 ("Funkcja aktualności nie jest obsługiwana w Warszawie", "The news feature is not available in Warsaw", "Die Nachrichtenfunktion ist in Warschau nicht verfügbar", "Funkcia aktualít nie je vo Varšave podporovaná", "Funkce aktualit není ve Varšavě podporována"),
+    ('nieprzeczytane', 'unread', 'ungelesen', 'neprečítané', 'nepřečtené'),
 ]
 
 WEEKDAYS = {

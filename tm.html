@@ -1033,14 +1033,17 @@ function redraw(){
  lineL.clearLayers();
  const CB=cullBox();DRAWN=CB;
  const vis=orderedLines().filter(l=>!l.hidden&&l.segs.length),z=map.getZoom(),sc=256*Math.pow(2,z);
+ ZF=Math.max(.4,Math.min(1,(z-10)/6)); // grubość i rozsunięcie linii maleją przy oddaleniu (od zbliżenia 16 – pełne), żeby linie nie zasłaniały pół mapy
  const toPx=p=>{const s=Math.sin(p[0]*Math.PI/180);return[(p[1]+180)/360*sc,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*sc]};
  const toLL=(x,y)=>[Math.atan(Math.sinh(Math.PI*(1-2*y/sc)))*180/Math.PI,x/sc*360-180];
  const sig=pathsSig(vis,CB);let paths;if(_pc&&_pc.sig===sig)paths=_pc.paths;else{paths=buildPaths(vis,CB);_pc={sig,paths}}
  paths.forEach(p=>{const P=p.pts.map(toPx),n=P.length;
-  p.disp=P.map((q,i)=>{const o=p.off[i];if(Math.abs(o)<.05)return p.pts[i];const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const h=Math.hypot(dx,dy)||1;dx/=h;dy/=h;if(p.flip[i]){dx=-dx;dy=-dy}return toLL(q[0]-dy*o,q[1]+dx*o)})});
- paths.forEach(p=>{const l=p.l,w=lw(l),sel=l.id===S.sel;if((l.style||'solid')!=='solid')return;
+  // kierunek do przesunięcia równoległego liczony z punktów odległych o co najmniej kilka pikseli: przy dużym oddaleniu sąsiednie punkty trasy wypadają
+  // niemal w tym samym pikselu i ich drobne odchylenia odwracały normalną – linie biegnące obok siebie zaczynały się przecinać
+  p.disp=P.map((q,i)=>{const o=p.off[i]*ZF;if(Math.abs(o)<.05)return p.pts[i];let ia=i,ib=i;while(ia>0&&Math.hypot(P[ia][0]-q[0],P[ia][1]-q[1])<6)ia--;while(ib<n-1&&Math.hypot(P[ib][0]-q[0],P[ib][1]-q[1])<6)ib++;const a=P[ia],b=P[ib];let dx=b[0]-a[0],dy=b[1]-a[1];const h=Math.hypot(dx,dy)||1;dx/=h;dy/=h;if(p.flip[i]){dx=-dx;dy=-dy}return toLL(q[0]-dy*o,q[1]+dx*o)})});
+ paths.forEach(p=>{const l=p.l,w=Math.max(2,lw(l)*ZF),sel=l.id===S.sel;if((l.style||'solid')!=='solid')return;
   pieces(p,1).forEach(r=>L.polyline(p.disp.slice(r.a,r.b+1),{color:'#fff',weight:sel?w+5:w+2,opacity:sel?(document.body.classList.contains('dark')?.5:.9):(document.body.classList.contains('dark')?.18:.6),interactive:false}).addTo(lineL))});
- paths.forEach(p=>{const l=p.l,w=lw(l),stl=l.style||'solid',da=stl==='dashed'?`${w*2.5} ${w*1.5}`:stl==='dotted'?`1 ${w*1.8}`:null;
+ paths.forEach(p=>{const l=p.l,w=Math.max(2,lw(l)*ZF),stl=l.style||'solid',da=stl==='dashed'?`${w*2.5} ${w*1.5}`:stl==='dotted'?`1 ${w*1.8}`:null;
   pieces(p).forEach(r=>{const seg=p.disp.slice(r.a,r.b+1);
    {const pl=L.polyline(seg,{color:l.color,weight:w,opacity:dimOf(l)?.3:.95,dashArray:da,lineCap:stl==='dotted'?'round':'butt'});pl._lid=l.id;pl.bindTooltip(tipOf(p,r,vis,paths.cvA),{sticky:true}).addTo(lineL)}});
   mergeR(p.ranges.filter(r=>r.mode==='straight')).forEach(r=>L.polyline(p.disp.slice(r.a,r.b+1),{color:'#d00',weight:1.5,opacity:.9,interactive:false}).addTo(lineL))});
@@ -1054,17 +1057,17 @@ function redraw(){
  paths.forEach(p=>!hsAll&&p.l.stops.forEach(id=>{const s=SM.get(id),u=UOF.get(id);if(!s||!u)return;if(CB&&!inBox(s.ll,CB))return;
   let bi=-1,bd=150*150;for(let i=0;i<p.pts.length;i++){const dx=(p.pts[i][1]-s.ll[1])*RX,dy=(p.pts[i][0]-s.ll[0])*R0,d=dx*dx+dy*dy;if(d<bd){bd=d;bi=i}}
   if(bi<0)return;capDrawn.add(id);let e=serve.get(u.key);if(!e)serve.set(u.key,e={u,en:[]});if(!e.en.some(x=>x.l===p.l))e.en.push({l:p.l,pos:p.disp[bi]})}));
- serve.forEach(e=>{const W=Math.max(...e.en.map(x=>lw(x.l))),px=e.en.map(x=>toPx(x.pos));let a=0,b=0,best=-1;
+ serve.forEach(e=>{const W=Math.max(...e.en.map(x=>Math.max(2,lw(x.l)*ZF))),px=e.en.map(x=>toPx(x.pos));let a=0,b=0,best=-1;
   for(let i=0;i<px.length;i++)for(let j=i;j<px.length;j++){const d=Math.hypot(px[i][0]-px[j][0],px[i][1]-px[j][1]);if(d>best){best=d;a=i;b=j}}
   if(best>=RING_PX){ // odległe perony po obu stronach skrzyżowania: małe symbole przy peronach połączone cienkim przejściem
    const cx=(px[a][0]+px[b][0])/2,cy=(px[a][1]+px[b][1])/2,c=toLL(cx,cy);
    e.en.forEach(x=>L.polyline([x.pos,c],{color:'#1c1f24',weight:2,opacity:.55,dashArray:'2 4',lineCap:'round',interactive:false}).addTo(lineL));
-   e.en.forEach(x=>{const w=lw(x.l);L.circleMarker(x.pos,{radius:w/2+4.5,color:'#1c1f24',weight:2.5,fillColor:'#fff',fillOpacity:1,interactive:false}).addTo(lineL);L.circleMarker(x.pos,{radius:Math.max(2,w/2-.5),stroke:false,fillColor:x.l.color,fillOpacity:1,interactive:false}).addTo(lineL)});
+   e.en.forEach(x=>{const w=Math.max(2,lw(x.l)*ZF);L.circleMarker(x.pos,{radius:w/2+4.5,color:'#1c1f24',weight:2.5,fillColor:'#fff',fillOpacity:1,interactive:false}).addTo(lineL);L.circleMarker(x.pos,{radius:Math.max(2,w/2-.5),stroke:false,fillColor:x.l.color,fillOpacity:1,interactive:false}).addTo(lineL)});
    capLab.set(e.u.key,{ll:c,hx:6});return}
   if(best<1)L.circleMarker(e.en[a].pos,{radius:W/2+4.5,color:'#1c1f24',weight:2.5,fillColor:'#fff',fillOpacity:1,interactive:false}).addTo(lineL);
   else{L.polyline([e.en[a].pos,e.en[b].pos],{color:'#1c1f24',weight:W+9,lineCap:'round',interactive:false}).addTo(lineL);L.polyline([e.en[a].pos,e.en[b].pos],{color:'#fff',weight:W+4,lineCap:'round',interactive:false}).addTo(lineL)}
   {const cx=(px[a][0]+px[b][0])/2,cy=(px[a][1]+px[b][1])/2;capLab.set(e.u.key,{ll:toLL(cx,cy),hx:Math.max(...px.map(q=>Math.abs(q[0]-cx)))+W/2+9})}
-  e.en.forEach(x=>L.circleMarker(x.pos,{radius:Math.max(2,lw(x.l)/2-.5),stroke:false,fillColor:x.l.color,fillOpacity:1,interactive:false}).addTo(lineL))});
+  e.en.forEach(x=>L.circleMarker(x.pos,{radius:Math.max(2,Math.max(2,lw(x.l)*ZF)/2-.5),stroke:false,fillColor:x.l.color,fillOpacity:1,interactive:false}).addTo(lineL))});
  termMarkers(UOF,CB);drawStops(CB,U)}
 // indeks przystanek -> linie; przebudowywany, gdy zmieni się lista linii, tablica przystanków linii albo jej długość (wszystkie zmiany składu linii zmieniają długość lub tablicę)
 const LX={L:null,obj:[],arr:[],len:[],m:new Map()},NOLINES=Object.freeze([]);
@@ -1216,6 +1219,7 @@ const LTYPES=[['tram','Tramwaje','tram'],['trolley','Trolejbusy','trolley'],['bu
 function ltype(l){if(l.veh==='trolley')return 'trolley';if(l.rm==='tram'||l.rm==='rail')return l.rm;if(l.rm==='street')return 'bus';const m=lineMode(l);return m==='tram'||m==='rail'?m:'bus'}
 const tyOf=l=>{const P=l.par&&S.lines.find(x=>x.id===l.par);return ltype(P||l)};
 // grubość linii na mapie i schemacie wynika z rodzaju: kolej 10, tramwaj 8, autobus i trolejbus 5; styl zawsze ciągły, kształt numeru: koło (tramwaj, kolej) albo kwadrat
+var ZF=1;
 const lw=l=>l?({rail:10,tram:8}[tyOf(l)]||5):5;
 function normLook(){S.lines.forEach(l=>{if(l.style&&l.style!=='solid')l.style='solid';const t=tyOf(l),sh=t==='tram'||t==='rail'?'round':'square';if(l.shape!==sh)l.shape=sh;if('w' in l)delete l.w})}
 function catList(){normCats();const present=new Set(S.lines.map(l=>l.cat||'')),o=S.cats.filter(c=>present.has(c));if(present.has(''))o.push('');return o}
