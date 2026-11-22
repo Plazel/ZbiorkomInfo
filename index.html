@@ -470,7 +470,7 @@ span.chip{cursor:inherit}
 .findRing{fill:none;stroke:var(--brand,#d71920);animation:findP 1.6s ease-out infinite}@keyframes findP{0%{stroke-opacity:1}100%{stroke-opacity:.25}}
 .mapPop{position:absolute;z-index:6;width:min(320px,calc(100% - 16px));background:var(--bg);color:var(--fg);border:1px solid var(--line);box-shadow:0 8px 28px rgba(0,0,0,.22)}
 .mapPop .mpH{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;font-weight:700}
-.mapPop .mpH span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mapPop .mpH .spPole{font-weight:500;color:var(--muted);margin-left:4px}.spTown{font-weight:400;color:var(--muted);margin-left:6px;font-size:.7em}.spTownSeg{display:inline-flex;gap:0}.spTownSeg .btn{border-radius:0;margin-left:-1px}.spTownSeg .btn.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.mapPop .mpH span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mapPop .mpH .spPole{font-weight:500;color:var(--muted);margin-left:4px}.spTown{font-weight:400;color:var(--muted);margin-left:6px;font-size:.7em}
 .mapPop .mpX{border:0;background:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:0 6px}
 .mapPop .miniBoard .mr{padding:6px 12px;gap:10px;grid-template-columns:minmax(40px,max-content) 1fr auto}.mapPop .miniBoard .mr.wpl{grid-template-columns:minmax(40px,max-content) 1fr 44px 60px}
 .mapPop .miniBoard .mb{height:28px;font-size:.95rem}.mapPop .miniBoard .mb.circle{width:28px}.mapPop .miniBoard .mb.rect{min-width:28px}.mapPop .miniBoard .mb.rect.sq{width:28px}.mapPop .miniBoard .mb.sq.len3{font-size:.76rem}.mapPop .miniBoard .mt{font-size:1rem}
@@ -1830,7 +1830,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795353337;
+const APP_BUILD=1795353772;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2366,7 +2366,7 @@ async function renderStop(id,di,si){
   document.title=st[0]+' – linia '+r.n;
   const mp=d.pats[0];
   const extra=`<div class="fromto2"><div class="ff"><i></i><s></s>${esc(st[0])}</div><div class="ft"><i></i>${esc(d.head)}</div></div>
-   <div class="tools">${L.dirs.length>1?'<button class="btn ibtn" type="button" id="swap" title="Zmień kierunek" aria-label="Zmień kierunek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V5M3.5 8.5 7 5l3.5 3.5M17 4v15M13.5 15.5 17 19l3.5-3.5"/></svg></button>':''}<a class="btn ibtn" href="#s${encodeURIComponent((IDX.stops[d.stops[si][0]]||[''])[0])}" title="Wybrany przystanek" aria-label="Wybrany przystanek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V11"/><rect x="6" y="2" width="12" height="9" rx="1.5"/><path d="M9 6.5h6M8 22h8"/></svg></a>${hubStarBtn(id,di,si)}${PRINT_BTNS}</div>`;
+   <div class="tools">${L.dirs.length>1?'<button class="btn ibtn" type="button" id="swap" title="Zmień kierunek" aria-label="Zmień kierunek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V5M3.5 8.5 7 5l3.5 3.5M17 4v15M13.5 15.5 17 19l3.5-3.5"/></svg></button>':''}<a class="btn ibtn" href="${(S=>stopHash(S[0],'',city==='all'&&['gda','sop','gdy'].includes(S[4])&&stopTowns(S[0]).length>1?S[4]:''))(IDX.stops[d.stops[si][0]]||[''])}" title="Wybrany przystanek" aria-label="Wybrany przystanek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V11"/><rect x="6" y="2" width="12" height="9" rx="1.5"/><path d="M9 6.5h6M8 22h8"/></svg></a>${hubStarBtn(id,di,si)}${PRINT_BTNS}</div>`;
   app.innerHTML=headerHTML(r,L,extra,'l'+id)+`<div class="tt"><div class="side" style="--dot:${badgeColor(r)}"><h2>Przystanki</h2><table><thead><tr><th style="padding-left:6px">min</th><th>Przystanek</th></tr></thead><tbody id="sl"></tbody></table></div><div class="grid" id="grid"></div></div>`;
   document.getElementById('hc').appendChild(chip(r,'big'));
   // stop list with minute offsets from the first stop of the main pattern
@@ -6413,6 +6413,9 @@ function gdNameTowns(){if(GUIDE._nt&&GUIDE._ntC===city)return GUIDE._nt;const m=
   for(const X of Object.values(IDX.stops)){if(!names.has(X[0])||!A.includes(X[4]))continue;if(!m.has(X[0]))m.set(X[0],new Set());m.get(X[0]).add(X[4])}
   GUIDE._nt=m;GUIDE._ntC=city;return m}
 const gdTownName=a=>(CITIES[a]||[''])[0]||'';
+// miasta Trójmiasta, w których jest przystanek o tej nazwie (Sikorskiego: Gdańsk, Sopot, Gdynia – trzy różne przystanki)
+const stopTowns=n=>[...new Set(Object.values(IDX.stops).filter(S=>S[0]===n&&['gda','sop','gdy'].includes(S[4])).map(S=>S[4]))].sort();
+const stopHash=(n,p,a)=>'#s'+encodeURIComponent(n)+(p||a?'|'+encodeURIComponent(p||''):'')+(a?'|'+a:'');
 function gsItems(q){const out=[];const raw=q.trim();if(!raw)return out;const f=fold(raw);
   if(typeof GUIDE!=='undefined'&&GUIDE.open){
     const I=depStopIndex(city),TA=gdNameTowns();I.forEach(x=>{let sc=x.key.startsWith(f)?3:x.key.split(/[\s\-–\/.,]+/).some(w=>w.startsWith(f))?4:x.key.includes(f)?5:null;if(sc==null)return;
@@ -6425,12 +6428,12 @@ function gsItems(q){const out=[];const raw=q.trim();if(!raw)return out;const f=f
   R.forEach(r=>{const n=r.n.toLowerCase();if(n===f)out.push({k:'l',r,score:1});else if(n.startsWith(f))out.push({k:'l',r,score:2+n.length/100})});
   // a stop with its pole: "Chałubińskiego 01" (or the poles of a stop written in full)
   const pm=raw.match(/^(.*\D)\s+(\d{1,3}[a-z]?)$/i);
-  depStopIndex(city).forEach(x=>{if(!x.poles.length)return;
-    if(pm&&x.key.startsWith(fold(pm[1].trim())))x.poles.filter(p=>p.startsWith(pm[2])||p.replace(/^0/,'')===pm[2]).forEach(p=>out.push({k:'s',n:x.n,p,score:2.5+x.n.length/1000}));
-    else if(!pm&&x.key===f)x.poles.forEach(p=>out.push({k:'s',n:x.n,p,score:3.5}))});
+  depStopIndexSc(city).forEach(x=>{if(!x.poles.length)return;const t=x.sc?{a:x.sc,town:gdTownName(x.sc)}:{},kk=fold(x.n);
+    if(pm&&kk.startsWith(fold(pm[1].trim())))x.poles.filter(p=>p.startsWith(pm[2])||p.replace(/^0/,'')===pm[2]).forEach(p=>out.push(Object.assign({k:'s',n:x.n,p,score:2.5+x.n.length/1000},t)));
+    else if(!pm&&kk===f)x.poles.forEach(p=>out.push(Object.assign({k:'s',n:x.n,p,score:3.5},t)))});
   if(f.length>=2||!/^\d/.test(f)){const names=new Set();R.forEach(r=>(r.sn||[]).forEach(n=>names.add(n)));
     names.forEach(n=>{const k=fold(n);let sc=null;if(k.startsWith(f))sc=3;else if(k.split(/[\s\-–\/.,]+/).some(w=>w.startsWith(f)))sc=4;else if(k.includes(f))sc=5;
-      if(sc!==null)out.push({k:'s',n,score:sc+n.length/1000})})}
+      if(sc===null)return;const tw=city==='all'?stopTowns(n):[];if(tw.length>1)tw.forEach(a=>out.push({k:'s',n,a,town:gdTownName(a),score:sc+n.length/1000}));else out.push({k:'s',n,score:sc+n.length/1000})})}
   // the vehicles on the map: a vehicle by its number, a vehicle by the duty it runs ("03", "106/03"), a line (chosen in the list)
   const vm=MAP.open&&typeof VEH!=='undefined'&&VEH.on;
   if(vm)vehFind(raw).forEach(x=>out.push(x));
@@ -6452,7 +6455,7 @@ function gsGo(it){const i=document.getElementById('gsIn');i.value='';gsShow([]);
         if(c>a){const svg=document.getElementById('mapSvg'),ar=(svg.clientHeight||1)/(svg.clientWidth||1);let w=(c-a)*1.15,h=(d-b)*1.15;if(h>w*ar)w=h/ar;else h=w*ar;MAP.vb={x:(a+c)/2-w/2,y:(b+d)/2-h/2,w,h};applyVB();renderLabels()}}return}}
   if(MAP.open){if(it.k==='s')focusStop(it.n,it.p||'');return}   // the map: the stop is brought into view and marked
   if(MAP.open)closeMap();if(typeof DEP!=='undefined'&&DEP.open)closeDep();if(typeof JP!=='undefined'&&JP.open)closeJP();if(typeof TD!=='undefined')closeTool();
-  location.hash=it.k==='l'?'#l'+it.r.id:it.k==='c'?'#c'+it.lines.map(n=>BYNAME[n].id).join('_'):'#s'+encodeURIComponent(it.n)+(it.p?'|'+encodeURIComponent(it.p):'')}
+  location.hash=it.k==='l'?'#l'+it.r.id:it.k==='c'?'#c'+it.lines.map(n=>BYNAME[n].id).join('_'):stopHash(it.n,it.p,city==='all'?it.a:'')}
 let GS=[],GSi=-1;
 function gsShow(items){GS=items;GSi=items.length?0:-1;const ul=document.getElementById('gsList'),inp=document.getElementById('gsIn');
   ul.replaceChildren();ul.hidden=!items.length;inp.setAttribute('aria-expanded',String(!!items.length));
@@ -6533,8 +6536,6 @@ async function renderStopPage(name,pole,town){
   // filters: platform (changes the page), direction, single lines, date
   const F={dirs:new Set(),lines:new Set(),ds:''};
   const pk=v=>'#s'+encodeURIComponent(name)+(v||town?'|'+encodeURIComponent(v||''):'')+(town&&city==='all'?'|'+town:'');
-  if(towns.length>1&&city==='all'){const f=document.getElementById('spFilt');if(f){const lb=document.createElement('label');lb.innerHTML='<span>Miasto</span>';const sg=document.createElement('span');sg.className='spTownSeg';
-    towns.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='btn'+(t===town?' on':'');b.setAttribute('aria-pressed',String(t===town));b.textContent=CITIES[t][0];b.onclick=()=>{if(t!==town)location.hash='#s'+encodeURIComponent(name)+'||'+t};sg.append(b)});lb.append(sg);f.prepend(lb)}}
   const ps=document.getElementById('spPoleSel');if(ps)msel(ps,poles.map(p=>({v:p,t:p})),PS,'Wszystkie perony',sel=>{location.hash=pk([...sel].sort((a,b)=>a.localeCompare(b,'pl',{numeric:true})).join(','))});
   const heads=[...new Set(items.flatMap(x=>x.dirs.map(d=>d.head)))].sort((a,b)=>a.localeCompare(b,'pl'));
   const dsel=document.getElementById('spDirSel');msel(dsel,heads.map(h=>({v:h,t:h})),F.dirs,'Wszystkie kierunki',()=>redraw());
