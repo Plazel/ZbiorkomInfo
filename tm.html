@@ -514,6 +514,12 @@ async function ov(q,ms){let last;for(const u of OVS){const h=new URL(u).host;try
  if(!r.ok){last=new Error('Overpass '+h+' HTTP '+r.status);dbg(last.message);continue}
  const j=await r.json();if(j.remark&&/error|timed out|out of memory/i.test(j.remark)){last=new Error('Overpass '+h+': '+j.remark);dbg(last.message);continue}
  dbg('Overpass OK '+h+': '+j.elements.length+' elem.');return j}catch(e){last=new Error('Overpass '+h+': '+(e.name==='AbortError'?'timeout':e.message));dbg(last.message)}}throw last||new Error('Overpass niedostępny')}
+// kopie danych OSM dla miast NetworkMakera, odświeżane przy budowaniu rozkładów (data/nm/, osm_nm.py): przystanki brane najpierw
+// z kopii (szybko, bez publicznych serwerów Overpass, które często odmawiają), tory – gdy Overpass nie odpowiada
+const nmSnapKey=()=>['gdansk','gdynia','sopot','trojmiasto'].includes(cityKey())?'trojmiasto':cityKey();
+async function nmSnap(kind,BX){try{const r=await fetch('data/nm/'+kind+'_'+nmSnapKey()+'.json',{cache:'no-cache'});if(!r.ok)return null;const j=await r.json();if(!j||!Array.isArray(j.elements))return null;
+  if(BX&&kind==='stops'){const [s0,w0,n0,e0]=String(BX).split(',').map(Number);j.elements=j.elements.filter(e=>{const la=e.lat!=null?e.lat:e.center&&e.center.lat,lo=e.lon!=null?e.lon:e.center&&e.center.lon;return la>=s0&&la<=n0&&lo>=w0&&lo<=e0})}
+  dbg('Kopia OSM '+kind+' ('+nmSnapKey()+', '+(j.t?new Date(j.t*1000).toLocaleString():'?')+'): '+j.elements.length+' elem.');return j}catch(e){return null}}
 let STOPMSG=''; // podsumowanie ostatniego importu po zmianie obszaru (wyświetlane ponownie, gdy skończy się ładowanie torowisk)
 // Przystanki w OSM bywają opisane na kilka sposobów: węzeł highway=bus_stop / railway=tram_stop / stacja (klasa 1), peron jako węzeł, linia lub obszar
 // public_transport=platform / highway=platform (klasa 2) albo sama pozycja zatrzymania public_transport=stop_position (klasa 3).
@@ -560,7 +566,8 @@ async function loadStops(o){
  // bez o.auto (przycisk „Pobierz z OSM”) – przywraca także wcześniej usunięte przystanki z tego obszaru
  const auto=!!(o&&o.auto===true),strip=!!(o&&o.strip),quiet=!!(o&&o.quiet),BX=(o&&o.bbox)||bb();if(auto&&!strip)STOPMSG='';
  if(!quiet)say(auto?'Pobieranie przystanków z OSM dla nowego obszaru…':'Pobieranie przystanków z OSM…');
- try{const j=await ov(stopQuery(BX));
+ try{let j=null;const snapOk=!(o&&o.live)&&!(o&&o.bbox);if(snapOk){const sn=await nmSnap('stops',BX);if(sn&&sn.t&&Date.now()/1000-sn.t<4*86400)j=sn}
+  if(!j){try{j=await ov(stopQuery(BX))}catch(e){const sn=await nmSnap('stops',BX);if(!sn)throw e;j=sn}}
   {const H=await histStops(BX);if(H.length)j.elements=(j.elements||[]).concat(H)}
   const have=new Map(S.stops.map(s=>[s.id,s])),gone=new Set(auto?(S.rmStops||[]):[]),added=new Set(),cov=new Map(),ck=ll=>Math.floor(ll[0]*1800)+','+Math.floor(ll[1]*1800),nn=x=>/^\(bez nazwy\)$/.test(x||'')?'':norm(String(x||'').replace(NUMRE,'$1'));
   const md=x=>x.rail?'r':x.tram?'t':'a',pn=(name,st)=>(st&&st.num)||((String(name||'').match(NUMRE)||[])[2])||'',addCov=(ll,name,st)=>{const k=ck(ll);(cov.get(k)||cov.set(k,[]).get(k)).push({ll,n:nn(name),st,m:st?md(st):'',p:pn(name,st)})};
@@ -681,7 +688,7 @@ function rebuildGraphs(){
 // a bez grafu torów trasy wychodzą jako proste odcinki
 async function fetchWays(q,ck,kind){
  try{const c=JSON.parse(localStorage.getItem(ck));if(c&&c.w&&c.w.length&&Date.now()-c.t<10*864e5){dbg('Tory z pamięci podręcznej: '+ck+' ('+c.w.length+' odcinków)');return c.w}}catch(e){}
- const j=await ov(q),pos=new Map(),ways=[];
+ let j;try{j=await ov(q)}catch(e){const sn=kind!=='rail'?await nmSnap('tram'):null;if(!sn)throw e;j=sn}const pos=new Map(),ways=[];
  {const cnt={};j.elements.filter(e=>e.type==='way').forEach(w=>{const k=((w.tags||{}).railway||('disused:'+(w.tags||{})['disused:railway']))+((w.tags||{}).construction?'/'+w.tags.construction:'');cnt[k]=(cnt[k]||0)+1});dbg('Odcinki wg tagu railway: '+JSON.stringify(cnt))}
  j.elements.filter(e=>e.type==='node').forEach(n=>pos.set(n.id,[n.lat,n.lon]));
  j.elements.filter(e=>e.type==='way').forEach(w=>{const c=[];w.nodes.forEach(id=>{const p=pos.get(id);if(p)c.push([id,p[0],p[1]])});if(c.length>1){const t=w.tags||{};
@@ -2084,7 +2091,9 @@ function setCity(k,go=true){
 $('#citySel').onchange=async()=>{const k=$('#citySel').value;
  if(S.lines.length||S.stops.length){if(!await askConfirm(`Zmiana obszaru na: ${CITIES[k].n}. Pobrane zostaną przystanki, torowiska i tory kolejowe tego obszaru. Dotychczasowe linie i przystanki pozostaną w projekcie, a przystanki usunięte lub zmienione przez Ciebie nie zostaną przywrócone ani nadpisane.`,{title:'Zmień miasto',ok:'Zmień miasto'})){$('#citySel').value=curCity;return}}
  setCity(k);save()};
-$('#retryTram').onclick=()=>{try{localStorage.removeItem('gdn-tw5-'+cityKey());localStorage.removeItem('gdn-rw5-'+cityKey())}catch(e){}tramTry=railTry=0;tramReady=loadTram();railReady=tramReady.then(loadRail)};
+$('#retryTram').onclick=()=>{try{localStorage.removeItem('gdn-tw5-'+cityKey());localStorage.removeItem('gdn-rw5-'+cityKey())}catch(e){}tramTry=railTry=0;tramReady=loadTram();railReady=tramReady.then(loadRail);
+ // (przystanki też: nowe z OSM, poprawki A+T, numery słupków z danych ZbiorkomInfo)
+ setTimeout(async()=>{const ok=await loadStops({auto:true,live:true,fixBus:true});if(ok){S.numZI2=0;await ziNums();say('Dane odświeżone: przystanki z OSM i numery słupków zaktualizowane.')}},300)};
 $('#lyRail').onchange=()=>$('#lyRail').checked?map.addLayer(railL):map.removeLayer(railL);
 $('#catMgB').onclick=()=>catDlg();
 $('#toggleAll').onclick=()=>{const hide=S.lines.some(l=>!l.hidden);S.lines.forEach(l=>l.hidden=hide);save();renderLines();redraw()};

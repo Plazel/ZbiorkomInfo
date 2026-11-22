@@ -2151,5 +2151,10 @@ try:
     import ixsplit
     print('Indeks wg obszarów:', ixsplit.build(OUT), 'plików')
 except Exception as e: print('Indeks wg obszarów: pominięty (%s)' % e)
+# NetworkMaker: kopie przystanków i torów z OSM dla jego miast (osm_nm.py) – gdy publiczne serwery Overpass nie odpowiadają w przeglądarce
+try:
+    import osm_nm
+    osm_nm.build(OUT)
+except Exception as e: print('NetworkMaker OSM: pominięty (%s)' % e)
 write_missing()
 shutil.rmtree(SCR, ignore_errors=True)
