@@ -948,7 +948,9 @@ async function clickAt(ll){
  if(mode==='stop'){{const k=$('#stopKind').value,sn=k==='bus'?null:snapToTrack(ll,k==='rail'?'rail':'tram'),id='u'+Date.now();
   const mk=(i,pt,pair)=>({id:i,name:'Nowy przystanek',num:'',ll:pt,tram:k==='tram'||k==='both',...(k==='both'?{bus:true}:{}),...(k==='rail'?{rail:true}:{}),...(pair?{pair}:{})});
   const mate=!$('#stopDbl').checked?null:k==='bus'?await roadMate(ll):sn?(dblMate(sn,k==='rail'?'rail':'tram')||trackMate(sn,k==='rail'?'rail':'tram')):null,ids=[id];
-  if(mate){S.stops.push(mk(id,sn,id),mk(id+'b',mate,id));ids.push(id+'b')}else S.stops.push(mk(id,sn||ll));
+  // (przystanek autobusowy nie jest osadzany na torze – sn puste: pierwszy z pary w miejscu kliknięcia; wcześniej dostawał położenie null,
+  // przez co rysowanie przystanków przerywało się błędem i nie pokazywał się żaden nowy przystanek)
+  if(mate){S.stops.push(mk(id,sn||ll,id),mk(id+'b',mate,id));ids.push(id+'b')}else S.stops.push(mk(id,sn||ll));
   if(k!=='bus')say(mate?'Dodano dwa przystanki – po jednym na każdy kierunek.':sn?($('#stopDbl').checked?'Przystanek osadzony na torze – obok nie ma drugiego toru, więc dodano jeden.':'Przystanek osadzony na torze.'):'Przystanek dodany (w pobliżu nie ma toru – nie osadzono).');
   else if($('#stopDbl').checked)say(mate?'Dodano dwa przystanki – po obu stronach jezdni.':'Dodano jeden przystanek – nie udało się ustalić drugiej strony jezdni (kliknij obok jezdni, nie na jej osi).');
   const l=selLine();if(l&&!l.auto&&l.segs.length){const rs=routeStops(l);ids.forEach(id=>{const ix=rs.indexOf(id);if(ix>=0&&!l.stops.includes(id)){let at=0;for(let j=ix-1;j>=0;j--){const p=l.stops.indexOf(rs[j]);if(p>=0){at=p+1;break}}l.stops.splice(at,0,id)}})}}save();drawStops();renderStops();renderLines();
@@ -1318,7 +1320,10 @@ const StopLab=(()=>{const MC=document.createElement('canvas').getContext('2d'),W
    ctx.lineWidth=3;ctx.strokeStyle=dk?'#16181c':'#fff';ctx.strokeText(o.text,p.x+o.dx,p.y);
    ctx.fillStyle=dk?'#e8eaed':'#1c1f24';ctx.fillText(o.text,p.x+o.dx,p.y);ctx.restore()}});
  return (ll,text,dx)=>new C(ll,{renderer:stlCv,interactive:false,radius:0,stroke:false,fill:false,text,dx})})();
-function drawStops(cb,U0){
+// przystanki bez poprawnego położenia (zapisane przez błąd przy dodawaniu pary przystanków autobusowych): usuwane z projektu i linii
+function stopsSane(){const bad=new Set(S.stops.filter(s=>!Array.isArray(s.ll)||s.ll.length<2||!isFinite(s.ll[0])||!isFinite(s.ll[1])).map(s=>s.id));if(!bad.size)return 0;
+ S.stops=S.stops.filter(s=>!bad.has(s.id));S.lines.forEach(l=>{if(l.stops&&l.stops.some(id=>bad.has(id)))l.stops=l.stops.filter(id=>!bad.has(id))});dbg('Usunięto przystanki bez położenia: '+bad.size);save();return bad.size}
+function drawStops(cb,U0){if(stopsSane())U0=null;
  stopL.clearLayers();const CB=cb!==undefined?cb:cullBox(),SB=CB||stopBox();SDRAWN=SB;
  if(UI.hs&&mode!=='stop'&&mode!=='move')return;   // wszystkie przystanki ukryte (poza dodawaniem i przenoszeniem przystanków)
  const usedBy=new Map();S.stops.forEach(s=>{if(linesOf(s.id).length){const k=baseName(s);(usedBy.get(k)||usedBy.set(k,[]).get(k)).push(s.ll)}});
