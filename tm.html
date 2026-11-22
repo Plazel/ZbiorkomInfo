@@ -884,6 +884,16 @@ map.on('click',e=>clickAt([e.latlng.lat,e.latlng.lng]));
 function nearOn(pts,ll){let best=null,bd=1e9;const px=ll[1]*RX,py=ll[0]*R0;
  for(let i=1;i<pts.length;i++){const x0=pts[i-1][1]*RX,y0=pts[i-1][0]*R0,dx=pts[i][1]*RX-x0,dy=pts[i][0]*R0-y0,L2=dx*dx+dy*dy;let t=L2?((px-x0)*dx+(py-y0)*dy)/L2:0;t=Math.max(0,Math.min(1,t));const d=Math.hypot(px-(x0+t*dx),py-(y0+t*dy));if(d<bd){bd=d;best=[(y0+t*dy)/R0,(x0+t*dx)/RX]}}
  return{p:best,d:bd}}
+// drugi tor obok (tory z OSM są zwykle opisane osobno, każdy tor jako osobna linia): najbliższy punkt na innym, równoległym torze
+// w odległości 2,5–12 m od przystanku osadzonego na torze – tam trafia przystanek dla drugiego kierunku
+function trackMate(sn,kind){const ways=kind==='rail'?[...(OSMR||[]),...customWays('rail')]:[...(OSMW||[]),...tramExtra(),...customWays('tram')];
+ const px=sn[1]*RX,py=sn[0]*R0;let own=null,od=1.5;const near=[];
+ ways.forEach(w=>{let bd=15,bq=null,bv=null;for(let i=1;i<w.length;i++){const x0=w[i-1][2]*RX,y0=w[i-1][1]*R0,x1=w[i][2]*RX,y1=w[i][1]*R0,dx=x1-x0,dy=y1-y0,L2=dx*dx+dy*dy;
+   if(Math.abs(px-x0)>bd+Math.abs(dx)&&Math.abs(px-x1)>bd+Math.abs(dx))continue;const t=L2?Math.max(0,Math.min(1,((px-x0)*dx+(py-y0)*dy)/L2)):0,qx=x0+t*dx,qy=y0+t*dy,d=Math.hypot(px-qx,py-qy);
+   if(d<bd){bd=d;bq=[qy/R0,qx/RX];bv=[dx,dy]}}
+  if(!bq)return;if(bd<od){od=bd;own=bv}near.push([bd,bq,bv])});
+ const par=(a,b)=>{if(!a||!b)return true;const c=Math.abs(a[0]*b[0]+a[1]*b[1])/((Math.hypot(a[0],a[1])*Math.hypot(b[0],b[1]))||1);return c>.87};
+ const c=near.filter(([d,q,v])=>d>=2.5&&d<=12&&par(v,own)).sort((a,b)=>a[0]-b[0])[0];return c?c[1]:null}
 function dblMate(sn,kind){for(const c of S.custom){if(c.kind!==kind||!c.dbl||c.pts.length<2)continue;const ws=cways(c);if(ws.length<2)continue;
   const a=nearOn(ws[0],sn),b=nearOn(ws[1],sn);if(Math.min(a.d,b.d)<2)return(a.d<b.d?b:a).p}return null}
 // przystanek autobusowy po drugiej stronie jezdni: punkt odbity względem osi najbliższej jezdni (własna droga dwujezdniowa – na drugiej
@@ -905,9 +915,9 @@ async function clickAt(ll){
  if(mode==='nav'){if(S.sel){S.sel=null;ins=null;renderLines();redraw()}return}
  if(mode==='stop'){{const k=$('#stopKind').value,sn=k==='bus'?null:snapToTrack(ll,k==='rail'?'rail':'tram'),id='u'+Date.now();
   const mk=(i,pt,pair)=>({id:i,name:'Nowy przystanek',num:'',ll:pt,tram:k==='tram'||k==='both',...(k==='both'?{bus:true}:{}),...(k==='rail'?{rail:true}:{}),...(pair?{pair}:{})});
-  const mate=!$('#stopDbl').checked?null:k==='bus'?await roadMate(ll):sn?dblMate(sn,k==='rail'?'rail':'tram'):null,ids=[id];
+  const mate=!$('#stopDbl').checked?null:k==='bus'?await roadMate(ll):sn?(dblMate(sn,k==='rail'?'rail':'tram')||trackMate(sn,k==='rail'?'rail':'tram')):null,ids=[id];
   if(mate){S.stops.push(mk(id,sn,id),mk(id+'b',mate,id));ids.push(id+'b')}else S.stops.push(mk(id,sn||ll));
-  if(k!=='bus')say(mate?'Dodano dwa przystanki – po jednym na każdy kierunek.':sn?'Przystanek osadzony na torze.':'Przystanek dodany (w pobliżu nie ma toru – nie osadzono).');
+  if(k!=='bus')say(mate?'Dodano dwa przystanki – po jednym na każdy kierunek.':sn?($('#stopDbl').checked?'Przystanek osadzony na torze – obok nie ma drugiego toru, więc dodano jeden.':'Przystanek osadzony na torze.'):'Przystanek dodany (w pobliżu nie ma toru – nie osadzono).');
   else if($('#stopDbl').checked)say(mate?'Dodano dwa przystanki – po obu stronach jezdni.':'Dodano jeden przystanek – nie udało się ustalić drugiej strony jezdni (kliknij obok jezdni, nie na jej osi).');
   const l=selLine();if(l&&!l.auto&&l.segs.length){const rs=routeStops(l);ids.forEach(id=>{const ix=rs.indexOf(id);if(ix>=0&&!l.stops.includes(id)){let at=0;for(let j=ix-1;j>=0;j--){const p=l.stops.indexOf(rs[j]);if(p>=0){at=p+1;break}}l.stops.splice(at,0,id)}})}}save();drawStops();renderStops();renderLines();
   const ls_=S.stops[S.stops.length-1],nss=ls_?(ls_.pair?S.stops.filter(x=>x.pair===ls_.pair):[ls_]):[],nv=await askPrompt('Nazwa przystanku:','',{title:nss.length>1?'Nowe przystanki (po jednym na kierunek)':'Nowy przystanek',ok:'Zapisz'});
