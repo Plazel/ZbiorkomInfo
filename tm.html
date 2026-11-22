@@ -993,7 +993,9 @@ function drawEdit(){
 {const __rd=redraw;redraw=function(){syncVariants();document.documentElement.style.setProperty('--stfs',(11+Math.max(0,map.getZoom()-14)*1.4).toFixed(1)+'px');__rd.apply(this,arguments);drawEdit();try{syncLoopBtn()}catch(e){}}}
 function unitDedup(ids){if(!UI.mg)return ids;const um=new Map();units(true).forEach(u=>u.members.forEach(m=>um.set(m.id,u.key)));const out=[];let pk=null;ids.forEach(id=>{const k=um.get(id)||id;if(k===pk)return;pk=k;out.push(id)});return out}
 function snapToTrack(ll,kind){
- const ways=kind==='rail'?[...(OSMR||[]),...customWays('rail')]:[...(OSMW||[]),...customWays('tram')];
+ // (te same tory co sieć, po której prowadzone są linie: z bocznicami i torami w budowie/planowanymi – wcześniej ich brakowało,
+ // więc przystanek przy nowej trasie, np. na Jaśkowej Dolinie, „nie miał toru”, choć linia była do niego przyciągana)
+ const ways=kind==='rail'?[...(OSMR||[]),...customWays('rail')]:[...(OSMW||[]),...tramExtra(),...customWays('tram')];
  const px=ll[1]*RX,py=ll[0]*R0;let best=null,bd=30;
  ways.forEach(w=>{for(let i=1;i<w.length;i++){const x0=w[i-1][2]*RX,y0=w[i-1][1]*R0,x1=w[i][2]*RX,y1=w[i][1]*R0,dx=x1-x0,dy=y1-y0,L2=dx*dx+dy*dy;if(Math.abs(px-x0)>bd+Math.abs(dx)&&Math.abs(px-x1)>bd+Math.abs(dx))continue;let t=L2?((px-x0)*dx+(py-y0)*dy)/L2:0;t=Math.max(0,Math.min(1,t));const qx=x0+t*dx,qy=y0+t*dy,d=Math.hypot(px-qx,py-qy);if(d<bd){bd=d;best=[qy/R0,qx/RX]}}});
  return best}
