@@ -5,7 +5,7 @@ stops of the area – those with its code and every stop its lines call at.
     python ixsplit.py [data]"""
 import collections, json, os, sys
 
-SEP = ('km', 'byd', 'ns', 'poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham', 'wro', 'lub', 'bts')   # as SEP_AREAS in index.html
+SEP = ('km', 'byd', 'ns', 'poz', 'krk', 'waw', 'wej', 'ldz', 'fl', 'prg', 'ber', 'ham', 'wro', 'lub', 'bts', 'gzm')   # as SEP_AREAS in index.html
 
 
 def area_of(r):

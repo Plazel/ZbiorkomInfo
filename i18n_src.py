@@ -928,6 +928,11 @@ ROWS = [
     ('Wczytane konta:', 'Accounts loaded:', 'Geladene Konten:', 'Načítané účty:', 'Načtené účty:'),
     ('pominięte (już istnieją):', 'skipped (already exist):', 'übersprungen (existieren bereits):', 'preskočené (už existujú):', 'přeskočené (už existují):'),
     ('Nie udało się wczytać kont.', 'Could not load the accounts.', 'Konten konnten nicht geladen werden.', 'Účty sa nepodarilo načítať.', 'Účty se nepodařilo načíst.'),
+    ('Linie metropolitalne', 'Metropolitan lines', 'Metropolitanlinien', 'Metropolitné linky', 'Metropolitní linky'),
+    ('Linie przyspieszone', 'Fast lines', 'Schnelllinien', 'Zrýchlené linky', 'Zrychlené linky'),
+    ('Linie szkolne', 'School lines', 'Schullinien', 'Školské linky', 'Školní linky'),
+    ('Metropolia GZM', 'GZM Metropolis', 'Metropole GZM', 'Metropola GZM', 'Metropole GZM'),
+    ('Śląskie', 'Silesia', 'Schlesien', 'Sliezsko', 'Slezsko'),
 ]
 
 WEEKDAYS = {
