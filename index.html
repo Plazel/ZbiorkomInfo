@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795459228;
+const APP_BUILD=1795459435;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5448,7 +5448,8 @@ function railMatch(e,Ls,keys,nowM,b0,want){if(!e.upd.length)return null;const m=
 async function depLiveRail(st){if(!['gda','sop','gdy','all'].includes(st.c))return null;
   const R=IDX.routes.filter(r=>r.t==='rail'&&inCityOf(r,st.c)&&(r.sn||[]).includes(st.n));if(!R.length)return null;
   const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime(),nowM=(Date.now()-b0)/60000,keys=depDayKeys(),out=[];let ok=0;
-  const at=(d,ps)=>ps.findIndex((si,j)=>j<ps.length-1&&sName(d.stops[si][0])===st.n);
+  // (tylko perony wybrane na tablicy – jak przy autobusach i tramwajach)
+  const at=(d,ps)=>ps.findIndex((si,j)=>j<ps.length-1&&sName(d.stops[si][0])===st.n&&(!st.poles||!st.poles.length||st.poles.includes((IDX.stops[d.stops[si][0]]||[])[1]||'')));
   for(const F of RAIL_LIVE){const rs=R.filter(r=>F.lines.includes(r.n));if(!rs.length)continue;let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}ok++;
     const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
     for(const e of ents){if(!F.rid.test(e.rid||''))continue;const M=railMatch(e,Ls,keys,nowM,b0,at);if(!M)continue;const {r,L,d,ps,off,t0,j0}=M,k=at(d,ps);
