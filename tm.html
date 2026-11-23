@@ -1277,7 +1277,8 @@ const _pidMap=new WeakMap();let _pidN=0,_pc=null;const pid=o=>{let v=_pidMap.get
 function pathsSig(vis,CB){const sg=l=>l.segs.map(x=>pid(x.pts)+':'+x.pts.length+':'+(x.mode||'')).join(';'),MC=!!UI.mc;
  return [map.getZoom(),CB?[CB.s,CB.w,CB.n,CB.e].map(x=>(+x).toFixed(5)).join(','):'',MC?1:0,MC?S.sel:'',vis.map(l=>{const rt=l.par?S.lines.find(x=>x.id===l.par):null;
   return [l.id,lw(l),l.color,l.style||'',l.par||'',MC&&dimOf(l)?1:0,sg(l),rt&&rt!==l?sg(rt):''].join('|')}).join('#')].join('~')}
-// trasa POWRÓT, która wyraźnie odbiega od trasy TAM (inne ulice na ponad 1/4 długości), na mapie tylko po jej wybraniu – inaczej dublowała linię
+// (nieużywane: trasa POWRÓT jest na mapie zawsze razem z TAM – cała trasa linii)
+// trasa POWRÓT, która wyraźnie odbiega od trasy TAM (inne ulice na ponad 1/4 długości)
 // blokada: zablokowana linia (lub cała jej kategoria) nie daje się edytować ani usuwać
 // blokada: linia, jej kategoria, „Bez kategorii” danego rodzaju (klucz „∅rodzaj”) albo cały rodzaj (S.tyLk: tramwaje, autobusy…)
 function isLk(l){if(!l)return false;const r=l.par?S.lines.find(x=>x.id===l.par)||l:l,C=S.catLk||{};return !!(r.lock||(r.cat&&C[r.cat])||(!r.cat&&C['∅'+tyOf(r)])||(S.tyLk&&S.tyLk[tyOf(r)]))}
@@ -1290,7 +1291,7 @@ function bHide(l){if(l.dir!=='B'||S.sel===l.id)return false;const f=S.lines.find
 function redraw(){
  lineL.clearLayers();
  const CB=cullBox();DRAWN=CB;
- const vis=orderedLines().filter(l=>!l.hidden&&l.segs.length&&!bHide(l)),z=map.getZoom(),sc=256*Math.pow(2,z);
+ const vis=orderedLines().filter(l=>!l.hidden&&l.segs.length),z=map.getZoom(),sc=256*Math.pow(2,z);
  ZF=Math.max(.4,Math.min(1,(z-10)/6)); // grubość i rozsunięcie linii maleją przy oddaleniu (od zbliżenia 16 – pełne), żeby linie nie zasłaniały pół mapy
  const toPx=p=>{const s=Math.sin(p[0]*Math.PI/180);return[(p[1]+180)/360*sc,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*sc]};
  const toLL=(x,y)=>[Math.atan(Math.sinh(Math.PI*(1-2*y/sc)))*180/Math.PI,x/sc*360-180];

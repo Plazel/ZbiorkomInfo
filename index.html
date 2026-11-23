@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795470904;
+const APP_BUILD=1795471083;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -7892,10 +7892,12 @@ function nmRoute(Lx){const keys=Object.keys(IDX.days||{w0:1,s0:1,h0:1});
       plans:['w','s','h'].map(k=>((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(t=>[t,0,0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1]}});
   return {id:'nml'+Lx.id,n:Lx.n,t:Lx.kind==='tram'?'tram':Lx.kind==='rail'?'rail':Lx.kind==='trolley'?'trol':'bus',op:'NM',dates:IDX.days,dirs,lt:[]}}
 // the network into the index (and the map's data): its stops and lines replace those put in before
+// kolor numeru linii z NetworkMakera – ta sama reguła co w NetworkMakerze (jasne tło: ciemny numer), symbole 1:1
+const nmTxt=h=>{const n=parseInt(String(h).slice(1),16);if(!/^#[0-9a-f]{6}$/i.test(String(h)))return '#fff';const r=n>>16,g=(n>>8)&255,b=n&255;return(.299*r+.587*g+.114*b)>160?'#111':'#fff'};
 function nmInject(){if(!IDX)return;NM.ac={};Object.keys(IDX.stops).forEach(k=>{if(k.startsWith('nm_')||k.startsWith('nmu_'))delete IDX.stops[k]});IDX.routes=IDX.routes.filter(r=>r.op!=='NM');Object.keys(CACHE).forEach(k=>{if(k.startsWith('nml'))delete CACHE[k]});
   if(MAP.data)Object.keys(MAP.data.routes).forEach(k=>{if(k.startsWith('nml'))delete MAP.data.routes[k]});
   const N=NM.data;if(nmOn()&&N&&Array.isArray(N.lines))N.lines.forEach(Lx=>{const R=nmRoute(Lx);if(!R.dirs.length)return;const d0=R.dirs[0];CACHE[R.id]=R;
-    IDX.routes.push({id:R.id,n:R.n,t:R.t,op:'NM',f:true,pk:null,fh:0,avg:15,c:['nm'],ends:[d0.from,d0.head],sn:[...new Set(R.dirs.flatMap(d=>d.stops.map(s=>IDX.stops[s[0]][0])))].sort(),k:Lx.color||'#555'});
+    IDX.routes.push({id:R.id,n:R.n,t:R.t,op:'NM',f:true,pk:null,fh:0,avg:15,c:['nm'],ends:[d0.from,d0.head],sn:[...new Set(R.dirs.flatMap(d=>d.stops.map(s=>IDX.stops[s[0]][0])))].sort(),k:Lx.color||'#555',kt:nmTxt(Lx.color||'#555')});
     if(MAP.data)nmMapOf(R)});
   setByName();if(city==='nm'&&!TD.view&&!MAP.open&&!location.hash)renderBoard()}
 function nmMapOf(R){if(!MAP.data)return;const sn={};R.dirs.forEach(d=>d.stops.forEach(s=>{const S=IDX.stops[s[0]];if(S&&!sn[s[0]]){const [x,y]=proj(S[2],S[3]);sn[s[0]]=[x,y,1,0]}}));
