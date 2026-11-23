@@ -20,6 +20,9 @@ jobs:
     timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
+        # (najnowszy main w chwili startu, nie z chwili zaplanowania – przebiegi czekają w kolejce, a poprzedni mógł już wypchnąć zmiany)
+        with:
+          ref: main
       # the hourly runs build only while a source is missing; the daily one and a run started by hand always
       - name: Czy budować
         id: gate
@@ -85,9 +88,16 @@ jobs:
           git diff --cached --quiet || git commit -m "Aktualizacja rozkładów $(date +%F)"
           # someone may have pushed while the data was being built (that takes long): their changes first, then ours on
           # top; where both changed the same generated file, this run's version (the newest data) wins
+          # (-X theirs nie rozstrzyga konfliktu „usunięty / zmieniony”, np. brak_zrodel.json usunięty tutaj, a zmieniony przez poprzedni
+          # przebieg – wtedy też wygrywa wersja tego przebiegu: plik z naszego commitu albo jego usunięcie)
           for i in 1 2 3; do
-            git pull --rebase -X theirs origin main && git push && exit 0
-            git rebase --abort 2>/dev/null || true
+            if ! git pull --rebase -X theirs origin main; then
+              for f in $(git diff --name-only --diff-filter=U); do
+                if git cat-file -e "REBASE_HEAD:$f" 2>/dev/null; then git checkout REBASE_HEAD -- "$f" && git add "$f"; else git rm -q --ignore-unmatch "$f"; fi
+              done
+              GIT_EDITOR=true git rebase --continue || { git rebase --abort 2>/dev/null || true; sleep 15; continue; }
+            fi
+            git push && exit 0
             sleep 15
           done
           exit 1
