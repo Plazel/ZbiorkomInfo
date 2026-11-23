@@ -945,6 +945,9 @@ ROWS = [
     ('Brak kont kierowców.', 'No driver accounts.', 'Keine Fahrerkonten.', 'Žiadne účty vodičov.', 'Žádné účty řidičů.'),
     ('Wyśrodkuj na pojeździe i podążaj za nim', 'Centre on the vehicle and follow it', 'Auf das Fahrzeug zentrieren und ihm folgen', 'Vycentrovať na vozidlo a sledovať ho', 'Vycentrovat na vozidlo a sledovat ho'),
     ('dokładność', 'accuracy', 'Genauigkeit', 'presnosť', 'přesnost'),
+    ('Wczytywanie mapy…', 'Loading the map…', 'Karte wird geladen…', 'Načítava sa mapa…', 'Načítá se mapa…'),
+    ('Nie udało się wczytać mapy', 'The map could not be loaded', 'Die Karte konnte nicht geladen werden', 'Mapu sa nepodarilo načítať', 'Mapu se nepodařilo načíst'),
+    ('Schemat nie jest jeszcze dostępny.', 'The diagram is not available yet.', 'Der Netzplan ist noch nicht verfügbar.', 'Schéma zatiaľ nie je k dispozícii.', 'Schéma zatím není k dispozici.'),
 ]
 
 WEEKDAYS = {

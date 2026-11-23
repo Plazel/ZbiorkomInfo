@@ -76,8 +76,18 @@ def build(out, log=print):
                 if not j.get('elements'): raise RuntimeError('pusta odpowiedź')
                 json.dump({'t': int(time.time()), 'bb': B, 'elements': j['elements']}, open(f, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
                 log('NetworkMaker OSM %s %s: %d elementów' % (kind, key, len(j['elements'])))
+                if kind == 'stops':
+                    # (same stacje kolejowe – mały plik dla NetworkMakera, gdy przystanki są z otwartych danych przewoźników)
+                    rl = rail_only(j['elements'])
+                    json.dump({'t': int(time.time()), 'bb': B, 'elements': rl}, open(os.path.join(d, 'rail_%s.json' % key), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
             except Exception as e:
                 log('NetworkMaker OSM %s %s: bez zmian (%s)' % (kind, key, e))
+
+
+
+def rail_only(els):
+    # jak zapytanie stacji kolejowych w NetworkMakerze: railway=station/halt, bez metra
+    return [e for e in els if (e.get('tags') or {}).get('railway') in ('station', 'halt') and (e.get('tags') or {}).get('station') != 'subway']
 
 
 if __name__ == '__main__':
