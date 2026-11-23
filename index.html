@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795456381;
+const APP_BUILD=1795456501;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -8989,8 +8989,12 @@ function dbdFDDraw(cv,cols,rows,on,cssW,prev,ph){const dpr=Math.min(window.devic
     if(st&&sx>.6){const hr=r*.28;pHi.moveTo(cx-r*.3+hr,cy-r*.3);pHi.ellipse(cx-r*.3,cy-r*.3,hr*sx,hr,0,0,Math.PI*2)}}
   x.fillStyle=FD_OFF;x.fill(pOff);x.fillStyle=FD_ON;x.fill(pOn);x.fillStyle='rgba(255,255,255,.22)';x.fill(pHi)}
 // rysowanie (i animacja przewracania, gdy zmienia się to, co pokazane – nie przy przewijaniu tekstu)
+// (w trakcie wpisywania tekstu: bez animacji – krążki od razu w nowym stanie; po chwili bez pisania jedno przewrócenie od stanu sprzed pisania)
+function dbdTyping(){DBD.typT=Date.now();clearTimeout(DBD.typTm);DBD.typTm=setTimeout(()=>{DBD.typT=0;if(TD.view==='dbd'&&dbdMode(DBD.st)==='flap')dbdPaint()},700)}
 function dbdFD(cv,S,cssW,anim){const g=dbdFDGrid(S),cols=DPB.W,rows=DPB.H;cancelAnimationFrame(cv._fdRaf);
-  const prev=cv._fd&&cv._fd.length===g.on.length?cv._fd:null;cv._fd=g.on;
+  if(anim&&DBD.typT&&cv.id==='dbdMx'){if(!cv._fdBase)cv._fdBase=cv._fd;cv._fd=g.on;dbdFDDraw(cv,cols,rows,g.on,cssW);return g.res}
+  const base=cv._fdBase;cv._fdBase=null;const old=base||cv._fd;
+  const prev=old&&old.length===g.on.length?old:null;cv._fd=g.on;
   if(!anim||!prev||prev.every((v,k)=>v===g.on[k])){dbdFDDraw(cv,cols,rows,g.on,cssW);return g.res}
   const t0=performance.now(),D=260,wave=520;const step=now=>{const e=now-t0;dbdFDDraw(cv,cols,rows,g.on,cssW,prev,i=>Math.max(0,Math.min(1,(e-wave*i/cols)/D)));
     if(e<wave+D)cv._fdRaf=requestAnimationFrame(step)};cv._fdRaf=requestAnimationFrame(step);return g.res}
@@ -9058,10 +9062,10 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
   // (dolny wiersz i jego rozmiar zablokowane, dopóki górny wiersz jest pusty)
   const lockB=()=>{const noTop=!String(S.top||'').trim(),noBot=!String(S.bottom||'').trim();A.querySelectorAll('[data-di=bottom],[data-xk=xb],[data-xa=xb]').forEach(x=>{x.disabled=noTop});
     A.querySelectorAll('[data-ds=rows2]').forEach(x=>{x.disabled=noTop||noBot});const bi=A.querySelector('[data-di=bottom]');if(bi)bi.placeholder=trS(noTop?'Najpierw wpisz górny wiersz':'np. przez Politechnikę')};
-  A.querySelectorAll('[data-di]').forEach(i=>i.oninput=()=>{S[i.dataset.di]=i.value;dbdKeep();dbdPaint();lockB()});lockB();
+  A.querySelectorAll('[data-di]').forEach(i=>i.oninput=()=>{S[i.dataset.di]=i.value;dbdTyping();dbdKeep();dbdPaint();lockB()});lockB();
   A.querySelectorAll('[data-dp]').forEach(b=>{b.onclick=()=>{S.picto=b.dataset.dp;dbdKeep();dbdRender()};const cv=b.querySelector('canvas');if(cv){const g=DPB.PICTOS[b.dataset.dp],ox=Math.floor((27-g.w)/2),oy=Math.floor((24-g.h)/2);
     dbdDots(cv,27,24,(x,y)=>{const bx=x-ox,by=y-oy;return bx>=0&&by>=0&&bx<g.w&&by<g.h&&g.px[by*g.w+bx]?'#ffffff':null},cv.closest('.dbdPicL')?34:68,false)}});   // (lista piktogramów: szerokość 34 px – wysokość z proporcji, bez rozciągania)
-  A.querySelectorAll('[data-xk]').forEach(i=>i.oninput=()=>{S[i.dataset.xk][+i.dataset.xi]=i.value;dbdAnim(true);dbdKeep();dbdPaint()});
+  A.querySelectorAll('[data-xk]').forEach(i=>i.oninput=()=>{S[i.dataset.xk][+i.dataset.xi]=i.value;dbdTyping();dbdAnim(true);dbdKeep();dbdPaint()});
   A.querySelectorAll('[data-xx]').forEach(b=>b.onclick=()=>{S[b.dataset.xx].splice(+b.dataset.xi,1);dbdAnim(true);dbdKeep();dbdRender()});
   A.querySelectorAll('[data-xa]').forEach(b=>b.onclick=()=>{const k=b.dataset.xa;S[k].push('');dbdAnim(true);dbdKeep();dbdRender();const l=A.querySelectorAll('[data-xk='+k+']');if(l.length)l[l.length-1].focus()});
   const ev=document.getElementById('dbdEvery');if(ev)ev.oninput=()=>{S.every=+ev.value;document.getElementById('dbdEv').textContent=S.every+' s';dbdAnim(true);dbdKeep()};
