@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795459650;
+const APP_BUILD=1795460145;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2245,7 +2245,8 @@ function emptyMsg(day,ops,running){const ds=weekDate(day);
   if(ds&&IDX.opEnd&&ops.length&&ops.every(op=>IDX.opEnd[op]&&ds>IDX.opEnd[op]))return `Rozkład ${dayLabel(ds)} nie został jeszcze opublikowany.`;
   return `${running?'Brak odjazdów w tym kierunku':'Linia nie kursuje'} ${dayLabel(ds)}.`}
 function headerHTML(r,line,extra,back){
-  return `<button class="crumb" type="button" data-go="${back||''}">← ${back?'Trasa linii':'Wszystkie linie'}</button>
+  // (bez przycisku „Wszystkie linie” – do listy linii prowadzi pasek boczny; zostaje tylko powrót do trasy linii)
+  return `${back?`<button class="crumb" type="button" data-go="${back}">← Trasa linii</button>`:''}
   <div class="lhead">${ICONS[lineIco(r)]}<span id="hc"></span>${withWeek(extra,r)}</div>`;   // (the operator: in the notes under the timetable, its source)
 }
 async function renderLine(id){
@@ -2558,7 +2559,7 @@ function comboPair(back,front){const inner=k=>ICONS[k].replace(/^<svg[^>]*>/,'')
 // the heading of the combined lines: tram and bus, or two buses in a city without trams (Flensburg)
 const comboHeadIcon=()=>IDX&&IDX.routes.some(r=>inCity(r)&&(r.t==='tram'||r.nt))?ICONS.combo:comboPair('bus','bus');
 function comboHeader(C,extra,back){
-  return back?`<button class="crumb" type="button" data-go="${back}">← Wspólna trasa</button>`+cHead(C,extra):`<button class="crumb" type="button" data-go="">← Wszystkie linie</button>`+cHead(C,extra)}
+  return back?`<button class="crumb" type="button" data-go="${back}">← Wspólna trasa</button>`+cHead(C,extra):cHead(C,extra)}
 function cHead(C,extra){return `
   <div class="lhead">${comboIcon(C.rs)}<span id="hc" style="display:flex;gap:8px;flex-wrap:wrap"></span>${withWeek(extra,{id:C.rs.map(r=>r.id).join(',')})}
    </div>`;
@@ -5342,7 +5343,7 @@ function rtParse(buf){const b=new Uint8Array(buf),td=new TextDecoder(),out=[];
   pbEach(b,0,b.length,(f,w,a,c)=>{if(f!==2||w!==2)return;let tu=null;pbEach(b,a,c,(f2,w2,a2,c2)=>{if(f2===3&&w2===2)tu=[a2,c2]});if(!tu)return;
     const e={tid:'',upd:[],delay:null};
     pbEach(b,tu[0],tu[1],(f3,w3,a3,c3)=>{
-      if(f3===1&&w3===2)pbEach(b,a3,c3,(f4,w4,a4,c4)=>{if(w4!==2)return;if(f4===1)e.tid=td.decode(b.subarray(a4,c4));else if(f4===2)e.stt=td.decode(b.subarray(a4,c4));else if(f4===5)e.rid=td.decode(b.subarray(a4,c4))});
+      if(f3===1&&w3===2)pbEach(b,a3,c3,(f4,w4,a4,c4)=>{if(w4!==2)return;if(f4===1)e.tid=td.decode(b.subarray(a4,c4));else if(f4===2)e.stt=td.decode(b.subarray(a4,c4));else if(f4===3)e.std=td.decode(b.subarray(a4,c4));else if(f4===5)e.rid=td.decode(b.subarray(a4,c4))});
       else if(f3===2&&w3===2){const u={seq:null,sid:null,d:null,t:null};
         pbEach(b,a3,c3,(f5,w5,a5,c5)=>{if(f5===1&&w5===0)u.seq=a5;else if(f5===4&&w5===2)u.sid=td.decode(b.subarray(a5,c5));
           else if((f5===2||f5===3)&&w5===2)pbEach(b,a5,c5,(f6,w6,v)=>{if(w6!==0)return;if(f6===1&&(f5===3||u.d==null))u.d=v;if(f6===2&&v&&(f5===3||u.t==null))u.t=v})});
@@ -5435,21 +5436,34 @@ const RAIL_LIVE=[{url:'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/SKMT
 // (SKM); inaczej (pociągi Polregio jadą dalej niż nasz rozkład) po przebiegu: kurs z rozkładu jako ciąg kolejnych stacji
 // pociągu, przy którym różnica godzin (opóźnienie) jest na wszystkich stacjach prawie ta sama (i niewielka – przy takcie
 // rozkład pasowałby też do innych kursów z dużym przesunięciem). Godziny pociągów w przegródkach minutowych – dla kursu
-// sprawdzane tylko pociągi będące przy jego pierwszej stacji w pobliżu jego godziny. Wynik: identyfikator → kurs
+// sprawdzane tylko pociągi będące przy jego pierwszej stacji w pobliżu jego godziny. Wynik: pociąg (obiekt z danych) → kurs
 function railMatchAll(ents,Ls,keys,nowM,b0,want){const res=new Map(),byS=new Map(),bk=new Map(),E=[];
   for(const e of ents){if(!e.upd.length)continue;const m=String(e.stt||'').match(/^(\d+):(\d+)/);const nS=Math.max(...e.upd.map(u=>u.seq==null?-1:u.seq))+1;if(nS<2)continue;
     const T=new Array(nS).fill(null);e.upd.forEach(u=>{if(u.seq!=null&&u.t)T[u.seq]=(u.t*1000-b0)/60000});const x={e,T,nS};E.push(x);
-    if(m){const k=(+m[1]*60+ +m[2])+'|'+nS;if(!byS.has(k))byS.set(k,[]);byS.get(k).push(x)}
+    // (w danych są też kursy z wczoraj – ten sam dzień kursu co w rozkładzie)
+    const dm=String(e.std||'').match(/^(\d{4})(\d\d)(\d\d)$/),dsh=dm?Math.round((new Date(+dm[1],dm[2]-1,+dm[3]).getTime()-b0)/86400000)*1440:null;
+    if(m){const k=(+m[1]*60+ +m[2])+'|'+nS;if(!byS.has(k))byS.set(k,[]);byS.get(k).push(x)}x.dsh=dsh;
     T.forEach((t,q)=>{if(t==null||t<nowM-400||t>nowM+300)return;const b=Math.floor(t);if(!bk.has(b))bk.set(b,[]);bk.get(b).push([x,q])})}
-  const put=(x,M)=>{const o=res.get(x.e.tid);if(!o||M.sc<o.sc)res.set(x.e.tid,M)};
+  const put=(x,M)=>{const o=res.get(x.e);if(!o||M.sc<o.sc)res.set(x.e,M)};   // (po samym kursie – identyfikator ten sam co dzień)
   for(const [r,L] of Ls)for(const [key,sh] of keys)L.dirs.forEach(d=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(t0<nowM-300||t0>nowM+180)return;
     const [pat,off]=d.prof[pi];const ps=d.pats[pat];if(want&&want(d,ps)<0)return;
-    const ex=byS.get(Math.round(tt)+'|'+ps.length);if(ex)ex.forEach(x=>put(x,{r,L,d,ps,off,t0,j0:0,sc:-1+Math.abs(t0-nowM)/1e4}));
+    const ex=byS.get(Math.round(tt)+'|'+ps.length);if(ex)ex.forEach(x=>{if(x.dsh==null||x.dsh===sh)put(x,{r,L,d,ps,off,t0,j0:0,T:x.T,sc:-1+Math.abs(t0-nowM)/1e4})});
     if(ps.length<6)return;const s0=t0+off[0];   // (krótsze kursy pasowałyby też do przypadkowych pociągów w innych częściach kraju)
     for(let b=Math.floor(s0-3);b<=Math.floor(s0+8);b++)(bk.get(b)||[]).forEach(([x,j0])=>{if(j0+ps.length>x.nS)return;let lo=1e9,hi=-1e9;
       for(let q=0;q<ps.length;q++){const v=x.T[j0+q];if(v==null)return;const df=v-(t0+off[q]);if(df<lo)lo=df;if(df>hi)hi=df}
-      if(hi-lo>1.5||lo<-3||lo>8)return;put(x,{r,L,d,ps,off,t0,j0,sc:Math.abs(lo)})})}));
+      if(hi-lo>1.5||lo<-3||lo>8)return;put(x,{r,L,d,ps,off,t0,j0,T:x.T,sc:Math.abs(lo)})})}));
   return res}
+// opóźnienie pociągu przy stacji k kursu: w danych są godziny rzeczywiste stacji już minionych, a dalej – godziny z
+// rozkładu (opóźnienie nie jest przenoszone). Stąd: stacja miniona – jej godzina rzeczywista; stacja przed pociągiem –
+// ostatnie znane opóźnienie (nie mniej niż zero). Stacja „miniona” według godziny, ale z opóźnieniem wyraźnie mniejszym niż
+// poprzednia, gdy pociąg z tamtym opóźnieniem jeszcze by do niej nie dojechał – to jeszcze godzina z rozkładu. Pociąg bez
+// żadnej minionej stacji (jeszcze nie ruszył) – brak danych na żywo
+function railDelay(M,k,nowM){const {ps,off,t0,j0,T}=M;let cur=null,pos=-1;
+  for(let i=0;i<ps.length;i++){const x=T[i+j0];if(x==null)continue;const sch=t0+off[i],dev=x-sch;if(x>nowM)break;
+    if(cur!=null&&dev<cur-1.5&&sch+cur>nowM)break;cur=dev;pos=i}
+  if(pos<0)return null;
+  if(k<=pos){const x=T[k+j0];return x==null?null:(x-(t0+off[k]))*60}
+  return Math.max(0,cur)*60}
 async function depLiveRail(st){if(!['gda','sop','gdy','all'].includes(st.c))return null;
   const R=IDX.routes.filter(r=>r.t==='rail'&&inCityOf(r,st.c)&&(r.sn||[]).includes(st.n));if(!R.length)return null;
   const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime(),nowM=(Date.now()-b0)/60000,keys=depDayKeys(),out=[];let ok=0;
@@ -5458,10 +5472,8 @@ async function depLiveRail(st){if(!['gda','sop','gdy','all'].includes(st.c))retu
   for(const F of RAIL_LIVE){const rs=R.filter(r=>F.lines.includes(r.n));if(!rs.length)continue;let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}ok++;
     const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
     const MM=railMatchAll(ents.filter(e=>F.rid.test(e.rid||'')),Ls,keys,nowM,b0,at);
-    for(const e of ents){const M=MM.get(e.tid);if(!M)continue;const {r,L,d,ps,off,t0,j0}=M,k=at(d,ps);
-      // (kursy jeszcze nie rozpoczęte mają w danych tylko godziny z rozkładu – nie na żywo)
-      const u0=e.upd.find(u=>u.seq===0);if((u0&&u0.t?(u0.t*1000-b0)/60000:t0)>nowM+1)continue;
-      const {dl}=tuDelayAt(e,'',j0,ps.map(si=>d.stops[si][0]),t0,off,k,b0);if(dl==null||dl<-600||dl>7200)continue;
+    for(const e of ents){const M=MM.get(e);if(!M)continue;const {r,L,d,ps,off,t0,j0}=M,k=at(d,ps);
+      const dl=railDelay(M,k,nowM);if(dl==null||dl<-600||dl>7200)continue;
       const tS=t0+off[k],t=tS+dl/60;if(t<nowM-1||t>nowM+120)continue;
       // (jeden pociąg na kurs: przy kilku – najlepiej dopasowany)
       const key=L.dirs.indexOf(d)+'|'+r.id+'|'+t0,sc=M.sc||0,o=out.findIndex(x=>x.key===key);if(o>=0){if(out[o].sc<=sc)continue;out.splice(o,1)}
@@ -5743,7 +5755,7 @@ async function alertsRail(g){const C=RAIL_AL[g];if(!C)return [];const out=[],hm=
     for(const i of C.tu){const F=RAIL_LIVE[i];const rs=IDX.routes.filter(r=>r.t==='rail'&&F.lines.includes(r.n)&&areaOf(r)===g);let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}
       const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
       const MM=railMatchAll(ents.filter(e=>F.rid.test(e.rid||'')),Ls,keys,nowM,b0);
-      for(const e of ents){const M=MM.get(e.tid);if(!M)continue;const {r,d,ps,off,t0}=M;
+      for(const e of ents){const M=MM.get(e);if(!M)continue;const {r,d,ps,off,t0}=M;
         if(t0+off[off.length-1]<nowM-5||t0>nowM+60)continue;TRN[e.tid]={r,t0,a:sName(d.stops[ps[0]][0]),b:sName(d.stops[ps[ps.length-1]][0])}}}}
   await Promise.all(Object.entries(C.ag).map(async([ag,mode])=>{let L;try{L=await alertsRT(RAIL_AL_U(ag))}catch(e){return}
     for(const a of L){const tripOnly=a.trips.length&&!a.routes.length&&!a.stops.length;const head=a.title+' '+(tripOnly?'':String(a.text||'').slice(0,240));
@@ -6257,6 +6269,8 @@ function depRender(){const m=depEl();if(m.hidden)return;
   const box=document.getElementById('depPanels');const np=depCfg.split?2:1;box.replaceChildren();DEP.wideAl=null;box.style.gridTemplateRows='';
   const now=new Date();const nowM=now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
   let any=false;
+  // (dwa panele: wspólny pasek komunikatów tylko przy tych samych komunikatach – np. stacja kolejowa obok przystanku: każdy panel swój)
+  const AG=[0,1].slice(0,np).map(p=>depStops(p).map(depAlertGrp).find(x=>x&&depAlerts(x).length)),wide=np===2&&AG[0]===AG[1];
   for(let p=0;p<np;p++){const sts=depStops(p);
     const P=document.createElement('div');P.className='dP';
     const title=(p===0?depCfg.title:depCfg.title2)||[...new Set(sts.map(s=>s.n))].join(' · ')||'Odjazdy';
@@ -6274,7 +6288,7 @@ function depRender(){const m=depEl();if(m.hidden)return;
         const tm=document.createElement('div');tm.className='dTime';tm.innerHTML=brdTime(d,nowM,(sts[0]&&sts[0].c)||city)+(d.t>=1440&&d.t-nowM>=60?'<small class="dDay">'+esc(dayShort(Math.floor(d.t/1440)))+'</small>':'');   // (another day: its date by the time)
         const c=document.createElement('div');c.className='dCode';c.innerHTML=(d.pole?POLE+esc(d.pole):'')+(pc.multi&&d.stn?'<span class="dStn">'+esc(d.stn)+'</span>':'');
         row.append(de,c,tm);row.classList.add('tap');row.onclick=()=>openRunOnMap(d,(DEP.schRaw||[])[p]);rows.append(row)});
-      if(al){if(np===2)DEP.wideAl=DEP.wideAl||ag;else rows.append(depAlertRow(ag))}}
+      if(al){if(wide)DEP.wideAl=DEP.wideAl||ag;else rows.append(depAlertRow(ag))}}
     box.append(P);
     if(pc.show&&pc.multi){let w=0;P.querySelectorAll('.dCode').forEach(c=>{w=Math.max(w,c.scrollWidth)});const hc=P.querySelector('.dHead .c');w=Math.max(w,hc?hc.scrollWidth:0);
       P.style.setProperty('--c-code',Math.min(w+8,P.clientWidth*.42)+'px')}
