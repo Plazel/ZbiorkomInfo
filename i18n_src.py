@@ -874,7 +874,6 @@ ROWS = [
 ("Funkcja aktualności nie jest obsługiwana w Warszawie", "The news feature is not available in Warsaw", "Die Nachrichtenfunktion ist in Warschau nicht verfügbar", "Funkcia aktualít nie je vo Varšave podporovaná", "Funkce aktualit není ve Varšavě podporována"),
     ('nieprzeczytane', 'unread', 'ungelesen', 'neprečítané', 'nepřečtené'),
     ('Ta funkcja nie jest obsługiwana w wybranym mieście', 'This feature is not supported in the selected city', 'Diese Funktion wird in der gewählten Stadt nicht unterstützt', 'Táto funkcia nie je vo vybranom meste podporovaná', 'Tato funkce není ve vybraném městě podporována'),
-    ('Klapkowy', 'Split-flap', 'Fallblatt', 'Preklápací', 'Překlápěcí'),
     ('Wyświetlacz', 'Display', 'Anzeige', 'Displej', 'Displej'),
     ('Standardowy', 'Standard', 'Standard', 'Štandardný', 'Standardní'),
     ('Rozmiar wiersza dolnego', 'Size of the bottom row', 'Größe der unteren Zeile', 'Veľkosť dolného riadku', 'Velikost dolního řádku'),
