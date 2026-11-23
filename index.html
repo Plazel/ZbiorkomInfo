@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795454669;
+const APP_BUILD=1795455272;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4904,7 +4904,7 @@ async function openRunOnMap(d,list){
     if(!pn){pn=document.createElement('div');pn.id='runPanel';pn.className='runPanel';const mb=document.querySelector('.mapBody');mb.insertBefore(pn,mb.querySelector('.mapArea'))}
     const s0=depStyle(d.r);pn.innerHTML=`<div class="rpH">${runVehHtml(d)}</div>`}
   if(typeof DEP!=='undefined'&&DEP.open)closeDep();await openMap();runTitle(d,'');await new Promise(r=>setTimeout(r,120));if(MAP.view!=='osm')await setMapView('osm');
-  RUN.d=d;RUN.cut=null;RUN.first=true;RUN.follow=false;RUN.scrolled=false;setTimeout(meBtnMode,0);closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([d.r.id]);applyHL();
+  RUN.d=d;RUN.cut=null;RUN.first=true;RUN.follow=false;RUN.scrolled=false;setTimeout(()=>{meBtnMode();drawMe()},0);closeStopPop(true);MAP.stopHL=null;MAP.hl=new Set([d.r.id]);applyHL();
   RUN.e=runEdge(d.r.id,d);RUN.e=(await runShape(d,RUN.e))||RUN.e;   // (a variant: its own course, laid onto the streets in the data)
   const v=RUN.e?{run:RUN.e}:runVariant(d.r.id,d);if(v!=null){MAP.varOf[d.r.id]=v;updateVarPanel();renderLabels()}
   clearInterval(RUN.tm);try{await runTick()}finally{document.getElementById('mapModal').classList.remove('runInit')}RUN.tm=setInterval(runTick,5000);clearInterval(RUN.ageTm);RUN.ageTm=setInterval(runAge,1000);
@@ -4999,7 +4999,7 @@ function runVehHtml(d){const a=[];if(d.vlabel)a.push(`${esc(trS('Pojazd'))} <b>$
 function runExit(){if(RUN.fromMap){const b=RUN.fromMap;closeRun();   // back to the stop and its board, where the run was chosen
     if(b&&b.vb){MAP.vb=b.vb;applyVB();renderLabels()}if(b&&b.pop)setTimeout(()=>reopenStopPop(b.pop),60);return}if(VEH.back){const b=VEH.back;VEH.back=false;closeRun();   // back to the live vehicles as they were: the lines chosen before (none: no line marked), the same place
     MAP.hl=new Set(b.hl||[]);Object.keys(MAP.varOf).forEach(id=>{if(!MAP.hl.has(id))delete MAP.varOf[id]});if(b.vb){MAP.vb=b.vb;applyVB()}applyHL();vehMode(true);return}const st=history.state||{};if(st.ov==='map'&&history.length>1){history.back();return}closeRun();closeMap()}
-function closeRun(){setTimeout(()=>{if(typeof RUN==='undefined'||!RUN.d){RUN.follow=false;meBtnMode()}},0);if(GUIDE.bg&&!GUIDE.open){GUIDE.bg=false;clearInterval(GUIDE.tm);try{speechSynthesis.cancel()}catch(e){}}{const g=document.getElementById('mapGuide');if(g)g.hidden=true}{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}RUN.fromMap=false;clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.cut=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
+function closeRun(){setTimeout(()=>{if(typeof RUN==='undefined'||!RUN.d){RUN.follow=false;meBtnMode();drawMe()}},0);if(GUIDE.bg&&!GUIDE.open){GUIDE.bg=false;clearInterval(GUIDE.tm);try{speechSynthesis.cancel()}catch(e){}}{const g=document.getElementById('mapGuide');if(g)g.hidden=true}{const h=document.getElementById('mapTitle');if(h&&h.classList.contains('rpT')){h.classList.remove('rpT');h.textContent=trS('Schemat sieci – '+CITIES[city][0])}}RUN.fromMap=false;clearInterval(RUN.tm);clearInterval(RUN.ageTm);cancelAnimationFrame(RUN.raf);if(RUN.d){const id=RUN.d.r.id;if(MAP.varOf[id]&&MAP.varOf[id].run)MAP.varOf[id]=RUN.e&&!RUN.e.m&&RUN.e.l>=0?RUN.e.l:'main'}RUN.e=null;RUN.cut=null;RUN.fixT=null;document.getElementById('mapModal').classList.remove('runInit');try{const st=history.state||{};if(st.run&&!NAV_POP)history.replaceState(Object.assign({},st,{run:null}),'',location.href)}catch(e){}RUN.d=null;RUN.pos=null;const p=document.getElementById('runPanel');if(p)p.remove();document.getElementById('mapModal').classList.remove('run');drawVeh()}
 async function runTick(){const d=RUN.d;if(!d||!MAP.open){clearInterval(RUN.tm);return}
   const base=new Date();base.setHours(0,0,0,0);const nowM=(Date.now()-base)/60000;let dl=(d.delay||0)/60,gps=null;
   // ZTM Gdańsk: the vehicle's own position (a run from the guide's board: its vehicle found by line, start time and headsign)
@@ -5127,6 +5127,8 @@ function toggleMe(){const b=document.getElementById('mapMeBtn');
     err=>{MAP.meW!=null&&navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null;b.setAttribute('aria-pressed','false');b.title=err.code===1?'Brak zgody na udostępnienie lokalizacji':'Nie udało się ustalić lokalizacji'},
     {enableHighAccuracy:true,maximumAge:10000,timeout:20000})}
 function drawMe(){const svg=document.getElementById('mapSvg');if(!svg)return;let g=svg.querySelector('#mapMe');
+  // (widok kursu – śledzony pojazd: bez kropki położenia użytkownika)
+  if(typeof RUN!=='undefined'&&RUN.d){if(g)g.remove();return}
   if(!MAP.me||MAP.view==='schema'||MAP.drawn==='schema'||!MAP.vb){if(g)g.remove();return}
   if(!g){g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='mapMe'}svg.appendChild(g);
   const [x,y]=proj(MAP.me.lat,MAP.me.lon);const k=unitsPerPx();   // (only the dot: no circle of the position's accuracy around it)
