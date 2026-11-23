@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795459435;
+const APP_BUILD=1795459650;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5427,24 +5427,29 @@ async function depLiveBYD(st){if(!RT_PROXY)return null;const M=await bydMap();
     else out.push({t,st:t,r,head:e.sDestino||'',pole:e.pole,live:true,delay:0,lastT:t})});
   return out}
 // ---- kolej w Trójmieście na żywo: GTFS-RT pociągów z zbiorkom.live (oficjalnych danych na żywo SKM i Polregio brak) – SKM
-// (linia S1) i Polregio na liniach PKM (S2, S22); identyfikatory kursów są tam własne, więc kurs dopasowany po godzinie odjazdu
+// (linia S1) i Polregio (PKM: S2, S22 i pociągi regionalne R); identyfikatory kursów są tam własne, więc kurs dopasowany po godzinie odjazdu
 // z pierwszej stacji i liczbie stacji; opóźnienie przy stacji z jej miejsca w kursie (stop_sequence)
 const RAIL_LIVE=[{url:'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/SKMT/tripUpdates',rid:/^SKMT/,lines:['S1']},
-  {url:'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/PR/tripUpdates',rid:/^PR(pkm|s2)/,lines:['S2','S22']}];
-// dopasowanie pociągu z GTFS-RT do kursu z rozkładu: najpierw ta sama godzina odjazdu z pierwszej stacji i liczba stacji
-// (SKM); inaczej (pociągi Polregio jadą dalej niż nasz rozkład PKM) po przebiegu: kurs z rozkładu jako ciąg kolejnych
-// stacji pociągu, przy którym różnica godzin (opóźnienie) jest na wszystkich stacjach prawie ta sama (i niewielka – przy
-// takcie rozkład pasowałby też do innych kursów z dużym przesunięciem)
-function railMatch(e,Ls,keys,nowM,b0,want){if(!e.upd.length)return null;const m=String(e.stt||'').match(/^(\d+):(\d+)/),ts=m?+m[1]*60+ +m[2]:null;
-  const nS=Math.max(...e.upd.map(u=>u.seq==null?-1:u.seq))+1,T=new Array(nS).fill(null);e.upd.forEach(u=>{if(u.seq!=null&&u.t)T[u.seq]=(u.t*1000-b0)/60000});
-  let best=null,fit=null;
+  {url:'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/PR/tripUpdates',rid:/^PR(?!zka)/,lines:['S2','S22','R']}];
+// dopasowanie pociągów z GTFS-RT do kursów z rozkładu: najpierw ta sama godzina odjazdu z pierwszej stacji i liczba stacji
+// (SKM); inaczej (pociągi Polregio jadą dalej niż nasz rozkład) po przebiegu: kurs z rozkładu jako ciąg kolejnych stacji
+// pociągu, przy którym różnica godzin (opóźnienie) jest na wszystkich stacjach prawie ta sama (i niewielka – przy takcie
+// rozkład pasowałby też do innych kursów z dużym przesunięciem). Godziny pociągów w przegródkach minutowych – dla kursu
+// sprawdzane tylko pociągi będące przy jego pierwszej stacji w pobliżu jego godziny. Wynik: identyfikator → kurs
+function railMatchAll(ents,Ls,keys,nowM,b0,want){const res=new Map(),byS=new Map(),bk=new Map(),E=[];
+  for(const e of ents){if(!e.upd.length)continue;const m=String(e.stt||'').match(/^(\d+):(\d+)/);const nS=Math.max(...e.upd.map(u=>u.seq==null?-1:u.seq))+1;if(nS<2)continue;
+    const T=new Array(nS).fill(null);e.upd.forEach(u=>{if(u.seq!=null&&u.t)T[u.seq]=(u.t*1000-b0)/60000});const x={e,T,nS};E.push(x);
+    if(m){const k=(+m[1]*60+ +m[2])+'|'+nS;if(!byS.has(k))byS.set(k,[]);byS.get(k).push(x)}
+    T.forEach((t,q)=>{if(t==null||t<nowM-400||t>nowM+300)return;const b=Math.floor(t);if(!bk.has(b))bk.set(b,[]);bk.get(b).push([x,q])})}
+  const put=(x,M)=>{const o=res.get(x.e.tid);if(!o||M.sc<o.sc)res.set(x.e.tid,M)};
   for(const [r,L] of Ls)for(const [key,sh] of keys)L.dirs.forEach(d=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(t0<nowM-300||t0>nowM+180)return;
     const [pat,off]=d.prof[pi];const ps=d.pats[pat];if(want&&want(d,ps)<0)return;
-    if(ts!=null&&Math.abs(tt-ts)<=.5&&ps.length===nS){if(!best||Math.abs(t0-nowM)<Math.abs(best.t0-nowM))best={r,L,d,ps,off,t0,j0:0}}
-    else if(ps.length>=3&&ps.length<nS)for(let j0=0;j0+ps.length<=nS;j0++){let lo=1e9,hi=-1e9,ok=true;
-      for(let q=0;q<ps.length;q++){const x=T[j0+q];if(x==null){ok=false;break}const df=x-(t0+off[q]);if(df<lo)lo=df;if(df>hi)hi=df}
-      if(!ok||hi-lo>2||lo<-3||lo>8)continue;const sc=Math.abs(lo);if(!fit||sc<fit.sc)fit={r,L,d,ps,off,t0,j0,sc}}}));
-  return best||fit}
+    const ex=byS.get(Math.round(tt)+'|'+ps.length);if(ex)ex.forEach(x=>put(x,{r,L,d,ps,off,t0,j0:0,sc:-1+Math.abs(t0-nowM)/1e4}));
+    if(ps.length<6)return;const s0=t0+off[0];   // (krótsze kursy pasowałyby też do przypadkowych pociągów w innych częściach kraju)
+    for(let b=Math.floor(s0-3);b<=Math.floor(s0+8);b++)(bk.get(b)||[]).forEach(([x,j0])=>{if(j0+ps.length>x.nS)return;let lo=1e9,hi=-1e9;
+      for(let q=0;q<ps.length;q++){const v=x.T[j0+q];if(v==null)return;const df=v-(t0+off[q]);if(df<lo)lo=df;if(df>hi)hi=df}
+      if(hi-lo>1.5||lo<-3||lo>8)return;put(x,{r,L,d,ps,off,t0,j0,sc:Math.abs(lo)})})}));
+  return res}
 async function depLiveRail(st){if(!['gda','sop','gdy','all'].includes(st.c))return null;
   const R=IDX.routes.filter(r=>r.t==='rail'&&inCityOf(r,st.c)&&(r.sn||[]).includes(st.n));if(!R.length)return null;
   const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime(),nowM=(Date.now()-b0)/60000,keys=depDayKeys(),out=[];let ok=0;
@@ -5452,7 +5457,8 @@ async function depLiveRail(st){if(!['gda','sop','gdy','all'].includes(st.c))retu
   const at=(d,ps)=>ps.findIndex((si,j)=>j<ps.length-1&&sName(d.stops[si][0])===st.n&&(!st.poles||!st.poles.length||st.poles.includes((IDX.stops[d.stops[si][0]]||[])[1]||'')));
   for(const F of RAIL_LIVE){const rs=R.filter(r=>F.lines.includes(r.n));if(!rs.length)continue;let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}ok++;
     const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
-    for(const e of ents){if(!F.rid.test(e.rid||''))continue;const M=railMatch(e,Ls,keys,nowM,b0,at);if(!M)continue;const {r,L,d,ps,off,t0,j0}=M,k=at(d,ps);
+    const MM=railMatchAll(ents.filter(e=>F.rid.test(e.rid||'')),Ls,keys,nowM,b0,at);
+    for(const e of ents){const M=MM.get(e.tid);if(!M)continue;const {r,L,d,ps,off,t0,j0}=M,k=at(d,ps);
       // (kursy jeszcze nie rozpoczęte mają w danych tylko godziny z rozkładu – nie na żywo)
       const u0=e.upd.find(u=>u.seq===0);if((u0&&u0.t?(u0.t*1000-b0)/60000:t0)>nowM+1)continue;
       const {dl}=tuDelayAt(e,'',j0,ps.map(si=>d.stops[si][0]),t0,off,k,b0);if(dl==null||dl<-600||dl>7200)continue;
@@ -5736,8 +5742,9 @@ async function alertsRail(g){const C=RAIL_AL[g];if(!C)return [];const out=[],hm=
   if(C.tu){const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime(),nowM=(Date.now()-b0)/60000,keys=depDayKeys();
     for(const i of C.tu){const F=RAIL_LIVE[i];const rs=IDX.routes.filter(r=>r.t==='rail'&&F.lines.includes(r.n)&&areaOf(r)===g);let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}
       const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
-      for(const e of ents){if(!F.rid.test(e.rid||''))continue;const M=railMatch(e,Ls,keys,nowM,b0);if(!M)continue;const {r,d,ps,off,t0}=M;
-        if(t0+off[off.length-1]<nowM-5)continue;TRN[e.tid]={r,t0,a:sName(d.stops[ps[0]][0]),b:sName(d.stops[ps[ps.length-1]][0])}}}}
+      const MM=railMatchAll(ents.filter(e=>F.rid.test(e.rid||'')),Ls,keys,nowM,b0);
+      for(const e of ents){const M=MM.get(e.tid);if(!M)continue;const {r,d,ps,off,t0}=M;
+        if(t0+off[off.length-1]<nowM-5||t0>nowM+60)continue;TRN[e.tid]={r,t0,a:sName(d.stops[ps[0]][0]),b:sName(d.stops[ps[ps.length-1]][0])}}}}
   await Promise.all(Object.entries(C.ag).map(async([ag,mode])=>{let L;try{L=await alertsRT(RAIL_AL_U(ag))}catch(e){return}
     for(const a of L){const tripOnly=a.trips.length&&!a.routes.length&&!a.stops.length;const head=a.title+' '+(tripOnly?'':String(a.text||'').slice(0,240));
       const x={title:a.title,text:a.text,url:a.url,from:a.from,to:a.to,lines:[],kind:'rail'};
