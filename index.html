@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795383502;
+const APP_BUILD=1795453734;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5104,7 +5104,9 @@ function mapZoomTo(lat,lon,n){if(MAP.view==='schema')return;if(!MAP.vb||!documen
 // the position: always shown while the map is open (followed); the button takes the map to it
 function meWatch(zoom){if(MAP.meW!=null||!navigator.geolocation)return;let first=!!zoom;
   MAP.meW=navigator.geolocation.watchPosition(p=>{MAP.me={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy};store.set('ztm.here',[MAP.me.lat,MAP.me.lon,Date.now()]);
-      if((first||MAP.meZoom)&&MAP.view!=='schema'){first=false;MAP.meZoom=false;mapZoomTo(MAP.me.lat,MAP.me.lon)}else drawMe()},
+      // (widok kursu – np. z tablicy odjazdów – albo wybrany pojazd: mapa zostaje przy pojeździe, położenie użytkownika tylko jako kropka)
+      const busy=(typeof RUN!=='undefined'&&RUN.d)||(typeof VEH!=='undefined'&&VEH.sel);
+      if((first||MAP.meZoom)&&MAP.view!=='schema'&&!busy){first=false;MAP.meZoom=false;mapZoomTo(MAP.me.lat,MAP.me.lon)}else{if(busy){first=false;MAP.meZoom=false}drawMe()}},
     err=>{if(MAP.meW!=null)navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null;const b=document.getElementById('mapMeBtn');if(b)b.title=err.code===1?'Brak zgody na udostępnienie lokalizacji':'Nie udało się ustalić lokalizacji'},
     {enableHighAccuracy:true,maximumAge:10000,timeout:20000})}
 function meGo(){if(MAP.view==='schema')return;if(MAP.me)mapZoomTo(MAP.me.lat,MAP.me.lon);else{if(MAP.meW!=null){navigator.geolocation.clearWatch(MAP.meW);MAP.meW=null}meWatch(true)}}
@@ -6146,7 +6148,9 @@ document.getElementById('alertDlg').addEventListener('click',e=>{if(e.target.id=
 addEventListener('keydown',e=>{if(e.key==='Escape'){const d=document.getElementById('alertDlg');if(d&&!d.hidden){alertClose();e.stopPropagation()}}},true);
 ztmAlerts();setInterval(()=>{if(alertCity(city))ztmAlerts()},120000);
 // the board's bottom row: the notices one after another, sliding across (going on from where it was at each redraw)
-function depAlertRow(g){const L=alertsOf(g);const row=document.createElement('div');row.className='dRow dAlert';row.title=trS('Zmiany w ruchu');row.onclick=()=>alertShow(null,g);
+// (na tablicy tylko utrudnienia i zmiany w ruchu – bez aktualności)
+const depAlerts=g=>alertsOf(g).filter(a=>!alertInfo(a));
+function depAlertRow(g){const L=depAlerts(g);const row=document.createElement('div');row.className='dRow dAlert';row.title=trS('Zmiany w ruchu');row.onclick=()=>alertShow(null,g);
   const txt=L.map(a=>a.title).join('   •   ');const dur=Math.max(12,txt.length*.28);const dl=-(((Date.now()-((ALERT_BY[g]||{}).t0||0))/1000)%dur);
   row.innerHTML=`${ALERT_IC}<div class="aMq"><span style="--d:${dur.toFixed(1)}s;--dl:${dl.toFixed(2)}s">${L.map(a=>lineSigns(esc(a.title),a.lines||[])).join(esc('   •   '))}</span></div>`;return row}
 // ---- every departure board on the page (the board, the stop's board, the map's stop popup, the guide's changes) gives a time
@@ -6175,7 +6179,7 @@ function depRender(){const m=depEl();if(m.hidden)return;
     const rows=P.querySelector('.dRows');
     if(!sts.length){const e=document.createElement('div');e.className='dEmpty';e.append('Nie wybrano przystanku.');
       const b=document.createElement('button');b.type='button';b.className='depBtn primary';b.textContent='Wybierz przystanek';b.onclick=()=>{DEP.editP=p;depOpenDlg('stops')};e.append(b);rows.append(e)}
-    else{const ag=sts.map(st=>alertGrp(st.c||city)).find(x=>x&&alertsOf(x).length);const al=!!ag;sts.forEach(st=>{const x=alertGrp(st.c||city);if(x)ztmAlerts(x)});   // (the stops' city's notices: the last row given to them)
+    else{const ag=sts.map(st=>alertGrp(st.c||city)).find(x=>x&&depAlerts(x).length);const al=!!ag;sts.forEach(st=>{const x=alertGrp(st.c||city);if(x)ztmAlerts(x)});   // (the stops' city's notices: the last row given to them)
       const list=DEP.data[p].filter(d=>d.t>=nowM-.5).slice(0,al?Math.max(1,depCfg.rows-1):depCfg.rows);any=any||list.length>0;
       if(!list.length){const e=document.createElement('div');e.className='dEmpty';e.textContent=trS('Brak odjazdów');rows.append(e)}
       list.forEach(d=>{const row=document.createElement('div');row.className='dRow';row.append(depBadge(d.r,'dBadge'));
