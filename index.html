@@ -415,7 +415,7 @@ span.chip{cursor:inherit}
 #schLab .tb text{fill:#fff;stroke:none;font-family:var(--font-line);font-weight:600;text-anchor:middle}
 #schLab .tb.dim{opacity:.25}
 #schLab text.cut{font-weight:400;fill:var(--muted)}
-.mapArea{position:relative;min-width:0;min-height:0;background:var(--panel);overflow:hidden;contain:layout paint}#mapToast{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 16px;background:var(--panel);color:var(--fg,inherit);box-shadow:0 2px 10px #0004;font-size:.92rem;line-height:1.35;cursor:default}#mapToast[hidden]{display:none}#mapToast.err{border-left:4px solid #d32f2f;cursor:pointer}#mapToast .mtSpin{flex:none;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:mtSp .8s linear infinite}@keyframes mtSp{to{transform:rotate(360deg)}}
+.mapArea{position:relative;min-width:0;min-height:0;background:var(--panel);overflow:hidden;contain:layout paint}#mapToast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;display:flex;align-items:center;gap:10px;max-width:calc(100% - 32px);box-sizing:border-box;padding:10px 16px;background:var(--panel);color:var(--fg,inherit);box-shadow:0 2px 10px #0004;font-size:.92rem;line-height:1.35;cursor:default}#mapToast[hidden]{display:none}#mapToast.err{border-left:4px solid #d32f2f;cursor:pointer}#mapToast .mtSpin{flex:none;width:16px;height:16px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:mtSp .8s linear infinite}@keyframes mtSp{to{transform:rotate(360deg)}}
 #mapSvg.zooming #mapLabels,#mapSvg.zooming #schLab{visibility:hidden}
 #mapSvg{width:100%;height:100%;display:block;touch-action:none;cursor:grab;position:relative;transform-origin:50% 50%;will-change:transform}
 #mapRot{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%) rotate(var(--rot,0deg))}
@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795469631;
+const APP_BUILD=1795470115;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -3618,7 +3618,7 @@ function schLabels(){
   if(MAP.hl.size)g.querySelectorAll('.bl').forEach(t=>t.classList.toggle('dim',!t.dataset.ids.split(' ').some(i=>MAP.hl.has(i))));
 }
 
-// komunikaty mapy (wczytywanie, błędy) w okienku na środku dołu mapy, nie w pasku nad nią: wczytywanie z kręcącym się kółkiem
+// komunikaty mapy (wczytywanie, błędy) w okienku na środku mapy, nie w pasku nad nią: wczytywanie z kręcącym się kółkiem
 // i dopiero gdy trwa dłużej (delay), błąd znika sam po kilku sekundach albo po kliknięciu
 function mapMsg(t,o){o=o||{};let el=document.getElementById('mapToast');clearTimeout(mapMsg.t);clearTimeout(mapMsg.d);
   if(!t){if(el)el.hidden=true;return}
@@ -5187,7 +5187,11 @@ function setupMap(){
     return [bw/2+dx*c-dy*sn,bh/2+dx*sn+dy*c,bw,bh]};
   const pt=e=>{const [lx,ly,bw,bh]=loc(e.clientX,e.clientY);const v=MAP.vb;const s=Math.max(v.w/bw,v.h/bh);
     const ox=(bw*s-v.w)/2,oy=(bh*s-v.h)/2;return [v.x-ox+lx*s,v.y-oy+ly*s,s]};
-  svg.addEventListener('wheel',e=>{e.preventDefault();if(!MAP.vb)return;const [x,y]=pt(e);zoomMap(Math.pow(1.0015,e.deltaY*(e.deltaMode?33:1)),x,y)},{passive:false});
+  // (kółko myszy: skok o ząbek rozłożony płynnie na kilka klatek wokół kursora – jak w mapach Google; gładzik i małe kroki od razu)
+  svg.addEventListener('wheel',e=>{e.preventDefault();if(!MAP.vb)return;const [x,y]=pt(e);const dy=e.deltaY*(e.deltaMode?33:1),f=Math.pow(1.0015,dy);
+    if(Math.abs(dy)<40&&!MAP.zAnim){zoomMap(f,x,y);return}
+    const A=MAP.zAnim||(MAP.zAnim={l:0});A.l+=Math.log(f);A.x=x;A.y=y;
+    if(!A.raf){const step=()=>{const q=A.l*.28;A.l-=q;zoomMap(Math.exp(q),A.x,A.y);if(Math.abs(A.l)>.002)A.raf=requestAnimationFrame(step);else{if(Math.abs(A.l)>0)zoomMap(Math.exp(A.l),A.x,A.y);MAP.zAnim=null}};A.raf=requestAnimationFrame(step)}},{passive:false});
   const prev=()=>{if(!MAP.raf)MAP.raf=requestAnimationFrame(()=>{MAP.raf=0;previewVB()})};
   // one finger (or the mouse) moves the map; two fingers zoom, move and – past a small turn, so zooming alone does not tilt it – turn it
   let drag=null,pinch=null;const pts=new Map();
