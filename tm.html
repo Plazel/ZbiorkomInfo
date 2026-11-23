@@ -1594,13 +1594,14 @@ function isCirc(f){if(!f||f.stops.length<3)return false;const a=stopOf(f.stops[0
 function dnums(l){if(l.par)return'';const all=[l,...S.lines.filter(v=>v.par===l.id)].flatMap(v=>[v.dnum?[v.dnum,v.dir==='B'?'Kierunek przeciwny':v===l?'Kierunek podstawowy':'Kierunek: '+varLabel(v)]:null,v.vnum&&v.dir!=='B'?[v.vnum,'Wariant z osobnym numerem: '+varLabel(v)]:null]).filter(Boolean);if(!all.length)return'';
  return `<div class="dnums">${all.map(([n,t])=>`<span title="${esc(t)}">${esc(n)}</span>`).join('')}</div>`}
 // przystanek dla przeciwnego kierunku: peron o tej samej nazwie po drugiej stronie ulicy / torów (do 250 m; para torów – jej drugi przystanek)
-function oppStop(id){const s=stopOf(id);if(!s)return id;if(s.pair){const m=S.stops.find(x=>x.pair===s.pair&&x.id!==s.id);if(m)return m.id}
+// (excl: perony używane przez trasę TAM – trasa powrotna co do zasady nie korzysta z tych samych)
+function oppStop(id,excl){const s=stopOf(id);if(!s)return id;if(s.pair){const m=S.stops.find(x=>x.pair===s.pair&&x.id!==s.id);if(m)return m.id}
  const bn=x=>String(x.name||'').replace(/\s+\d{2}$/,'').trim().toLowerCase(),k=sKinds(s);let best=null,bd=250;
- S.stops.forEach(x=>{if(x.id===s.id||bn(x)!==bn(s)||!sKinds(x).some(q=>k.includes(q)))return;const d=mdist(x.ll,s.ll);if(d<bd){bd=d;best=x}});return best?best.id:id}
+ S.stops.forEach(x=>{if(x.id===s.id||(excl&&excl.has(x.id))||bn(x)!==bn(s)||!sKinds(x).some(q=>k.includes(q)))return;const d=mdist(x.ll,s.ll);if(d<bd){bd=d;best=x}});return best?best.id:id}
 // kierunek przeciwny linii okrężnej: przystanki w odwrotnej kolejności, każdy zamieniony na peron dla tamtego kierunku, trasa wyznaczona na nowo
 async function oppGen(root,f){lmClose();if(!f)return;if(S.lines.some(x=>x.dir==='B'&&x.par===root.id&&(x.rev||x.par)===f.id)){say(isCirc(f)?'Kierunek przeciwny już istnieje.':'Trasa powrotna już istnieje.');return}
  const v=JSON.parse(JSON.stringify(f));v.id='l'+Date.now();v.par=root.id;v.hidden=false;['note','terms','loop','loopBak','loopWant','excl','vname','op','win','tt','tto','dnum'].forEach(x=>delete v[x]);
- v.dir='B';v.rev=f.id;v.stops=f.stops.slice().reverse().map(oppStop);v.stops=v.stops.filter((x,i)=>i===0||x!==v.stops[i-1]);v.segs=[];v.wp=[];v.excl=[];v.auto=true;
+ v.dir='B';v.rev=f.id;{const ex=new Set(f.stops);v.stops=f.stops.slice().reverse().map(id=>oppStop(id,ex))}v.stops=v.stops.filter((x,i)=>i===0||x!==v.stops[i-1]);v.segs=[];v.wp=[];v.excl=[];v.auto=true;
  if(isCirc(f)&&/\d$/.test(root.num||'')&&!f.dnum&&f===root){f.dnum=root.num+'A';v.dnum=root.num+'B'}
  S.lines.push(v);S.sel=v.id;const ui=(cardUI[root.id]=cardUI[root.id]||{});ui.var=true;ui.lst=true;syncVariants();save();renderLines();redraw();
  delete f.oneway;say(isCirc(f)?'Wyznaczanie trasy w przeciwnym kierunku…':'Wyznaczanie trasy powrotnej…');await rebuild(v,true);
@@ -2171,7 +2172,13 @@ function platFix(l){
  const arc=(P,fromEnd)=>{P=densify(P,5);const Q=fromEnd?P.slice().reverse():P,o=[];let c=0;for(let k=1;k<Q.length;k++){c+=mdist(Q[k-1],Q[k]);if(c>=20&&c<=70)o.push(Q[k]);if(c>70)break}return fromEnd?o.reverse():o};
  const dirAt=i=>{const b=l.segs[i-1]?arc(l.segs[i-1].pts,true):[],a=l.segs[i]?arc(l.segs[i].pts,false):[],Q=[...b,...a];if(Q.length<2)return null;
   const A=Q[0],B=Q[Q.length-1],dx=(B[1]-A[1])*kx,dy=(B[0]-A[0])*ky,L=Math.hypot(dx,dy);return L<10?null:[dx/L,dy/L]};
+ // perony trasy TAM (bez krańców): trasa powrotna co do zasady z nich nie korzysta – peron używany przez TAM zamieniany na najbliższy
+ // inny peron tej samej nazwy, którego TAM nie używa (przed oceną strony jazdy)
+ const fw=l.dir==='B'&&l.rev?S.lines.find(x=>x.id===l.rev):null,fwU=fw&&fw.stops.length>2?new Set(fw.stops.slice(1,-1)):null;
  for(let i=1;i<st.length-1;i++){const s0=st[i];if(l.pfKeep&&l.pfKeep.includes(s0.id))continue; // (krańce pomijane – stanowisko na pętli to świadomy wybór; słupek wybrany ręcznie też)
+  if(fwU&&fwU.has(s0.id)){const k0=sKinds(s0),nb0=bn(s0);let bx=null,bd=1e9;S.stops.forEach(x=>{if(x.id===s0.id||fwU.has(x.id)||bn(x)!==nb0||!sKinds(x).some(q=>k0.includes(q)))return;const D=mdist(x.ll,s0.ll);if(D<=120&&D<bd){bd=D;bx=x}});
+   // (tylko peron przy obecnym przebiegu – nie przystanek tej nazwy na innej ulicy)
+   const rb=bx&&rel(i,bx.ll);if(bx&&rb&&rb.d<=60){l.stops[i]=bx.id;st[i]=bx;n++;continue}}
   let t=dirAt(i);if(!t&&i>0&&i<st.length-1){const dx=(st[i+1].ll[1]-st[i-1].ll[1])*kx,dy=(st[i+1].ll[0]-st[i-1].ll[0])*ky,L=Math.hypot(dx,dy);if(L>20)t=[dx/L,dy/L]}if(!t)continue;const r0=rel(i,s0.ll);if(!r0||r0.d>45)continue;
   const k=sKinds(s0),nb=bn(s0);let bc=null;
   const grp=S.stops.filter(x=>x.id!==s0.id&&bn(x)===nb&&sKinds(x).some(q=>k.includes(q))&&mdist(x.ll,s0.ll)<=120);if(grp.length!==1)continue; // tylko zwykła para peronów (węzły z kilkoma stanowiskami – bez zmian)
