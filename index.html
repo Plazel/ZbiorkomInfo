@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795471083;
+const APP_BUILD=1795471213;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2129,15 +2129,15 @@ function groupEl(lines,idx){
 }
 function renderGroups(){
   const box=document.getElementById('groups');if(!box)return;box.innerHTML='';
-  const h=t=>{const d=document.createElement('div');d.className='ghead';d.textContent=t;box.appendChild(d)};
   const {v,t,tr}=autoGroups();
   // trams first, then rail, then numbered lines ascending, groups starting with a letter at the end
   const rank=g=>{const r=BYNAME[g[0]];return r.t==='tram'?0:r.t==='rail'?1:/^[A-Z]/i.test(g[0])?3:2};
   const num=n=>parseInt(n.replace(/\D/g,''))||0;
-  [...tr,...v].map(g=>[...g].sort(lineAsc)).sort((a,b)=>rank(a)-rank(b)||num(a[0])-num(b[0])||a[0].localeCompare(b[0],'pl'))
-    .forEach(g=>{const ok=comboOkKnown(g);if(ok===false)return;const el=groupEl(g);box.appendChild(el);if(ok===undefined)comboOk(g).then(y=>{if(!y)el.remove()})});
-  const mine=custom.map((g,i)=>[g,i]).filter(([g])=>g.length>1&&g.every(n=>BYNAME[n]&&inCity(BYNAME[n])));
-  if(mine.length){h('Twoje łączenia');mine.forEach(([g])=>box.appendChild(groupEl(g)))}
+  // (łączenia dodane ręcznie razem z gotowymi, w tym samym porządku i bez osobnego nagłówka; powtórzone – raz)
+  const mine=custom.filter(g=>g.length>1&&g.every(n=>BYNAME[n]&&inCity(BYNAME[n]))).map(g=>[...g].sort(lineAsc)),isMine=new Set(mine.map(g=>g.join('+'))),seen=new Set();
+  [...tr,...v].map(g=>[...g].sort(lineAsc)).concat(mine).filter(g=>{const k=g.join('+');if(seen.has(k))return false;seen.add(k);return true})
+    .sort((a,b)=>rank(a)-rank(b)||num(a[0])-num(b[0])||a[0].localeCompare(b[0],'pl')||a.length-b.length)
+    .forEach(g=>{if(isMine.has(g.join('+'))){box.appendChild(groupEl(g));return}const ok=comboOkKnown(g);if(ok===false)return;const el=groupEl(g);box.appendChild(el);if(ok===undefined)comboOk(g).then(y=>{if(!y)el.remove()})});
   // (fewer than two lines in the city – e.g. a NetworkMaker network just begun: nothing to combine, no section)
   {const sec=document.getElementById('combo');if(sec)sec.style.display=IDX.routes.filter(r=>inCity(r)).length<2?'none':''}
 }
