@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795456696;
+const APP_BUILD=1795459228;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -5342,7 +5342,7 @@ function rtParse(buf){const b=new Uint8Array(buf),td=new TextDecoder(),out=[];
   pbEach(b,0,b.length,(f,w,a,c)=>{if(f!==2||w!==2)return;let tu=null;pbEach(b,a,c,(f2,w2,a2,c2)=>{if(f2===3&&w2===2)tu=[a2,c2]});if(!tu)return;
     const e={tid:'',upd:[],delay:null};
     pbEach(b,tu[0],tu[1],(f3,w3,a3,c3)=>{
-      if(f3===1&&w3===2)pbEach(b,a3,c3,(f4,w4,a4,c4)=>{if(f4===1&&w4===2)e.tid=td.decode(b.subarray(a4,c4))});
+      if(f3===1&&w3===2)pbEach(b,a3,c3,(f4,w4,a4,c4)=>{if(w4!==2)return;if(f4===1)e.tid=td.decode(b.subarray(a4,c4));else if(f4===2)e.stt=td.decode(b.subarray(a4,c4));else if(f4===5)e.rid=td.decode(b.subarray(a4,c4))});
       else if(f3===2&&w3===2){const u={seq:null,sid:null,d:null,t:null};
         pbEach(b,a3,c3,(f5,w5,a5,c5)=>{if(f5===1&&w5===0)u.seq=a5;else if(f5===4&&w5===2)u.sid=td.decode(b.subarray(a5,c5));
           else if((f5===2||f5===3)&&w5===2)pbEach(b,a5,c5,(f6,w6,v)=>{if(w6!==0)return;if(f6===1&&(f5===3||u.d==null))u.d=v;if(f6===2&&v&&(f5===3||u.t==null))u.t=v})});
@@ -5426,10 +5426,48 @@ async function depLiveBYD(st){if(!RT_PROXY)return null;const M=await bydMap();
     if(m){used.add(m);out.push({...m,t,st:m.t,live:true,delay:Math.round((t-m.t)*60),lastT:t})}
     else out.push({t,st:t,r,head:e.sDestino||'',pole:e.pole,live:true,delay:0,lastT:t})});
   return out}
+// ---- kolej w Trójmieście na żywo: GTFS-RT pociągów z zbiorkom.live (oficjalnych danych na żywo SKM i Polregio brak) – SKM
+// (linia S1) i Polregio na liniach PKM (S2, S22); identyfikatory kursów są tam własne, więc kurs dopasowany po godzinie odjazdu
+// z pierwszej stacji i liczbie stacji; opóźnienie przy stacji z jej miejsca w kursie (stop_sequence)
+const RAIL_LIVE=[{url:'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/SKMT/tripUpdates',rid:/^SKMT/,lines:['S1']},
+  {url:'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/PR/tripUpdates',rid:/^PR(pkm|s2)/,lines:['S2','S22']}];
+// dopasowanie pociągu z GTFS-RT do kursu z rozkładu: najpierw ta sama godzina odjazdu z pierwszej stacji i liczba stacji
+// (SKM); inaczej (pociągi Polregio jadą dalej niż nasz rozkład PKM) po przebiegu: kurs z rozkładu jako ciąg kolejnych
+// stacji pociągu, przy którym różnica godzin (opóźnienie) jest na wszystkich stacjach prawie ta sama (i niewielka – przy
+// takcie rozkład pasowałby też do innych kursów z dużym przesunięciem)
+function railMatch(e,Ls,keys,nowM,b0,want){if(!e.upd.length)return null;const m=String(e.stt||'').match(/^(\d+):(\d+)/),ts=m?+m[1]*60+ +m[2]:null;
+  const nS=Math.max(...e.upd.map(u=>u.seq==null?-1:u.seq))+1,T=new Array(nS).fill(null);e.upd.forEach(u=>{if(u.seq!=null&&u.t)T[u.seq]=(u.t*1000-b0)/60000});
+  let best=null,fit=null;
+  for(const [r,L] of Ls)for(const [key,sh] of keys)L.dirs.forEach(d=>planOf(d,key).forEach(([tt,pi])=>{const t0=tt+sh;if(t0<nowM-300||t0>nowM+180)return;
+    const [pat,off]=d.prof[pi];const ps=d.pats[pat];if(want&&want(d,ps)<0)return;
+    if(ts!=null&&Math.abs(tt-ts)<=.5&&ps.length===nS){if(!best||Math.abs(t0-nowM)<Math.abs(best.t0-nowM))best={r,L,d,ps,off,t0,j0:0}}
+    else if(ps.length>=3&&ps.length<nS)for(let j0=0;j0+ps.length<=nS;j0++){let lo=1e9,hi=-1e9,ok=true;
+      for(let q=0;q<ps.length;q++){const x=T[j0+q];if(x==null){ok=false;break}const df=x-(t0+off[q]);if(df<lo)lo=df;if(df>hi)hi=df}
+      if(!ok||hi-lo>2||lo<-3||lo>8)continue;const sc=Math.abs(lo);if(!fit||sc<fit.sc)fit={r,L,d,ps,off,t0,j0,sc}}}));
+  return best||fit}
+async function depLiveRail(st){if(!['gda','sop','gdy','all'].includes(st.c))return null;
+  const R=IDX.routes.filter(r=>r.t==='rail'&&inCityOf(r,st.c)&&(r.sn||[]).includes(st.n));if(!R.length)return null;
+  const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime(),nowM=(Date.now()-b0)/60000,keys=depDayKeys(),out=[];let ok=0;
+  const at=(d,ps)=>ps.findIndex((si,j)=>j<ps.length-1&&sName(d.stops[si][0])===st.n);
+  for(const F of RAIL_LIVE){const rs=R.filter(r=>F.lines.includes(r.n));if(!rs.length)continue;let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}ok++;
+    const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
+    for(const e of ents){if(!F.rid.test(e.rid||''))continue;const M=railMatch(e,Ls,keys,nowM,b0,at);if(!M)continue;const {r,L,d,ps,off,t0,j0}=M,k=at(d,ps);
+      // (kursy jeszcze nie rozpoczęte mają w danych tylko godziny z rozkładu – nie na żywo)
+      const u0=e.upd.find(u=>u.seq===0);if((u0&&u0.t?(u0.t*1000-b0)/60000:t0)>nowM+1)continue;
+      const {dl}=tuDelayAt(e,'',j0,ps.map(si=>d.stops[si][0]),t0,off,k,b0);if(dl==null||dl<-600||dl>7200)continue;
+      const tS=t0+off[k],t=tS+dl/60;if(t<nowM-1||t>nowM+120)continue;
+      // (jeden pociąg na kurs: przy kilku – najlepiej dopasowany)
+      const key=L.dirs.indexOf(d)+'|'+r.id+'|'+t0,sc=M.sc||0,o=out.findIndex(x=>x.key===key);if(o>=0){if(out[o].sc<=sc)continue;out.splice(o,1)}
+      out.push({t,st:tS,r,head:sName(d.stops[ps[ps.length-1]][0]),pole:(IDX.stops[d.stops[ps[k]][0]]||[])[1]||'',live:true,delay:Math.round(dl),lastT:t,di:L.dirs.indexOf(d),ps:ps.map(i=>d.stops[i][0]),t0,off,k,key,sc})}}
+  return ok?out:null}
 // the live data's shortened directions written out as in the timetables ("Łostowice Świętokrz." – Łostowice Świętokrzyska)
 const fixHead=h=>String(h).replace(/(^|\s)Świętokrz\.?(?=\s|$)/u,'$1Świętokrzyska');
 async function depLive(st){
   if(st.c==='byd')return depLiveBYD(st);
+  // (Trójmiasto: autobusy i tramwaje z ZTM, pociągi SKM i PKM z GTFS-RT – razem)
+  if(['gda','sop','gdy','all'].includes(st.c)){const [a,b]=await Promise.all([depLiveTri(st),depLiveRail(st).catch(()=>null)]);return a&&b?a.concat(b):a||b}
+  return depLiveTri(st)}
+async function depLiveTri(st){
   if(RT_GTFS[st.c])return RT_LOCAL?depLiveRT(st):depLiveGT(st);
   if(!['gda','sop','gdy','all'].includes(st.c)||Date.now()<RT_DEAD)return null;
   const ids=ztmIds(st);if(!ids.length)return null;
@@ -5678,6 +5716,36 @@ async function alertsBVG(u){try{const j=await (await fetch(u,{cache:'no-store'})
 // the page of a city's notices, for those that come without a link of their own (Kraków: ZTP)
 const ALERT_PAGE={krk:'https://ztp.krakow.pl/kmk/komunikaty'};
 const alertGrp=c=>['gda','sop','gdy','all'].includes(c)?'tri':ALERT_SRC[c]?c:null;
+// ---- utrudnienia na kolei (tablice dworców i przystanków kolejowych): komunikaty przewoźników kolejowych z GTFS-RT
+// zbiorkom.live (oficjalnych otwartych komunikatów kolejowych brak) – zamiast komunikatów komunikacji miejskiej. Do miasta
+// trafiają: komunikaty przewoźnika działającego tylko tam (all), komunikaty o linii/odcinku z nazwą miasta w tytule (txt),
+// a komunikaty o pojedynczych pociągach – gdy pociąg jest jednym z kursów linii miasta (dopasowanym jak na tablicy:
+// godzina odjazdu z pierwszej stacji, liczba stacji), z linią, godziną i kierunkiem w tytule, albo gdy tytuł wskazuje odcinek w mieście
+const RAIL_AL_U=a=>'https://api.zbiorkom.live/api6-open/pkp/gtfsRealtime/'+a+'/serviceAlerts';
+const RAIL_AL={tri:{re:/gda[nń]sk|gdyni|sopot/i,ag:{SKMT:'all',PR:'txt',IC:'txt'},tu:[0,1]},
+  waw:{re:/warszaw/i,ag:{SKM:'all',KM:'txt',PR:'txt',IC:'txt'}},krk:{re:/krak[oó]w/i,ag:{KML:'txt',PR:'txt',IC:'txt'}},
+  poz:{re:/pozna[nń]/i,ag:{KW:'txt',PR:'txt',IC:'txt'}}};
+const railGrp=c=>{const g=alertGrp(c)||c;return RAIL_AL[g]?'rail:'+g:null};
+// stacja kolejowa: wszystkie linie przy niej (w jej mieście) to pociągi
+const railSt=st=>{const c=st.c||city,R=IDX.routes.filter(r=>inCityOf(r,c)&&(r.sn||[]).includes(st.n));return R.length>0&&R.every(r=>r.t==='rail')};
+const depAlertGrp=st=>{const c=st.c||city;return (railSt(st)&&railGrp(c))||alertGrp(c)};
+async function alertsRail(g){const C=RAIL_AL[g];if(!C)return [];const out=[],hm=m=>{m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+  // pociągi linii miasta z GTFS-RT (tylko gdzie tablica je dopasowuje): identyfikator kursu → linia, godzina, kierunek
+  const TRN={};
+  if(C.tu){const base=new Date();base.setHours(0,0,0,0);const b0=base.getTime(),nowM=(Date.now()-b0)/60000,keys=depDayKeys();
+    for(const i of C.tu){const F=RAIL_LIVE[i];const rs=IDX.routes.filter(r=>r.t==='rail'&&F.lines.includes(r.n)&&areaOf(r)===g);let ents;try{ents=await rtFeedGet(F.url)}catch(e){continue}
+      const Ls=[];for(const r of rs){try{Ls.push([r,await loadRoute(r.id)])}catch(e){}}
+      for(const e of ents){if(!F.rid.test(e.rid||''))continue;const M=railMatch(e,Ls,keys,nowM,b0);if(!M)continue;const {r,d,ps,off,t0}=M;
+        if(t0+off[off.length-1]<nowM-5)continue;TRN[e.tid]={r,t0,a:sName(d.stops[ps[0]][0]),b:sName(d.stops[ps[ps.length-1]][0])}}}}
+  await Promise.all(Object.entries(C.ag).map(async([ag,mode])=>{let L;try{L=await alertsRT(RAIL_AL_U(ag))}catch(e){return}
+    for(const a of L){const tripOnly=a.trips.length&&!a.routes.length&&!a.stops.length;const head=a.title+' '+(tripOnly?'':String(a.text||'').slice(0,240));
+      const x={title:a.title,text:a.text,url:a.url,from:a.from,to:a.to,lines:[],kind:'rail'};
+      if(/rozk[łl]ad\w* jazdy/i.test(a.title)){x.info=true;x.kind=undefined}
+      if(tripOnly){const ts=a.trips.map(t=>TRN[t]).filter(Boolean);
+        if(ts.length){const why=a.title.replace(/^Utrudnienia:\s*/i,'');ts.forEach(t=>out.push({...x,title:`${t.r.n} ${hm(t.t0)} ${t.a} → ${t.b}: ${why}`,lines:[t.r.n]}))}
+        else if(C.re.test(a.title))out.push(x);continue}
+      if(mode==='all'||C.re.test(head))out.push(x)}}));
+  return out}
 const alertCity=c=>!!alertGrp(c);
 // GTFS-Realtime alerts: the ones in force now, their header (a general one like "Ogólny tekst specjalny": the text instead),
 // text (markdown marks taken off, struck-out parts left out) and link
@@ -5685,21 +5753,21 @@ const mdPlain=t=>String(t||'').replace(/~~[\s\S]*?~~/g,'').replace(/\*\*|__|(^|\
 async function alertsRT(url,viaProxy){const tries=viaProxy&&RT_PROXY?[RT_PROXY+'?url='+encodeURIComponent(url),url]:[url];
   for(const u of tries){try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)continue;const buf=await r.arrayBuffer(),b=new Uint8Array(buf),td=new TextDecoder(),out=[],now=Date.now()/1000;
       const tr=(a,c)=>{let t='',pl='';pbEach(b,a,c,(f,w,a2,c2)=>{if(f===1&&w===2){let x='',lg='';pbEach(b,a2,c2,(f3,w3,a3,c3)=>{if(w3!==2)return;if(f3===1)x=td.decode(b.subarray(a3,c3));else if(f3===2)lg=td.decode(b.subarray(a3,c3))});if(!t||lg==='pl'){if(lg==='pl')pl=x;t=x}}});return pl||t};
-      pbEach(b,0,b.length,(f,w,a,c)=>{if(f!==2||w!==2)return;pbEach(b,a,c,(f2,w2,a2,c2)=>{if(f2!==5||w2!==2)return;const al={title:'',text:'',url:'',per:[],routes:[]};
+      pbEach(b,0,b.length,(f,w,a,c)=>{if(f!==2||w!==2)return;pbEach(b,a,c,(f2,w2,a2,c2)=>{if(f2!==5||w2!==2)return;const al={title:'',text:'',url:'',per:[],routes:[],trips:[],stops:[]};
         pbEach(b,a2,c2,(f3,w3,a3,c3)=>{if(w3!==2)return;
           if(f3===1){const p=[0,0];pbEach(b,a3,c3,(f4,w4,v)=>{if(w4===0&&(f4===1||f4===2))p[f4-1]=v});al.per.push(p)}
-          else if(f3===5)pbEach(b,a3,c3,(f4,w4,a4,c4)=>{if(f4===2&&w4===2)al.routes.push(td.decode(b.subarray(a4,c4)))});
+          else if(f3===5)pbEach(b,a3,c3,(f4,w4,a4,c4)=>{if(w4!==2)return;if(f4===2)al.routes.push(td.decode(b.subarray(a4,c4)));else if(f4===5)al.stops.push(td.decode(b.subarray(a4,c4)));else if(f4===4)pbEach(b,a4,c4,(f5,w5,a5,c5)=>{if(f5===1&&w5===2)al.trips.push(td.decode(b.subarray(a5,c5)))})});
           else if(f3===8)al.url=tr(a3,c3);else if(f3===10)al.title=tr(a3,c3);else if(f3===11)al.text=mdPlain(tr(a3,c3))});
         if(al.per.length&&!al.per.some(([s0,e0])=>(!s0||s0<=now)&&(!e0||e0>=now)))return;
         if(!al.title||/^Ogólny tekst|^Komunikat$/i.test(al.title)){const t=al.text.split('\n')[0];al.title=t.length>140?t.slice(0,137)+'…':t;if(al.title===al.text)al.text=''}
-        if(al.title){const pr=al.per.find(([s0,e0])=>(!s0||s0<=now)&&(!e0||e0>=now))||al.per[0]||[];out.push({title:al.title,text:al.text,url:al.url,from:pr[0]?pr[0]*1000:null,to:pr[1]?pr[1]*1000:null,lines:[...new Set(al.routes.map(x=>String(x).toUpperCase()))]})}})});
+        if(al.title){const pr=al.per.find(([s0,e0])=>(!s0||s0<=now)&&(!e0||e0>=now))||al.per[0]||[];out.push({title:al.title,text:al.text,url:al.url,from:pr[0]?pr[0]*1000:null,to:pr[1]?pr[1]*1000:null,lines:[...new Set(al.routes.map(x=>String(x).toUpperCase()))],trips:al.trips,stops:al.stops,routes:al.routes})}})});
       return out}catch(e){}}
   return []}
 // (kept for each city apart: a slow answer for the city left a moment ago never shows up in another)
 const ALERT_BY={},ALERT_P={};
 const alertsOf=g=>(ALERT_BY[g]&&ALERT_BY[g].list)||[];
 function ztmAlerts(g0){const g=g0||alertGrp(city);if(!g)return Promise.resolve([]);const c=ALERT_BY[g];if(c&&Date.now()-c.t<120000)return Promise.resolve(c.list);if(ALERT_P[g])return ALERT_P[g];
-  return ALERT_P[g]=Promise.all(ALERT_SRC[g].map(([k,u,px])=>k==='ztm'?(RT_PROXY?fetch(RT_PROXY.replace(/\/?$/,'/')+'alerts',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[]):Promise.resolve([])):k==='bvg'?alertsBVG(u):k==='json'?alertsJSON(u,px):alertsRT(u,px)))
+  return ALERT_P[g]=Promise.all((g.startsWith('rail:')?[['rail',g.slice(5)]]:ALERT_SRC[g]).map(([k,u,px])=>k==='rail'?alertsRail(u):k==='ztm'?(RT_PROXY?fetch(RT_PROXY.replace(/\/?$/,'/')+'alerts',{cache:'no-store'}).then(r=>r.ok?r.json():[]).catch(()=>[]):Promise.resolve([])):k==='bvg'?alertsBVG(u):k==='json'?alertsJSON(u,px):alertsRT(u,px)))
     .then(R=>{const seen=new Set();const l=R.flat().filter(x=>x&&x.title&&!seen.has(x.title)&&seen.add(x.title));
       const raw=JSON.stringify(l),prev=ALERT_BY[g];delete ALERT_P[g];
       if(prev&&prev.raw===raw){prev.t=Date.now();return prev.list}   // (unchanged: the list kept as it is, translated or not)
@@ -6190,7 +6258,7 @@ function depRender(){const m=depEl();if(m.hidden)return;
     const rows=P.querySelector('.dRows');
     if(!sts.length){const e=document.createElement('div');e.className='dEmpty';e.append('Nie wybrano przystanku.');
       const b=document.createElement('button');b.type='button';b.className='depBtn primary';b.textContent='Wybierz przystanek';b.onclick=()=>{DEP.editP=p;depOpenDlg('stops')};e.append(b);rows.append(e)}
-    else{const ag=sts.map(st=>alertGrp(st.c||city)).find(x=>x&&depAlerts(x).length);const al=!!ag;sts.forEach(st=>{const x=alertGrp(st.c||city);if(x)ztmAlerts(x)});   // (the stops' city's notices: the last row given to them)
+    else{const ag=sts.map(depAlertGrp).find(x=>x&&depAlerts(x).length);const al=!!ag;sts.forEach(st=>{const x=depAlertGrp(st);if(x)ztmAlerts(x)});   // (the stops' city's notices – at railway stations the railway's: the last row given to them)
       const list=DEP.data[p].filter(d=>d.t>=nowM-.5).slice(0,al?Math.max(1,depCfg.rows-1):depCfg.rows);any=any||list.length>0;
       if(!list.length){const e=document.createElement('div');e.className='dEmpty';e.textContent=trS('Brak odjazdów');rows.append(e)}
       list.forEach(d=>{const row=document.createElement('div');row.className='dRow';row.append(depBadge(d.r,'dBadge'));
