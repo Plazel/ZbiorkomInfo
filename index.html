@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795460351;
+const APP_BUILD=1795460505;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6259,10 +6259,10 @@ const LIVE_CITIES=['gda','sop','gdy','all','byd','poz','krk','waw','ldz','prg','
 function brdTime(d,nowM,c){const left=d.t-nowM,mins=d.live||!LIVE_CITIES.includes(c||city);
   if(mins&&left<1)return '<span class="dArr" aria-label="odjeżdża"><i>&gt;</i><i>&gt;</i><i>&gt;</i></span>';if(mins&&left<60)return Math.floor(left)+' min';
   const t=Math.floor(d.t+1e-6)%1440;return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0')}
-// the platform column: shown where the board has more than one platform; with stops of several names it is the "Przystanek"
+// the platform column: shown wherever the departures have a platform; with stops of several names it is the "Przystanek"
 // column, the pole's number with the stop's name
 function depPanelCode(p){const L=(DEP.data[p]||[]),names=new Set((p===0?depCfg.stops:depCfg.stops2).map(x=>x.n));
-  const poles=new Set(L.map(d=>(d.stn||'')+'|'+(d.pole||'')));return {multi:names.size>1,show:names.size>1||(poles.size>1&&L.some(d=>d.pole))}}
+  const poles=new Set(L.map(d=>(d.stn||'')+'|'+(d.pole||'')));return {multi:names.size>1,show:names.size>1||L.some(d=>d.pole)}}   // (także przy jednym słupku – tablica zawsze z numerem peronu)
 function depRender(){const m=depEl();if(m.hidden)return;
   DEP.poles=true;m.classList.remove('nocode');
   m.classList.toggle('light',depCfg.theme==='light'||(depCfg.theme==='page'&&pageLight()));
