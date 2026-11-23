@@ -944,6 +944,7 @@ ROWS = [
     ('Brak kierowców pasujących do wyszukiwania.', 'No drivers match the search.', 'Keine Fahrer entsprechen der Suche.', 'Vyhľadávaniu nezodpovedajú žiadni vodiči.', 'Hledání neodpovídají žádní řidiči.'),
     ('Brak kont kierowców.', 'No driver accounts.', 'Keine Fahrerkonten.', 'Žiadne účty vodičov.', 'Žádné účty řidičů.'),
     ('Wyśrodkuj na pojeździe i podążaj za nim', 'Centre on the vehicle and follow it', 'Auf das Fahrzeug zentrieren und ihm folgen', 'Vycentrovať na vozidlo a sledovať ho', 'Vycentrovat na vozidlo a sledovat ho'),
+    ('dokładność', 'accuracy', 'Genauigkeit', 'presnosť', 'přesnost'),
 ]
 
 WEEKDAYS = {
