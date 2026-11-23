@@ -222,7 +222,7 @@ span.chip{cursor:inherit}
 .lhead .meta small{display:block;color:var(--muted);font-size:.82rem}
 
 /* the stop and the destination, as on the printed sheets */
-.fromto2{display:flex;flex-direction:column;gap:6px;line-height:1.2}
+.fromto2{display:flex;flex-direction:column;gap:6px;line-height:1.2;flex:1 1 0;min-width:0}.fromto2 .ftN{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fromto2>div{position:relative;padding-left:20px}
 .fromto2 i{position:absolute;left:0;top:50%;width:9px;height:9px;margin-top:-5px;border-radius:50%;box-sizing:border-box}
 .fromto2 .ff{color:var(--muted);font-size:.95rem}.fromto2 .ff i{border:2px solid var(--muted);background:var(--bg)}
@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795461429;
+const APP_BUILD=1795462600;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2244,10 +2244,26 @@ function noteP(ops){const u=[...new Set(ops)],seen=new Set(),out=[];
 function emptyMsg(day,ops,running){const ds=weekDate(day);
   if(ds&&IDX.opEnd&&ops.length&&ops.every(op=>IDX.opEnd[op]&&ds>IDX.opEnd[op]))return `Rozkład ${dayLabel(ds)} nie został jeszcze opublikowany.`;
   return `${running?'Brak odjazdów w tym kierunku':'Linia nie kursuje'} ${dayLabel(ds)}.`}
+// przystanek aktualny i ostatni przy numerze linii (rozkład przystanku, cała trasa); nazwy za długie na miejsce obok numeru
+// skracane (ftFit) według zasad skrótów: najpierw utarte (Dworzec – Dw., Główny – Gł., Osiedle – Os.…), potem ucięcie wyrazu
+// na spółgłosce przed samogłoską z kropką (Świętokrzyska – Świętokrz.), od ostatnich wyrazów; pierwszy wyraz na końcu
+const ft2=(a,b)=>`<div class="fromto2"><div class="ff"><i></i><s></s><span class="ftN" data-full="${esc(a)}">${esc(a)}</span></div><div class="ft"><i></i><span class="ftN" data-full="${esc(b)}">${esc(b)}</span></div></div>`;
+const FT_AB={Dworzec:'Dw.',Główny:'Gł.',Główna:'Gł.',Osiedle:'Os.',Ulica:'ul.',Plac:'pl.',Aleja:'al.',Aleje:'al.',Zajezdnia:'Zaj.',Cmentarz:'Cm.',Uniwersytet:'Uniw.',Szpital:'Szp.'};
+const FT_V=/[aeiouyąęó]/i;
+function ftCuts(w){if(FT_AB[w])return [FT_AB[w]];if(w.length<=5||/\.|\d/.test(w))return [];const out=[];
+  for(let i=w.length-2;i>=3;i--){const c=w[i-1],n=w[i];if(!FT_V.test(c)&&/\p{L}/u.test(c)&&FT_V.test(n))out.push(w.slice(0,i)+'.')}return out}
+function ftFit(root){(root||document).querySelectorAll('.fromto2 .ftN').forEach(el=>{const full=el.dataset.full||'';el.textContent=full;el.title='';
+  const fits=()=>el.scrollWidth<=el.clientWidth+1;if(fits())return;el.title=full;
+  // (najpierw dalsze wyrazy – od ostatniego, każdy stopniowo coraz krócej – a pierwszy dopiero gdy to nie wystarczy)
+  const W=full.split(' '),C=W.map(ftCuts),lv=W.map(()=>0),later=W.map((_,i)=>i).slice(1).reverse();
+  const run=ix=>{for(let step=0;step<8;step++){let any=false;for(const i of ix){if(lv[i]>=C[i].length)continue;any=true;W[i]=C[i][lv[i]++];el.textContent=W.join(' ');if(fits())return true}if(!any)return false}return false};
+  if(!run(later))run([0])})}
+window.addEventListener('resize',()=>{clearTimeout(ftFit.t);ftFit.t=setTimeout(()=>ftFit(),150)});
+// (dopasowanie po każdym wstawieniu nagłówka i jeszcze raz po wczytaniu czcionki – inna szerokość liter)
+new MutationObserver(()=>{if(document.querySelector('.fromto2 .ftN:not([data-ok])')){document.querySelectorAll('.fromto2 .ftN').forEach(e=>e.dataset.ok=1);requestAnimationFrame(()=>ftFit());if(document.fonts)document.fonts.ready.then(()=>ftFit())}}).observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
 function headerHTML(r,line,extra,back,noMap){
-  // (bez przycisku „Wszystkie linie” – do listy linii prowadzi pasek boczny; zostaje tylko powrót do trasy linii)
-  return `${back?`<button class="crumb" type="button" data-go="${back}">← Trasa linii</button>`:''}
-  <div class="lhead">${ICONS[lineIco(r)]}<span id="hc"></span>${withWeek(extra,noMap?null:r)}</div>`;   // (the operator: in the notes under the timetable, its source)
+  // (bez przycisków powrotu „Wszystkie linie” i „Trasa linii” – do listy linii prowadzi pasek boczny, do trasy przycisk wstecz)
+  return `<div class="lhead">${ICONS[lineIco(r)]}<span id="hc"></span>${withWeek(extra,noMap?null:r)}</div>`;   // (the operator: in the notes under the timetable, its source)
 }
 async function renderLine(id){
   const r=IDX.routes.find(x=>x.id===id);if(!r)return renderBoard();
@@ -2256,7 +2272,7 @@ async function renderLine(id){
   const mt=document.getElementById('lineMapTop');if(mt){mt.hidden=false;mt.dataset.showmap=r.id}
   app.innerHTML=headerHTML(r,null,'',null,true)+'<p class="loading">Trwa wczytywanie trasy</p>';
   const L=await loadRoute(id);PER_LS=[L];
-  const d0=L.dirs[0],p0=d0&&d0.pats[0],ft=p0?`<div class="fromto2"><div class="ff"><i></i><s></s>${esc(sName(d0.stops[p0[0]][0]))}</div><div class="ft"><i></i>${esc(d0.head)}</div></div>`:'';
+  const d0=L.dirs[0],p0=d0&&d0.pats[0],ft=p0?ft2(sName(d0.stops[p0[0]][0]),d0.head):'';
   app.innerHTML=headerHTML(r,null,ft,null,true)+'<div class="dirs" id="dirs"></div>';
   document.getElementById('hc').appendChild(chip(r,'big'));
   {const w=lineWarn(r,L);if(w)document.getElementById('hc').insertAdjacentHTML('afterend',w);lineWarnLive(r)}
@@ -2379,7 +2395,7 @@ async function renderStop(id,di,si){
   const st=IDX.stops[d.stops[si][0]];
   document.title=st[0]+' – linia '+r.n;
   const mp=d.pats[0];
-  const extra=`<div class="fromto2"><div class="ff"><i></i><s></s>${esc(st[0])}</div><div class="ft"><i></i>${esc(d.head)}</div></div>
+  const extra=`${ft2(st[0],d.head)}
    <div class="tools">${L.dirs.length>1?'<button class="btn ibtn" type="button" id="swap" title="Zmień kierunek" aria-label="Zmień kierunek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V5M3.5 8.5 7 5l3.5 3.5M17 4v15M13.5 15.5 17 19l3.5-3.5"/></svg></button>':''}<a class="btn ibtn" href="${(S=>stopHash(S[0],'',city==='all'&&['gda','sop','gdy'].includes(S[4])&&stopTowns(S[0]).length>1?S[4]:''))(IDX.stops[d.stops[si][0]]||[''])}" title="Wybrany przystanek" aria-label="Wybrany przystanek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V11"/><rect x="6" y="2" width="12" height="9" rx="1.5"/><path d="M9 6.5h6M8 22h8"/></svg></a>${hubStarBtn(id,di,si)}${PRINT_BTNS}</div>`;
   app.innerHTML=headerHTML(r,L,extra,'l'+id)+`<div class="tt"><div class="side" style="--dot:${badgeColor(r)}"><h2>Przystanki</h2><table><thead><tr><th style="padding-left:6px">min</th><th>Przystanek</th></tr></thead><tbody id="sl"></tbody></table></div><div class="grid" id="grid"></div></div>`;
   document.getElementById('hc').appendChild(chip(r,'big'));
@@ -2562,7 +2578,7 @@ function comboPair(back,front){const inner=k=>ICONS[k].replace(/^<svg[^>]*>/,'')
 // the heading of the combined lines: tram and bus, or two buses in a city without trams (Flensburg)
 const comboHeadIcon=()=>IDX&&IDX.routes.some(r=>inCity(r)&&(r.t==='tram'||r.nt))?ICONS.combo:comboPair('bus','bus');
 function comboHeader(C,extra,back){
-  return back?`<button class="crumb" type="button" data-go="${back}">← Wspólna trasa</button>`+cHead(C,extra):cHead(C,extra)}
+  return cHead(C,extra)}
 function cHead(C,extra){return `
   <div class="lhead">${comboIcon(C.rs)}<span id="hc" style="display:flex;gap:8px;flex-wrap:wrap"></span>${withWeek(extra,{id:C.rs.map(r=>r.id).join(',')})}
    </div>`;
@@ -2596,7 +2612,7 @@ async function renderComboStop(key,ci,i){
   if(!cd||!cd.common[i])return renderCombo(key);
   const name=cd.common[i];PER_LS=C.Ls||[];XD_CUR=xdOf(C.Ls);XD_FRI=xFri(C.Ls);XP_CUR=((C.Ls).find(L=>L&&L.dates&&L.dates['p'+WEEK])||{dates:{}}).dates['p'+WEEK]||null;
   document.title=name+' – linie '+C.rs.map(r=>r.n).join(' + ');
-  const extra=`<div class="fromto2"><div class="ff"><i></i><s></s>${esc(name)}</div><div class="ft"><i></i>${esc(cd.common[cd.common.length-1])}</div></div>
+  const extra=`${ft2(name,cd.common[cd.common.length-1])}
    <div class="tools">${C.dirs.length>1?'<button class="btn ibtn" type="button" id="swap" title="Zmień kierunek" aria-label="Zmień kierunek"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 20V5M3.5 8.5 7 5l3.5 3.5M17 4v15M13.5 15.5 17 19l3.5-3.5"/></svg></button>':''}${PRINT_BTNS}</div>`;
   // the line of the stop list: grey, unless all the combined lines have one colour
   const cDot=new Set(C.rs.map(badgeColor)).size===1?badgeColor(C.rs[0]):'var(--chip-grey)';
