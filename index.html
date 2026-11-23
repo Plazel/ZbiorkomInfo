@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795456501;
+const APP_BUILD=1795456631;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -9062,10 +9062,13 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
   // (dolny wiersz i jego rozmiar zablokowane, dopóki górny wiersz jest pusty)
   const lockB=()=>{const noTop=!String(S.top||'').trim(),noBot=!String(S.bottom||'').trim();A.querySelectorAll('[data-di=bottom],[data-xk=xb],[data-xa=xb]').forEach(x=>{x.disabled=noTop});
     A.querySelectorAll('[data-ds=rows2]').forEach(x=>{x.disabled=noTop||noBot});const bi=A.querySelector('[data-di=bottom]');if(bi)bi.placeholder=trS(noTop?'Najpierw wpisz górny wiersz':'np. przez Politechnikę')};
-  A.querySelectorAll('[data-di]').forEach(i=>i.oninput=()=>{S[i.dataset.di]=i.value;dbdTyping();dbdKeep();dbdPaint();lockB()});lockB();
+  // (limit znaków pilnowany przy każdej zmianie – klawiatury telefonów w trakcie składania słowa (kompozycja) omijają maxlength,
+// a zatwierdzenie słowa literą wstawiało wszystkie wcześniej „zablokowane” cyfry)
+  const cap=i=>{const m=+i.getAttribute('maxlength')||0;if(m>0&&i.value.length>m){const p=Math.min(i.selectionStart||m,m);i.value=i.value.slice(0,m);try{i.setSelectionRange(p,p)}catch(e){}}};
+  A.querySelectorAll('[data-di]').forEach(i=>{i.oninput=()=>{cap(i);S[i.dataset.di]=i.value;dbdTyping();dbdKeep();dbdPaint();lockB()};i.addEventListener('compositionend',()=>{if((+i.getAttribute('maxlength')||0)>0&&i.value.length>+i.getAttribute('maxlength'))i.oninput()})});lockB();
   A.querySelectorAll('[data-dp]').forEach(b=>{b.onclick=()=>{S.picto=b.dataset.dp;dbdKeep();dbdRender()};const cv=b.querySelector('canvas');if(cv){const g=DPB.PICTOS[b.dataset.dp],ox=Math.floor((27-g.w)/2),oy=Math.floor((24-g.h)/2);
     dbdDots(cv,27,24,(x,y)=>{const bx=x-ox,by=y-oy;return bx>=0&&by>=0&&bx<g.w&&by<g.h&&g.px[by*g.w+bx]?'#ffffff':null},cv.closest('.dbdPicL')?34:68,false)}});   // (lista piktogramów: szerokość 34 px – wysokość z proporcji, bez rozciągania)
-  A.querySelectorAll('[data-xk]').forEach(i=>i.oninput=()=>{S[i.dataset.xk][+i.dataset.xi]=i.value;dbdTyping();dbdAnim(true);dbdKeep();dbdPaint()});
+  A.querySelectorAll('[data-xk]').forEach(i=>i.oninput=()=>{cap(i);S[i.dataset.xk][+i.dataset.xi]=i.value;dbdTyping();dbdAnim(true);dbdKeep();dbdPaint()});
   A.querySelectorAll('[data-xx]').forEach(b=>b.onclick=()=>{S[b.dataset.xx].splice(+b.dataset.xi,1);dbdAnim(true);dbdKeep();dbdRender()});
   A.querySelectorAll('[data-xa]').forEach(b=>b.onclick=()=>{const k=b.dataset.xa;S[k].push('');dbdAnim(true);dbdKeep();dbdRender();const l=A.querySelectorAll('[data-xk='+k+']');if(l.length)l[l.length-1].focus()});
   const ev=document.getElementById('dbdEvery');if(ev)ev.oninput=()=>{S.every=+ev.value;document.getElementById('dbdEv').textContent=S.every+' s';dbdAnim(true);dbdKeep()};
