@@ -962,6 +962,8 @@ ROWS = [
     ('Edytuj', 'Edit', 'Bearbeiten', 'Upraviť', 'Upravit'),
     ('Wstaw przystanek', 'Insert a stop', 'Haltestelle einfügen', 'Vložiť zastávku', 'Vložit zastávku'),
     ('Brak sygnału GPS', 'No GPS signal', 'Kein GPS-Signal', 'Žiadny signál GPS', 'Žádný signál GPS'),
+    ('mSIP (TEST)', 'mSIP (TEST)', 'mSIP (TEST)', 'mSIP (TEST)', 'mSIP (TEST)'),
+    ('Przełącznik w ustawieniach', 'Switch in the settings', 'Schalter in den Einstellungen', 'Prepínač v nastaveniach', 'Přepínač v nastavení'),
 ]
 
 WEEKDAYS = {
