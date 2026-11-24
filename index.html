@@ -915,7 +915,7 @@ nav.rail .navMore button{flex-direction:column!important;justify-content:center!
 .tkList li{display:grid;grid-template-columns:52px auto 1fr 64px;gap:10px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--line);font-size:.9rem}
 .tkList li .tm{font-variant-numeric:tabular-nums;font-weight:600}.tkList li .hd{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tkList li .gp{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
-.tkList li.hl{background:var(--hlbg)}.tkList li.hl .gp{color:var(--fg);font-weight:600}
+.tkList li.hl{background:rgba(211,47,47,.13)}.tkList li.hl .gp{color:#d32f2f;font-weight:600}.tkList.tkCmp{column-width:230px;column-gap:18px;border-top:0}.tkList.tkCmp li{break-inside:avoid;grid-template-columns:42px auto minmax(0,1fr) 50px;gap:6px;padding:2px 4px;font-size:.84rem}.tkList.tkCmp li .hd{font-size:.8rem}.tkList.tkCmp .chip{transform:scale(.8);margin:-3px -2px}.tkHead{display:flex;justify-content:flex-end;margin:4px 0}
 .tkList li.out{opacity:.45}
 .tdMsg{background:var(--panel);border-radius:8px;padding:12px 14px;font-size:.9rem;margin:12px 0}
 .bgList{list-style:none;margin:8px 0 0;padding:0}
@@ -996,7 +996,7 @@ html.co-map-schema [data-mv=schema],html.co-map-schema [data-mv=schemaN],html.co
 .slist li.noDep button,tr.noDep button.sb{cursor:default;pointer-events:none}.slist li.noDep button:disabled,tr.noDep button.sb:disabled{color:inherit;opacity:1}.slist li.noDep button:hover,tr.noDep button.sb:hover{background:none}
 [data-mv=schema],[data-mv=schemaN]{display:none!important}   /* (the diagrams: off for now, see SCHEMA_OFF) */
 /* ---- html.flat: buttons without frames, smaller gaps between them (remove the class to undo) */
-html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
+html.flat button:not(.chip):not(.sw-depot):not([role=switch]):not(.mapPop *):not(.ssel),html.flat .plus,html.flat .btn,html.flat .crumb,html.flat .accBtn,html.flat .seg>button,html.flat a.btn{border-color:transparent!important;box-shadow:none!important}
 html.flat #gsBtn{border-color:var(--line)!important}html.flat header.top .themebar{gap:2px!important}   /* (the search box keeps its frame round the button too) */html.flat .gdBtns,html.flat .ibtns,html.flat .lhBtns,html.flat .seg{gap:2px!important}html.flat .seg>button+button{margin-left:0!important}
 html.flat button.plus:hover,html.flat .crumb:hover,html.flat .btn:hover,html.flat .ibtn:hover,html.flat .moreMenu button:hover,html.flat #topMoreMenu .plus:hover{background:var(--hover,rgba(127,127,127,.12))!important;color:var(--fg)!important}html.flat button.plus:hover svg,html.flat .moreMenu button:hover svg,html.flat .btn:hover svg,html.flat .ibtn:hover svg{color:var(--fg)!important;opacity:1!important}   /* (the icon stays dark on the light background of the pointer) */
 html.flat .seg>button[aria-pressed=true],html.flat .seg>button.on{border-color:transparent!important}
@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795552037;
+const APP_BUILD=1795552371;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -9466,7 +9466,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('.hubStar');if(!b
 // ---- Takty: the joint departures of chosen lines at a common stop, with the gaps between them ----
 const TK={city:null,lines:[],dir:0,stop:'',date:'',hl:false,op:'gt',x:15,from:'',to:'',C:null,ckey:''};
 function tkLoad(){if(TK.city===city)return;Object.assign(TK,{city,dir:0,stop:'',C:null,ckey:''},store.get('ztm.takt.'+city,{lines:[]}));TK.lines=(TK.lines||[]).filter(n=>lineIn(n))}
-function tkSave(){store.set('ztm.takt.'+city,{lines:TK.lines,hl:TK.hl,op:TK.op,x:TK.x,from:TK.from,to:TK.to})}
+function tkSave(){store.set('ztm.takt.'+city,{lines:TK.lines,hl:TK.hl,op:TK.op,x:TK.x,from:TK.from,to:TK.to,cols:!!TK.cols})}
 // one line on its own: its directions with the stops of the main route
 function singleCombo(r,L){return {ids:[r.id],Ls:[L],rs:[r],dirs:L.dirs.map((d,di)=>{const names=[];d.pats[0].forEach(i=>{const n=sName(d.stops[i][0]);if(!names.includes(n))names.push(n)});return {members:[{li:0,di}],common:names}})}}
 // departures at a stop name of one direction of a line on a plan key; on a loop the visit given by "pref" counts
@@ -9478,8 +9478,8 @@ function depsAtKey(d,name,k,pref){const by=new Map();const plan=planOf(d,k);
   return [...by.values()]}
 async function tkRender(){if(!IDX)return;tkLoad();const box=document.getElementById('tdTakt');
   if(!TK.date||!winDays().some(x=>x.ds===TK.date))TK.date=(winDays()[0]||{}).ds||'';
-  box.innerHTML=`<h2>Takty</h2><p class="hint">Łączny rozkład wybranych linii na wspólnym przystanku: kolejne odjazdy, odstęp od poprzedniego kursu i średni czas oczekiwania.</p>
-   <div class="tdGrid"><label class="tdF wide"><span>Linie (wpisz numer i naciśnij Enter)</span><div class="tdLines" id="tkTags"><input id="tkIn" placeholder="${TK.lines.length?'dodaj linię':'np. '+esc(comboEx())}" autocomplete="off" aria-label="Dodaj linię"></div></label></div>
+  box.innerHTML=`<h2>Takty</h2>
+   <div class="tdGrid"><label class="tdF wide"><span>Linie</span><div class="tdLines" id="tkTags"><input id="tkIn" placeholder="${TK.lines.length?'dodaj linię':'np. '+esc(comboEx())}" autocomplete="off" aria-label="Dodaj linię"></div></label></div>
    <div id="tkMain"></div>`;
   const tags=document.getElementById('tkTags'),inp=document.getElementById('tkIn');
   lineAC(inp,tags,n=>{inp.value=n;add()},n=>!TK.lines.includes(n));
@@ -9509,7 +9509,9 @@ async function tkRender(){if(!IDX)return;tkLoad();const box=document.getElementB
      <select id="tkOp" class="tdIn"><option value="gt"${TK.op==='gt'?' selected':''}>większy niż</option><option value="lt"${TK.op==='lt'?' selected':''}>mniejszy niż</option><option value="eq"${TK.op==='eq'?' selected':''}>równy</option></select>
      <input type="number" id="tkX" class="tdIn" min="0" max="240" value="${TK.x}"> min</div>
     <div class="tdCond">Statystyka w godzinach <input type="time" id="tkFrom" class="tdIn" value="${TK.from}"> – <input type="time" id="tkTo" class="tdIn" value="${TK.to}"><button type="button" class="btn" id="tkAll"${TK.from||TK.to?'':' hidden'}>cały dzień</button></div>
-    <div class="tdStats" id="tkStats"></div><ol class="tkList" id="tkList"></ol>`;
+    <div class="tdStats" id="tkStats"></div><div class="tkHead"><button type="button" class="accBtn icoBtn${TK.cols?' on':''}" id="tkCols" aria-pressed="${!!TK.cols}" title="Widok kompaktowy" aria-label="Widok kompaktowy"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M9 4v16M15 4v16"/></svg></button></div><ol class="tkList${TK.cols?' tkCmp':''}" id="tkList"></ol>`;
+  // (widok kompaktowy: odjazdy w kolumnach obok siebie – więcej na ekranie bez przewijania; zapamiętywany)
+  document.getElementById('tkCols').onclick=e=>{TK.cols=!TK.cols;tkSave();const b=e.currentTarget;b.classList.toggle('on',TK.cols);b.setAttribute('aria-pressed',TK.cols);document.getElementById('tkList').classList.toggle('tkCmp',TK.cols)};
   TK.date=daySelect(document.getElementById('tkDate'),TK.date);
   const on=(id,ev,f)=>document.getElementById(id).addEventListener(ev,f);
   on('tkDir','change',e=>{TK.dir=+e.target.value;TK.stop='';tkRender()});
