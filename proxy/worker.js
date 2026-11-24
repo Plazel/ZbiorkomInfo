@@ -278,7 +278,7 @@ async function konta(req, env, cors) {
         .map(m => { while (m.length < 5) m.push(''); return m; }).filter(m => m.some(Boolean)) : null;
       if ('l2' in b) c.l2 = ['pl', 'en', 'de', 'sk', 'cs'].includes(b.l2) ? b.l2 : null;
       // what the drivers may do: change the announcements' settings, use the special announcements, the microphone, trips without a duty
-      if ('perm' in b && b.perm && typeof b.perm === 'object') { c.perm = c.perm || {}; for (const k of ['ann', 'spec', 'mic', 'free']) if (k in b.perm) c.perm[k] = b.perm[k] !== false; }
+      if ('perm' in b && b.perm && typeof b.perm === 'object') { c.perm = c.perm || {}; for (const k of ['ann', 'spec', 'mic', 'free', 'voice']) if (k in b.perm) c.perm[k] = b.perm[k] !== false; }
       // the components each role may use: {guest|user|driver: [the switched-off sections and options]}
       if ('comp' in b) { const o = {}; if (b.comp && typeof b.comp === 'object') for (const r of ['guest', 'user', 'driver']) o[r] = (Array.isArray(b.comp[r]) ? b.comp[r] : []).map(String).filter(k => /^[a-zA-Z.]{2,24}$/.test(k)).slice(0, 60); c.comp = o; }
       // approved proposals (ids of the proposals from data/propozycje.json, with what was approved): applied for everyone
@@ -286,6 +286,10 @@ async function konta(req, env, cors) {
         .map(x => ({ id: x.id, at: typeof x.at === 'string' ? x.at.slice(0, 30) : new Date().toISOString(), d: x.d && typeof x.d === 'object' && JSON.stringify(x.d).length <= 4000 ? x.d : null }));
       // sections or options given to single accounts, whatever their group: {account id: [keys]}
       if ('ucomp' in b) { const own = await ownIds(env, u.id), o = {}; for (const [k, v] of Object.entries(c.ucomp || {})) if (!own.has(k)) o[k] = v; if (b.ucomp && typeof b.ucomp === 'object') for (const [id, L] of Object.entries(b.ucomp).slice(0, 300)) { if (!/^[A-Za-z0-9_-]{4,40}$/.test(id) || !Array.isArray(L) || !own.has(id)) continue; const k = L.map(String).filter(x => /^[a-zA-Z.]{2,24}$/.test(x)).slice(0, 60); if (k.length) o[id] = k; } c.ucomp = o; }
+      // emergency route changes (Zmiany tras): [{id, c: city, r: line id, d: direction, h: its head, ps: the stops in order, on}]
+      if ('awr' in b) c.awr = (Array.isArray(b.awr) ? b.awr : []).filter(x => x && typeof x === 'object' && /^[a-z0-9]{2,24}$/.test(String(x.id || '')) && Array.isArray(x.ps)).slice(0, 100)
+        .map(x => ({ id: String(x.id), c: String(x.c || '').slice(0, 24), r: String(x.r || '').slice(0, 60), d: Math.max(0, Math.min(30, x.d | 0)), h: String(x.h || '').slice(0, 120),
+          ps: x.ps.slice(0, 300).filter(v => typeof v === 'number' || (typeof v === 'string' && v.length <= 40)), on: x.on !== false }));
       if ('no' in b) c.no = (Array.isArray(b.no) ? b.no : []).map(String).filter(x => x.length <= 80).slice(0, 500);
       await env.KONTA.put('cfg:mk', JSON.stringify(c)); { const own = await ownIds(env, u.id), out = Object.assign({}, c); out.ucomp = Object.fromEntries(Object.entries(c.ucomp || {}).filter(([k]) => own.has(k))); return J(out); }
     }

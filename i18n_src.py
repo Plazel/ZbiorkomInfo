@@ -953,6 +953,15 @@ ROWS = [
     ('Druk rozkładów', 'Timetable printing', 'Fahrplandruck', 'Tlač cestovných poriadkov', 'Tisk jízdních řádů'),
     ('Całe linie', 'Whole lines', 'Ganze Linien', 'Celé linky', 'Celé linky'),
     ('Plik', 'File', 'Datei', 'Súbor', 'Soubor'),
+    ('Kierowca może włączać i wyłączać zapowiedzi', 'The driver may switch the announcements on and off', 'Der Fahrer darf die Ansagen ein- und ausschalten', 'Vodič môže zapínať a vypínať hlásenia', 'Řidič může zapínat a vypínat hlášení'),
+    ('Zmiana trasy', 'Route change', 'Umleitung', 'Zmena trasy', 'Změna trasy'),
+    ('Zmiana trasy ze zmianą krańca', 'Route change with a different terminus', 'Umleitung mit anderer Endhaltestelle', 'Zmena trasy so zmenou konečnej', 'Změna trasy se změnou konečné'),
+    ('Zmiana trasy ze zmianą zapowiedzi', 'Route change with changed announcements', 'Umleitung mit geänderten Ansagen', 'Zmena trasy so zmenou hlásení', 'Změna trasy se změnou hlášení'),
+    ('Zmiany tras', 'Route changes', 'Umleitungen', 'Zmeny trás', 'Změny tras'),
+    ('Nowa zmiana', 'New change', 'Neue Änderung', 'Nová zmena', 'Nová změna'),
+    ('Edytuj', 'Edit', 'Bearbeiten', 'Upraviť', 'Upravit'),
+    ('Wstaw przystanek', 'Insert a stop', 'Haltestelle einfügen', 'Vložiť zastávku', 'Vložit zastávku'),
+    ('Brak sygnału GPS', 'No GPS signal', 'Kein GPS-Signal', 'Žiadny signál GPS', 'Žádný signál GPS'),
 ]
 
 WEEKDAYS = {
