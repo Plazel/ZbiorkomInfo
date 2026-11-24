@@ -97,7 +97,10 @@ async function alerts(cors) {
     const linesOf = t => { const m = t.match(/^Lini[ae]\s+([^:]+):/); return m ? m[1].split(/\s*,\s*|\s+i\s+|\s+oraz\s+/).map(x => x.trim()).filter(x => /^[A-Z]?\d{1,3}[A-Z]?$|^[A-Z]\d*$/.test(x)) : []; };
     out = await Promise.all(items.concat(info).map(async x => {
       let text = '';
-      if (/^https:\/\/ztm\.gda\.pl\//.test(x.url)) { try { const a = await get(x.url); const c = (a.match(/class="article-content[^"]*">([\s\S]*?)<div class="row">/) || ['', ''])[1]; text = strip(c).slice(0, 2000); } catch (e) {} }
+      if (/^https:\/\/ztm\.gda\.pl\//.test(x.url)) { try { const a = await get(x.url); const c = (a.match(/class="article-content[^"]*">([\s\S]*?)<div class="row">/) || ['', ''])[1];
+        // (wstęp komunikatu – akapit nad treścią, osobno w "article-summary" – też, na początku)
+        const lead = strip((a.match(/class="article-summary[^"]*">([\s\S]*?)<\/div>/) || ['', ''])[1]);
+        text = [lead, strip(c)].filter(Boolean).join('\n').slice(0, 2400); } catch (e) {} }
       const o = { title: x.title, url: x.url, text: text || x.sum || '' };
       if (x.info) { o.info = true; o.date = x.date; const l = linesOf(x.title); if (l.length) o.lines = l; }
       return o;
