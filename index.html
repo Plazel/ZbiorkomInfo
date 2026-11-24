@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795554567;
+const APP_BUILD=1795554636;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -9170,6 +9170,8 @@ const DBD_SY=(()=>{const sv=d=>`<svg viewBox="0 0 24 24" width="20" height="20" 
     left:sv('<path d="M4 6h16M4 10h10M4 14h16M4 18h10"/>'),center:sv('<path d="M4 6h16M7 10h10M4 14h16M7 18h10"/>'),
     fit:sv('<path d="M3 12h6M6 9l3 3-3 3M21 12h-6M18 9l-3 3 3 3"/>'),scroll:sv('<path d="M3 12h14M13 8l4 4-4 4M21 6v12"/>')}})();
 const DBD_SW=['#d2001a','#d95300','#ffd500','#3f7d00','#006b2d','#00726c','#0063b5','#1c3a9e','#66217c','#bf0067','#734419','#545c66','#8b0000','#e8401c','#f5a300','#7ab800','#00a19a','#0098d4','#003f87','#9b2589','#e5007d','#a5682a','#000000','#8a939c'];   /* (deep enough for the white number; yellow takes a dark one) */
+// (zmiana tekstu wiersza zawsze co 6 s – bez ustawienia)
+const DBD_EVERY=6;
 const DBD_KEYS=['line','color','digits','box','top','bottom','align','picto','xt','xb','every','ink','rows2','mode','long','case','flap','dir'];
 // (the three modes: white or amber LEDs – the number lit, or with "Kontrast" black in a field of the LEDs' colour – or coloured:
 // the number in a field of its colour; boards saved before the modes keep their look)
@@ -9179,7 +9181,7 @@ function dbdRS(S){let m=dbdMode(S);if(m==='flap')m='color';if(m==='color')return
 // (the board shown first: one of the language's own)
 const DBD_LANG={pl:{line:'6',color:'#d2001a',top:'Jelitkowo'},en:{line:'74',color:'#66217c',top:'Baker Street'},de:{line:'12',color:'#1c3a9e',top:'Teufelsbrück (F)'},
   sk:{line:'3',color:'#d2001a',top:'Petržalka'},cs:{line:'199',mode:'amber',top:'Želivského'}};
-const DBD_BASE={line:'',color:'#0063b5',digits:'auto',mode:'color',box:'on',top:'',bottom:'',align:'center',picto:'none',anim:'none',alts:'',every:12,ink:'white',rows2:'small',long:'fit',case:'upper',id:null};
+const DBD_BASE={line:'',color:'#0063b5',digits:'auto',mode:'color',box:'on',top:'',bottom:'',align:'center',picto:'none',anim:'none',alts:'',every:6,ink:'white',rows2:'small',long:'fit',case:'upper',id:null};
 const dbdDef=()=>Object.assign({},DBD_BASE,DBD_LANG[LANG]||DBD_LANG.pl);
 const DBD_PIC=[['none','Brak'],['train','Pociąg'],['plane','Samolot'],['cemetery','Cmentarz'],['candle','Znicz'],['ferry','Prom'],['lion','Lew'],['pine','Sosna'],['sbahn','S-Bahn'],['ubahn','U-Bahn'],['faehre','Prom (F)'],['metroWaw','Metro (Warszawa)'],['metroPrg','Metro (Praga)'],['hospital','Szpital'],['factory','Fabryka'],['park','Park'],['car','Samochód'],['pr','P+R'],['castle','Zamek'],['shipyard','Stocznia'],['beach','Plaża'],['detour','Objazd']];
 const dbdList=()=>{const a=ACC.data.dboards;return Array.isArray(a)?a:(ACC.data.dboards=[])};
@@ -9201,7 +9203,7 @@ function dbdX(S){if(!Array.isArray(S.xt)||!Array.isArray(S.xb)){const fr=dbdFr(S
     S.xt=cut(a==='top'||a==='both'?fr.map(f=>f.t||''):[]);S.xb=cut(a==='bottom'||a==='both'?fr.map(f=>f.b||''):[]);S.anim='none'}return [S.xt,S.xb]}
 function dbdOpts(){const S=DBD.st,[xt,xb]=dbdX(S),tr=x=>String(x||'').trim(),n=1+Math.max(xt.length,xb.length);if(n<2)return [];
   return Array.from({length:n},(_,i)=>({top:i&&tr(xt[i-1])||tr(S.top),bottom:i&&tr(xb[i-1])||tr(S.bottom)}))}
-function dbdAnim(keep){clearInterval(DBD.anim);if(!keep)DBD.ai=0;const n=dbdOpts().length;if(n>1)DBD.anim=setInterval(()=>{if(TD.view!=='dbd'){clearInterval(DBD.anim);return}DBD.ai=(DBD.ai+1)%n;DBD.flip=true;dbdPaint();DBD.flip=false},(+DBD.st.every||12)*1000)}
+function dbdAnim(keep){clearInterval(DBD.anim);if(!keep)DBD.ai=0;const n=dbdOpts().length;if(n>1)DBD.anim=setInterval(()=>{if(TD.view!=='dbd'){clearInterval(DBD.anim);return}DBD.ai=(DBD.ai+1)%n;DBD.flip=true;dbdPaint();DBD.flip=false},DBD_EVERY*1000)}
 // the floating row: a step of one LED every 40 ms while the board is open and a row is too long ("Przewijaj"); otherwise still at its start
 // ---- FlipDot (tryb „flap”): ta sama siatka punktów co tablice cyfrowe (DPB.W × DPB.H, ten sam rozmiar), ale każdy punkt to
 // obracany krążek – żółty (zapalony) albo czarny (zgaszony) na ciemnym tle, bez poświaty; przy zmianie tekstu krążki, które się
@@ -9246,7 +9248,7 @@ async function dbdExport(kind,btn){if(dbdMode(DBD.st)==='flap'){const cv=documen
   const old=btn.innerHTML,oldT=btn.title;btn.disabled=true;btn.title=trS('Trwa przygotowywanie pliku');btn.classList.add('busy');
   try{if(kind==='jpg'){const cur=o.length>1?Object.assign({},S,o[DBD.ai%o.length]):S,c=dbdFrame(cur,1600);
       await saveBlob(base+'.jpg',await new Promise(r=>c.toBlob(r,'image/jpeg',.92)))}
-    else{const G=await import('https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js'),enc=G.GIFEncoder(),d=(+S.every||12)*1000;
+    else{const G=await import('https://cdn.jsdelivr.net/npm/gifenc@1.0.3/dist/gifenc.esm.js'),enc=G.GIFEncoder(),d=DBD_EVERY*1000;
       for(const t of o){const c=dbdFrame(Object.assign({},S,t),1000),px=c.getContext('2d').getImageData(0,0,c.width,c.height).data,pal=G.quantize(px,256);
         enc.writeFrame(G.applyPalette(px,pal),c.width,c.height,{palette:pal,delay:d});await new Promise(r=>setTimeout(r))}
       enc.finish();await saveBlob(base+'.gif',new Blob([enc.bytes()],{type:'image/gif'}))}}
@@ -9277,7 +9279,6 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
       ${M==='color'?`<div class="dbdF"><span>${esc(trS('Kolor pola'))}</span><span class="krCols2 dbdSw">${DBD_SW.map(c=>`<button type="button" class="krSw" data-dc="${c}" style="background:${c}" aria-pressed="${String(S.color).toLowerCase()===c}" aria-label="${c}"></button>`).join('')}<label class="krSw dbdCust" style="background:${custom?esc(S.color):'#444a52'}" aria-pressed="${custom}" title="${esc(trS('Własny kolor'))}">+<input type="color" id="dbdCol" value="${/^#[0-9a-f]{6}$/i.test(S.color)?S.color:'#444a52'}"></label></span></div>`:`<div class="dbdF"><span>${esc(trS(M==='flap'?'Wyświetlacz':'Cyfry'))}</span>${M==='flap'?seg('flap',[['std','Standardowy'],['contrast','Kontrast']]):seg('digits',[['auto','Auto'],['contrast','Kontrast']])}</div>`}</div>
       <div class="dbdF"><span>${esc(trS('Górny wiersz'))}</span>${multi('top','xt','np. Jelitkowo',48)}</div>
       <div class="dbdF"><span>${esc(trS('Dolny wiersz'))}</span>${multi('bottom','xb',String(S.top||'').trim()?'np. przez Politechnikę':'Najpierw wpisz górny wiersz',60)}</div>
-      ${S.xt.length||S.xb.length?`<div class="dbdF dbdFw"><span>${esc(trS('Zmiana tekstu co'))}</span><label class="dbdEvL"><input type="range" id="dbdEvery" min="3" max="30" step="1" value="${+S.every||12}"><b id="dbdEv">${+S.every||12} s</b></label></div>`:''}
       <div class="dbdF dbdFw"><span>${esc(trS('Piktogram'))}</span><div class="dbdPics dbdPicS">${DBD_PIC.map(([k,t])=>`<button type="button" data-dp="${k}" aria-pressed="${(S.picto||'none')===k}" title="${esc(trS(t))}" aria-label="${esc(trS(t))}">${k==='none'?'<span class="dbdNo">—</span>':'<canvas></canvas>'}</button>`).join('')}</div></div>
     </div></div>
     <aside class="dbdSide"><div class="dbdLH"><button type="button" class="dbdUp" id="dbdUp"${DBD.fd?'':' hidden'} aria-label="${esc(trS('Wstecz'))}"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button><h3>${esc(trS('Zapisane tablice'))} <small>(${L.length})</small></h3><button type="button" class="accBtn" id="dbdNM" hidden>${esc(trS('Generuj tablice z NetworkMakera'))}</button><span class="accMsg" id="dbdNMst"></span></div><ul class="dbdList persList">${L.length?'':`<li class="hint">${esc(trS('Nie masz jeszcze zapisanych tablic.'))}</li>`}</ul></aside></div>`;
@@ -9298,7 +9299,7 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
   A.querySelectorAll('[data-xk]').forEach(i=>i.oninput=()=>{cap(i);S[i.dataset.xk][+i.dataset.xi]=i.value;dbdAnim(true);dbdKeep();dbdPaint()});
   A.querySelectorAll('[data-xx]').forEach(b=>b.onclick=()=>{S[b.dataset.xx].splice(+b.dataset.xi,1);dbdAnim(true);dbdKeep();dbdRender()});
   A.querySelectorAll('[data-xa]').forEach(b=>b.onclick=()=>{const k=b.dataset.xa;S[k].push('');dbdAnim(true);dbdKeep();dbdRender();const l=A.querySelectorAll('[data-xk='+k+']');if(l.length)l[l.length-1].focus()});
-  const ev=document.getElementById('dbdEvery');if(ev)ev.oninput=()=>{S.every=+ev.value;document.getElementById('dbdEv').textContent=S.every+' s';dbdAnim(true);dbdKeep()};
+
   // saving: into the account's data (the order of the list is the order kept)
   const save=asNew=>{const old=!asNew&&L.find(b=>b.id===S.id),row=dbdAutoFd(Object.assign(dbdCfg(),{id:old?old.id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),fd:old?(old.fd||''):(S.fd||''),fdM:old?old.fdM:S.fdM}));
     if(old)L[L.indexOf(old)]=row;else L.unshift(row);S.id=row.id;DBD.snap=JSON.stringify(dbdCfg());accSave();dbdKeep();dbdRender()};
