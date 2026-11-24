@@ -948,6 +948,7 @@ ROWS = [
     ('Wczytywanie mapy…', 'Loading the map…', 'Karte wird geladen…', 'Načítava sa mapa…', 'Načítá se mapa…'),
     ('Nie udało się wczytać mapy', 'The map could not be loaded', 'Die Karte konnte nicht geladen werden', 'Mapu sa nepodarilo načítať', 'Mapu se nepodařilo načíst'),
     ('Schemat nie jest jeszcze dostępny.', 'The diagram is not available yet.', 'Der Netzplan ist noch nicht verfügbar.', 'Schéma zatiaľ nie je k dispozícii.', 'Schéma zatím není k dispozici.'),
+    ('Zaznaczone:', 'Selected:', 'Ausgewählt:', 'Vybrané:', 'Vybrané:'),
 ]
 
 WEEKDAYS = {
