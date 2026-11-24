@@ -950,6 +950,9 @@ ROWS = [
     ('Schemat nie jest jeszcze dostępny.', 'The diagram is not available yet.', 'Der Netzplan ist noch nicht verfügbar.', 'Schéma zatiaľ nie je k dispozícii.', 'Schéma zatím není k dispozici.'),
     ('Zaznaczone:', 'Selected:', 'Ausgewählt:', 'Vybrané:', 'Vybrané:'),
     ('Wstecz', 'Back', 'Zurück', 'Späť', 'Zpět'),
+    ('Druk rozkładów', 'Timetable printing', 'Fahrplandruck', 'Tlač cestovných poriadkov', 'Tisk jízdních řádů'),
+    ('Całe linie', 'Whole lines', 'Ganze Linien', 'Celé linky', 'Celé linky'),
+    ('Plik', 'File', 'Datei', 'Súbor', 'Soubor'),
 ]
 
 WEEKDAYS = {
