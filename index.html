@@ -1837,7 +1837,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795552371;
+const APP_BUILD=1795553047;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -9239,10 +9239,12 @@ async function dbdExport(kind,btn){if(dbdMode(DBD.st)==='flap'){const cv=documen
       enc.finish();await saveBlob(base+'.gif',new Blob([enc.bytes()],{type:'image/gif'}))}}
   catch(e){console.error(e);alert(trS('Nie udało się utworzyć pliku.'))}
   finally{btn.disabled=false;btn.innerHTML=old;btn.title=oldT;btn.classList.remove('busy')}}
+// folder zapisanej tablicy z numeru jej linii – sam, dopóki folderu nie wybrano ręcznie (fdM); zmiana linii przenosi tablicę
+function dbdAutoFd(b){if(b.fdM)return b;const n=String(b.line||'').trim().toUpperCase();b.fd=n;return b}
 function dbdFdMenu(btn,b,L){document.querySelectorAll('.dbdFdM').forEach(x=>x.remove());const M=document.createElement('div');M.className='dbdFdM';M.setAttribute('role','menu');
-  const fds=[...new Set(L.map(x=>x.fd||'').filter(Boolean))].sort((a,c)=>a.localeCompare(c,'pl'));
+  const fds=[...new Set(L.map(x=>x.fd||'').filter(Boolean))].sort((a,c)=>a.localeCompare(c,'pl',{numeric:true}));
   M.innerHTML=[['',trS('Bez folderu')],...fds.map(f=>[f,f])].map(([v,t])=>`<button type="button" role="menuitem" data-f="${esc(v)}" aria-pressed="${(b.fd||'')===v}">${esc(t)}</button>`).join('')+`<div class="dbdFdN"><input type="text" class="tdIn" maxlength="40" placeholder="${esc(trS('Nowy folder'))}"><button type="button" class="accBtn">${esc(trS('Dodaj'))}</button></div>`;
-  btn.parentNode.style.position='relative';btn.parentNode.append(M);const set=f=>{b.fd=f;accSave();M.remove();dbdRender()};
+  btn.parentNode.style.position='relative';btn.parentNode.append(M);const set=f=>{b.fd=f;b.fdM=1;accSave();M.remove();dbdRender()};
   M.querySelectorAll('[data-f]').forEach(x=>x.onclick=()=>set(x.dataset.f));const inp=M.querySelector('input');M.querySelector('.dbdFdN button').onclick=()=>{const v=inp.value.trim();if(v)set(v)};inp.onkeydown=e=>{if(e.key==='Enter'){const v=inp.value.trim();if(v)set(v)}};
   setTimeout(()=>{const out=e=>{if(!M.contains(e.target)){M.remove();document.removeEventListener('pointerdown',out)}};document.addEventListener('pointerdown',out)},0)}
 function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='dbd')return;dpbInit();if(DBD.st&&!DBD.st.long)DBD.st.long='fit';if(DBD.st&&!DBD.st.case)DBD.st.case='upper';
@@ -9285,7 +9287,7 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
   A.querySelectorAll('[data-xa]').forEach(b=>b.onclick=()=>{const k=b.dataset.xa;S[k].push('');dbdAnim(true);dbdKeep();dbdRender();const l=A.querySelectorAll('[data-xk='+k+']');if(l.length)l[l.length-1].focus()});
   const ev=document.getElementById('dbdEvery');if(ev)ev.oninput=()=>{S.every=+ev.value;document.getElementById('dbdEv').textContent=S.every+' s';dbdAnim(true);dbdKeep()};
   // saving: into the account's data (the order of the list is the order kept)
-  const save=asNew=>{const old=!asNew&&L.find(b=>b.id===S.id),row=Object.assign(dbdCfg(),{id:old?old.id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),fd:old?(old.fd||''):(S.fd||'')});
+  const save=asNew=>{const old=!asNew&&L.find(b=>b.id===S.id),row=dbdAutoFd(Object.assign(dbdCfg(),{id:old?old.id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),fd:old?(old.fd||''):(S.fd||''),fdM:old?old.fdM:S.fdM}));
     if(old)L[L.indexOf(old)]=row;else L.unshift(row);S.id=row.id;DBD.snap=JSON.stringify(dbdCfg());accSave();dbdKeep();dbdRender()};
   {const eb=document.getElementById('dbdExpB'),em=document.getElementById('dbdExpM'),shut=()=>{em.hidden=true;eb.setAttribute('aria-expanded','false');document.removeEventListener('pointerdown',out)},
     out=e=>{if(!e.target.closest('.dbdExp'))shut()};
@@ -9294,18 +9296,19 @@ function dbdRender(){const A=document.getElementById('tdDbd');if(!A||TD.view!=='
     em.querySelectorAll('[data-ex]').forEach(b=>b.onclick=()=>{shut();dbdExport(b.dataset.ex,eb)})}
   document.getElementById('dbdSave').onclick=()=>save(false);document.getElementById('dbdSaveNew').onclick=()=>save(true);
   // (nowa tablica: bieżąca najpierw zapisana, a nowa zaczyna z tą samą treścią – np. ta sama linia w drugim kierunku)
-  document.getElementById('dbdNew').onclick=()=>{const has=String(S.line||'').trim()||String(S.top||'').trim();if(has&&(!S.id||JSON.stringify(dbdCfg())!==DBD.snap)){const old=L.find(b=>b.id===S.id),row=Object.assign(dbdCfg(),{id:old?old.id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),fd:old?old.fd:(S.fd||'')});if(old)L[L.indexOf(old)]=row;else L.unshift(row);accSave()}
+  document.getElementById('dbdNew').onclick=()=>{const has=String(S.line||'').trim()||String(S.top||'').trim();if(has&&(!S.id||JSON.stringify(dbdCfg())!==DBD.snap)){const old=L.find(b=>b.id===S.id),row=dbdAutoFd(Object.assign(dbdCfg(),{id:old?old.id:'b'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:Date.now(),fd:old?old.fd:(S.fd||''),fdM:old?old.fdM:S.fdM}));if(old)L[L.indexOf(old)]=row;else L.unshift(row);accSave()}
     const cp=JSON.parse(JSON.stringify(dbdCfg()));DBD.st=Object.assign({},dbdDef(),cp,{id:null,fd:S.fd||''});DBD.snap=null;dbdAnim();dbdKeep();dbdRender();const i=A.querySelector('[data-di=top]');if(i){i.focus();i.select()}};
   // the saved boards: open, delete (asked once more), the grip to reorder
   const ul=A.querySelector('.dbdList');L.forEach(b=>{const li=document.createElement('li');li.dataset.k=b.id;li.className=b.id===S.id?'on':'';
     li.innerHTML=`<span class="persGrip" aria-label="${esc(trS('Przytrzymaj i przeciągnij, aby zmienić kolejność'))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span><button type="button" class="dbdOpen"><canvas></canvas><b></b><small></small></button><button type="button" class="accBtn dbdIco dbdFdB" data-a="fd" title="${esc(trS('Przenieś do folderu'))}" aria-label="${esc(trS('Przenieś do folderu'))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h7l2 2h9v11H3z"/></svg></button><button type="button" class="accBtn dbdIco" data-a="del" title="${esc(trS('Usuń'))}" aria-label="${esc(trS('Usuń'))}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>`;
     li.querySelector('b').textContent=dbdTitle(b);li.querySelector('small').textContent=b.t?new Date(b.t).toLocaleString(LANG==='pl'?'pl-PL':LANG,{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-    li.querySelector('.dbdOpen').onclick=()=>{DBD.st=dbdDef();DBD_KEYS.concat(['anim','alts','fr']).forEach(k=>{if(b[k]!==undefined)DBD.st[k]=typeof b[k]==='object'?JSON.parse(JSON.stringify(b[k])):b[k]});DBD.st.id=b.id;DBD.st.fd=b.fd||'';DBD.snap=JSON.stringify(dbdCfg());dbdAnim();dbdKeep();dbdRender();A.closest('.toolsDr').scrollTo({top:0,behavior:'smooth'})};
+    li.querySelector('.dbdOpen').onclick=()=>{DBD.st=dbdDef();DBD_KEYS.concat(['anim','alts','fr']).forEach(k=>{if(b[k]!==undefined)DBD.st[k]=typeof b[k]==='object'?JSON.parse(JSON.stringify(b[k])):b[k]});DBD.st.id=b.id;DBD.st.fd=b.fd||'';DBD.st.fdM=b.fdM;DBD.snap=JSON.stringify(dbdCfg());dbdAnim();dbdKeep();dbdRender();A.closest('.toolsDr').scrollTo({top:0,behavior:'smooth'})};
     const del=li.querySelector('[data-a=del]');del.onclick=()=>{if(!del.classList.contains('ask')){del.classList.add('ask');del.title=trS('Kliknij ponownie, aby usunąć');del.style.color='var(--brand)';return}L.splice(L.indexOf(b),1);if(S.id===b.id){S.id=null;DBD.snap=null}accSave();dbdRender()};
     {const fb=li.querySelector('[data-a=fd]');fb.onclick=e=>{e.stopPropagation();dbdFdMenu(fb,b,L)}}
     ul.append(li);if(dbdMode(b)==='flap')dbdFD(li.querySelector('canvas'),Object.assign({},dbdDef(),b),200,false);else{const res=DPB.render(dbdRS(Object.assign({},dbdDef(),b)));dbdDots(li.querySelector('canvas'),DPB.W,DPB.H,(x,y)=>res.grid[y*DPB.W+x],200,false)}});
-  // (foldery: tablice zgrupowane pod nagłówkami folderów – zwijanymi; bez folderu na końcu)
-  {const fds=[...new Set(L.map(b=>b.fd||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl'));if(fds.length){const lis=[...ul.children];const byK=new Map(lis.map(x=>[x.dataset.k,x]));ul.replaceChildren();
+  // (foldery: tablice zgrupowane pod nagłówkami folderów – zwijanymi; bez folderu na końcu; zapisane wcześniej bez ręcznego folderu – w folderze linii)
+  {let ch=false;L.forEach(b=>{const f=b.fd||'';dbdAutoFd(b);if((b.fd||'')!==f)ch=true});if(ch){accSave();dbdRender();return}}
+  {const fds=[...new Set(L.map(b=>b.fd||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pl',{numeric:true}));if(fds.length){const lis=[...ul.children];const byK=new Map(lis.map(x=>[x.dataset.k,x]));ul.replaceChildren();
     const shut=store.get('ztm.dbdFdShut',[])||[];[...fds,''].forEach(f=>{const items=L.filter(b=>(b.fd||'')===f);if(!items.length)return;const h=document.createElement('li');h.className='dbdFolder';const open=!shut.includes(f);
       h.innerHTML=`<button type="button" aria-expanded="${open}"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg><b></b><small>${items.length}</small></button>`;h.querySelector('b').textContent=f||trS('Bez folderu');
       h.querySelector('button').onclick=()=>{const S2=new Set(store.get('ztm.dbdFdShut',[])||[]);if(S2.has(f))S2.delete(f);else S2.add(f);store.set('ztm.dbdFdShut',[...S2]);dbdRender()};ul.append(h);
