@@ -2008,13 +2008,20 @@ function cwCity(){const k=cityKey();if(CWCITY&&CWCITY.k===k)return CWCITY;
  const b=String(CITIES[k].bb).split(',').map(Number),ent={b,ways:null,p:null,t0:Date.now(),k,city:1};CWCITY=ent;
  const draw=()=>{const cl=ent.ways.filter(x=>isClosedWay(x.t)).map(x=>x.g);closedL.clearLayers();if(cl.length)L.polyline(cl,{color:'#d33',weight:3,opacity:.8,dashArray:'6 5',interactive:false}).addTo(closedL);return cl.length};
  ent.p=(async()=>{
-  try{const c=await idbGet('cw2-'+k);if(c&&c.w&&c.w.length&&Date.now()-c.t<7*864e5){ent.ways=c.w;dbg(`Sieć dróg miasta z pamięci: ${ent.ways.length} dróg, zamkniętych ${draw()}`);return ent}}catch(e){}
+  try{const c=await idbGet('cw2-'+k);if(c&&c.w&&c.w.length&&Date.now()-c.t<7*864e5){ent.ways=c.w;dbg(`Sieć dróg miasta z pamięci: ${ent.ways.length} dróg, zamkniętych ${draw()}`);cwPrebuild(ent);return ent}}catch(e){}
+  // (kopia sieci dróg z budowania rozkładów – data/nm/roads_<miasto>.json, osm_nm.py: bez czekania na Overpass)
+  try{const r=await fetch('data/nm/roads_'+nmSnapKey()+'.json',{cache:'no-cache'});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.w)&&j.w.length>100){
+    ent.ways=j.w.map(([id,t,c])=>{const g=[];let la=0,lo=0;for(let i=0;i<c.length;i+=2){la+=c[i];lo+=c[i+1];g.push([la/1e6,lo/1e6])}return{id,g,t}}).filter(w=>w.g.some(p=>inBx(b,p)));
+    dbg(`Sieć dróg miasta z kopii: ${ent.ways.length} dróg, zamkniętych ${draw()}`);idbSet('cw2-'+k,{t:Date.now(),w:ent.ways}).catch(()=>{});cwPrebuild(ent);return ent}}}catch(e){}
   say('Pobieranie sieci dróg miasta (jednorazowo – potem z pamięci)…');
   const bx=b.join(','),r=await ov(`[out:json][timeout:180];(way["highway"~"${HWR}"]["service"!~"^(parking_aisle|driveway|drive-through)$"](${bx});way["construction:highway"~"${HWR}"](${bx});way["disused:highway"~"${HWR}"](${bx}););out tags geom qt;`,200000);
   ent.ways=r.elements.filter(x=>x.geometry&&x.geometry.length>1).map(x=>{const t={},T=x.tags||{};CWTAGS.forEach(q=>{if(T[q]!=null)t[q]=T[q]});return{id:x.id,g:x.geometry.map(c=>[+c.lat.toFixed(6),+c.lon.toFixed(6)]),t}});
-  dbg(`Sieć dróg miasta: ${ent.ways.length} dróg, zamkniętych ${draw()}`);idbSet('cw2-'+k,{t:Date.now(),w:ent.ways}).catch(()=>{});say('Sieć dróg miasta wczytana.');return ent})();
+  dbg(`Sieć dróg miasta: ${ent.ways.length} dróg, zamkniętych ${draw()}`);idbSet('cw2-'+k,{t:Date.now(),w:ent.ways}).catch(()=>{});say('Sieć dróg miasta wczytana.');cwPrebuild(ent);return ent})();
  ent.p.catch(e=>{dbg('Sieć dróg miasta: '+(e&&e.message||e));if(CWCITY===ent)CWCITY=null;CWOFF=Date.now()+30000});
  return ent}
+// graf dróg budowany zawczasu, w wolnej chwili po wczytaniu sieci (pierwsze rysowanie nie czeka na budowę grafu)
+function cwPrebuild(ent){if(!(UI.ow||UI.closed))return;const gk=(UI.closed?1:0)+(UI.ow?2:0),run=()=>{if(!ent.ways||(ent.gs&&ent.gs[gk]))return;(ent.gs||(ent.gs={}))[gk]=cwBuild(ent.ways,!!UI.closed,!!UI.ow)};
+ (window.requestIdleCallback||(f=>setTimeout(f,300)))(run,{timeout:3000})}
 const inBx=(b,p)=>p[0]>=b[0]&&p[0]<=b[2]&&p[1]>=b[1]&&p[1]<=b[3];
 // A*: jak dijkstra, z oszacowaniem odległości do celu (najtańszy metr kosztuje 0,5 – odcinki zamknięte), więc przeszukuje tylko okolicę odcinka
 function astar(s,t,adj,hf){const g=new Map([[s,0]]),prev=new Map(),h=[[hf(s),s]];
@@ -2033,12 +2040,12 @@ function cwBuild(ways,cOk,iOw){ // cOk – dopuszczaj odcinki zamknięte i ście
  const nid=p=>{const k=p[0].toFixed(7)+','+p[1].toFixed(7);let v=kid.get(k);if(v===undefined){v=++nc;kid.set(k,v);pos.set(v,p);adj.set(v,[]);const c=Math.floor(p[0]*R0/40)+','+Math.floor(p[1]*RX/40);let a=cell.get(c);if(!a)cell.set(c,a=[]);a.push(v)}return v};
  ways.forEach(w=>{const t=w.t,cl=isClosedWay(t);
   if(!cOk&&(cl||HWXRE.test(t.highway||'')))return; // bez opcji zamkniętych dróg: pomijamy odcinki zamknięte oraz ścieżki, chodniki i drogi rowerowe
-  const m=cl?.5:hwCost(t);
+  const m=cl?Math.max(1.6,hwCost(t)):hwCost(t);
   let ow=cl?0:/^(-1|reverse)$/.test(t.oneway||'')?-1:(/^(yes|true|1)$/.test(t.oneway||'')||/^(roundabout|circular)$/.test(t.junction||''))?1:0;
   if(/^(no|false|0)$/.test(t['oneway:bus']||'')||t['oneway:psv']==='no')ow=0;
   if(iOw&&!/^(roundabout|circular)$/.test(t.junction||''))ow=0; // ignorowanie jednokierunkowości (ronda zostają jednokierunkowe)
   const g=w.g;let prev=nid(g[0]);
-  for(let i=1;i<g.length;i++){const a0=g[i-1],b0=g[i],d=mdist(a0,b0),n=Math.max(1,Math.ceil(d/(ways.length>3000?30:15)));
+  for(let i=1;i<g.length;i++){const a0=g[i-1],b0=g[i],d=mdist(a0,b0),n=Math.max(1,Math.ceil(d/(ways.length>3000?45:15)));
    for(let k=1;k<=n;k++){const p=k===n?b0:[a0[0]+(b0[0]-a0[0])*k/n,a0[1]+(b0[1]-a0[1])*k/n],id=nid(p);if(id===prev)continue;const dd=d/n*m;
     adj.get(prev).push([id,ow<0?dd*8:dd]);adj.get(id).push([prev,ow>0?dd*8:dd]);prev=id}}});
  return{adj,pos,cell}}
@@ -2068,7 +2075,7 @@ async function closedRoute(a,b){
   if(!na.length||!nb.length)throw new Error('w pobliżu punktu nie ma drogi w danych OSM');
   const VS=-1,VT=-2,ex=new Map();nb.forEach(([id,dd])=>ex.set(id,[[VT,dd*1.6]]));
   const adj={get:u=>u===VS?na.map(([id,dd])=>[id,dd*1.6]):(ex.has(u)?g.adj.get(u).concat(ex.get(u)):g.adj.get(u))};
-  const hf=u=>u===VS?mdist(a,b)*.5:u===VT?0:mdist(g.pos.get(u),b)*.5,p=astar(VS,VT,adj,hf);if(!p){err=new Error('brak połączenia drogami w tym obszarze');continue}
+  const hf=u=>u===VS?mdist(a,b)*.9:u===VT?0:mdist(g.pos.get(u),b)*.9,p=astar(VS,VT,adj,hf);if(!p){err=new Error('brak połączenia drogami w tym obszarze');continue}
   const pts=p.slice(1,-1).map(id=>g.pos.get(id));if(pts.length<2)throw new Error('trasa zbyt krótka');
   pts._loc=1;return pts}
  throw err}
@@ -2495,7 +2502,7 @@ document.addEventListener('click',e=>{if(!e.target.closest('.dd'))document.query
   say(UI.closed?'Zamknięte drogi włączone: trasy po ulicach (linie autobusowe) mogą prowadzić także po odcinkach zamkniętych – dane dróg pobierane są z Overpass dla rysowanego odcinka.'+(UI.strict?'':' Uwaga: przyciąganie (magnes) jest wyłączone, więc linie są rysowane swobodnie.')+($('#amode').value!=='street'?' Opcja działa dla linii autobusowych – wybierz na liście „Trasa” pozycję „Linia autobusowa”.':''):'Zamknięte drogi wyłączone: trasy po ulicach liczy zwykły routing (OSRM).')}}
 {const ob=$('#owTr'),sy=()=>ob.classList.toggle('on',!!UI.ow);if(!!UI.ow!==!!UI.closed){UI.closed=!!UI.ow;$('#closedTr').classList.toggle('on',UI.closed);if(UI.closed)closedL.addTo(map);else map.removeLayer(closedL)}sy();
  if(UI.ow)setTimeout(()=>{try{cwCity()}catch(e){}},4000);   // (sieć dróg miasta wczytywana zawczasu, gdy obostrzenia są ignorowane)
- ob.onclick=()=>{UI.ow=!UI.ow;UI.closed=UI.ow;if(UI.ow)try{cwCity()}catch(e){}$('#closedTr').classList.toggle('on',UI.closed);if(UI.closed)closedL.addTo(map);else map.removeLayer(closedL);rcache.clear();sy();applyUI();say(UI.ow?'Ignorowanie obostrzeń włączone: linie autobusowe mogą jechać pod prąd ulicami jednokierunkowymi i po zamkniętych odcinkach.':'Ignorowanie obostrzeń wyłączone.');return;
+ ob.onclick=()=>{UI.ow=!UI.ow;UI.closed=UI.ow;if(UI.ow)try{const e=cwCity();e.p.then(()=>cwPrebuild(e)).catch(()=>{})}catch(e){}$('#closedTr').classList.toggle('on',UI.closed);if(UI.closed)closedL.addTo(map);else map.removeLayer(closedL);rcache.clear();sy();applyUI();say(UI.ow?'Ignorowanie obostrzeń włączone: linie autobusowe mogą jechać pod prąd ulicami jednokierunkowymi i po zamkniętych odcinkach.':'Ignorowanie obostrzeń wyłączone.');return;
   say(UI.ow?'Jednokierunkowość ignorowana: trasy po ulicach (linie autobusowe) mogą prowadzić pod prąd po ulicach jednokierunkowych (ronda pozostają jednokierunkowe) – dane dróg pobierane są z Overpass dla rysowanego odcinka. Dotyczy nowo wyznaczanych tras.'+(UI.strict?'':' Uwaga: przyciąganie (magnes) jest wyłączone, więc linie są rysowane swobodnie.')+($('#amode').value!=='street'?' Opcja działa dla linii autobusowych – wybierz na liście „Trasa” pozycję „Linia autobusowa”.':''):'Jednokierunkowość uwzględniana: trasy po ulicach liczy zwykły routing (OSRM), o ile nie jest włączona opcja „Zamknięte drogi”.')}}
 {const sb=$('#strictTr'),sy=()=>sb.classList.toggle('on',!!UI.strict);sy();sb.onclick=()=>{UI.strict=!UI.strict;rcache.clear();sy();applyUI();say(UI.strict?'Przyciąganie włączone: linie są prowadzone po torach/drogach.':'Przyciąganie wyłączone: linię można rysować w dowolnym miejscu mapy.')}}
 $('#hideUnused').onchange=e=>{UI.hu=e.target.checked;applyUI();drawStops()};

@@ -82,7 +82,47 @@ def build(out, log=print):
                     json.dump({'t': int(time.time()), 'bb': B, 'elements': rl}, open(os.path.join(d, 'rail_%s.json' % key), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
             except Exception as e:
                 log('NetworkMaker OSM %s %s: bez zmian (%s)' % (kind, key, e))
+    build_roads(d, log)
 
+
+
+# sieć dróg miasta dla trasowania z ignorowaniem obostrzeń (jak cwCity w tm.html): tylko potrzebne tagi, współrzędne jako liczby
+# całkowite (1e-6°) zapisane różnicowo – plik kilka razy mniejszy niż odpowiedź Overpass
+HWR = '^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|service|busway|road|construction)(_link)?$'
+CWTAGS = ['highway', 'service', 'oneway', 'junction', 'oneway:bus', 'oneway:psv', 'access', 'motor_vehicle', 'vehicle', 'motorcar', 'bus', 'psv', 'construction:highway', 'disused:highway']
+
+
+def roads_query(B):
+    return ('[out:json][timeout:240];(way["highway"~"%s"]["service"!~"^(parking_aisle|driveway|drive-through)$"](%s);'
+            'way["construction:highway"~"%s"](%s);way["disused:highway"~"%s"](%s););out tags geom qt;') % (HWR, B, HWR, B, HWR, B)
+
+
+def roads_pack(els):
+    W = []
+    for e in els:
+        g = e.get('geometry') or []
+        if len(g) < 2: continue
+        T = e.get('tags') or {}
+        t = {k: T[k] for k in CWTAGS if k in T}
+        c, la, lo = [], 0, 0
+        for q in g:
+            a, b = round(q['lat'] * 1e6), round(q['lon'] * 1e6)
+            c += [a - la, b - lo]; la, lo = a, b
+        W.append([e['id'], t, c])
+    return W
+
+
+def build_roads(d, log=print):
+    for key, B in BOX.items():
+        f = os.path.join(d, 'roads_%s.json' % key)
+        try:
+            j = ov(roads_query(B))
+            W = roads_pack(j.get('elements') or [])
+            if len(W) < 100: raise RuntimeError('za mało dróg (%d)' % len(W))
+            json.dump({'t': int(time.time()), 'bb': B, 'w': W}, open(f, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+            log('NetworkMaker OSM drogi %s: %d' % (key, len(W)))
+        except Exception as e:
+            log('NetworkMaker OSM drogi %s: bez zmian (%s)' % (key, e))
 
 
 def rail_only(els):
