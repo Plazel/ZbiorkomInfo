@@ -317,7 +317,8 @@ body.mapMv #top,body.mapMv .pop{-webkit-backdrop-filter:none!important;backdrop-
 .fsHid{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important;margin:0!important;padding:0!important;border:0!important}
 .fsBtn{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;font:inherit;font-size:13.5px;line-height:1.2;padding:6px 10px;min-height:32px;border:1px solid var(--bd);background:var(--panel);color:var(--fg);cursor:pointer;text-align:left;box-sizing:border-box;max-width:100%}.fsBtn .fsT{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fsBtn svg{flex:none;margin:0;color:var(--mut)}.fsBtn:hover{border-color:var(--mut)}.fsBtn[aria-expanded=true]{border-color:var(--fg)}.fsBtn:disabled{opacity:.45;cursor:default}.fsBtn[hidden]{display:none}
 .fsMenu{position:fixed;z-index:7000;max-height:60vh;overflow:auto;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--bd);box-shadow:0 8px 24px rgba(0,0,0,.2);padding:3px 0}.fsMenu[hidden]{display:none}.fsBtn .fsT,.fsMenu button{display:flex;align-items:center;gap:8px}.fsSym{flex:none}.fsMenu button{font:inherit;font-size:13.5px;text-align:left;padding:7px 12px;border:0;background:transparent;color:var(--fg);cursor:pointer;white-space:nowrap}.fsMenu button:hover{background:var(--tab)}.fsMenu button.on{font-weight:700}.fsMenu button:disabled{opacity:.45;cursor:default}
-</style></head><body><div id="needLand" role="alert"><svg viewBox="0 0 24 24" width="52" height="52" aria-hidden="true"><path d="M12 2.8 1.6 21h20.8z" fill="#c4161c"/><path d="M12 9.2v5.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="#fff"/></svg><div>Aplikacja NetworkMaker wymaga do prawidłowego działania większego wyświetlacza w orientacji poziomej</div></div>
+html:not(.nmReady) body>*:not(#needLand){visibility:hidden}html:not(.nmReady) body{background:var(--bg,#f4f5f8)}
+</style><script>setTimeout(()=>document.documentElement.classList.add('nmReady'),15000)</script></head><body><div id="needLand" role="alert"><svg viewBox="0 0 24 24" width="52" height="52" aria-hidden="true"><path d="M12 2.8 1.6 21h20.8z" fill="#c4161c"/><path d="M12 9.2v5.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="18" r="1.3" fill="#fff"/></svg><div>Aplikacja NetworkMaker wymaga do prawidłowego działania większego wyświetlacza w orientacji poziomej</div></div>
 <header id="top">
  <div class="brand"><i data-ic="route"></i><b>NetworkMaker</b><select id="citySel" class="citysel" title="Ustala obszar, na którym można wprowadzać zmiany."><option value="gdansk">Gdańsk</option><option value="gdynia">Gdynia</option><option value="sopot">Sopot</option><option value="trojmiasto">Trójmiasto</option><option value="bydgoszcz">Bydgoszcz</option><option value="krynica">Krynica-Zdrój</option></select></div>
  <div class="hist"><button class="b ico" id="hUndo" title="Cofnij (Ctrl+Z)"><i data-ic="undo"></i></button><button class="b ico" id="hRedo" title="Ponów (Ctrl+Y)"><i data-ic="redo"></i></button></div>
@@ -553,7 +554,7 @@ function ziExport(){try{
   const P=FP(),lines=[];
   S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>{const T=ttOf(l,dk,a);if(!T)return null;const o={st:T.st,off:T.off,sh:T.sh,dep:T.dep};
      // (kursy wariantów i skrócone – osobne trasy z opisem; w ZbiorkomInfo jako kursy oznaczone w rozkładach)
-     if(!l.par){const W=((l.ttv||{})[dk])||{},vs=ttVars(l,dk,P).map(v=>{const dep={};TT_D.forEach(k=>{dep[k]=((W[k]||{})[v.key]||[]).slice()});return TT_D.some(k=>dep[k].length)?{st:v.d.st,off:v.d.off,sh:v.d.sh,dep,note:v.note}:null}).filter(Boolean);if(vs.length)o.vars=vs}
+     if(!l.par){const W=((l.ttv||{})[dk])||{},vs=ttVars(l,dk,P).map(v=>{const dep={};TT_D.forEach(k=>{dep[k]=((W[k]||{})[v.key]||[]).slice()});return {st:v.d.st,off:v.d.off,sh:v.d.sh,dep,note:v.note}});if(vs.length)o.vars=vs}
      return o}).filter(Boolean);
     const rt=l.par?S.lines.find(x=>x.id===l.par)||l:l;lines.push({id:l.id,n:String((l.par?l.vnum:l.num)||rt.num||''),color:rt.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
   const k=cityKey(),body=JSON.stringify({city:k,lines});if(body===ziExport.last&&localStorage.getItem('gdn-zi'))return;ziExport.last=body;
@@ -889,7 +890,7 @@ async function loadRail(){
  const gs=$('#rstat');gs.textContent='Tory kolejowe: pobieranie…';
  try{localStorage.removeItem('gdn-rw4-'+cityKey())}catch(e){}
  try{const ways=railWithPlanned(await fetchWays(`[out:json][timeout:120];(way["railway"~"^(rail|narrow_gauge|construction|proposed)$"](${bb()});way["construction:railway"~"^(rail|narrow_gauge)$"](${bb()});way["proposed:railway"~"^(rail|narrow_gauge)$"](${bb()});way["planned:railway"~"^(rail|narrow_gauge)$"](${bb()}););out body;>;out skel qt;`,'gdn-rw5-'+cityKey(),'rail')),segs=ways.filter(w=>w[0][3]!==2).map(c=>c.map(x=>[x[1],x[2]])),plan=ways.filter(w=>w[0][3]===2||w[0][3]===4).map(c=>c.map(x=>[x[1],x[2]]));
-  OSMR=ways;rebuildGraphs();railL.clearLayers();railTry=0;dbg('Dołączone do sieci tramwajowej (bocznice, tory w budowie/planowane): '+_extra.length+' odcinków');drawTracks();S.lines.filter(l=>l.auto&&l.stops.length>1).forEach(l=>rebuild(l,false));
+  OSMR=ways;rebuildGraphs();railL.clearLayers();railTry=0;dbg('Dołączone do sieci tramwajowej (bocznice, tory w budowie/planowane): '+_extra.length+' odcinków');drawTracks();nmRepair();
   if(segs.length){L.polyline(segs,{color:'#555',weight:2,opacity:.45,interactive:false}).addTo(railL)}
   if(plan.length){L.polyline(plan,{color:'#555',weight:2,opacity:.55,dashArray:'6 5',interactive:false}).addTo(railL)}
   dbg('Kolej planowana/w budowie: '+plan.length+' odcinków');
@@ -904,7 +905,7 @@ async function loadTram(){
    gs.textContent=`Torowiska: ${G.adj.size} węzłów, ${G.size.length} sieci (największa ${Math.max(...G.size)}), uzupełniono ${G.br} luk`}
   else gs.textContent='Torowiska: brak w tym obszarze';
   say('Torowiska wczytane. Możesz wyznaczać trasy.');
-  S.lines.filter(l=>l.auto&&l.stops.length>1).forEach(l=>rebuild(l,false))
+  nmRepair()
  }catch(e){gs.textContent='Torowiska: BŁĄD – '+(e.message||e)+' (ponawiam…)';say('Nie udało się pobrać torowisk: '+(e.message||e)+'. Ponowię próbę automatycznie.');if(tramTry++<4)setTimeout(()=>{tramReady=loadTram()},30000*tramTry)}}
 function components(g){let c=0;for(const id of g.adj.keys()){if(g.comp.has(id))continue;let n=0;const q=[id];g.comp.set(id,c);while(q.length){const u=q.pop();n++;for(const [v] of g.adj.get(u)||[]){if(!g.comp.has(v)){g.comp.set(v,c);q.push(v)}}}g.size[c++]=n}g.min=Math.min(30,Math.max(1,...g.size))}
 const mdist=(p,q)=>Math.hypot((p[0]-q[0])*111000,(p[1]-q[1])*65000),MAXD=150;
@@ -1060,8 +1061,17 @@ const R0=111000,RX=65000;
 const curAm=()=>UI.strict?$('#amode').value:'free';
 // tryb trasowania konkretnej linii (przeliczanie w tle, np. po wczytaniu torowisk): jej własny, potem linii głównej, potem rodzaj linii –
 // nie bieżący wybór na pasku (wcześniej powroty linii tramwajowych przeliczały się jak autobusy, gdy na pasku wybrany był tryb ulic)
-const lineAm=l=>{if(!UI.strict)return 'free';const R=l&&l.par?S.lines.find(x=>x.id===l.par):null,m=(l&&l.rm)||(R&&R.rm);if(m)return m;
- const B=R||l,k=B&&(B.kind||(B.segs&&B.segs.length?lineMode(B):null));return k==='tram'?'tram':k==='rail'?'rail':k==='bus'?'street':$('#amode').value};
+const lineAm=l=>{if(!UI.strict)return 'free';const R=l&&l.par?S.lines.find(x=>x.id===l.par):null,B=R||l,mm=x=>({tram:'tram',rail:'rail'})[lineMode(x)]||'street';
+ if(B&&B.kind)return B.kind==='tram'?'tram':B.kind==='rail'?'rail':'street';
+ // (wariant i powrót: tryb z faktycznego przebiegu linii głównej, nie z ostatniego wyboru na pasku)
+ if(R&&R.segs&&R.segs.length)return mm(R);
+ return (l&&l.rm)||(R&&R.rm)||(l&&l.segs&&l.segs.length?mm(l):$('#amode').value)};
+// przeliczanie w tle tylko tras, które tego wymagają: bez odcinków, z odcinkami prostymi/błędnymi albo poprowadzonych ulicami,
+// choć linia jest tramwajowa lub kolejowa (naprawa) – trasy poprawne zostają nietknięte
+// naprawa w tle, ponawiana, aż znane będą przystanki linii (dane przystanków mogą dochodzić po torowiskach)
+function nmRepair(n=0){clearTimeout(nmRepair.t);const L=S.lines.filter(needsRebuild);L.forEach(l=>rebuild(l,false));if(L.length&&n<10)nmRepair.t=setTimeout(()=>nmRepair(n+1),12000)}
+const needsRebuild=l=>{if(!l.auto||!l.stops||l.stops.length<2)return false;const sg=l.segs||[];if(!sg.length||sg.length!==l.stops.length-1)return true;if(sg.some(x=>x.mode==='straight'||x.bad))return true;
+ const am=lineAm(l);return (am==='tram'||am==='rail')&&sg.some(x=>x.mode==='street')};
 const editL=L.layerGroup().addTo(map);
 function snapWp(ll,mm){const g=mm==='rail'?RG:(mm==='tram'||mm==='tramfirst')?G:null;if(!g)return ll;
  let bn=null;for(const [n,d] of bestPerComp(ll,g).values())if(!bn||d<bn[1])bn=[n,d];
@@ -2177,6 +2187,9 @@ async function segRoute(A,B,am){
 async function rebuild(l,verbose,quiet){
  const tok=(tokens.get(l.id)||0)+1;tokens.set(l.id,tok);
  const st=l.stops.map(id=>stopOf(id)).filter(Boolean);
+ // (w tle – np. po wczytaniu torowisk – nie przeliczamy, dopóki nie są znane wszystkie przystanki linii: trasa przez brakujące przystanki
+ // byłaby zupełnie inna; wcześniej w ten sposób psuły się trasy powrotne)
+ if(!verbose&&st.length!==l.stops.length)return;
  if(st.length<2){l.segs=[];l.wp=st.length?[st[0].ll]:[];save();redraw();renderLines();if(verbose)say('Dodaj do linii co najmniej 2 przystanki.');return}
  const am=lineAm(l),res=new Array(st.length-1);let next=0,done=0;
  const worker=async()=>{while(next<res.length&&tokens.get(l.id)===tok){const i=next++;res[i]=await segRoute(st[i],st[i+1],am);done++;if(verbose&&tokens.get(l.id)===tok)say(`Wyznaczanie trasy: ${done} z ${res.length} odc.…`)}};
@@ -4120,4 +4133,5 @@ function fsSym(k){const f=k==='t'?'#d32f2f':k==='r'?'#1b8a3a':'#1e6fe0',t=k==='t
  all(document);document.querySelectorAll('form').forEach(f=>f.setAttribute('autocomplete','off'));
  new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)all(n)}))).observe(document.documentElement,{childList:true,subtree:true});
  document.addEventListener('focusin',e=>{if(e.target&&e.target.matches&&e.target.matches('input,textarea'))off(e.target)},true)})();
+requestAnimationFrame(()=>document.documentElement.classList.add('nmReady'));
 </script></body></html>
