@@ -2738,30 +2738,46 @@ function coordSuggest(P){const items=[];S.lines.filter(l=>!l.par).forEach(l=>['A
 // czasy przejazdu przez początek odcinka: odjazd z pierwszego przystanku + czas do przystanku, od którego zaczyna się odcinek
 function coordTimes(c,it,dy,P){const l=S.lines.find(x=>x.id===it.l);if(!l)return null;const T=coordDn(l,it.dk,P);if(!T)return null;const n=T.st.map(q=>q.n);
  let k=-1;for(let i=0;i+c.sec.length<=n.length;i++){if(c.sec.every((x,q)=>n[i+q]===x)){k=i;break}}if(k<0)return null;return {l,T,k,t:(T.dep[dy]||[]).map(m=>m+T.off[k])}}
-const coordCost=arr=>{const a=arr.slice().sort((x,y)=>x-y);let c=0;for(let i=1;i<a.length;i++){const g=a[i]-a[i-1];c+=g*g}return c};
+const coordCost=arr=>{const a=arr.slice().sort((x,y)=>x-y);let c=0;for(let i=1;i<a.length;i++){const g=a[i]-a[i-1];c+=g*g+(g<1?60:0)}return c};   // (dwa kursy w tej samej minucie: kara)
 const coordStats=arr=>{const a=arr.slice().sort((x,y)=>x-y),g=[];for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];if(d<=90)g.push(d)}if(!g.length)return null;
  const m=g.reduce((x,y)=>x+y,0)/g.length,sd=Math.sqrt(g.reduce((x,y)=>x+(y-m)**2,0)/g.length);return {min:Math.min(...g),max:Math.max(...g),sd,n:a.length}};
-// optymalizacja wszystkich powiązanych odcinków dla jednego dnia: zmienne – przesunięcie każdej pary (linia, kierunek)
+// optymalizacja wszystkich powiązanych odcinków dla jednego dnia. Zmienne: przesunięcie każdego okresu stałego taktu w rozkładzie każdej
+// pary (linia, kierunek) – nie jedno dla całego dnia (gdy rytm linii zmienia się w ciągu dnia, jedno przesunięcie dawało równe odstępy
+// tylko w części dnia, a w reszcie „stada” po dwa kursy). Koszt: suma kwadratów odstępów na początku każdego odcinka oraz – żeby
+// przesunięcia okresów nie psuły rytmu samej linii – suma kwadratów odstępów jej własnych kursów.
+function coordRuns(dep){const R=[];let s=0;for(let i=1;i<=dep.length;i++){if(i===dep.length){R.push([s,i]);break}const g=dep[i]-dep[i-1];
+  // (średni odstęp dotychczasowego okresu – takt ułamkowy, np. 7,5 min, daje odstępy 7 i 8 i nie dzieli okresu)
+  const n=i-1-s,mg=n>0?(dep[i-1]-dep[s])/n:g;if(n>=2&&(Math.abs(g-mg)>.75||g>40)){R.push([s,i]);s=i}}
+ // (krótkie końcówki doklejane do poprzedniego okresu)
+ for(let k=R.length-1;k>0;k--)if(R[k][1]-R[k][0]<3){R[k-1][1]=R[k][1];R.splice(k,1)}return R}
 function coordSolve(groups,dy,P){const V=new Map(),terms=[];
  groups.forEach(c=>{if(!(c.days||TT_D).includes(dy))return;const rows=[];c.items.forEach(it=>{const r=coordTimes(c,it,dy,P);if(!r||!r.t.length)return;const key=it.l+'|'+it.dk;
-   if(!V.has(key))V.set(key,{key,l:it.l,dk:it.dk,max:Math.max(0,Math.round(c.max!=null?c.max:15)),fix:c.anchor===it.l+'|'+it.dk,d:0});else{const v=V.get(key);v.max=Math.min(v.max,Math.max(0,Math.round(c.max!=null?c.max:15)));if(c.anchor===key)v.fix=true}
-   rows.push({key,t:r.t})});if(rows.length>=2)terms.push(rows)});
+   const mx=Math.max(0,Math.round(c.max!=null?c.max:15));
+   if(!V.has(key)){const dep=(r.T.dep[dy]||[]).slice().sort((x,y)=>x-y),runs=coordRuns(dep);V.set(key,{key,l:it.l,dk:it.dk,max:mx,fix:c.anchor===key,dep,runs,ds:runs.map(()=>0),d:0})}
+   else{const v=V.get(key);v.max=Math.min(v.max,mx);if(c.anchor===key)v.fix=true}
+   rows.push({key,off:r.T.off[r.k]||0})});if(rows.length>=2)terms.push(rows)});
  const vars=[...V.values()];if(!vars.length||!terms.length)return null;
  if(!vars.some(v=>v.fix))vars[0].fix=true;   // (jedna linia zostaje na miejscu – przesuwanie wszystkich o tyle samo niczego nie zmienia)
- const cost=()=>terms.reduce((acc,rows)=>acc+coordCost(rows.flatMap(r=>{const d=V.get(r.key).d;return r.t.map(x=>x+d)})),0);
- const before=terms.map(rows=>coordStats(rows.flatMap(r=>r.t)));
+ const times=v=>{const o=new Array(v.dep.length);v.runs.forEach(([a,b],k)=>{for(let i=a;i<b;i++)o[i]=v.dep[i]+v.ds[k]});return o};
+ const ownOk=t=>{for(let i=1;i<t.length;i++)if(t[i]<=t[i-1])return false;return true};
+ const cost=()=>{let c=0;const TM=new Map(vars.map(v=>[v.key,times(v)]));
+  for(const v of vars){if(v.fix)continue;const t=TM.get(v.key);if(!ownOk(t))return 1e15;c+=coordCost(t)}
+  terms.forEach(rows=>{c+=coordCost(rows.flatMap(r=>TM.get(r.key).map(x=>x+r.off)))});return c};
+ const stat=()=>terms.map(rows=>coordStats(rows.flatMap(r=>times(V.get(r.key)).map(x=>x+r.off))));
+ const before=stat();
  const free=vars.filter(v=>!v.fix);let best=null,bestD=null;
- for(let rs=0;rs<6;rs++){free.forEach(v=>v.d=rs?Math.round((Math.random()*2-1)*v.max):0);let c0=cost();
-  for(let it=0;it<12;it++){let imp=false;free.forEach(v=>{let bd=v.d,bc=c0;for(let d=-v.max;d<=v.max;d++){v.d=d;const c=cost();if(c<bc-1e-9||(Math.abs(c-bc)<1e-9&&Math.abs(d)<Math.abs(bd))){bc=c;bd=d}}if(bd!==v.d||bc<c0)imp=imp||bc<c0-1e-9;v.d=bd;c0=bc});if(!imp)break}
-  if(best==null||c0<best-1e-9){best=c0;bestD=new Map(vars.map(v=>[v.key,v.d]))}}
- vars.forEach(v=>v.d=bestD.get(v.key));
- const after=terms.map(rows=>coordStats(rows.flatMap(r=>{const d=V.get(r.key).d;return r.t.map(x=>x+d)})));
- return {vars,before,after}}
-// powiązane odcinki: wszystkie, które dzielą choć jedną parę (linia, kierunek) z danym – przeliczane razem
-function coordComp(c){const all=S.coord||[],inC=new Set([c]);let ch=true;while(ch){ch=false;all.forEach(x=>{if(inC.has(x))return;if(x.items.some(it=>[...inC].some(y=>y.items.some(j=>j.l===it.l&&j.dk===it.dk)))){inC.add(x);ch=true}})}return [...inC]}
+ for(let rs=0;rs<4;rs++){free.forEach(v=>{const d0=rs?Math.round((Math.random()*2-1)*v.max):0;v.ds=v.runs.map(()=>d0)});let c0=cost();
+  for(let it=0;it<10;it++){let imp=false;
+   // (najpierw cały dzień linii razem, potem każdy okres osobno)
+   free.forEach(v=>{const base=v.ds.slice();let bd=null,bc=c0;for(let d=-v.max;d<=v.max;d++){v.ds=base.map(()=>d);const c=cost();if(c<bc-1e-9){bc=c;bd=d}}v.ds=bd==null?base:base.map(()=>bd);if(bc<c0-1e-9){imp=true;c0=bc}
+    v.runs.forEach((_,k)=>{const o=v.ds[k];let bk=o,bck=c0;for(let d=-v.max;d<=v.max;d++){if(d===o)continue;v.ds[k]=d;const c=cost();if(c<bck-1e-9||(Math.abs(c-bck)<1e-9&&Math.abs(d)<Math.abs(bk))){bck=c;bk=d}}v.ds[k]=bk;if(bck<c0-1e-9){imp=true;c0=bck}})});
+   if(!imp)break}
+  if(best==null||c0<best-1e-9){best=c0;bestD=new Map(vars.map(v=>[v.key,v.ds.slice()]))}}
+ vars.forEach(v=>{v.ds=bestD.get(v.key);const u=[...new Set(v.ds)];v.d=u.length===1?u[0]:'różnie';v.times=times(v)});
+ return {vars,before,after:stat()}}
 function coordRun(groups,P){const res={},moved=[];TT_D.forEach(dy=>{const r=coordSolve(groups,dy,P);if(!r)return;res[dy]=r;
-  r.vars.forEach(v=>{if(!v.d)return;const l=S.lines.find(x=>x.id===v.l);const T=coordDn(l,v.dk,P);if(!T)return;l.tt=l.tt||{};const D=l.tt[v.dk]=l.tt[v.dk]||{};
-   D[dy]=[...new Set((T.dep[dy]||[]).map(m=>((m+v.d)%1440+1440)%1440))].sort((x,y)=>x-y);moved.push([l,v.dk,dy,v.d])})});
+  r.vars.forEach(v=>{if(!v.d||v.fix)return;const l=S.lines.find(x=>x.id===v.l);if(!l)return;l.tt=l.tt||{};const D=l.tt[v.dk]=l.tt[v.dk]||{};
+   D[dy]=[...new Set(v.times.map(m=>((Math.round(m))%1440+1440)%1440))].sort((x,y)=>x-y);moved.push([l,v.dk,dy,v.d])})});
  groups.forEach((c,gi)=>{c.res=c.res||{};TT_D.forEach(dy=>{const r=res[dy];if(!r)return;const terms=groups.filter(x=>(x.days||TT_D).includes(dy));const ti=terms.indexOf(c);
    if(ti>=0&&r.before[ti]!==undefined)c.res[dy]={b:r.before[ti],a:r.after[ti],t:Date.now()}})});
  save();renderLines();return moved}
@@ -2785,7 +2801,7 @@ function coordBody(P,onCh){S.coord=S.coord||[];const b=document.createElement('d
   const t=k=>b.querySelector(`[data-t="${k}"]`);
   t('addc').onclick=()=>{add=add?null:{sel:[],sec:0};draw()};
   t('runall').onclick=()=>{const m=coordRun(S.coord,P);if(onCh)onCh();draw();say(m.length?'Skoordynowano: przesunięto '+m.length+' rozkładów ('+[...new Set(m.map(x=>x[0].num))].join(', ')+').':'Rozkłady są już rozłożone najlepiej, jak się da – bez zmian.')};
-  b.querySelectorAll('[data-run]').forEach(x=>x.onclick=()=>{const c=S.coord[+x.dataset.run],m=coordRun(coordComp(c),P);if(onCh)onCh();draw();say(m.length?'Skoordynowano: '+m.map(([l,dk,dy,d])=>l.num+' '+TT_DN[dy].toLowerCase()+' '+(d>0?'+':'')+d+' min').join(', ')+'.':'Bez zmian – odjazdy są już rozłożone najlepiej, jak się da.')});
+  b.querySelectorAll('[data-run]').forEach(x=>x.onclick=()=>{const c=S.coord[+x.dataset.run],m=coordRun(coordComp(c),P);if(onCh)onCh();draw();say(m.length?'Skoordynowano: '+m.map(([l,dk,dy,d])=>l.num+' '+TT_DN[dy].toLowerCase()+' '+(typeof d==='number'?(d>0?'+':'')+d+' min':'przesunięcia w poszczególnych okresach')).join(', ')+'.':'Bez zmian – odjazdy są już rozłożone najlepiej, jak się da.')});
   b.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{S.coord.splice(+x.dataset.del,1);save();if(onCh)onCh();draw()});
   b.querySelectorAll('[data-anc]').forEach(x=>x.onchange=()=>{S.coord[+x.dataset.anc].anchor=x.value;save();draw()});
   b.querySelectorAll('[data-cday]').forEach(x=>x.onclick=()=>{const c=S.coord[+x.dataset.cday],D=new Set(c.days||TT_D);D.has(x.dataset.k)?D.delete(x.dataset.k):D.add(x.dataset.k);c.days=TT_D.filter(k=>D.has(k));save();draw()});
