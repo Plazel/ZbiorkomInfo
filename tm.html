@@ -117,6 +117,8 @@ input[type=range]:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .ttAdd{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--bd);padding:0 6px;height:30px}.ttAdd:focus-within{border-color:var(--fg)}.ttAdd span{display:inline-flex;color:var(--mut)}.ttAdd input{width:58px;border:0!important;padding:0!important;background:transparent;outline:none;font-variant-numeric:tabular-nums}
 .ttGenP{border:1px solid var(--bd);background:var(--bd2);padding:12px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
 .ttGenH{display:flex;align-items:center;gap:8px}.ttGenH b{font-size:13.5px}.ttPv{margin-left:auto;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.ttVb{min-width:0;padding:2px 7px!important;font-size:12px;gap:4px;display:inline-flex;align-items:center}.ttVb.on{color:var(--fg);font-weight:600}.ttVl{font-style:normal;font-weight:700;font-size:11px;min-width:15px;height:15px;display:inline-grid;place-items:center;background:var(--fg);color:var(--bg);border-radius:2px;margin-right:2px}
+.ttVlg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;margin:2px 0 6px}.ttVlg span{display:inline-flex;align-items:center;gap:5px}.ttHv{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.ttHv sup{font-weight:700;font-size:9px}
 .ttBand{gap:6px}.ttBl{display:inline-flex;color:var(--mut)}.ttDash,.ttCo{color:var(--mut);font-size:13px}.ttBand input{background:var(--panel)}
 .ttPre{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:12.5px}.ttPre>span:first-child{color:var(--mut);margin-right:4px}.ttPre .b.flat{height:28px;min-width:34px;padding:0 8px;justify-content:center;background:var(--panel);border:1px solid var(--bd)}
 .ttGenF{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.ttGenF .small{flex:1;color:var(--mut);margin:0}.ttApT{font-size:12.5px;color:var(--mut)}.ttWh{color:var(--mut);margin:-4px 0 0}.ttMore{height:30px;padding:0 10px;background:var(--panel);border:1px solid var(--bd);font-size:12.5px;gap:6px}.ttMore.on{background:var(--fg)!important;color:var(--panel)!important;border-color:var(--fg)!important}.ttApD button{padding:5px 10px;font-size:12.5px;background:var(--panel)}.ttApD button.on{background:var(--fg)}
@@ -492,7 +494,7 @@ function saveNow(){clearTimeout(_svT);_svT=null;if(BOOTWAIT)return;if(NOSAVE){if
 // the line as ZbiorkomInfo needs it, worked out: both directions (TAM and its POWRÓT, or TAM reversed) with their stops, the
 // minutes to each stop (from the line's length and speed) and the shape, and the departures from the headways (peak / off-peak /
 // days off) within the line's hours. The timetable edited by hand (l.tt departures, l.tto minutes to the stops) goes over it.
-function ziAuto(l,P){P=P||FP();const pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.some(x=>t>=x[0]&&t<x[1]);
+function ziAuto(l,P,raw){P=P||FP();const pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.some(x=>t>=x[0]&&t<x[1]);
   const deps=(l,kind)=>{const o=l.op||{},iv=ivOf(winSrc(l).ws),out=[];iv.forEach(([a,b])=>{let t=a;let n=0;while(t<b&&n<400){const h=kind==='we'?numOr((o.we||{}).h,0):inPk(t)?numOr((o.pk||{}).h,0):numOr((o.ot||{}).h,0);if(!(h>0)){t+=5;continue}out.push(Math.round(t));t+=h;n++}});return out};
   const pathOf=x=>{const F=[];x.segs.forEach((sg,k)=>sg.pts.forEach((q,i)=>{if(k>0&&i===0)return;F.push(q)}));return F};
   const thin=F=>{const o=[];F.forEach(q=>{if(!o.length||mdist(o[o.length-1],q)>=12)o.push(q)});if(F.length&&o[o.length-1]!==F[F.length-1])o.push(F[F.length-1]);return o.map(q=>[+q[0].toFixed(6),+q[1].toFixed(6)])};
@@ -508,13 +510,40 @@ function ziAuto(l,P){P=P||FP();const pkIv=ivOf(S.peak||DEFPEAK),inPk=t=>pkIv.som
   const dir=(x,ids,F,t1)=>{const st=ids.map(stopOf).filter(Boolean);if(st.length<2)return null;const D=plen(F)||1;const dd=F.length>1?alongAll(F,st):st.map(()=>0);
     for(let i=1;i<dd.length;i++)if(dd[i]<dd[i-1])dd[i]=dd[i-1];
     return {st:st.map(q=>({id:q.id,n:String(q.name).replace(NUMRE,'$1'),num:q.num||((String(q.name).match(NUMRE)||[])[2]||''),ll:[+q.ll[0].toFixed(6),+q.ll[1].toFixed(6)]})),off:dd.map(d=>Math.round(t1*d/D)),sh:thin(F)}};
-  if((l.par&&!l.vnum)||l.dir==='B'||!l.stops||l.stops.length<2||!l.segs||!l.segs.length)return null;
+  if((!raw&&((l.par&&!l.vnum)||l.dir==='B'))||!l.stops||l.stops.length<2||!l.segs||!l.segs.length)return null;
   const opL=l.par?S.lines.find(x=>x.id===l.par)||l:l;   // (wariant z osobnym numerem: częstotliwość i godziny jego linii)
   const r=calcLine(l,P),t1=r.ok?r.t1:Math.max(1,lineLen(l)/1000/20*60),F=pathOf(l);
   const A=dir(l,l.stops,F,t1);if(!A)return null;
+  if(raw)return {A,B:null,dep:{w:[],s:[],h:[]}};   // (sama trasa wariantu – bez odjazdów i bez kierunku powrotnego)
   const B0=S.lines.find(x=>x.dir==='B'&&x.par===l.id&&(x.rev||x.par)===l.id&&x.segs&&x.segs.length&&x.stops.length>1);
   const B=l.oneway?null:B0?dir(B0,B0.stops,pathOf(B0),t1):dir(l,l.stops.slice().reverse(),F.slice().reverse(),t1);
   const w=deps(opL,'w'),we=deps(opL,'we');return {A,B,dep:{w,s:we,h:we}}}
+// ---- warianty linii w rozkładach (bez własnego numeru): w kierunku TAM warianty TAM; w kierunku POWRÓT – osobne trasy powrotne
+// wariantów, „Tylko POWRÓT” i odwrócone warianty bez własnej trasy powrotnej. Każdy: klucz, litera, nazwa, trasa (st/off/sh),
+// przesunięcie względem kursu podstawowego (czas na pierwszym wspólnym przystanku taki sam – kursy zgrane na wspólnej części trasy)
+// i opis do rozkładów ZbiorkomInfo. Odjazdy wariantów: l.ttv[kierunek][dzień][klucz] = minuty odjazdu z pierwszego przystanku wariantu.
+function ttVars(R,dk,P){const out=[];if(!R||R.par)return out;const a0=ziAuto(R,P),base=a0&&a0[dk];if(!base)return out;
+ const B0=S.lines.find(x=>x.dir==='B'&&x.par===R.id&&(x.rev||x.par)===R.id),As=S.lines.filter(x=>x.par===R.id&&x.dir!=='B'&&!x.vnum);
+ const vn=x=>{const g=x.dir==='B'&&x.rev?S.lines.find(z=>z.id===x.rev):null;return (x.vname||(g&&g.vname)||'').trim()};
+ const push=(key,x,d)=>{if(!d||!d.st||d.st.length<2)return;const ix=new Map(base.st.map((q,i)=>[q.id,i]));let sh=0;for(let j=0;j<d.st.length;j++){const i=ix.get(d.st[j].id);if(i!=null){sh=base.off[i]-d.off[j];break}}
+  const f=d.st[0],e=d.st[d.st.length-1],bf=base.st[0],be=base.st[base.st.length-1],only=d.st.find(q=>!ix.has(q.id));
+  const note=f.id!==bf.id&&e.id!==be.id?'Kurs z przystanku '+f.n+' do przystanku '+e.n:e.id!==be.id?'Kurs do przystanku '+e.n:f.id!==bf.id?'Kurs z przystanku '+f.n:only?'Kurs przez przystanek '+only.n:(vn(x)||'Kurs wariantu');
+  out.push({key,x,d,sh,note,name:vn(x)||note,l:String.fromCharCode(97+out.length)})};
+ if(dk==='A')As.forEach(x=>{const a=ziAuto(x,P,true);if(a)push(x.id,x,a.A)});
+ else{S.lines.filter(y=>y.dir==='B'&&y.par===R.id&&y!==B0&&!y.vnum).forEach(y=>{const a=ziAuto(y,P,true);if(a)push(y.id,y,a.A)});
+  if(!R.oneway)As.forEach(x=>{if(S.lines.some(y=>y.dir==='B'&&y.rev===x.id&&y.par===R.id))return;const a=ziAuto(x,P,true);if(!a)return;const A=a.A,T=A.off[A.off.length-1];
+   push(x.id+'~r',x,{st:A.st.slice().reverse(),off:A.off.slice().reverse().map(o=>T-o),sh:A.sh.slice().reverse()})})}
+ return out}
+// takty z wariantami: w przedziale z ustawionym „co N. kurs” wariantu co N-ty kurs linii jedzie wariantem (kolejne warianty o tym samym N
+// przesunięte o jeden kurs, żeby się nie nakładały); kurs wariantu zastępuje kurs podstawowy, więc na wspólnej części trasy rytm zostaje
+function ttGenV(bands,VS){const all=ttCnt(bands),taken=new Map();
+ bands.filter(B=>!B.off&&B.v).forEach(B=>{const ix=[];all.forEach((m,i)=>{const t=m<B.a%1440&&B.b>1440?m+1440:m;if(t>=B.a&&t<B.b)ix.push(i)});
+  VS.forEach((v,k)=>{const n=+(B.v[v.key]||0);if(!(n>=1))return;ix.forEach((i,j)=>{if(taken.has(i))return;if(n===1||(j+k)%n===n-1)taken.set(i,v.key)})})});
+ const base=[],V={};all.forEach((m,i)=>{const k=taken.get(i);if(!k){base.push(m);return}const v=VS.find(q=>q.key===k);(V[k]=V[k]||[]).push(((Math.round(m+v.sh))%1440+1440)%1440)});
+ Object.values(V).forEach(a=>a.sort((x,y)=>x-y));return {base,V,n:all.length}}
+function ttApply(l,dk,days,bands,VS){const g=ttGenV(bands,VS);l.tt=l.tt||{};const D=l.tt[dk]=l.tt[dk]||{};days.forEach(d=>D[d]=g.base.slice());
+ l.ttv=l.ttv||{};const W=l.ttv[dk]=l.ttv[dk]||{};days.forEach(d=>{const o={};VS.forEach(v=>{const a=g.V[v.key];if(a&&a.length)o[v.key]=a.slice()});if(Object.keys(o).length)W[d]=o;else delete W[d]});
+ if(!Object.keys(W).length)delete l.ttv[dk];if(!Object.keys(l.ttv).length)delete l.ttv;save();renderLines();return g}
 // the timetable of one direction (A: TAM, B: POWRÓT) with the hand edits: the departures of each kind of day, the minutes to the stops
 const TT_D=['w','s','h'];
 function ttOf(l,dk,a){const d=a[dk];if(!d)return null;const tt=((l.tt||{})[dk])||{},to=((l.tto||{})[dk]);
@@ -522,7 +551,10 @@ function ttOf(l,dk,a){const d=a[dk];if(!d)return null;const tt=((l.tt||{})[dk])|
   const off=Array.isArray(to)&&to.length===d.st.length?to.slice():d.off.slice();return {...d,off,dep,own:TT_D.filter(k=>Array.isArray(tt[k])),ownOff:Array.isArray(to)&&to.length===d.st.length}}
 function ziExport(){try{
   const P=FP(),lines=[];
-  S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>ttOf(l,dk,a)).filter(Boolean).map(({st,off,sh,dep})=>({st,off,sh,dep}));
+  S.lines.forEach(l=>{const a=ziAuto(l,P);if(!a)return;const D=['A','B'].map(dk=>{const T=ttOf(l,dk,a);if(!T)return null;const o={st:T.st,off:T.off,sh:T.sh,dep:T.dep};
+     // (kursy wariantów i skrócone – osobne trasy z opisem; w ZbiorkomInfo jako kursy oznaczone w rozkładach)
+     if(!l.par){const W=((l.ttv||{})[dk])||{},vs=ttVars(l,dk,P).map(v=>{const dep={};TT_D.forEach(k=>{dep[k]=((W[k]||{})[v.key]||[]).slice()});return TT_D.some(k=>dep[k].length)?{st:v.d.st,off:v.d.off,sh:v.d.sh,dep,note:v.note}:null}).filter(Boolean);if(vs.length)o.vars=vs}
+     return o}).filter(Boolean);
     const rt=l.par?S.lines.find(x=>x.id===l.par)||l:l;lines.push({id:l.id,n:String((l.par?l.vnum:l.num)||rt.num||''),color:rt.color||'#555',kind:l.veh==='trolley'?'trolley':lineMode(l),dirs:D})});
   const k=cityKey(),body=JSON.stringify({city:k,lines});if(body===ziExport.last&&localStorage.getItem('gdn-zi'))return;ziExport.last=body;
   if(!lines.length){if(localStorage.getItem('gdn-zi')){localStorage.removeItem('gdn-zi');try{if(parent&&parent!==window)parent.postMessage({zi:'nm'},location.origin)}catch(e){}}return}   // (projekt bez linii: miasta nie ma w menu ZbiorkomInfo) // unchanged lines: nothing written, ZbiorkomInfo does no work
@@ -2612,7 +2644,7 @@ function ttEdit(l0,coordFirst){const P=FP(),roots=orderedLines().filter(x=>!x.pa
   const v=await modal({title:'Niezastosowane takty',body:`<p style="margin:0;line-height:1.5">Ustawione takty nie zostały zastosowane do rozkładów: <b>${esc(list)}</b>. Jeśli zamkniesz okno, zostaną utracone.</p>`,cancelV:'back',
    btns:[{t:'Wróć',v:'back'},{t:'Odrzuć',v:'drop',c:'del'},{t:ic('check',14)+'Zastosuj i zamknij',v:'apply',c:'pri'}]});
   if(v==='back')return false;
-  if(v==='apply'){dirty.forEach(e=>{const out=ttCnt(e.bands),days=e.gdOpen?e.gd:[e.dy];const l=e.l;l.tt=l.tt||{};const D=l.tt[e.dk]=l.tt[e.dk]||{};days.forEach(d=>D[d]=out.slice())});save();renderLines();say('Zastosowano takty: '+list+'.')}
+  if(v==='apply'){const P0=FP();dirty.forEach(e=>{const days=e.gdOpen?e.gd:[e.dy];ttApply(e.l,e.dk,days,e.bands,ttVars(e.l,e.dk,P0))});save();renderLines();say('Zastosowano takty: '+list+'.')}
   return true};
  modal({title:'Rozkłady jazdy',body:box,cls:'ttModal',cancelV:true,btns:[{t:'Gotowe',v:true,c:'pri'}],beforeClose,onClose:()=>{TTDRAFT=new Map()},init:()=>show()})}
 function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElement('div');d.className='ttNone';d.innerHTML=`${ic('clock',28)}<p>Linia nie ma jeszcze trasy z co najmniej dwoma przystankami – narysuj ją, aby edytować rozkład.</p>`;return d}
@@ -2625,6 +2657,10 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
    return D.map(B=>{const d=dep.filter(m=>m>=B.a&&m<B.b);if(!d.length)return {...B,off:true};const g=[];for(let i=1;i<d.length;i++)g.push(d[i]-d[i-1]);
     let h=B.h;if(g.length){const c=new Map();g.forEach(x=>c.set(x,(c.get(x)||0)+1));h=[...c.entries()].sort((p,q)=>q[1]-p[1]||p[0]-q[0])[0][0]}else{const nx=dep.find(m=>m>=B.b);h=nx!=null?Math.max(1,Math.min(240,nx-d[0])):B.b-d[0]}
     return {a:d[0],b:B.b,h}})};
+ // (z wariantami: przedziały z wszystkich kursów, w każdym – co który kurs jechał danym wariantem)
+ const bandsCurV=(dep,dy)=>{const VS=ttVars(l,st.dk,P),W=((((l.ttv||{})[st.dk])||{})[dy])||{},VB=VS.map(v=>[v,(W[v.key]||[]).map(m=>(((m-v.sh)%1440)+1440)%1440)]);
+   if(!VB.some(([,a])=>a.length))return bandsCur(dep,dy);const all=[...new Set(dep.concat(...VB.map(([,a])=>a)))].sort((x,y)=>x-y),B=bandsCur(all,dy);
+   B.forEach(b=>{if(b.off)return;const n=all.filter(m=>m>=b.a&&m<b.b).length;VB.forEach(([v,a])=>{const c=a.filter(m=>m>=b.a&&m<b.b).length;if(c){b.v=b.v||{};b.v[v.key]=Math.max(1,Math.min(6,Math.round(n/c)))}})});return B};
  // domyślne przedziały taktów (te same dla wszystkich dni i linii); częstotliwość z ustawień kursowania linii: szczyt w dni robocze
  // 6–9 i 13–18, poza szczytem pozostałe, wczesny ranek i późny wieczór rzadziej (półtora odstępu); w soboty i niedziele odstęp weekendowy
  const bandsDef=dy=>{const r5=x=>Math.max(1,Math.round(x/5)*5)||x,pk=numOr((o0.pk||{}).h,0)||10,ot=numOr((o0.ot||{}).h,0)||20,we=numOr((o0.we||{}).h,0)||Math.max(ot,20);
@@ -2642,10 +2678,13 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
   const byH=h=>dep.filter(m=>Math.floor(m/60)===h).map(m=>String(m%60).padStart(2,'0')).join(' ');
   const dn=x=>x.st.length?x.st[x.st.length-1].n:'',nDay=k=>(ttOf(l,st.dk,a).dep[k]||[]).length;
   if(st.E){st.E.bands=st.bands;st.E.gd=st.gd;st.E.gdOpen=st.gdOpen}
-  {const key=l.id+'|'+st.dk+'|'+st.dy;let e=TTDRAFT.get(key);if(!e){e={l,dk:st.dk,dy:st.dy,bands:bandsCur(dep,st.dy),gd:[st.dy],gdOpen:false};e.base=JSON.stringify(e.bands);TTDRAFT.set(key,e)}
+  {const key=l.id+'|'+st.dk+'|'+st.dy;let e=TTDRAFT.get(key);if(!e){e={l,dk:st.dk,dy:st.dy,bands:bandsCurV(dep,st.dy),gd:[st.dy],gdOpen:false};e.base=JSON.stringify(e.bands);TTDRAFT.set(key,e)}
    if(st.E!==e){st.E=e;st.bands=e.bands;st.gd=e.gd;st.gdOpen=e.gdOpen}}
   const TPL=Array.isArray(S.ttTpl)?S.ttTpl:[];
-  const pv=cnt(st.bands),sum=dep.length?`${dep.length} odjazdów · pierwszy ${hm(dep[0])} · ostatni ${hm(dep[dep.length-1])}`:'Brak odjazdów';
+  const VS=ttVars(l,st.dk,P),VW=((((l.ttv||{})[st.dk])||{})[st.dy])||{},gv=ttGenV(st.bands,VS),pv={length:gv.n,0:cnt(st.bands)[0],[gv.n-1]:cnt(st.bands)[gv.n-1]};
+  const vtx=g=>VS.filter(v=>(g.V[v.key]||[]).length).map(v=>` · ${v.l}: ${g.V[v.key].length}`).join('');
+  const byHv=h=>VS.flatMap(v=>(VW[v.key]||[]).map(m=>(((m-v.sh)%1440)+1440)%1440).filter(m=>Math.floor(m/60)===h).map(m=>[m,v.l])).sort((p,q)=>p[0]-q[0]).map(([m,c])=>`${String(m%60).padStart(2,'0')}<sup>${c}</sup>`).join(' ');
+  const sum=dep.length?`${dep.length} odjazdów · pierwszy ${hm(dep[0])} · ostatni ${hm(dep[dep.length-1])}`:'Brak odjazdów';
   b.innerHTML=`<div class="ttHead">${badgeOf(l)}<div class="ttHT"><b>${esc(routeText(l))}</b><small class="ttSt ${isOwn?'own':'auto'}">${isOwn?'Rozkład własny (wpisany lub wygenerowany)':'Rozkład wyliczany z częstotliwości linii'}</small></div></div>
    <div class="ttBar"><div class="ttSeg" role="group" aria-label="Kierunek">${['A','B'].filter(k=>a[k]).map(k=>`<button type="button" data-dk="${k}" class="${st.dk===k?'on':''}">${ic('right',14)}${esc(dn(a[k]))}</button>`).join('')}</div>
     <div class="ttSeg" role="group" aria-label="Dni">${TT_D.map(k=>`<button type="button" data-dy="${k}" class="${st.dy===k?'on':''}">${TT_DN[k]}<span class="ttN">${nDay(k)}</span>${((l.tt||{})[st.dk]||{})[k]?'<i class="ttDot" title="rozkład własny"></i>':''}</button>`).join('')}</div></div>
@@ -2656,12 +2695,13 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
       ${tb('copy','copy','Kopiuj do pozostałych dni','Ustawia te same odjazdy w pozostałe rodzaje dni tego kierunku.',!dep.length)}
       ${tb('clear','eraser','Wyczyść','Usuwa wszystkie odjazdy tego dnia – możesz wpisać rozkład od zera.',!dep.length)}
       ${tb('auto','reset','Przywróć wyliczony','Wraca do rozkładu wyliczanego automatycznie z częstotliwości linii.',!isOwn)}</div></div>
-     ${st.gen?`<div class="ttGenP"><div class="ttGenH">${ic('wand',16)}<b>Takty – ${TT_DN[st.dy].toLowerCase()}</b><span class="ttPv">${pv.length} odjazdów${pv.length?` · ${hm(pv[0])}–${hm(pv[pv.length-1])}`:''}</span></div>
+     ${st.gen?`<div class="ttGenP"><div class="ttGenH">${ic('wand',16)}<b>Takty – ${TT_DN[st.dy].toLowerCase()}</b><span class="ttPv">${pv.length} odjazdów${pv.length?` · ${hm(pv[0])}–${hm(pv[pv.length-1])}`:''}${vtx(gv)}</span></div>
       <div class="ttTpl"><span>Szablon:</span>${dep.length?`<button type="button" class="b flat" data-t="tcur" data-tl="Jak obecny rozkład" data-td="Przedziały i odstępy odczytane z odjazdów, które są teraz w rozkładzie tego dnia.">${ic('clock',14)}Obecny</button>`:''}<button type="button" class="b flat" data-t="tdef" data-tl="Domyślne przedziały" data-td="4–5, 5–6, 6–9, 9–13, 13–18, 18–20, 20–22, 22–23:30 z częstotliwością z ustawień kursowania linii.">${ic('reset',14)}Domyślny</button>${TPL.map((q,i)=>`<span class="ttTp"><button type="button" class="b flat" data-tpl="${i}" data-tl="${esc(q.n)}" data-td="${esc(q.b.filter(x=>!x.off).map(x=>hm(x.a)+'–'+hm(x.b%1440)+' co '+String(x.h).replace('.',',')).join(', '))}">${esc(q.n)}</button><button type="button" class="b ico flat" data-tplx="${i}" aria-label="Usuń szablon ${esc(q.n)}" data-tl="Usuń szablon" data-td="Usuwa zapisany szablon „${esc(q.n)}”.">${ic('x',13)}</button></span>`).join('')}<span class="grow"></span><button type="button" class="b flat" data-t="tsave" data-tl="Zapisz jako szablon" data-td="Zapisuje te przedziały i częstotliwości w pliku projektu – do użycia przy kolejnych liniach.">${ic('save',14)}Zapisz jako szablon</button></div>
-      <div class="ttBands">${st.bands.map((x,i)=>`<div class="ttBand${x.off?' off':''}"><input type="checkbox" class="ttBon" data-bon="${i}"${x.off?'':' checked'} aria-label="Przedział włączony" title="Włącz lub wyłącz ten przedział"><input data-ba="${i}" value="${hm(x.a)}" inputmode="numeric" aria-label="Od godziny"><span class="ttDash">–</span><input data-bb="${i}" value="${hm(x.b%1440)}" inputmode="numeric" aria-label="Do godziny"><span class="ttCo">co</span><input data-bh="${i}" type="number" min="1" max="240" step="any" value="${x.h}" aria-label="Co ile minut"><span class="ttCo">min</span><button type="button" class="b ico flat" data-bx="${i}" data-tl="Usuń przedział" data-td="Usuwa ten przedział godzin z taktów." aria-label="Usuń przedział"${st.bands.length>1?'':' disabled'}>${ic('trash',15)}</button></div>`).join('')}</div>
+      <div class="ttBands">${st.bands.map((x,i)=>`<div class="ttBand${x.off?' off':''}"><input type="checkbox" class="ttBon" data-bon="${i}"${x.off?'':' checked'} aria-label="Przedział włączony" title="Włącz lub wyłącz ten przedział"><input data-ba="${i}" value="${hm(x.a)}" inputmode="numeric" aria-label="Od godziny"><span class="ttDash">–</span><input data-bb="${i}" value="${hm(x.b%1440)}" inputmode="numeric" aria-label="Do godziny"><span class="ttCo">co</span><input data-bh="${i}" type="number" min="1" max="240" step="any" value="${x.h}" aria-label="Co ile minut"><span class="ttCo">min</span>${VS.map(v=>{const n=+((x.v||{})[v.key]||0);return `<button type="button" class="b flat ttVb${n?' on':''}" data-bv="${i}" data-vk="${esc(v.key)}" data-tl="${esc(v.name)}" data-td="Który kurs w tym przedziale jedzie tym wariantem" aria-label="${esc(v.name)}"><i class="ttVl">${v.l}</i>${n?(n===1?'każdy':'co '+n+'.'):'–'}</button>`}).join('')}<button type="button" class="b ico flat" data-bx="${i}" data-tl="Usuń przedział" data-td="Usuwa ten przedział godzin z taktów." aria-label="Usuń przedział"${st.bands.length>1?'':' disabled'}>${ic('trash',15)}</button></div>`).join('')}</div>
+      ${VS.length?`<div class="ttVlg">${VS.map(v=>`<span><i class="ttVl">${v.l}</i>${esc(v.name)}</span>`).join('')}</div>`:''}
       <div class="ttPre"><span>Wszędzie co:</span>${pres.map(h=>`<button type="button" class="b flat" data-pre="${h}">${String(h).replace('.',',')}</button>`).join('')}<span class="grow"></span><button type="button" class="b flat" data-t="badd">${ic('plus',14)}Przedział</button></div>
       <div class="small ttWh">Kółko myszy nad godziną zmienia ją o 5 min (z Shiftem o 1 min).${dep.length?' Zastosowanie zastąpi obecne odjazdy.':''}</div><div class="ttGenF"><button type="button" class="b flat ttMore${st.gdOpen?' on':''}" data-t="gdmore" aria-pressed="${!!st.gdOpen}" data-tl="Także inne dni" data-td="Zastosuj te same takty również do innych rodzajów dni.">${ic('copy',14)}Także inne dni</button>${st.gdOpen?`<span class="ttSeg ttApD" role="group" aria-label="Dni, do których zastosować">${TT_D.map(k=>`<button type="button" data-gd="${k}" class="${st.gd.includes(k)?'on':''}">${TT_DN[k]}</button>`).join('')}</span>`:''}<span class="grow"></span><button type="button" class="b" data-t="gcancel">Anuluj</button><button type="button" class="b pri" data-t="gok">${ic('check',14)}Zastosuj</button></div></div>`:''}
-     <div class="ttGrid${isOwn?'':' isAuto'}">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" placeholder="" aria-label="Minuty odjazdów o godzinie ${h}"></label>`).join('')}</div>
+     <div class="ttGrid${isOwn?'':' isAuto'}">${hrs.map(h=>`<label class="ttH"><b>${String(h).padStart(2,'0')}</b><input data-h="${h}" value="${byH(h)}" inputmode="numeric" autocomplete="off" placeholder="" aria-label="Minuty odjazdów o godzinie ${h}">${VS.length&&byHv(h)?`<span class="ttHv">${byHv(h)}</span>`:''}</label>`).join('')}</div>
      <div class="ttFoot"><span class="small">${sum}</span><span class="small ttHint">Wpisz minuty oddzielone spacją, np. „05 25 45”.</span></div>
     </section>
     <section class="ttOff"><div class="ttTH"><h4>Czasy przejazdu</h4><div class="ttTools">${tb('oauto','reset','Przywróć wyliczone','Wraca do czasów przejazdu wyliczonych z długości trasy.',!T.ownOff)}</div></div>
@@ -2687,7 +2727,14 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
   t('shift').onclick=async()=>{const v=await modal({title:'Przesuń odjazdy',body:'<label class="row" style="gap:8px">O ile minut (np. 5 lub -3): <input id="ttSh" type="number" value="0" style="width:80px" autofocus></label>',cancelV:null,btns:[{t:'Anuluj',v:null},{t:'Przesuń',c:'pri',v:()=>+document.getElementById('ttSh').value||0}]});
    if(!v)return;setDep(cur().dep[st.dy].map(m=>(m+v+1440)%1440));draw()};
   if(st.gen){const wheel=(inp,f)=>inp.addEventListener('wheel',e=>{e.preventDefault();f(e.deltaY<0?1:-1,e.shiftKey)},{passive:false});
-   const pvU=()=>{const p=cnt(st.bands),e=b.querySelector('.ttPv');if(e)e.textContent=p.length+' odjazdów'+(p.length?' · '+hm(p[0])+'–'+hm(p[p.length-1]):'')};
+   const pvU=()=>{const p=cnt(st.bands),g=ttGenV(st.bands,VS),e=b.querySelector('.ttPv');if(e)e.textContent=p.length+' odjazdów'+(p.length?' · '+hm(p[0])+'–'+hm(p[p.length-1]):'')+vtx(g)};
+   // (wariant w przedziale: który kurs nim jedzie – okienko z wyborem)
+   b.querySelectorAll('[data-bv]').forEach(x=>x.onclick=e=>{e.stopPropagation();const B=st.bands[+x.dataset.bv],k=x.dataset.vk,cur=+((B.v||{})[k]||0);
+    document.querySelectorAll('.npop').forEach(q=>q.remove());const pp=document.createElement('div');pp.className='npop ttVpop';pp.setAttribute('role','listbox');
+    pp.innerHTML=[[0,'brak'],[1,'każdy kurs'],[2,'co 2. kurs'],[3,'co 3. kurs'],[4,'co 4. kurs'],[5,'co 5. kurs'],[6,'co 6. kurs']].map(([n,t])=>`<button type="button" class="b flat${n===cur?' on':''}" data-vn="${n}" role="option" aria-selected="${n===cur}">${t}</button>`).join('');
+    document.body.appendChild(pp);const r=x.getBoundingClientRect();pp.style.left=Math.max(8,Math.min(innerWidth-pp.offsetWidth-8,r.left))+'px';pp.style.top=(r.bottom+pp.offsetHeight+8>innerHeight?r.top-pp.offsetHeight-4:r.bottom+4)+'px';
+    const off=ev=>{if(!pp.contains(ev.target)){pp.remove();removeEventListener('pointerdown',off,true)}};setTimeout(()=>addEventListener('pointerdown',off,true));
+    pp.onclick=ev=>{const q=ev.target.closest('[data-vn]');if(!q)return;pp.remove();removeEventListener('pointerdown',off,true);const n=+q.dataset.vn;B.v=Object.assign({},B.v||{});if(n)B.v[k]=n;else delete B.v[k];if(!Object.keys(B.v).length)delete B.v;draw()}});
    // (kliknięcie pola godziny lub częstotliwości zaznacza jego treść – pisanie od razu ją zastępuje)
    b.querySelectorAll('[data-ba],[data-bb],[data-bh]').forEach(x=>{let fresh=false;x.addEventListener('focus',()=>{fresh=true;x.select()});x.addEventListener('mouseup',e=>{if(fresh){e.preventDefault();x.select()}fresh=false})});
    b.querySelectorAll('[data-ba],[data-bb],[data-bh]').forEach(x=>{const i=+(x.dataset.ba||x.dataset.bb||x.dataset.bh),B=st.bands[i];
@@ -2705,12 +2752,12 @@ function ttBody(l,P,onCh){const a=ziAuto(l,P);if(!a){const d=document.createElem
    b.querySelectorAll('[data-bon]').forEach(x=>x.onchange=()=>{st.bands[+x.dataset.bon].off=!x.checked;draw()});
    t('gdmore').onclick=()=>{st.gdOpen=!st.gdOpen;if(st.gdOpen&&!st.gd.includes(st.dy))st.gd=[st.dy,...st.gd];draw()};
    b.querySelectorAll('[data-gd]').forEach(x=>x.onclick=()=>{const k=x.dataset.gd,G=new Set(st.gd);G.has(k)?G.delete(k):G.add(k);if(!G.size)G.add(st.dy);st.gd=TT_D.filter(q=>G.has(q));draw()});
-   t('tdef').onclick=()=>{st.bands=bandsDef(st.dy);draw()};if(t('tcur'))t('tcur').onclick=()=>{st.bands=bandsCur(cur().dep[st.dy],st.dy);draw()};
+   t('tdef').onclick=()=>{st.bands=bandsDef(st.dy);draw()};if(t('tcur'))t('tcur').onclick=()=>{st.bands=bandsCurV(cur().dep[st.dy],st.dy);draw()};
    b.querySelectorAll('[data-tpl]').forEach(x=>x.onclick=()=>{const q=TPL[+x.dataset.tpl];if(!q)return;st.bands=q.b.map(y=>({...y}));draw();say('Wczytano szablon „'+q.n+'”.')});
    b.querySelectorAll('[data-tplx]').forEach(x=>x.onclick=async()=>{const q=TPL[+x.dataset.tplx];if(!q||!await askConfirm('Usunąć szablon „'+q.n+'”?',{title:'Usuń szablon',ok:'Usuń',danger:true}))return;S.ttTpl=TPL.filter(y=>y!==q);save();draw()});
    t('tsave').onclick=async()=>{const n=await askPrompt('Nazwa szablonu (np. „Linia dzienna – dni robocze”):',TT_DN[st.dy]+' – '+(TPL.length+1),{title:'Zapisz szablon taktów',ok:'Zapisz'});if(!n||!n.trim())return;
     const L=TPL.filter(q=>q.n!==n.trim());L.push({n:n.trim(),b:st.bands.map(y=>({a:y.a,b:y.b,h:y.h,...(y.off?{off:true}:{})}))});S.ttTpl=L;save();draw();say('Zapisano szablon „'+n.trim()+'” – dostępny przy każdej linii tego projektu.')};
-   t('gok').onclick=()=>{const out=cnt(st.bands),days=st.gdOpen?st.gd:[st.dy];days.forEach(dy=>setDepDay(dy,out));
+   t('gok').onclick=()=>{const days=st.gdOpen?st.gd:[st.dy],g=ttApply(l,st.dk,days,st.bands,VS),out={length:g.n};if(onCh)onCh();
     // (zastosowane: szkic tego dnia – i dni, do których też zastosowano – nie jest już „niezapisany”)
     const js=JSON.stringify(st.bands);st.E.base=js;days.forEach(dy=>{const e=TTDRAFT.get(l.id+'|'+st.dk+'|'+dy);if(e&&e!==st.E&&JSON.stringify(e.bands)===js)e.base=js});
     st.gen=false;draw();say('Wygenerowano '+out.length+' odjazdów ('+days.map(k=>TT_DN[k].toLowerCase()).join(', ')+').')}}};

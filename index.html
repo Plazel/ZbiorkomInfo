@@ -1846,7 +1846,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795619482;
+const APP_BUILD=1795632959;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -8132,11 +8132,18 @@ function nmPole(st,sh){const f=fold(st.n);if(!f)return null;const C=[];for(const
   const side=S=>{const w=M(a,[S[2],S[3]]);return v[0]*w[1]-v[1]*w[0]};
   return C.filter(c=>side(c.S)<0).sort((x,y)=>x.d-y.d)[0]||C.sort((x,y)=>x.d-y.d)[0]}
 function nmRoute(Lx){const keys=Object.keys(IDX.days||{w0:1,s0:1,h0:1});
-  const dirs=(Lx.dirs||[]).filter(d=>d&&d.st&&d.st.length>1).map((d,di)=>{const ids=d.st.map(st=>{const P=nmPole(st,d.sh);if(P){const ca=cityArea(P.S[4]);if(NM.ac)NM.ac[ca]=(NM.ac[ca]||0)+1;const id='nm_'+P.id;IDX.stops[id]=[P.S[0],P.S[1]||'',P.S[2],P.S[3],'nm'];return id}
-      const id='nmu_'+st.id;IDX.stops[id]=[st.n,st.num||'',st.ll[0],st.ll[1],'nm'];return id});
-    const nm=k=>IDX.stops[ids[k]][0];
-    return {d:String(di),head:nm(ids.length-1),from:nm(0),stops:ids.map(id=>[id,0,0,'',0]),pats:[ids.map((_,i)=>i)],notes:[''],prof:[[0,d.off]],shape:d.sh&&d.sh.length>1?d.sh:null,
-      plans:['w','s','h'].map(k=>((d.dep||{})[k]||[]).slice().sort((a,b)=>a-b).map(t=>[t,0,0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1]}});
+  const pole=(st,sh)=>{const P=nmPole(st,sh);if(P){const ca=cityArea(P.S[4]);if(NM.ac)NM.ac[ca]=(NM.ac[ca]||0)+1;const id='nm_'+P.id;IDX.stops[id]=[P.S[0],P.S[1]||'',P.S[2],P.S[3],'nm'];return id}
+      const id='nmu_'+st.id;IDX.stops[id]=[st.n,st.num||'',st.ll[0],st.ll[1],'nm'];return id};
+  const dirs=(Lx.dirs||[]).filter(d=>d&&d.st&&d.st.length>1).map((d,di)=>{const ids=d.st.map(st=>pole(st,d.sh));
+    // (warianty i kursy skrócone z NetworkMakera: osobne przebiegi kierunku z opisem – przystanki spoza trasy podstawowej wstawiane
+    // w kolejności przebiegu; w rozkładach przystanków kursy wariantów dostają oznaczenia jak w danych przewoźników)
+    const U=ids.map(id=>({id})),P0=U.slice(),VP=[],V=(d.vars||[]).filter(v=>v&&v.st&&v.st.length>1);
+    V.forEach(v=>{let p=-1;VP.push(v.st.map(st=>{const id=pole(st,v.sh||d.sh);let k=-1;for(let i=p+1;i<U.length;i++)if(U[i].id===id){k=i;break}
+      if(k<0){const o={id};U.splice(p+1,0,o);p=p+1;return o}p=k;return U[k]}))});
+    const ix=new Map(U.map((o,i)=>[o,i])),nm=k=>IDX.stops[ids[k]][0],day=(dep,k)=>((dep||{})[k]||[]).slice().sort((a,b)=>a-b);
+    return {d:String(di),head:nm(ids.length-1),from:nm(0),stops:U.map(o=>[o.id,0,0,'',0]),pats:[P0.map(o=>ix.get(o)),...VP.map(R=>R.map(o=>ix.get(o)))],notes:['',...V.map(v=>v.note||'')],
+      prof:[[0,d.off],...V.map((v,k)=>[k+1,v.off])],shape:d.sh&&d.sh.length>1?d.sh:null,
+      plans:['w','s','h'].map(k=>day(d.dep,k).map(t=>[t,0,0]).concat(...V.map((v,j)=>day(v.dep,k).map(t=>[t,j+1,j+1]))).sort((a,b)=>a[0]-b[0])),tp:Object.fromEntries(keys.map(k=>[k,{w:0,s:1,h:2}[k[0]]||0])),nl:[-1,...V.map(()=>-1)]}});
   return {id:'nml'+Lx.id,n:Lx.n,t:Lx.kind==='tram'?'tram':Lx.kind==='rail'?'rail':Lx.kind==='trolley'?'trol':'bus',op:'NM',dates:IDX.days,dirs,lt:[]}}
 // the network into the index (and the map's data): its stops and lines replace those put in before
 // kolor numeru linii z NetworkMakera – ta sama reguła co w NetworkMakerze (jasne tło: ciemny numer), symbole 1:1
