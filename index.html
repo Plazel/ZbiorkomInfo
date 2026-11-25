@@ -1846,7 +1846,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795610790;
+const APP_BUILD=1795614664;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -4321,12 +4321,21 @@ const gdSayAs=t=>t.replace(/[A-Za-zÀ-ž]+/g,w=>GD_SAY_AS[w]||w);
 function gdSegs(kind,name,isLast,req,zc){return gdSegs0(kind,name,isLast,req,zc).map(([t,l])=>[l==='pl'?gdSayFix(t):l==='cs'?t.replace(/\blinky S\b/g,'linky es'):t,l])}
 // a stop's name as said: in Krynica and Muszyna the town apart from the place in it ("Muszyna, Granica", not "Muszynagranica";
 // a station, "… PKP", said in one go), the numbers I and II as words, and with the voice going down at its end (a full stop)
+// dzielnice i osiedla Trójmiasta oraz miejscowości wokół – pierwszy człon nazw typu „Łostowice Świętokrzyska”, „Sopot Kamienny Potok”
+const GD_TRI=['Gdańsk','Gdynia','Sopot','Rumia','Reda','Wejherowo','Pruszcz Gdański','Straszyn','Kowale','Banino','Chwaszczyno','Rotmanka','Juszkowo','Borkowo','Przejazdowo','Pępowo','Bąkowo','Rusocin','Żukowo','Kolbudy','Lublewo',
+  'Aniołki','Brętowo','Brzeźno','Bysewo','Chełm','Firoga','Jasień','Jelitkowo','Kiełpinek','Klukowo','Kokoszki','Krakowiec','Letnica','Lipce','Łostowice','Matarnia','Migowo','Młyniska','Oliwa','Olszynka','Orunia','Osowa','Piecki','Płonia','Przegalina','Przeróbka','Przymorze','Rębiechowo','Rudniki','Siedlce','Sobieszewo','Stogi','Strzyża','Suchanino','Szadółki','Świbno','Ujeścisko','Wiślinka','Wrzeszcz','Zaspa','Żabianka','Orle','Sianki','Górki Wschodnie','Górki Zachodnie','Nowy Port','Stare Szkoty','Wzgórze Mickiewicza',
+  'Babie Doły','Chwarzno','Chylonia','Cisowa','Dąbrowa','Demptowo','Działki Leśne','Grabówek','Kamienna Góra','Karwiny','Leszczynki','Mały Kack','Obłuże','Oksywie','Orłowo','Pogórze','Pustki Cisowskie','Redłowo','Wiczlino','Wielki Kack','Witomino',
+  'Kamienny Potok','Karlikowo','Brodwino','Przylesie'];
+const GD_TRI_RE=new RegExp('^('+GD_TRI.slice().sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\s+(\\p{Lu}.*)$','u');
 const GD_TOWNS_X=['Krynica','Mochnaczka Niżna','Mochnaczka Wyżna','Wierchomla Wielka','Wojkowa','Złockie','Jastrzębik','Frycowa','Łabowa','Maciejowa','Nawojowa','Nowa Wieś','Nowy Sącz','Szczawnik','Tylicz'];   // (Krynica: its stops are "Krynica …", the town's own stop "Krynica-Zdrój")
 // (the towns: the names of stops in the area that no other stop's name begins (a stop of a town is "<town> <place>"), and the
 // spa towns "… Zdrój")
 function gdTownsKM(){if(gdTownsKM.c)return gdTownsKM.c;const A=new Set(GD_TOWNS_X);Object.values(IDX.stops).forEach(X=>{if(X[4]==='km'&&!/\s(I|II|PKP)$/.test(X[0]))A.add(X[0])});
   const S=new Set([...A].filter(x=>/ Zdrój$/.test(x)||!x.split(' ').some((_,k,w)=>k>0&&A.has(w.slice(0,k).join(' ')))));return gdTownsKM.c=S}
 function gdNameSaid(name,nl){let n=name.replace(/(^|[^\p{L}\d])P\s*\+\s*R(?![\p{L}\d])/gu,'$1Park and Ride');   // (P+R said as Park and Ride in every language)
+  // (Trójmiasto: „<dzielnica/miejscowość> <ulica/miejsce>” z pauzą między członami – „Łostowice, Świętokrzyska”; nie stacje i nie „… Górny/Nowy” itp.)
+  if(nl==='pl'&&['gda','sop','gdy','all','nm'].includes(city)&&!GD_STN.test(n)){const m=n.match(GD_TRI_RE);
+    if(m&&!/^(I|II|III|IV|PKP|SKM|PKM|Główn[ay]|Dolna|Górna|Dolny|Górny|Dolne|Górne|Wielka|Mała|Wielki|Mały|Wielkie|Małe|Nowy|Nowa|Nowe|Stary|Stara|Stare|Zachód|Wschód|Północ|Południe|Centrum|Zachodnia|Wschodnia|Północna|Południowa|Pętla|Zdrój)(\s|$)/.test(m[2]))n=m[1]+', '+m[2]}
   if(nl==='pl'&&city==='km'&&!/\bPKP$/.test(n)){const T=gdTownsKM(),w=n.split(' ');
     for(let k=w.length-1;k>0;k--){const p=w.slice(0,k).join(' '),rest=w.slice(k).join(' ');if(T.has(p)&&!/^(Zdrój|I|II|III|Dolna|Górna|Wielka|Mała|Wyżna|Niżna|Dolny|Górny|Wielki|Mały|Wyżny|Niżny|Dolne|Górne|Wielkie|Małe|Wyżne|Niżne|Nowy|Stary|Nowa|Stara|Nowe|Stare)$/.test(rest)){n=p+', '+rest;break}}}   // (Krynica Dolna, Łabowa Górna, Milik Niżny: one name)
   // (a Roman numeral after a name – "Jana Pawła II", "Władysława IV", "Mieszka I", "Jana III Sobieskiego", "Elżbiety II" –: an ordinal
