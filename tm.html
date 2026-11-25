@@ -1192,7 +1192,14 @@ function buildPaths(vis,CB){
   for(let i=0;i<n;i++){const a=m[Math.max(0,i-TK)],b=m[Math.min(n-1,i+TK)],dx=b[0]-a[0],dy=b[1]-a[1],h=Math.hypot(dx,dy)||1;tx[i]=dx/h;ty[i]=dy/h}
   const gi=MC?gfirst.get(ck(l)):vis.findIndex(x=>(x.par||x.id)===(l.par||l.id));
   const pp={l,li,gi,pts,ranges,m,tx,ty,off:new Float32Array(n),flip:new Uint8Array(n),has:new Uint8Array(n)};
-  if(MC){pp.dup=new Uint8Array(n);pp.cv=new Uint16Array(n);pp.rk=(dimOf(l)?4e9:0)+(l.id===S.sel?0:2e9)+(100-Math.min(99,lw(l)))*1e6+li} // niższe = ważniejsze (rysuje wspólny odcinek)
+  // (linia niezaznaczona: jej warianty i kierunek POWRÓT rysowane tylko tam, gdzie odchodzą od trasy głównej dalej niż ok. 60 m –
+  // obie jezdnie, sąsiednie perony i wspólne ulice dają na mapie jedną linię; po zaznaczeniu linii widać wszystkie przebiegi)
+  if(l.par){const rt=S.lines.find(x=>x.id===l.par),g=l.par,selG=S.sel&&(S.sel===g||(S.lines.find(x=>x.id===S.sel)||{}).par===g);
+   if(rt&&rt!==l&&rt.segs.length&&!selG){const ix=rootIndex(rt),near=q=>{const px=q[1]*RX,py=q[0]*R0,cx=Math.floor(px/ix.CS),cy=Math.floor(py/ix.CS);
+     for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const Lc=ix.cell.get((cx+a)+','+(cy+b));if(!Lc)continue;for(const id of Lc){const [A,B]=ix.segs[id],dx=B[0]-A[0],dy=B[1]-A[1],L2=dx*dx+dy*dy;let t=L2?((px-A[0])*dx+(py-A[1])*dy)/L2:0;t=Math.max(0,Math.min(1,t));if(Math.hypot(px-A[0]-t*dx,py-A[1]-t*dy)<60)return true}}return false};
+    const du=new Uint8Array(n);let any=false;for(let i=0;i<n;i++)if(near(pts[i])){du[i]=1;any=true}
+    if(any){if(du.every(x=>x))return;pp.dup=du;pp.cv=pp.cv||new Uint16Array(n)}}}
+  if(MC){pp.dup=pp.dup||new Uint8Array(n);pp.cv=pp.cv||new Uint16Array(n);pp.rk=(dimOf(l)?4e9:0)+(l.id===S.sel?0:2e9)+(100-Math.min(99,lw(l)))*1e6+li} // niższe = ważniejsze (rysuje wspólny odcinek)
   paths.push(pp)});
  const C=Math.max(10,THR),grid=new Map();
  // (klucze siatki – małe liczby całkowite liczone od rogu sieci: szybsze w Map niż duże liczby zmiennoprzecinkowe)
@@ -1321,7 +1328,7 @@ const pieces=(p,hl)=>{const rs=mergeR(p.ranges);if(!p.dup)return rs;const o=[],s
 // selecting a line, opening a panel or redrawing for the stops does not repeat the work
 const _pidMap=new WeakMap();let _pidN=0,_pc=null;const pid=o=>{let v=_pidMap.get(o);if(!v){v=++_pidN;_pidMap.set(o,v)}return v};
 function pathsSig(vis,CB){const sg=l=>l.segs.map(x=>pid(x.pts)+':'+x.pts.length+':'+(x.mode||'')).join(';'),MC=!!UI.mc;
- return [map.getZoom(),CB?[CB.s,CB.w,CB.n,CB.e].map(x=>(+x).toFixed(5)).join(','):'',MC?1:0,MC?S.sel:'',vis.map(l=>{const rt=l.par?S.lines.find(x=>x.id===l.par):null;
+ return [map.getZoom(),CB?[CB.s,CB.w,CB.n,CB.e].map(x=>(+x).toFixed(5)).join(','):'',MC?1:0,S.sel||'',vis.map(l=>{const rt=l.par?S.lines.find(x=>x.id===l.par):null;
   return [l.id,lw(l),l.color,l.style||'',l.par||'',MC&&dimOf(l)?1:0,sg(l),rt&&rt!==l?sg(rt):''].join('|')}).join('#')].join('~')}
 // (nieużywane: trasa POWRÓT jest na mapie zawsze razem z TAM – cała trasa linii)
 // trasa POWRÓT, która wyraźnie odbiega od trasy TAM (inne ulice na ponad 1/4 długości)
@@ -3289,7 +3296,12 @@ function schemaRuntime(){
 
 let CLSC={};   // (styl klasyczny: wynik rozsuwania węzłów, ponownie użyty, gdy schemat jest budowany jeszcze raz z większym odstępem dla nazw)
 function buildSchema(spread=1){
- syncVariants();const lines=orderedLines().filter(l=>!l.hidden&&l.stops.length>1);
+ syncVariants();
+ // (schemat: każda linia w jednym kierunku – kierunek POWRÓT tylko wtedy, gdy jedzie wyraźnie inaczej niż TAM: ponad 1/4 jego przystanków
+ // to przystanki, których TAM nie obsługuje; warianty zostają)
+ const unitN=id=>{const x=stopOf(id);return x?baseName(x):id},bOff=l=>{if(l.dir!=='B')return false;const f=S.lines.find(x=>x.id===(l.rev||l.par));if(!f||f.stops.length<2)return false;
+   const A=new Set(f.stops.map(unitN)),n=l.stops.filter(id=>!A.has(unitN(id))).length;return n<=l.stops.length/4};
+ const lines=orderedLines().filter(l=>!l.hidden&&l.stops.length>1&&!bOff(l));
  if(!lines.length)return null;
  const gid0=lines.map((l,li)=>{const k=lines.findIndex(x=>(x.par||x.id)===(l.par||l.id));return k<0?li:k}),isMain=li=>!lines[li].par||gid0[li]===li;
   // gid0 – tożsamość linii (linia i jej warianty): numery, znaczniki końcowe, zaznaczanie. gidx – „pas” na schemacie: bez opcji to samo co gid0, a przy opcji
