@@ -1058,6 +1058,10 @@ async function clickAt(ll){
 
 const R0=111000,RX=65000;
 const curAm=()=>UI.strict?$('#amode').value:'free';
+// tryb trasowania konkretnej linii (przeliczanie w tle, np. po wczytaniu torowisk): jej własny, potem linii głównej, potem rodzaj linii –
+// nie bieżący wybór na pasku (wcześniej powroty linii tramwajowych przeliczały się jak autobusy, gdy na pasku wybrany był tryb ulic)
+const lineAm=l=>{if(!UI.strict)return 'free';const R=l&&l.par?S.lines.find(x=>x.id===l.par):null,m=(l&&l.rm)||(R&&R.rm);if(m)return m;
+ const B=R||l,k=B&&(B.kind||(B.segs&&B.segs.length?lineMode(B):null));return k==='tram'?'tram':k==='rail'?'rail':k==='bus'?'street':$('#amode').value};
 const editL=L.layerGroup().addTo(map);
 function snapWp(ll,mm){const g=mm==='rail'?RG:(mm==='tram'||mm==='tramfirst')?G:null;if(!g)return ll;
  let bn=null;for(const [n,d] of bestPerComp(ll,g).values())if(!bn||d<bn[1])bn=[n,d];
@@ -2174,7 +2178,7 @@ async function rebuild(l,verbose,quiet){
  const tok=(tokens.get(l.id)||0)+1;tokens.set(l.id,tok);
  const st=l.stops.map(id=>stopOf(id)).filter(Boolean);
  if(st.length<2){l.segs=[];l.wp=st.length?[st[0].ll]:[];save();redraw();renderLines();if(verbose)say('Dodaj do linii co najmniej 2 przystanki.');return}
- const am=curAm(),res=new Array(st.length-1);let next=0,done=0;
+ const am=lineAm(l),res=new Array(st.length-1);let next=0,done=0;
  const worker=async()=>{while(next<res.length&&tokens.get(l.id)===tok){const i=next++;res[i]=await segRoute(st[i],st[i+1],am);done++;if(verbose&&tokens.get(l.id)===tok)say(`Wyznaczanie trasy: ${done} z ${res.length} odc.…`)}};
  await Promise.all([worker(),worker(),worker()]);
  if(tokens.get(l.id)!==tok)return;
@@ -2247,7 +2251,7 @@ function swapPlatform(l,k,nid){const oldIds=l.stops.slice(),st0=oldIds.map(id=>s
   save();redraw();renderLines()}))}
 async function gapFix(l,k){
  if(l.auto||l.loop||!l.segs.length||k<1||k>=l.stops.length)return;
- const am=UI.strict?(l.rm||$('#amode').value):'free';if(am==='free')return;
+ const am=lineAm(l);if(am==='free')return;
  const st=l.stops.map(id=>stopOf(id));if(st.some(x=>!x))return;
  const ch=chainArcs(l.segs,st);if(!ch)return;const a0=ch.a[k-1],a1=ch.a[k];if(!(a1>a0))return;
  const A=st[k-1],B=st[k],r=await segRoute(A,B,am);if(!r||r.bad||!r.pts||r.pts.length<2)return;
