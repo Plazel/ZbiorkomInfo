@@ -1228,7 +1228,7 @@ header.top #cityBtn{border:0!important;background:none!important;box-shadow:none
 header.top #cityBtn>svg:last-child{width:12px;height:12px;opacity:.6;transition:transform .15s;position:relative;top:2px}
 header.top #cityName{position:relative;top:1.75px}   /* (the city name on the logo's baseline) */
 header.top #cityBtn[aria-expanded="true"]>svg:last-child{transform:rotate(180deg)}
-header.top #cityBtn:hover #cityName{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+
 header.top #cityBtn:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 @media (max-width:460px){header.top #cityBtn{font-size:1.02rem;padding:0 4px}}
 @media (min-width:901px){header.top #gsIn,header.top #gsBtn{height:38px}header.top #gsMob{display:none}}
@@ -1848,7 +1848,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795727565;
+const APP_BUILD=1795727592;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -6588,7 +6588,7 @@ async function depNearest(la,lo,acc){const st=document.getElementById('depStat')
   store.set(depKey(),depCfg);   // the nearest stop's board is remembered too (the next visit opens with it)
   DEP.loc=true;document.getElementById('topLoc').setAttribute('aria-pressed','true');depCloseDlg();
   depLoadData();st.textContent='Najbliższy przystanek: '+best+' ('+Math.round(bd)+' m'+(acc?', '+trS('dokładność')+' ±'+Math.round(acc)+' m':'')+')'}
-function markCity(){document.getElementById('cityName').textContent=CITIES[city][0];document.getElementById('cityBtn').title='Miasto: '+CITIES[city][0];
+function markCity(){document.getElementById('cityName').textContent=CITIES[city][0];document.getElementById('cityBtn').setAttribute('aria-label','Miasto: '+CITIES[city][0]);
   document.querySelectorAll('#cityMenu [data-city]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.city===city)));cityUrl();navMark()}
 function fitGs(){const g=document.querySelector('.gsWrap'),h=document.querySelector('header.top');if(!g||!h)return;
   if(innerWidth<=900){g.style.width='';return}
