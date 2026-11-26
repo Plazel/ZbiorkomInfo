@@ -969,6 +969,7 @@ ROWS = [
     ('Konta, role i dostęp', 'Accounts, roles and access', 'Konten, Rollen und Zugang', 'Účty, roly a prístup', 'Účty, role a přístup'),
     ('Linie regionalne', 'Regional lines', 'Regionallinien', 'Regionálne linky', 'Regionální linky'),
     ('Ortofotomapa', 'Orthophoto map', 'Orthofoto', 'Ortofotomapa', 'Ortofotomapa'),
+    ("Na urządzeniu nie znaleziono głosu odpowiedniego dla wybranego języka", "No voice for the chosen language was found on this device", "Auf dem Gerät wurde keine passende Stimme für die gewählte Sprache gefunden", "V zariadení sa nenašiel hlas vhodný pre zvolený jazyk", "V zařízení nebyl nalezen hlas vhodný pro zvolený jazyk"),
 ]
 
 WEEKDAYS = {
