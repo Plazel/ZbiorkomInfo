@@ -720,6 +720,7 @@ nav.rail::before{content:"";position:absolute;left:0;right:0;top:0;height:var(--
 .expDays{flex-wrap:wrap;gap:6px 14px}.expDays label{white-space:nowrap}.expDays[hidden]{display:none}
 .expFmt{display:flex;gap:14px;align-items:center;padding:6px 2px 2px;font-size:.92rem}.expFmt span{color:var(--muted)}.expFmt label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
 .expBtns{display:flex;gap:8px}
+html #pdfBtn{border:1px solid var(--line)!important;border-radius:0!important}   /* (obramowanie jak przy pozostałych przyciskach także w płaskim motywie) */
 
 /* ---- departure board (Odjazdy): a stop's departures as on a stop display, from the timetables ---- */
 .depModal{position:fixed;left:var(--rail-w);top:var(--top-h);right:0;bottom:0;z-index:34;display:grid;grid-template-rows:1fr auto;
@@ -1848,7 +1849,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795727665;
+const APP_BUILD=1795727806;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
