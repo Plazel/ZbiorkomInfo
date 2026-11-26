@@ -273,7 +273,7 @@ span.chip{cursor:inherit}
 .side tr.brk .sb::before{border-left-style:dotted}
 .side .d{z-index:1}
 .side .sb:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
-.side .m{width:30px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
+.side table.tmClk .m{width:42px}.side .m{width:30px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;flex:none}
 .side .d{width:14px;height:14px;flex:none;position:relative}
 .side .d::after{content:"";position:absolute;inset:2px;border-radius:50%;border:2px solid var(--dot);background:var(--bg)}
 .side tr.end .d::after,.side tr.cur .d::after{background:var(--dot)}
@@ -1848,7 +1848,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795708256;
+const APP_BUILD=1795726897;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2425,7 +2425,7 @@ async function renderStop(id,di,si){
   const off=mainOffsets(d);const sl=document.getElementById('sl');const ends=new Set([mp[0],mp[mp.length-1]]);
   // T: a trip picked in the timetable (its stops and minutes are shown, with its variant route; the rest is dimmed)
   // (a trip is listed in its own order, only the stops it serves)
-  let DTX=null;const drawSL=T=>{sl.innerHTML='';
+  let DTX=null;const drawSL=T=>{sl.innerHTML='';const tb=sl.closest('table');if(tb){tb.classList.toggle('tmClk',!!(T&&T.clock));const th=tb.querySelector('thead th');if(th)th.textContent=T&&T.clock?trS('godz.'):'min'}
     // minutes from the chosen stop on to the end of the route (stops before it: none)
     const o0=off[si];const rows=T?T.seq:d.stops.map((s,i)=>[i,off[i]===undefined?'':o0===undefined?off[i]:off[i]>=o0&&(i>=si||off[i]>o0)?off[i]-o0:'']);
     rows.forEach(([i,m],k)=>{const s=d.stops[i];if(!T&&hideDepot&&s[4]&&i!==si)return;
@@ -2480,7 +2480,8 @@ async function renderStop(id,di,si){
     const was=sp.classList.contains('sel');document.querySelectorAll('.mins span.sel').forEach(x=>x.classList.remove('sel'));
     if(was){drawSL(null);return}
     sp.classList.add('sel');const [pi,t0]=sp.dataset.tr.split(',').map(Number);const [pat,po]=d.prof[pi];
-    drawSL({seq:d.pats[pat].map((k,j)=>[k,po[j]-po[0]])})});
+    // (zaznaczony kurs: zamiast minut przejazdu – godziny tego kursu na kolejnych przystankach)
+    const ck=t=>{const m=((Math.round(t)%1440)+1440)%1440;return Math.floor(m/60)+':'+String(m%60).padStart(2,'0')};drawSL({clock:1,seq:d.pats[pat].map((k,j)=>[k,ck(t0+po[j])])})});
   // a click on an empty place (not on a departure, a button or a link) lets go of the chosen trip
   if(window._ttDesel)document.removeEventListener('click',window._ttDesel);
   window._ttDesel=e=>{if(!document.querySelector('.mins span.sel'))return;if(!document.getElementById('grid')){document.removeEventListener('click',window._ttDesel);return}
