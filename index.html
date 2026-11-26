@@ -605,13 +605,14 @@ span.chip{cursor:inherit}
 .ps .pscols{display:grid;grid-template-columns:repeat(var(--nc,3),1fr);gap:2mm;flex:1;min-height:0;align-items:stretch}
 .ps .psc{background:#fff;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .ps .psc table{flex:none}
-.ps .psch{flex:none;display:flex;align-items:center;gap:2mm;padding:1.5mm 2mm;background:#dfe3e7;font-weight:700;font-size:calc(var(--pf) * 1.05);min-height:9mm;box-sizing:border-box}
+.ps .psch svg{width:calc(var(--pf) * 1.2);height:calc(var(--pf) * 1.2);flex:none}   /* zegarek dokładnie nad środkiem kolumny godzin */
+.ps .psch{flex:none;display:flex;align-items:center;gap:calc(var(--pf) * .6);padding:1.5mm 2mm 1.5mm calc(var(--pf) * .55);background:#dfe3e7;font-weight:700;font-size:calc(var(--pf) * 1.05);min-height:9mm;box-sizing:border-box}
 .ps .psch small{display:block;font-weight:400;font-size:calc(var(--pf) * .85)}
 .ps .psxn{flex:none;background:#f4c20d;color:#111;padding:1.2mm 2mm;font-size:calc(var(--pf) * .85);line-height:1.3}
 .ps .psc.dark .psch{background:#2d3238;color:#fff}
 .ps table{border-collapse:collapse;width:100%}
 .ps .psc table{table-layout:fixed}
-.ps .psc th{width:9mm;box-sizing:border-box;text-align:center;font-weight:700;background:#e8ebee;border-bottom:.4mm solid #fff;padding:.9mm 0;vertical-align:middle}
+.ps .psc th{width:calc(var(--pf) * 2.3);box-sizing:border-box;text-align:center;font-weight:700;background:#e8ebee;border-bottom:.4mm solid #fff;padding:.9mm 0;vertical-align:middle}
 .ps .psc.dark th{background:#2d3238;color:#fff;border-bottom-color:#555}
 .ps .psc td{padding:.9mm 2mm;border-bottom:.4mm solid #e8ebee;line-height:1.3;vertical-align:middle}
 .ps .psc tr:nth-child(even) td{background:#f6f7f9}
@@ -1847,7 +1848,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795705342;
+const APP_BUILD=1795705680;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2757,6 +2758,11 @@ function sheetHTML(S){
     const rows=H.map(h=>`<tr><th>${h%24}</th><td>${fq&&(fq[h]||allDay&&fq[h+24])?`<span>co ok. ${fq[h]||fq[h+24]} min</span>`:(by[h]||[]).map(x=>`<span>${String(x.t%60).padStart(2,'0')}${x.lt&&!S.noNotes?'<sup>'+x.lt+'</sup>':''}${x.ln&&!S.noLines?`<sub style="color:${x.lc}">${esc(x.ln)}</sub>`:''}</span>`).join('')}</td></tr>`).join('');
     const empty=!S.cols[k].length?`<tr><td colspan="2" class="psnone">${esc(emptyMsg(k,S.ops,false))}</td></tr>`:'';
     return `<div class="psc${dark?' dark':''}${k==='x'?' xcol':''}"><div class="psch">${CLOCK}<span>${DAYNAMES[k]}</span></div><table>${empty||rows}</table>${k==='x'&&!XD_FRI?'<div class="psxn">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</div>':''}</div>`};
+  // szerokość kolumn dni według potrzeb: najdłuższa godzina (minuty z oznaczeniami) i nagłówek – dzień z dużą liczbą kursów dostaje
+  // więcej miejsca kosztem dni z małą (mniej minut zawiniętych do drugiego wiersza); jednostka ≈ wysokość czcionki
+  const colW=ds=>ds.map(k=>{const by={};S.cols[k].forEach(x=>{const h=allDay?Math.floor(x.t/60)%24:Math.floor(x.t/60);by[h]=(by[h]||0)+2.05+(x.lt&&!S.noNotes?.45:0)+(x.ln&&!S.noLines?.75:0)});
+    const fq=S.rs.length===1?freqHours(S.rs[0],S.cols[k]):null,mx=fq&&Object.keys(fq).length?Math.max(9,...Object.values(by)):Math.max(0,...Object.values(by)),hd=2.6+String(DAYNAMES[k]||'').length*.6;
+    return `minmax(0,${Math.max(hd,2.3+1.4+mx).toFixed(2)}fr)`}).join(' ');
   // the stops still to come: minutes from this stop and a line down to the end of the route
   const L0=(S.short?shortList(S.list):S.list.map(x=>({...x}))).filter(x=>!x.before);while(L0.length&&L0[0].brk)L0.shift();const lastIdx=L0.length-1;
   const list=L0.map((x,k)=>x.brk?`<tr class="brk${x.before?' bef':''}"><td class="m"></td><td class="d"><b></b><s></s><s></s><s></s></td><td class="n"></td><td class="p"></td></tr>`:`<tr class="${x.cur?'cur':x.before?'bef':''}${k===0||k===lastIdx||(L0[k-1]&&L0[k-1].brk)||(L0[k+1]&&L0[k+1].brk)?' end':''}${k===0||k===lastIdx?' fl':''}${x.gap?' gap':''}"><td class="m">${x.before?'':x.m}</td><td class="d"><b></b><i></i></td><td class="n">${esc(x.n)}${x.req?' '+HAND:''}</td><td class="p">${x.p?esc(x.p):''}</td></tr>`).join('');
@@ -2765,7 +2771,7 @@ function sheetHTML(S){
   <div class="psl">
    <div class="pshead${many?' many':''}">${ICONS[lineIco(S.rs[0])].replace('<svg ','<svg width="46" height="46" ').replace('fill:var(--bg)','fill:#fff').replace(/currentColor/g,'#222')}<div class="psbs">${S.rs.map(badge).join('')}</div>
     <div class="psroute"><div class="psfrom"><i></i><b class="pslk"></b><span>${nb(S.name)} ${esc(S.num)}</span></div><div class="psto"><i></i><span>${nb(S.head)}</span></div></div></div>
-   <div class="pscols" style="--nc:${days.length}">${days.map(k=>col(k,k==='h')).join('')}</div>
+   <div class="pscols" style="--nc:${days.length};grid-template-columns:${colW(days)}">${days.map(k=>col(k,k==='h')).join('')}</div>
    <div class="psfoot"><div>${S.req?'<p>'+HAND+' – przystanek na żądanie</p>':''}${S.noNotes?'':S.notes.map(([l,t])=>`<p><b class="k">${l}</b> – ${esc(t)}</p>`).join('')}</div>
     <div class="psmeta"><p>Rozkład ważny od: <b>${fmtDay(wk.from)}</b></p><p>Organizator: <b>${esc(ops)}</b></p></div></div>
   </div>
