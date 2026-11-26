@@ -625,7 +625,7 @@ span.chip{cursor:inherit}
 .ps .psfoot b.k{color:#b3261e}
 .ps .hand{width:1.15em;height:1.15em;vertical-align:-.2em;color:#111}
 .ps .psr{border:.3mm solid #cfd4d9;border-radius:2mm;padding:2mm;overflow:hidden;min-height:0}
-.ps .psr{width:max-content;max-width:110mm}.ps.a5 .psr{max-width:78mm}   /* the stop list only as wide as its longest name needs */
+.ps .psr{width:max-content;max-width:110mm}   /* the stop list only as wide as its longest name needs */
 .ps .psr table{width:auto}.ps .psr td.n{white-space:nowrap}
 .ps .psr th{text-align:left;font-size:calc(var(--pf) * .9);padding:.5mm 1mm 1.5mm;border-bottom:.4mm solid #111}
 .ps .psr td{padding:.7mm 1.2mm;font-size:calc(var(--pf) * .98);line-height:1.2;vertical-align:middle}
@@ -647,8 +647,9 @@ span.chip{cursor:inherit}
 .ps .psr tr.cur td.m,.ps .psr tr.cur td.n,.ps .psr tr.cur td.p{background:#111;color:#fff;font-weight:700}
 @page{size:A4 landscape;margin:0}
 /* A5: the same sheet, smaller */
-.ps.a5{width:210mm;height:148mm;padding:3mm 4mm;grid-template-columns:minmax(0,1fr) auto;gap:3mm}
-.ps.a5 .pshead>svg{width:9mm;height:9mm}
+/* (dokładnie ten sam układ co A4, pomniejszony – wcześniej osobne wymiary A5 przy niezmienionych odstępach w mm dawały
+   rozciągnięte nagłówki, za duże kropki i zmarnowane miejsce) */
+.ps.a5{zoom:.70707}
 @media print{
   body>*:not(#printSheet){display:none!important}
   html,body{background:#fff!important;padding:0!important;margin:0!important}
@@ -1846,7 +1847,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795635399;
+const APP_BUILD=1795705342;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2748,12 +2749,12 @@ function sheetHTML(S){
   // badges: smaller when there are many lines (or long names), so that they all fit in the header
   const bw=S.rs.reduce((a,r)=>a+Math.max(1,String(r.n).length*.46+.3),0);
   const many=S.rs.length>4;   // many lines: smaller badges (wrapping onto a second row if need be), the route still beside them
-  const W5=S.fmt==='a5'?.7:1;const bs=Math.max(5,Math.min((many?11:17)*W5,(many?150:118)*W5/bw-1.5));
+  const W5=1;const bs=Math.max(5,Math.min((many?11:17)*W5,(many?150:118)*W5/bw-1.5));
   const nb=t=>esc(t).split(' ').map(w=>`<span class="nw">${w}</span>`).join(' ');   // a name breaks only between words
   const badge=r=>`<span class="psb${r.t==='tram'||r.nt?' tram':''}${String(r.n).length<=4?' sq l'+String(r.n).length:''}" style="background:${sheetCol(r)};color:${(r.f||r.t==='rail')?txtOf(r):'#fff'};--bs:${bs.toFixed(2)}">${esc(r.n)}</span>`;
   const col=(k,dark)=>{const by={};S.cols[k].forEach(x=>{const h=allDay?Math.floor(x.t/60)%24:Math.floor(x.t/60);(by[h]=by[h]||[]).push(x)});if(allDay)for(const h in by)by[h].sort((a,b)=>a.t%60-b.t%60);
     const fq=S.rs.length===1?freqHours(S.rs[0],S.cols[k]):null;
-    const rows=H.map(h=>`<tr><th>${String(h%24).padStart(2,'0')}</th><td>${fq&&(fq[h]||allDay&&fq[h+24])?`<span>co ok. ${fq[h]||fq[h+24]} min</span>`:(by[h]||[]).map(x=>`<span>${String(x.t%60).padStart(2,'0')}${x.lt&&!S.noNotes?'<sup>'+x.lt+'</sup>':''}${x.ln&&!S.noLines?`<sub style="color:${x.lc}">${esc(x.ln)}</sub>`:''}</span>`).join('')}</td></tr>`).join('');
+    const rows=H.map(h=>`<tr><th>${h%24}</th><td>${fq&&(fq[h]||allDay&&fq[h+24])?`<span>co ok. ${fq[h]||fq[h+24]} min</span>`:(by[h]||[]).map(x=>`<span>${String(x.t%60).padStart(2,'0')}${x.lt&&!S.noNotes?'<sup>'+x.lt+'</sup>':''}${x.ln&&!S.noLines?`<sub style="color:${x.lc}">${esc(x.ln)}</sub>`:''}</span>`).join('')}</td></tr>`).join('');
     const empty=!S.cols[k].length?`<tr><td colspan="2" class="psnone">${esc(emptyMsg(k,S.ops,false))}</td></tr>`:'';
     return `<div class="psc${dark?' dark':''}${k==='x'?' xcol':''}"><div class="psch">${CLOCK}<span>${DAYNAMES[k]}</span></div><table>${empty||rows}</table>${k==='x'&&!XD_FRI?'<div class="psxn">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</div>':''}</div>`};
   // the stops still to come: minutes from this stop and a line down to the end of the route
@@ -2805,8 +2806,8 @@ function buildSheet(S){
     for(let i=0;i<n;i++){const rs=tbs.map(t=>t.rows[i]).filter(Boolean);const h=Math.max(...rs.map(r=>r.getBoundingClientRect().height));rs.forEach(r=>r.style.height=h+'px')}};
   const fits=f=>{ps.style.setProperty('--pf',f+'px');eq();return ![...ps.querySelectorAll('.psl,.psr,.psc')].some(el=>el.scrollHeight>el.clientHeight+1)&&ps.scrollHeight<=ps.clientHeight+1};
   // the largest type that still fits on the page (so a short timetable fills the sheet too)
-  const a5=S.fmt==='a5',base=a5?8.5:11;
-  const best=()=>{let lo=a5?4:5,hi=a5?14:19;if(fits(hi))return hi;for(let k=0;k<9;k++){const m=(lo+hi)/2;if(fits(m))lo=m;else hi=m}return lo};
+  const base=11;
+  const best=()=>{let lo=5,hi=19;if(fits(hi))return hi;for(let k=0;k<9;k++){const m=(lo+hi)/2;if(fits(m))lo=m;else hi=m}return lo};
   // with many departures the line numbers at the top get smaller first, and only then the type
   let lo=0,kk=1;for(const k of [1,.85,.7,.55]){ps.style.setProperty('--bsk',k);lo=best();kk=k;if(lo>=base)break}
   ps.style.setProperty('--bsk',kk);fits(lo);
@@ -2830,6 +2831,8 @@ const rgba=c=>{const m=(c||'').match(/rgba?\(([^)]+)\)/);if(!m)return null;const
 // (doc0: a PDF begun before – the sheet goes on a new page of it: the timetables of all a line's stops in one file)
 async function vectorPDF(ps,doc0){
   const {jsPDF}=window.jspdf;const a5=ps.classList.contains('a5');let doc=doc0;
+  // (A5 to arkusz A4 pomniejszony przez zoom: położenia z prostokątów są już pomniejszone, a wartości stylów nie – mnożymy je przez skalę)
+  const ZS=(()=>{const w=parseFloat(getComputedStyle(ps).width)||0,rw=ps.getBoundingClientRect().width;return w>0&&rw>0?rw/w:1})(),pz=v=>parseFloat(v)*ZS;
   if(doc)doc.addPage(a5?'a5':'a4','landscape');
   else{doc=new jsPDF({unit:'mm',format:a5?'a5':'a4',orientation:'landscape',compress:true});
     const vfs=window.pdfMake.vfs;
@@ -2856,9 +2859,9 @@ async function vectorPDF(ps,doc0){
       const holder=document.createElement('div');holder.style.cssText='position:fixed;left:-9999px;top:0';holder.appendChild(c);document.body.appendChild(holder);
       try{await doc.svg(c,{x,y,width:w,height:h})}catch(e){}
       holder.remove();if(op<1)alpha(1);continue}
-    const bg=rgba(cs.backgroundColor),rad=parseFloat(cs.borderTopLeftRadius)||0;
+    const bg=rgba(cs.backgroundColor),rad=pz(cs.borderTopLeftRadius)||0;
     const round=rad>0&&rad>=Math.min(r.width,r.height)/2-.5;
-    const bw=parseFloat(cs.borderTopWidth)||0,bc=rgba(cs.borderTopColor),allB=bw>0&&cs.borderTopStyle!=='none'&&['Right','Bottom','Left'].every(sd=>parseFloat(cs['border'+sd+'Width'])===bw);
+    const bw=pz(cs.borderTopWidth)||0,bc=rgba(cs.borderTopColor),allB=bw>0&&cs.borderTopStyle!=='none'&&['Right','Bottom','Left'].every(sd=>pz(cs['border'+sd+'Width'])===bw);
     if(round){   // circles (stop dots) and round badges
       if(bg&&bg.a>0)fill(bg);if(allB&&bc&&bc.a>0){stroke(bc);doc.setLineWidth(bw*k)}
       const st=(bg&&bg.a>0?'F':'')+(allB&&bc&&bc.a>0?'D':'');
@@ -2867,7 +2870,7 @@ async function vectorPDF(ps,doc0){
       if(bg&&bg.a>0){fill(bg);if(rad>0)doc.roundedRect(x,y,w,h,rad*k,rad*k,'F');else doc.rect(x,y,w,h,'F')}
       if(allB&&rad>0&&bc&&bc.a>0){stroke(bc);doc.setLineWidth(bw*k);doc.roundedRect(x+bw*k/2,y+bw*k/2,w-bw*k,h-bw*k,rad*k,rad*k,'D')}
       else for(const [sd,x1,y1,x2,y2] of [['Top',x,y,x+w,y],['Bottom',x,y+h,x+w,y+h],['Left',x,y,x,y+h],['Right',x+w,y,x+w,y+h]]){
-        const b=parseFloat(cs['border'+sd+'Width'])||0,c=rgba(cs['border'+sd+'Color']),styl=cs['border'+sd+'Style'];
+        const b=pz(cs['border'+sd+'Width'])||0,c=rgba(cs['border'+sd+'Color']),styl=cs['border'+sd+'Style'];
         if(!b||styl==='none'||!c||c.a===0)continue;
         stroke(c);doc.setLineWidth(b*k);const off=b*k/2;
         if(styl==='dotted'||styl==='dashed')doc.setLineDashPattern(styl==='dotted'?[b*k,b*k*1.6]:[b*k*3,b*k*2],0);
@@ -2875,7 +2878,7 @@ async function vectorPDF(ps,doc0){
         doc.setLineDashPattern([],0)}
     }
     // text: each word drawn where the page shows it
-    const tc=rgba(cs.color);const fs=parseFloat(cs.fontSize);const bold=(parseInt(cs.fontWeight)||400)>=500;
+    const tc=rgba(cs.color);const fs=pz(cs.fontSize);const bold=(parseInt(cs.fontWeight)||400)>=500;
     // a line badge: its number centred in it, in the badge font
     if(el.classList.contains('psb')){const t=el.textContent.trim();
       doc.setFont(RC_B64?'RC':'Roboto',RC_B64?'normal':'bold');doc.setFontSize(fs*.75);if(tc)doc.setTextColor(tc.r,tc.g,tc.b);
@@ -2913,7 +2916,7 @@ function pdfPreview(doc,name,sheets){const blob=doc.output('blob'),url=URL.creat
   D.innerHTML=`<div class="depBox pdfPvBox"><div class="depHead"><h2>${esc(trS('Podgląd PDF'))}</h2><span class="pdfPvN">${esc(name)}${sheets.length>1?' · '+sheets.length+' '+esc(trS('str.')):''}</span><button type="button" class="accBtn pdfPvPr">${esc(trS('Drukuj'))}</button><button type="button" class="accBtn pri pdfPvDl">${esc(trS('Pobierz PDF'))}</button><button type="button" class="depX" aria-label="${esc(trS('Zamknij'))}">×</button></div><div class="pdfPvBody">${viewer?`<iframe title="PDF" src="${url}#view=FitH"></iframe>`:''}</div></div>`;
   const body=D.querySelector('.pdfPvBody');
   if(!viewer)sheets.forEach(ps=>{const w=document.createElement('div');w.className='pdfPvPg';const c=ps.cloneNode(true);c.removeAttribute('id');w.appendChild(c);body.appendChild(w)});
-  const fit=()=>body.querySelectorAll('.pdfPvPg').forEach(w=>{const c=w.firstChild,sc=Math.min(1.4,(body.clientWidth-24)/c.offsetWidth);c.style.transform='scale('+sc+')';w.style.width=c.offsetWidth*sc+'px';w.style.height=c.offsetHeight*sc+'px'});
+  const fit=()=>body.querySelectorAll('.pdfPvPg').forEach(w=>{const c=w.firstChild;c.style.transform='none';const R=c.getBoundingClientRect(),cw=R.width||c.offsetWidth,ch=R.height||c.offsetHeight,sc=Math.min(1.4,(body.clientWidth-24)/cw);c.style.transform='scale('+sc+')';w.style.width=cw*sc+'px';w.style.height=ch*sc+'px'});
   const end=()=>{D.remove();setTimeout(()=>{const f=document.getElementById('pdfPrF');if(f)f.remove();URL.revokeObjectURL(url)},60000);removeEventListener('resize',fit);document.removeEventListener('keydown',kd,true)},kd=e=>{if(e.key==='Escape'){e.stopPropagation();end()}};
   D.querySelector('.depX').onclick=end;D.onclick=e=>{if(e.target===D)end()};
   D.querySelector('.pdfPvDl').onclick=async e=>{const b=e.currentTarget;b.disabled=true;try{await fileSave(name,blob)}catch(x){console.error(x);alert(trS('Nie udało się zapisać pliku.'))}finally{b.disabled=false}};
