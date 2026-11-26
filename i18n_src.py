@@ -968,6 +968,7 @@ ROWS = [
     ('Pominięte i dodatkowe przystanki w zapowiedziach', 'Skipped and extra stops in the announcements', 'Ausgelassene und zusätzliche Haltestellen in den Ansagen', 'Vynechané a ďalšie zastávky v hláseniach', 'Vynechané a další zastávky v hlášeních'),
     ('Konta, role i dostęp', 'Accounts, roles and access', 'Konten, Rollen und Zugang', 'Účty, roly a prístup', 'Účty, role a přístup'),
     ('Linie regionalne', 'Regional lines', 'Regionallinien', 'Regionálne linky', 'Regionální linky'),
+    ('Ortofotomapa', 'Orthophoto map', 'Orthofoto', 'Ortofotomapa', 'Ortofotomapa'),
 ]
 
 WEEKDAYS = {
