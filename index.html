@@ -1848,7 +1848,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795705680;
+const APP_BUILD=1795705918;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -1931,7 +1931,7 @@ function chip(r,extra='',plain=false){
   if(typeof r==='string')r=BYNAME[r];
   const a=document.createElement(plain?'span':'a');if(!plain)a.href='#l'+r.id;a.className='chip '+r.t+(r.nt?' nt':'')+(r.n.length>4&&r.t!=='tram'&&r.t!=='rail'&&!r.nt?' wide':'')+(r.n.length<=3&&r.t!=='tram'&&r.t!=='rail'&&!r.nt&&r.n!=='S22'?' sq':'')+(r.n==='S22'?' circle':'')+(r.t==='rail'&&r.n.length<=2?' r2':'')+(r.f?' freq':'')+(extra?' '+extra:'');a.textContent=r.n;
   if(r.f||r.t==='rail'){a.style.setProperty('--c',colOf(r));a.style.setProperty('--t',txtOf(r))}
-  a.title='Linia '+r.n+': '+r.ends.join(' – ');
+  a.title='Linia '+r.n+((r.ends||[]).length?': '+r.ends.join(' – '):'');
   return a;
 }
 
@@ -2933,13 +2933,13 @@ function pdfPreview(doc,name,sheets){const blob=doc.output('blob'),url=URL.creat
 // "Eksport": print, PDF and the shortened list of stops, in one menu
 const PRINT_BTNS='<span class="expWrap"><button class="btn ibtn" type="button" id="expBtn" aria-expanded="false" aria-controls="expPanel" title="Eksport" aria-label="Eksport"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="1.5"/><path d="M7 14h10v7H7z"/></svg></button>'
   +'<div class="expPanel" id="expPanel" hidden role="group" aria-label="Eksport rozkładu"><label class="sw-depot" for="expShort"><input type="checkbox" id="expShort" role="switch"><span class="track" aria-hidden="true"></span><span>Skrócona lista przystanków</span></label>'
-  +'<label class="sw-depot" for="expNotes"><input type="checkbox" id="expNotes" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj adnotacje<small>bez liter przy kursach i objaśnień pod rozkładem</small></span></label>'
-  +'<label class="sw-depot" for="expLines"><input type="checkbox" id="expLines" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj oznaczenia linii<small>bez numeru linii przy każdym kursie</small></span></label>'
-  +'<label class="sw-depot" for="expRoute"><input type="checkbox" id="expRoute" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj trasę przejazdu<small>bez listy przystanków z czasami przejazdu</small></span></label>'
-  +'<label class="sw-depot" for="expX"><input type="checkbox" id="expX" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj dni ze specjalnym rozkładem<small>bez żółtej kolumny dnia ze specjalnym rozkładem jazdy</small></span></label>'
+  +'<label class="sw-depot" for="expNotes"><input type="checkbox" id="expNotes" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj adnotacje</span></label>'
+  +'<label class="sw-depot" for="expLines"><input type="checkbox" id="expLines" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj oznaczenia linii</span></label>'
+  +'<label class="sw-depot" for="expRoute"><input type="checkbox" id="expRoute" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj trasę przejazdu</span></label>'
+  +'<label class="sw-depot" for="expX"><input type="checkbox" id="expX" role="switch"><span class="track" aria-hidden="true"></span><span>Ukryj dni ze specjalnym rozkładem</span></label>'
   +'<div class="expFmt expDays" id="expDays" role="group" aria-label="Dni w rozkładzie"></div>'
   +'<div class="expFmt" role="radiogroup" aria-label="Format"><span>Format</span><label><input type="radio" name="expFmt" value="a4"> A4</label><label><input type="radio" name="expFmt" value="a5"> A5</label></div>'
-  +'<div class="expBtns"><button class="btn" type="button" id="prBtn">Drukuj</button><button class="btn" type="button" id="pdfBtn">PDF</button></div></div></span>';
+  +'<div class="expBtns"><button class="btn" type="button" id="pdfBtn">Eksportuj</button></div></div></span>';
 function hookPrint(make){const p=document.getElementById('prBtn'),q=document.getElementById('pdfBtn'),b=document.getElementById('expBtn'),pn=document.getElementById('expPanel'),sh=document.getElementById('expShort');
   if(!b)return;
   const S0=make();const long=isLong(S0.list);sh.closest('label').hidden=!long;sh.checked=long&&store.get('ztm.expShort',false);
@@ -2960,7 +2960,7 @@ function hookPrint(make){const p=document.getElementById('prBtn'),q=document.get
   const show=on=>{pn.hidden=!on;b.setAttribute('aria-expanded',String(on))};
   b.onclick=e=>{e.stopPropagation();show(pn.hidden)};
   document.addEventListener('click',e=>{if(!pn.hidden&&!e.target.closest('.expWrap'))show(false)});
-  p.onclick=()=>{show(false);printSheet(mk())};q.onclick=()=>pdfSheet(mk(),q)}
+  if(p)p.onclick=()=>{show(false);printSheet(mk())};q.onclick=()=>{show(false);pdfSheet(mk(),q)}}
 
 /* ---------- network map ---------- */
 // Geometry (merged directions) and stop positions on the drawn lines come precomputed in data/map.json.
@@ -5784,10 +5784,15 @@ const VEH_W='(?:Tram|Bus|U-Bahn|Fähre|Tramwaj|Autobus|Prom|Ferry|Přívoz|Priev
 const SEV_W=/Ersatz|zastępcza|Replacement|Náhrad/;
 // words after which a number is a line's, kept in the sentence ("linii 6", "linky 9", "line 175")
 const KEEP_W='(?:[Ll]\\.|[Ll]inii|[Ll]inie|[Ll]inia|[Ll]iniach|[Ll]iniami|[Ll]inią|[Nn]r|[Ll]ines?|Linien?|[Ll]inky|[Ll]inka|[Ll]ince|[Ll]inek|[Ll]inkami)';   // ("Linia 183" at a sentence's start too)   // (a replacement service: its lines are buses; the words kept)
-function lineSigns(html,lines){const set=new Set(lines||[]),deLn=/^(ber|ham)/.test(city||'');const here=IDX?IDX.routes.filter(r=>inCity(r)):[];
+// symbole linii, których nie ma w bieżących danych (zawieszonych), a które pojawiają się w komunikatach – w barwach przewoźnika
+// (Bydgoszcz, linia 1: „Katalog symboli stosowanych w komunikacji miejskiej” ZDMiKP – tło R117 G197 B240, napis biały)
+const LINE_X={byd:[{id:'byd_x1',n:'1',t:'tram',op:'ZDMiKP Bydgoszcz',f:true,k:'#75c5f0',kt:'#ffffff',ends:[],x:1}]};
+function lineSigns(html,lines){const set=new Set(lines||[]),deLn=/^(ber|ham)/.test(city||'');const here=IDX?IDX.routes.filter(r=>inCity(r)).concat((LINE_X[city]||[]).filter(x=>!IDX.routes.some(r=>inCity(r)&&r.n===x.n))):[];
   const find=(n,kind)=>{const c=here.filter(r=>r.n===n);if(!c.length)return null;const want=kind&&/Tram/.test(kind)?['tram']:kind&&(/Bus|Autobus/.test(kind)||SEV_W.test(kind))?['repl','bus','night','exp']:null;
     return want?c.find(r=>want.includes(r.t))||null:c.find(r=>r.t!=='repl')||c[0]};   // (a bus 18 replacing tram 18 that the timetable lacks: the number, not the tram's sign)
-  const tok='(?:[A-Z]{1,2}-?\\d{1,3}[A-Z]?|\\d{1,3}[A-Z]?)';html=html.replace(/\bl\.(?=[A-Z]{0,2}-?\d)/g,'l. ');   // ("l.106", "l.E-2": the lines; Warszawa's E-2 with its hyphen)
+  // (oprócz zwykłych numerów – nietypowe nazwy linii miasta, np. bydgoskie ZaT i ZaT6)
+  const odd=[...new Set(here.map(r=>String(r.n)).filter(n=>n.length>=2&&n.length<=8&&/^[\p{L}\d]+$/u.test(n)&&/\p{Ll}/u.test(n)&&!/^\d{1,3}[A-Z]?$/.test(n)))].sort((a,b)=>b.length-a.length);
+  const tok='(?:'+(odd.length?odd.join('|')+'|':'')+'[A-Z]{1,2}-?\\d{1,3}[A-Z]?|\\d{1,3}[A-Z]?)';html=html.replace(/\bl\.(?=[A-Z]{0,2}-?\d)/g,'l. ');   // ("l.106", "l.E-2": the lines; Warszawa's E-2 with its hyphen)
   return html.replace(new RegExp('(?:\\b('+VEH_W+'|'+KEEP_W+')\\s+)?(?<![\\w./:#&-])(?<!\\d\\.\\s?)((?:'+tok+')(?:(?:\\s*,\\s*|\\s+(?:i|oraz|und|a|and|lub|oder|nebo|alebo|bzw\\.)\\s+|\\s+)(?:'+tok+'))*)(?!\\d|[\\d.:]\\d|:\\d|\\.\\s?\\d|-\\w|\\s*(?:min\\b|min\\.|minut|sek|godz|km\\b|m\\b|%|zł|h\\b))','g'),(m,veh,grp,off,all)=>{
     // (numer nie może być początkiem dłuższej liczby – „23:09” to godzina, nie linia 2 przed „3:09”)
     // (a telephone number – "na čísle 296 19 18 17", "tel. 58 524 44 00" – is not a list of lines)
