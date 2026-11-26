@@ -150,13 +150,13 @@ try:
     _fc = os.path.join(HERE, 'cache', 'fl')
     # the timetable from the Schleswig-Holstein file (its trips carry their directions); only the platforms (B1, B2…) from gtfs.de
     _src = open(_fc + '/zrodlo.txt').read().strip() if os.path.exists(_fc + '/zrodlo.txt') else ''
-    _fresh = os.path.exists(_fc + '/stop_times.txt') and _src.startswith('sh') and (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) < 6 * 86400
+    _fresh = os.path.exists(_fc + '/stop_times.txt') and _src.startswith('sh') and 'reg' in _src and (datetime.datetime.now().timestamp() - os.path.getmtime(_fc + '/stop_times.txt')) < 6 * 86400
     if not _fresh:
         os.makedirs(os.path.dirname(_fc), exist_ok=True)
         try:
             _nw = _fc + '.new'; shutil.rmtree(_nw, ignore_errors=True); os.makedirs(_nw)   # (built aside, put in place of the old folder only when complete)
-            flensburg_gtfs.build(flensburg_gtfs.current_url(), _nw); _src = 'sh'
-            try: flensburg_gtfs.platforms_de(_nw); _src = 'sh+gtfs.de'
+            flensburg_gtfs.build(flensburg_gtfs.current_url(), _nw); _src = 'sh+reg'
+            try: flensburg_gtfs.platforms_de(_nw); _src = 'sh+reg+gtfs.de'
             except Exception as e: print('Flensburg: perony z gtfs.de pominięte (%s)' % e)
             open(_nw + '/zrodlo.txt', 'w').write(_src); shutil.rmtree(_fc, ignore_errors=True); os.replace(_nw, _fc)
         except Exception as e:
@@ -1346,7 +1346,7 @@ def wej_name(n):
 def fl_name(n):
     """Aktiv Bus Flensburg writes the platform and the way into the name ("Angelburger Str. B1 > Südermarkt 3,7", "Bahnhof Richtung ZOB")"""
     n = re.sub(r'\s*-?>.*$', '', n.strip()); n = re.sub(r'\s+Richtung\s.*$', '', n); n = re.sub(r'\s+Ring [AB]\b.*$', '', n)
-    n = re.sub(r'^Flensburg[ ,]+(?=\S)', '', n)   # the city's own name in front of its stops (Schleswig-Holstein data)
+    n = re.sub(r'^Flensburg(?:\s*[,\-–]\s*|\s+)(?=\S)', '', n)   # the city's own name in front of its stops ("Flensburg, ZOB", "Flensburg-Weiche Gartenstadt")
     m = re.match(r'^(.*?)\s+B(\d)$', n)
     return (m.group(1).strip(), 'B' + m.group(2)) if m else (n.strip(), '')   # Flensburg's platforms are B1, B2…
 def zb_name(s):
@@ -1360,6 +1360,7 @@ def city_name(area, r):
     if area == 'wej': return wej_name(r['stop_name'])[0]
     if area == 'ber':   # "U Alexanderplatz (Berlin) [Tram]" -> "U Alexanderplatz"
         return re.sub(r'^Berlin,\s*', '', re.sub(r'\s+', ' ', re.sub(r'\s*\[[^\]]*\]', '', re.sub(r'\s*\(Berlin,?\s*\)', '', r['stop_name']))).strip())
+    if area == 'fl' and r['stop_id'].startswith('R:'): return re.sub(r'\s+', ' ', re.sub(r'\s*-?>.*$', '', r['stop_name'])).strip()   # (przystanki linii regionalnych: nazwa z członem „Flensburg”)
     if area == 'fl': return fl_name(r['stop_name'])[0]
     if area in ('lub', 'wro'): return zb_name(r['stop_name'])[0]
     return re.sub(r'\s+', ' ', r['stop_name']).strip()   # ("Kaliskiego  - Akademicka": one space)
@@ -1422,6 +1423,7 @@ def city_kind(area, short, rtype):
 DE_RAIL_NAMES = {}   # Berlin, Hamburg: the names of the trains and trams, which their replacement buses bear too
 NEW_ROUTE_IDS = collections.defaultdict(list)
 for _a, _ids in EXTRA_RAIL.items(): NEW_ROUTE_IDS[_a].extend(_ids)   # the added trains belong to their area's files (map, schema)
+FL_REG = {}   # Flensburg: linie regionalne (id -> przewoźnik)
 for area, A in NEW_AREAS.items():
     try:
         if area in ('ber', 'ham'):
@@ -1444,6 +1446,7 @@ for area, A in NEW_AREAS.items():
                 if area == 'ldz' and re.fullmatch(r'o?[PR]\d+', short): continue   # Łódź: staff and works lines, not for passengers
                 if area == 'prg' and not (rt['route_type'] == '2' and re.fullmatch(r'S\d+', short)) and (rt.get('is_regional') == '1' or rt['route_type'] == '2' or re.match(r'(MHD|BB\d|IKEA)', short)): continue   # Prague: the city lines and the Esko (S) trains
                 rk = A['rk'] + re.sub(r'\W', '', short)
+                if area == 'fl' and (rt.get('route_desc') or '').startswith('REG|'): rk = 'flr' + re.sub(r'\W', '', short); FL_REG[rk] = rt['route_desc'][4:] or 'Regional'   # (linie regionalne: osobne id i przewoźnik)
                 if area in ('wro', 'lub', 'bts'): rk = A['rk'] + re.sub(r'[^0-9A-Za-z]', lambda m: '_%x' % ord(m.group()), short)   # (Šk, Biała: plain file names)
                 if area == 'ham': short = re.sub(r'\s*\(Shuttle\)$', '', short)   # (Hamburg: "386(Shuttle)" shown as 386; its id kept)
                 if area in ('ber', 'ham') and rt['route_type'] in ('3', '700', '702') and short in DE_RAIL_NAMES[area]: rk += 'E'   # (bus S1 apart from train S1)
@@ -1523,7 +1526,7 @@ for area, A in NEW_AREAS.items():
             if rk in NODIR: groups[rk] = fix_dirs(groups[rk])
         for rk in groups:
             short, rtype = rmeta[rk]
-            meta_of[rk] = {'id': rk, 'n': short, 't': city_kind(area, short, rtype), 'op': A['op'], 'dates': dates[rk]}
+            meta_of[rk] = {'id': rk, 'n': short, 't': city_kind(area, short, rtype), 'op': FL_REG.get(rk, A['op']), 'dates': dates[rk]}
         if area == 'fl' and not os.path.exists(SCR + '/fl/shapes.txt'): street_shapes(groups, 'Flensburg')   # only if the feed has no shapes
         n0 = len(ROUTES_OUT); build_routes(groups, meta_of)
         for r in ROUTES_OUT[n0:]: r['c'] = [area]; NEW_ROUTE_IDS[area].append(r['id'])
@@ -1564,13 +1567,14 @@ for area, A in NEW_AREAS.items():
                 if re.fullmatch(r'[0-9A-F]{6}', c) and c != '898989':
                     AREA_LINE_COLORS.setdefault(r['route_short_name'].strip(), ('#' + c.lower(), '#fff' if (r.get('route_text_color') or 'FFFFFF').upper() == 'FFFFFF' else '#222'))
         for r in ROUTES_OUT[n0:]:   # Prague: metro and the funicular in sections of their own
+            if r['id'] in FL_REG: r['cat'] = 'reg'
             if area == 'prg' and r['id'] in rmeta: r['cat'] = {'1': 'metro', '7': 'cable', '4': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))
             if area == 'waw' and r['id'] in rmeta and rmeta[r['id']][1] == '1': r['cat'] = 'metro'   # Warszawa: the metro (M1, M2) apart from the trains (S)
             if area in ('ber', 'ham') and r['id'] in rmeta: r['cat'] = {'400': 'metro', '402': 'metro', '1000': 'ferry', '1200': 'ferry'}.get(rmeta[r['id']][1], r.get('cat'))   # U-Bahn, ferries
             if area == 'bts': r['f'] = False   # Bratislava: only DPB's own colours (below), its grey lines grey
             if area == 'prg': r['f'] = bool(r.get('avg')) and r['avg'] <= 15   # Prague: colour only the lines running every 15 minutes or more often (7–18 h)
         for r in ROUTES_OUT[n0:]:
-            if r['n'] in AREA_LINE_COLORS and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True; r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]   # (Berlin, Hamburg: not the replacement bus S1)
+            if r['n'] in AREA_LINE_COLORS and r['id'] not in FL_REG and (r['t'] == 'rail' or area not in ('ber', 'ham')): r['f'] = True; r['k'], r['kt'] = AREA_LINE_COLORS[r['n']]   # (Berlin, Hamburg: not the replacement bus S1)
         print(A['op'] + ':', len(ROUTES_OUT) - n0, 'linii')
     except Exception as e:
         print(A['op'] + ': pominięty (%s)' % e); import traceback; traceback.print_exc()

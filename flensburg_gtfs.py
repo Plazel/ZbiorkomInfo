@@ -38,10 +38,29 @@ def build(src, out, log=print):
     ag = [a for a in rd('agency.txt') if a['agency_name'] == AGENCY]
     aids = {a['agency_id'] for a in ag}
     write('agency.txt', ag, list(ag[0].keys()))
-    routes = [r for r in rd('routes.txt') if r['agency_id'] in aids]
+    # linie regionalne innych przewoźników, które zatrzymują się w Flensburgu (np. 33, R1): ich przystanki osobno („R:”), z nazwą jak
+    # w danych (z członem „Flensburg”) – przystanki linii miejskich tracą ten człon w build.py
+    allst = {s['stop_id']: s for s in rd('stops.txt')}
+    inFl = lambda s: s and s.get('stop_lat') and 54.74 <= float(s['stop_lat']) <= 54.85 and 9.33 <= float(s['stop_lon']) <= 9.52
+    allr = list(rd('routes.txt'))
+    routes = [r for r in allr if r['agency_id'] in aids]
     rids = {r['route_id'] for r in routes}
-    write('routes.txt', routes, list(routes[0].keys()))
-    trips = [t for t in rd('trips.txt') if t['route_id'] in rids]
+    oth = {r['route_id']: r for r in allr if r['agency_id'] not in aids and (r['route_type'] in ('2', '3') or r['route_type'][:1] in ('1', '7'))}
+    alltr = list(rd('trips.txt'))
+    otrip = {t['trip_id']: t for t in alltr if t['route_id'] in oth}
+    hit = set()
+    with z.open('stop_times.txt') as fh:
+        rdr = csv.reader(io.TextIOWrapper(fh, encoding='utf-8-sig')); hdr = next(rdr); it = hdr.index('trip_id'); isd = hdr.index('stop_id')
+        for row in rdr:
+            if row[it] in otrip and row[it] not in hit and inFl(allst.get(row[isd])): hit.add(row[it])
+    rtr = {t: otrip[t] for t in hit}
+    regr = {otrip[t]['route_id'] for t in hit}
+    agn = {a['agency_id']: a['agency_name'] for a in rd('agency.txt')}
+    for rid in regr:
+        r = dict(oth[rid]); r['route_desc'] = 'REG|' + agn.get(r['agency_id'], ''); routes.append(r)
+    rids |= regr
+    write('routes.txt', routes, list(dict.fromkeys(k for r in routes for k in r.keys())))
+    trips = [t for t in alltr if t['route_id'] in rids and (t['route_id'] not in regr or t['trip_id'] in rtr)]
     tids = {t['trip_id'] for t in trips}; sids = {t['service_id'] for t in trips}
     write('trips.txt', trips, list(trips[0].keys()))
     for n in ('calendar.txt', 'calendar_dates.txt'):
@@ -54,7 +73,9 @@ def build(src, out, log=print):
         rdr = csv.reader(io.TextIOWrapper(fh, encoding='utf-8-sig')); hdr = next(rdr); it = hdr.index('trip_id'); isd = hdr.index('stop_id')
         w = csv.writer(fo); w.writerow(hdr)
         for row in rdr:
-            if row[it] in tids: w.writerow(row); used.add(row[isd]); n += 1
+            if row[it] in tids:
+                if row[it] in rtr: row[isd] = 'R:' + row[isd]
+                w.writerow(row); used.add(row[isd]); n += 1
     shp = {t.get('shape_id') for t in trips if t.get('shape_id')}
     if shp and 'shapes.txt' in z.namelist():
         with z.open('shapes.txt') as fh, open(os.path.join(out, 'shapes.txt'), 'w', encoding='utf-8', newline='') as fo:
@@ -62,8 +83,9 @@ def build(src, out, log=print):
             w = csv.writer(fo); w.writerow(hdr)
             for row in rdr:
                 if row[ish] in shp: w.writerow(row)
-    stops = [s for s in rd('stops.txt') if s['stop_id'] in used]
+    stops = [s for s in allst.values() if s['stop_id'] in used] + [dict(allst[i[2:]], stop_id=i, parent_station='') for i in sorted(used) if i.startswith('R:') and i[2:] in allst]
     write('stops.txt', stops, list(stops[0].keys()))
+    log('Flensburg: linie regionalne: %d' % len(regr))
     log('Flensburg: %d linii, %d kursów, %d przystanków, %d odjazdów' % (len(routes), len(trips), len(stops), n))
     if src.endswith('.zip') and os.path.dirname(src) == os.path.dirname(out.rstrip('/')) and os.path.basename(src) == os.path.basename(out.rstrip('/')) + '.zip':
         os.remove(src)

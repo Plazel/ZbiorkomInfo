@@ -967,6 +967,7 @@ ROWS = [
     ('Rozkłady linii i przystanków w PDF lub ZIP', 'Timetables of lines and stops as PDF or ZIP', 'Fahrpläne von Linien und Haltestellen als PDF oder ZIP', 'Cestovné poriadky liniek a zastávok v PDF alebo ZIP', 'Jízdní řády linek a zastávek v PDF nebo ZIP'),
     ('Pominięte i dodatkowe przystanki w zapowiedziach', 'Skipped and extra stops in the announcements', 'Ausgelassene und zusätzliche Haltestellen in den Ansagen', 'Vynechané a ďalšie zastávky v hláseniach', 'Vynechané a další zastávky v hlášeních'),
     ('Konta, role i dostęp', 'Accounts, roles and access', 'Konten, Rollen und Zugang', 'Účty, roly a prístup', 'Účty, role a přístup'),
+    ('Linie regionalne', 'Regional lines', 'Regionallinien', 'Regionálne linky', 'Regionální linky'),
 ]
 
 WEEKDAYS = {
