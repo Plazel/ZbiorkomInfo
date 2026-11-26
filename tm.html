@@ -1069,7 +1069,8 @@ const lineAm=l=>{if(!UI.strict)return 'free';const R=l&&l.par?S.lines.find(x=>x.
 // przeliczanie w tle tylko tras, które tego wymagają: bez odcinków, z odcinkami prostymi/błędnymi albo poprowadzonych ulicami,
 // choć linia jest tramwajowa lub kolejowa (naprawa) – trasy poprawne zostają nietknięte
 // naprawa w tle, ponawiana, aż znane będą przystanki linii (dane przystanków mogą dochodzić po torowiskach)
-function nmRepair(n=0){clearTimeout(nmRepair.t);const L=S.lines.filter(needsRebuild);L.forEach(l=>rebuild(l,false));if(L.length&&n<10)nmRepair.t=setTimeout(()=>nmRepair(n+1),12000)}
+function nmRepair(n=0){clearTimeout(nmRepair.t);const T=nmRepair.done||(nmRepair.done=new Set());const L=S.lines.filter(l=>!T.has(l.id)&&needsRebuild(l));
+ L.forEach(l=>{if(l.stops.every(id=>stopOf(id)))T.add(l.id);rebuild(l,false)});if(L.some(l=>!T.has(l.id))&&n<10)nmRepair.t=setTimeout(()=>nmRepair(n+1),12000)}
 const needsRebuild=l=>{if(!l.auto||!l.stops||l.stops.length<2)return false;const sg=l.segs||[];if(!sg.length||sg.length!==l.stops.length-1)return true;if(sg.some(x=>x.mode==='straight'||x.bad))return true;
  const am=lineAm(l);return (am==='tram'||am==='rail')&&sg.some(x=>x.mode==='street')};
 const editL=L.layerGroup().addTo(map);
@@ -3292,15 +3293,14 @@ function schemaRuntime(){
   var s=new XMLSerializer().serializeToString(c).replace(/var\(--(\w+)\)/g,function(m,n){return cs.getPropertyValue('--'+n).trim()||m});
   s=s.replace(/(<svg[^>]*>)/,'$1<rect x="'+vb0[0]+'" y="'+vb0[1]+'" width="'+vb0[2]+'" height="'+vb0[3]+'" fill="'+bg+'"/>');
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+s],{type:'image/svg+xml'}));a.download='schemat-sieci.svg';document.body.appendChild(a);a.click();a.remove()}
- window.addEventListener('resize',fit);fit();setSel([])}
+ var cw0=0,ch0=0;window.addEventListener('resize',function(){var ow=cw,oh=ch;dims();if(!vb||(Math.abs(cw-ow)<1&&Math.abs(ch-oh)<1))return;var u=vb[2]/(ow||cw),cx=vb[0]+vb[2]/2,cy=vb[1]+vb[3]/2;vb=[cx-cw*u/2,cy-ch*u/2,cw*u,ch*u];commit()});fit();setSel([])}
 
 let CLSC={};   // (styl klasyczny: wynik rozsuwania węzłów, ponownie użyty, gdy schemat jest budowany jeszcze raz z większym odstępem dla nazw)
 function buildSchema(spread=1){
  syncVariants();
- // (schemat: każda linia w jednym kierunku – kierunek POWRÓT tylko wtedy, gdy jedzie wyraźnie inaczej niż TAM: ponad 1/4 jego przystanków
- // to przystanki, których TAM nie obsługuje; warianty zostają)
+ // (schemat: każda linia w jednym kierunku – kierunek POWRÓT tylko wtedy, gdy obsługuje przystanki, których TAM nie obsługuje; warianty zostają)
  const unitN=id=>{const x=stopOf(id);return x?baseName(x):id},bOff=l=>{if(l.dir!=='B')return false;const f=S.lines.find(x=>x.id===(l.rev||l.par));if(!f||f.stops.length<2)return false;
-   const A=new Set(f.stops.map(unitN)),n=l.stops.filter(id=>!A.has(unitN(id))).length;return n<=l.stops.length/4};
+   const A=new Set(f.stops.map(unitN)),n=l.stops.filter(id=>!A.has(unitN(id))).length;return n===0};   // (POWRÓT z choćby jednym przystankiem spoza TAM – np. pętla uliczna – zostaje; wspólną część i tak rysuje jeden pas)
  const lines=orderedLines().filter(l=>!l.hidden&&l.stops.length>1&&!bOff(l));
  if(!lines.length)return null;
  const gid0=lines.map((l,li)=>{const k=lines.findIndex(x=>(x.par||x.id)===(l.par||l.id));return k<0?li:k}),isMain=li=>!lines[li].par||gid0[li]===li;
