@@ -353,7 +353,7 @@ span.chip{cursor:inherit}
 .col th{font-weight:500;text-align:left;padding:8px 6px 4px;font-size:.9rem}
 .col td{padding:5px 6px;vertical-align:top;white-space:nowrap}
 .col tr.h:nth-child(even) td{background:var(--stripe)}
-.col td.hr{width:34px;text-align:right;font-weight:600;padding-right:10px}
+.col td.hr{width:34px;text-align:center;font-weight:600;padding-left:5px;padding-right:5px}
 .col tr.eh td.hr{color:var(--muted);font-weight:400;opacity:.55}   /* an hour without departures this day (kept for the alignment with the other days) */
 .mins{display:flex;flex-wrap:nowrap;gap:2px 9px;padding-right:10px}
 .mins span{min-width:2.1ch;flex:none}
@@ -1848,7 +1848,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!/claude\.
 // ---- the page's own version: on opening (and on coming back after an hour) "version.json" beside the page says the newest; an
 // older page shows that it is updating, empties the stored copies (the service worker's, the browser's) and loads again.
 // Tried once per newest version: should the server still give the old page, it is used, not loaded over and over
-const APP_BUILD=1795727592;
+const APP_BUILD=1795727665;
 async function appVerCheck(){if(!/^https?:$/.test(location.protocol)||/claude\.ai|claudeusercontent/.test(location.hostname)||!APP_BUILD)return;appVerCheck.t=Date.now();
   let j=null;try{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),6000);const r=await fetch('version.json?t='+Date.now(),{cache:'no-store',signal:ac.signal});clearTimeout(t);if(r.ok)j=await r.json()}catch(e){}
   const nb=j&&+j.b;if(!nb||nb<=APP_BUILD)return;try{if(sessionStorage.getItem('ztm.upd')===String(nb))return;sessionStorage.setItem('ztm.upd',String(nb))}catch(e){}
@@ -2460,7 +2460,7 @@ async function renderStop(id,di,si){
     const rows=hs.map(h=>`<tr class="h${byH[h]?'':' eh'}"><td class="hr">${h%24}</td><td><div class="mins">${fq&&fq[h]?`<span class="fq">co ok. ${fq[h]} min</span>`:(byH[h]||[]).map(x=>{
       let nx='';if(x===nxT&&!nextMarked){nx=' nx';nextMarked=true}
       const lt=letterFor(x);return `<span data-k="${lt}" data-tr="${x.pi},${x.t0}" class="${nx}">${String(x.t%60).padStart(2,'0')}${lt?'<sup>'+lt+'</sup>':''}</span>`}).join('')}</div></td></tr>`).join('');
-    return `<div class="col${day==='x'&&!XD_FRI?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}${day==='x'&&!XD_FRI?'<small class="xnote">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</small>':''}</h3><table><thead><tr><th style="text-align:right;padding-right:10px">godz.</th><th>min</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<div class="col${day==='x'&&!XD_FRI?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}${day==='x'&&!XD_FRI?'<small class="xnote">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</small>':''}</h3><table><thead><tr><th style="text-align:center;padding-left:5px;padding-right:5px">godz.</th><th>min</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join('');
   const notes=[...used].sort().map(l=>{const tx=Object.keys(noteKey).find(k=>noteKey[k]===l);return `<p class="click" data-note="${l}" title="Pokaż kursy"><b class="k">${l}</b>${esc(tx)}</p>`}).join('');
   const cols2=/class="col( xcol)?">/.test(cols)?cols.replace(/<div class="col ecol( xcol)?">.*?<\/div><\/div>/g,''):cols;
@@ -2675,7 +2675,7 @@ async function renderComboStop(key,ci,i){
       let nx='';if(x===nxT&&!nextMarked){nx=' nx';nextMarked=true}
       const lt=letterFor(x.r,x.d,x);
       return `<span data-k="${lt} L${esc(x.r.n)}" class="${nx}">${String(x.t%60).padStart(2,'0')}${lt?'<sup>'+lt+'</sup>':''}</span>`}).join('')}</div></td></tr>`).join('');
-    return `<div class="col${day==='x'&&!XD_FRI?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}${day==='x'&&!XD_FRI?'<small class="xnote">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</small>':''}</h3><table><thead><tr><th style="text-align:right;padding-right:10px">godz.</th><th>min</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<div class="col${day==='x'&&!XD_FRI?' xcol':''}" data-day="${day}"><h3>${DAYNAMES[day]}${day==='x'&&!XD_FRI?'<small class="xnote">W ten dzień dla linii obowiązuje specjalny rozkład jazdy</small>':''}</h3><table><thead><tr><th style="text-align:center;padding-left:5px;padding-right:5px">godz.</th><th>min</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join('');
   const memb=C.rs.filter((r,k)=>cd.members.some(m=>m.li===k));
   const picks=memb.map(r=>{const el=chip(r,'small click lp',true);el.dataset.note='L'+r.n;el.setAttribute('role','button');el.tabIndex=0;
